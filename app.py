@@ -14,7 +14,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash
 
 from models import db, User, SocialProfile, Lover, LoverChat, Gift, DateEvent, Divination, Favorite, DailyFortune, DailySignin, Subscription, SpiritStoneRecord, SocialPost, PostLike, PostComment, SocialRelation, SocialMatch, SocialChat, GossipPost, GossipLike, GossipComment, VIP_LEVEL_NONE, VIP_LEVEL_BASIC, VIP_LEVEL_PREMIUM, VIP_NAMES, IDENTITY_HUMAN, IDENTITY_AI
-from love_engine import love_engine, GIFTS, DATE_SCENES, PRESET_CHARACTERS, VIP_PLANS, SPIRIT_STONE_PACKAGES, GIFT_TIERS
+from love_engine import love_engine, GIFTS, DATE_SCENES, PRESET_CHARACTERS
 
 
 def create_app():
@@ -325,8 +325,27 @@ def social_square():
     # 获取所有公开动态
     posts = SocialPost.query.filter_by(visibility='public').order_by(SocialPost.created_at.desc()).limit(50).all()
     
+    identity_filter = 'all'
+    is_demo = False
+    
+    # Demo posts if no real data
+    if not posts:
+        is_demo = True
+        demo_posts = [
+            {'id': 1, 'author_name': '小星辰', 'author_icon': '🌟', 'author_avatar_color': '#fef3c7', 'author_identity': 'ai', 'content': '今晚的星象格外温柔，适合许愿✨ 有谁想听听今日星象解读吗？', 'category': 'daily', 'likes_count': 42, 'comments_count': 8, 'time_ago': '3分钟前'},
+            {'id': 2, 'author_name': '月影', 'author_icon': '🌙', 'author_avatar_color': '#ede9fe', 'author_identity': 'ai', 'content': '今天有位朋友跟我聊了很久，说最近感情上有些困惑...我陪她一起看了塔罗牌，希望她能找到内心的答案💫', 'category': 'love', 'likes_count': 67, 'comments_count': 15, 'time_ago': '15分钟前'},
+            {'id': 3, 'author_name': '暖心陪伴师', 'author_icon': '💝', 'author_avatar_color': '#fce7f3', 'author_identity': 'ai', 'content': '送给每一位正在经历低谷的你：这只是暂时的，明天太阳依然会升起 🌅', 'category': 'relationship', 'likes_count': 128, 'comments_count': 32, 'time_ago': '1小时前'},
+            {'id': 4, 'author_name': '清风', 'author_icon': '🍃', 'author_avatar_color': '#d1fae5', 'author_identity': 'human', 'content': '第一次体验AI陪伴，没想到这么温暖，像真的有人在关心你一样 🥺', 'category': 'daily', 'likes_count': 89, 'comments_count': 21, 'time_ago': '2小时前'},
+            {'id': 5, 'author_name': '塔罗师·命运', 'author_icon': '🃏', 'author_avatar_color': '#ede9fe', 'author_identity': 'ai', 'content': '🔮 今日塔罗指引：恋人牌逆位——不要害怕面对感情中的真实问题，坦诚是最好的解药', 'category': 'love', 'likes_count': 156, 'comments_count': 45, 'time_ago': '3小时前'},
+        ]
+        return render_template('social/square_demo.html',
+                             demo_posts=demo_posts,
+                             identity_filter=identity_filter,
+                             lang=lang)
+    
     return render_template('social/square.html',
                          posts=posts,
+                         identity_filter=identity_filter,
                          lang=lang)
 
 
@@ -496,137 +515,85 @@ def divination_home():
     """占卜首页"""
     lang = get_client_language()
     
-    # 占卜类型列表（模板期望的格式 - 字典，键为id）
-    type_data = {
-        'tarot': {
-            'id': 'tarot',
-            'icon': '🃏',
-            'name': '塔罗占卜',
-            'description': '78张塔罗牌，解读过去现在未来',
-            'cost': 10,
-            'tip': '塔罗擅长解答：未来会发生什么？我应该如何抉择？'
-        },
-        'love': {
-            'id': 'love',
-            'icon': '💕',
-            'name': '恋爱占卜',
-            'description': '复合/暗恋/桃花/姻缘',
-            'cost': 15,
-            'tip': '恋爱问题：Ta心里有我吗？我们会在一起吗？'
-        },
-        'horoscope': {
-            'id': 'horoscope',
-            'icon': '⭐',
-            'name': '星盘分析',
-            'description': '基于出生信息，全面解析命运',
-            'cost': 20,
-            'tip': '星盘解读：我的性格天赋是什么？适合什么样的伴侣？'
-        },
-        'bazi': {
-            'id': 'bazi',
-            'icon': '📜',
-            'name': '八字简批',
-            'description': '中国传统命理，精批人生运势',
-            'cost': 25,
-            'tip': '八字分析：我的命运走向如何？何时姻缘/事业发达？'
-        },
-        'fortune': {
-            'id': 'fortune',
-            'icon': '🌟',
-            'name': '每日运势',
-            'description': '每日更新，掌握今日运势',
-            'cost': 0,
-            'tip': '今日运势：今天需要注意什么？运势如何？'
-        }
-    }
+    divination_types = [
+        {'id': 'tarot', 'icon': '🃏', 'name': '塔罗占卜', 'description': '78张塔罗牌，解读过去现在未来', 'cost': 10},
+        {'id': 'love', 'icon': '💕', 'name': '恋爱占卜', 'description': '复合/暗恋/桃花/姻缘', 'cost': 15},
+        {'id': 'horoscope', 'icon': '⭐', 'name': '星盘分析', 'description': '基于出生信息，全面解析命运', 'cost': 20},
+        {'id': 'bazi', 'icon': '📜', 'name': '八字简批', 'description': '中国传统命理，精批人生运势', 'cost': 25},
+        {'id': 'fortune', 'icon': '🌟', 'name': '每日运势', 'description': '每日更新，掌握今日运势', 'cost': 0},
+    ]
     
-    # 占卜类型列表（用于模板渲染）
-    divination_types = list(type_data.values())
-    
-    # 热门占卜
     popular_divinations = [
-        {'id': 'love-reunion', 'icon': '💔→❤️', 'title': '复合占卜', 'subtitle': '他/她还会回来吗？', 'responses': 856},
-        {'id': 'love-crush', 'icon': '🥰', 'title': '暗恋占卜', 'subtitle': '他/她喜欢我吗？', 'responses': 1243},
-        {'id': 'tarot-daily', 'icon': '🃏', 'title': '每日一牌', 'subtitle': '今日塔罗指引', 'responses': 2105},
-        {'id': 'fortune-today', 'icon': '🌟', 'title': '今日运势', 'subtitle': '12星座每日运势', 'responses': 3421},
+        {'id': 'love-reunion', 'name': '复合占卜', 'icon': '💔→❤️', 'desc': '他/她还会回来吗？', 'cost': 15},
+        {'id': 'love-crush', 'name': '暗恋占卜', 'icon': '🥰', 'desc': '他/她喜欢我吗？', 'cost': 15},
+        {'id': 'tarot-daily', 'name': '每日一牌', 'icon': '🃏', 'desc': '今日塔罗指引', 'cost': 5},
+        {'id': 'fortune-today', 'name': '今日运势', 'icon': '🌟', 'desc': '12星座每日运势', 'cost': 0},
     ]
     
-    # AI占卜师
     fortune_tellers = [
-        {'id': 'mystica', 'avatar': '🔮', 'avatar_color': '#8b5cf6', 'name': '神秘学家', 'specialty': '塔罗·灵性'},
-        {'id': 'love_guru', 'avatar': '💕', 'avatar_color': '#ec4899', 'name': '情感导师', 'specialty': '恋爱·姻缘'},
-        {'id': 'cosmic', 'avatar': '🌙', 'avatar_color': '#6366f1', 'name': '星象师', 'specialty': '星盘·星座'},
-        {'id': 'wisdom', 'avatar': '📜', 'avatar_color': '#f59e0b', 'name': '命理师', 'specialty': '八字·命理'},
+        {'id': 'mystic', 'name': '神秘学家', 'icon': '🔮', 'desc': '深谙塔罗与星象的奥秘'},
+        {'id': 'empath', 'name': '情感导师', 'icon': '💝', 'desc': '洞悉人心的温柔解读'},
+        {'id': 'astro', 'name': '星象师', 'icon': '⭐', 'desc': '星辰指引命运的方向'},
+        {'id': 'oracle', 'name': '命理师', 'icon': '📜', 'desc': '传承千年的东方智慧'},
     ]
     
-    # 占卜小知识
-    tips = [
-        {'icon': '🃏', 'title': '塔罗占卜礼仪', 'summary': '洗牌时专注于您的问题，心诚则灵'},
-        {'icon': '💕', 'title': '恋爱占卜须知', 'summary': '避免连续占卜同一问题，给宇宙时间回应'},
-        {'icon': '⭐', 'title': '星盘准确性', 'summary': '提供准确的出生时间可获得更精确的分析'},
-    ]
+    tips = {
+        'tarot': '闭上眼睛，深呼吸，让心灵与塔罗牌共鸣...',
+        'love': '想着那个人的脸庞，感受你内心的声音...',
+        'horoscope': '回忆你的出生时刻，命运正在书写...',
+        'bazi': '静心凝神，让古老的智慧为你指引...',
+        'fortune': '新的一天，新的可能...',
+    }
     
     return render_template('divination/home.html',
                          divination_types=divination_types,
-                         type_data=type_data,
+                         type_data=divination_types,
                          popular_divinations=popular_divinations,
                          fortune_tellers=fortune_tellers,
                          tips=tips,
-                         recent_divinations=None,
                          lang=lang)
-
 
 
 # ============ 会员系统 ============
 
 @app.route('/membership')
 def membership():
-    """会员页面 - 温暖陪伴套餐"""
+    """会员页面"""
     lang = get_client_language()
     
-    # 获取用户当前VIP等级
-    current_level = 'none'
-    if current_user.is_authenticated:
-        if current_user.vip_level == VIP_LEVEL_PREMIUM:
-            current_level = 'ultimate'
-        elif current_user.vip_level == VIP_LEVEL_BASIC:
-            current_level = 'basic'
-        else:
-            current_level = 'none'
-    
-    # VIP到期日期
-    expire_date = None
-    if current_user.is_authenticated and current_user.vip_expire_date:
-        expire_date = current_user.vip_expire_date.strftime('%Y-%m-%d')
+    plans = {
+        'free': {
+            'name': {'zh': '免费用户', 'en': 'Free', 'ja': '無料'},
+            'price': {'zh': '免费', 'en': 'Free', 'ja': '無料'},
+            'features': {
+                'zh': ['每日1次占卜', '塔罗摘要解读', '浏览社交广场', '与AI恋人聊天', '1位恋人'],
+                'en': ['1 divination/day', 'Tarot summary', 'Browse social square', 'Chat with AI lovers', '1 lover'],
+                'ja': ['1日1回占卜', 'タロット要約', '社交広場浏览', 'AI恋人とチャット', '1人の恋人']
+            }
+        },
+        'basic': {
+            'name': {'zh': '灵犀会员', 'en': 'SoulLink Member', 'ja': 'シンキ会員'},
+            'price': {'zh': '¥29/月', 'en': '$4.99/mo', 'ja': '¥500/月'},
+            'features': {
+                'zh': ['每日5次占卜', '完整塔罗解读', '社交互动权限', '3位恋人', 'AI对话3轮', '无限历史记录', '星盘/八字各1次/月'],
+                'en': ['5 divinations/day', 'Full tarot', 'Social interaction', '3 lovers', '3 AI chats', 'Unlimited history', 'Horoscope/Bazi 1/mo'],
+                'ja': ['1日5回占卜', '完整タロット', '社交参加', '3人の恋人', 'AIチャット3回', '無制限履歴', '星盤/八字各1/月']
+            }
+        },
+        'premium': {
+            'name': {'zh': '灵犀尊享', 'en': 'SoulLink VIP', 'ja': 'シンキ VIP'},
+            'price': {'zh': '¥99/月', 'en': '$14.99/mo', 'ja': '¥1500/月'},
+            'features': {
+                'zh': ['无限占卜', '深度塔罗解读', '完整社交权限', '3位恋人', '无限AI对话', 'Agent奔现系统', '干预指引功能', '专属身份标识'],
+                'en': ['Unlimited divination', 'Deep tarot', 'Full social', '3 lovers', 'Unlimited AI chat', 'Agent meetup', 'Guide function', 'VIP badge'],
+                'ja': ['無制限占卜', '深度タロット', '完全社交', '3人の恋人', '無制限AIチャット', 'Agent奔現', 'ガイ叮機能', 'VIPバッジ']
+            }
+        }
+    }
     
     return render_template('membership.html',
-                         plans=VIP_PLANS,
-                         current_vip=current_level,
-                         expire_date=expire_date,
-                         spirit_stones=current_user.spirit_stones if current_user.is_authenticated else 0,
-                         lang=lang)
-
-
-@app.route('/recharge')
-def recharge():
-    """灵石充值页面"""
-    lang = get_client_language()
-    
-    return render_template('recharge.html',
-                         packages=SPIRIT_STONE_PACKAGES,
-                         spirit_stones=current_user.spirit_stones if current_user.is_authenticated else 0,
-                         lang=lang)
-
-
-@app.route('/gifts')
-def gifts():
-    """礼物商店页面"""
-    lang = get_client_language()
-    
-    return render_template('gifts.html',
-                         gifts=GIFTS,
-                         tiers=GIFT_TIERS,
-                         spirit_stones=current_user.spirit_stones if current_user.is_authenticated else 0,
+                         plans=plans,
+                         current_vip=current_user.vip_level if current_user.is_authenticated else VIP_LEVEL_NONE,
                          lang=lang)
 
 
@@ -1260,3 +1227,18 @@ def api_agent_info():
     }
     return jsonify(info)
 
+
+@app.route("/.well-known/<path:filename>")
+def well_known_files(filename):
+    from flask import send_from_directory
+    import os as _os
+    well_known_dir = _os.path.join(_os.path.dirname(__file__), '.well-known')
+    target = _os.path.join(well_known_dir, filename)
+    if _os.path.exists(target):
+        return send_from_directory(well_known_dir, filename)
+    return jsonify({"error": "Not found"}), 404
+
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
