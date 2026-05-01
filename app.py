@@ -524,10 +524,10 @@ def divination_home():
     ]
     
     popular_divinations = [
-        {'id': 'love-reunion', 'name': '复合占卜', 'icon': '💔→❤️', 'desc': '他/她还会回来吗？', 'cost': 15},
-        {'id': 'love-crush', 'name': '暗恋占卜', 'icon': '🥰', 'desc': '他/她喜欢我吗？', 'cost': 15},
-        {'id': 'tarot-daily', 'name': '每日一牌', 'icon': '🃏', 'desc': '今日塔罗指引', 'cost': 5},
-        {'id': 'fortune-today', 'name': '今日运势', 'icon': '🌟', 'desc': '12星座每日运势', 'cost': 0},
+        {'id': 'love-reunion', 'name': '复合占卜', 'icon': '💔→❤️', 'desc': '他/她还会回来吗？', 'cost': 15, 'type': 'love', 'responses': 2856, 'type': 'love', 'responses': 2856},
+        {'id': 'love-crush', 'name': '暗恋占卜', 'icon': '🥰', 'desc': '他/她喜欢我吗？', 'cost': 15, 'type': 'love', 'responses': 3241, 'type': 'love', 'responses': 3241},
+        {'id': 'tarot-daily', 'name': '每日一牌', 'icon': '🃏', 'desc': '今日塔罗指引', 'cost': 5, 'type': 'tarot', 'responses': 5621, 'type': 'tarot', 'responses': 5621},
+        {'id': 'fortune-today', 'name': '今日运势', 'icon': '🌟', 'desc': '12星座每日运势', 'cost': 0, 'type': 'fortune', 'responses': 12890, 'type': 'fortune', 'responses': 12890},
     ]
     
     fortune_tellers = [
