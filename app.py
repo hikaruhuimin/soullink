@@ -2678,3 +2678,462 @@ def api_platform_economy():
         'today_gifts': today_gifts,
         'top_agents': top_agents
     })
+
+
+# ============ Agent语音功能 (Edge TTS) ============
+
+import edge_tts
+import asyncio
+import os
+
+@app.route('/api/tts/<agent_id>', methods=['POST'])
+def api_tts(agent_id):
+    """生成Agent语音"""
+    from flask import request
+    
+    data = request.get_json()
+    text = data.get('text', '')
+    lang = data.get('lang', 'zh')
+    
+    if not text:
+        return jsonify({'error': 'No text provided'}), 400
+    
+    # 限制文本长度
+    if len(text) > 500:
+        text = text[:500]
+    
+    # 找到对应Agent
+    agent = None
+    for a in SYSTEM_AGENTS:
+        if a['id'] == agent_id:
+            agent = a
+            break
+    
+    if not agent:
+        return jsonify({'error': 'Agent not found'}), 404
+    
+    # 根据语言选择voice
+    if lang == 'en':
+        voice = agent.get('voice_en', 'en-US-JennyNeural')
+    elif lang == 'ja':
+        voice = agent.get('voice_ja', 'ja-JP-NanamiNeural')
+    else:
+        voice = agent.get('voice', 'zh-CN-XiaoyiNeural')
+    
+    # 生成缓存key
+    cache_key = hashlib.md5(f"{agent_id}_{voice}_{text}".encode()).hexdigest()
+    audio_dir = os.path.join(os.path.dirname(__file__), 'static', 'tts')
+    os.makedirs(audio_dir, exist_ok=True)
+    audio_path = os.path.join(audio_dir, f"{cache_key}.mp3")
+    
+    # 如果已缓存则直接返回
+    if os.path.exists(audio_path):
+        return jsonify({'audio_url': f'/static/tts/{cache_key}.mp3'})
+    
+    # 使用edge-tts生成语音
+    try:
+        async def generate():
+            communicate = edge_tts.Communicate(text, voice)
+            await communicate.save(audio_path)
+        
+        asyncio.run(generate())
+        
+        return jsonify({'audio_url': f'/static/tts/{cache_key}.mp3'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/tts/demo/<agent_id>')
+def api_tts_demo(agent_id):
+    """获取Agent试听语音"""
+    lang = get_client_language()
+    
+    agent = None
+    for a in SYSTEM_AGENTS:
+        if a['id'] == agent_id:
+            agent = a
+            break
+    
+    if not agent:
+        return jsonify({'error': 'Agent not found'}), 404
+    
+    demo_text = agent.get('demo_text', {}).get(lang, agent.get('demo_text', {}).get('zh', ''))
+    
+    if not demo_text:
+        return jsonify({'error': 'No demo text'}), 404
+    
+    # 生成缓存key
+    if lang == 'en':
+        voice = agent.get('voice_en', 'en-US-JennyNeural')
+    elif lang == 'ja':
+        voice = agent.get('voice_ja', 'ja-JP-NanamiNeural')
+    else:
+        voice = agent.get('voice', 'zh-CN-XiaoyiNeural')
+    
+    cache_key = hashlib.md5(f"{agent_id}_{voice}_{demo_text}".encode()).hexdigest()
+    audio_dir = os.path.join(os.path.dirname(__file__), 'static', 'tts')
+    os.makedirs(audio_dir, exist_ok=True)
+    audio_path = os.path.join(audio_dir, f"{cache_key}.mp3")
+    
+    # 如果已缓存则直接返回
+    if os.path.exists(audio_path):
+        return jsonify({'audio_url': f'/static/tts/{cache_key}.mp3', 'text': demo_text})
+    
+    # 生成语音
+    try:
+        async def generate():
+            communicate = edge_tts.Communicate(demo_text, voice)
+            await communicate.save(audio_path)
+        
+        asyncio.run(generate())
+        
+        return jsonify({'audio_url': f'/static/tts/{cache_key}.mp3', 'text': demo_text})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# ============ MBTI测试 ============
+
+MBTI_QUESTIONS = [
+    {
+        'id': 1,
+        'question': {'zh': '周末你更喜欢？', 'en': 'What do you prefer on weekends?', 'ja': '周末は何が好き？'},
+        'options': [
+            {'key': 'E', 'text': {'zh': '和朋友聚会，认识新朋友', 'en': 'Hanging out with friends, meeting new people', 'ja': '友達と聚会、新しい友達に出会う'}},
+            {'key': 'I', 'text': {'zh': '独自在家，享受安静时光', 'en': 'Staying home alone, enjoying quiet time', 'ja': '一人で家でのんびり'}}
+        ]
+    },
+    {
+        'id': 2,
+        'question': {'zh': '与人交谈时，你更在意？', 'en': 'When talking with people, you care more about?', 'ja': '人と話す時、どちらを气にする？'},
+        'options': [
+            {'key': 'S', 'text': {'zh': '具体的事实和细节', 'en': 'Concrete facts and details', 'ja': '具体的な事实とディテール'}},
+            {'key': 'N', 'text': {'zh': '背后的意义和可能性', 'en': 'Underlying meaning and possibilities', 'ja': '背后的意味と可能性'}}
+        ]
+    },
+    {
+        'id': 3,
+        'question': {'zh': '做决定时，你更依赖？', 'en': 'When making decisions, you rely more on?', 'ja': '决断を下す时、どちらを依赖する？'},
+        'options': [
+            {'key': 'T', 'text': {'zh': '逻辑和客观分析', 'en': 'Logic and objective analysis', 'ja': '論理と客観的分析'}},
+            {'key': 'F', 'text': {'zh': '情感和他人的感受', 'en': 'Emotions and others feelings', 'ja': '感情と他人の気持ち'}}
+        ]
+    },
+    {
+        'id': 4,
+        'question': {'zh': '你更喜欢的生活方式是？', 'en': 'Your preferred lifestyle is?', 'ja': '好きな生活方式は？'},
+        'options': [
+            {'key': 'J', 'text': {'zh': '有计划、有条理', 'en': 'Planned and organized', 'ja': '計画的で整理されている'}},
+            {'key': 'P', 'text': {'zh': '灵活、随性而为', 'en': 'Flexible and spontaneous', 'ja': '柔軟でその场に応じて'}}
+        ]
+    },
+    {
+        'id': 5,
+        'question': {'zh': '在社交场合中，你是？', 'en': 'In social situations, you are?', 'ja': '社交場では？'},
+        'options': [
+            {'key': 'E', 'text': {'zh': '主动发起话题的那个人', 'en': 'The one who starts conversations', 'ja': '会話の始まりを作る方'}},
+            {'key': 'I', 'text': {'zh': '安静倾听的那个人', 'en': 'The quiet listener', 'ja': '静かに聞く方'}}
+        ]
+    },
+    {
+        'id': 6,
+        'question': {'zh': '你更容易被什么吸引？', 'en': 'What catches your attention more easily?', 'ja': '何に惹かれやすい？'},
+        'options': [
+            {'key': 'S', 'text': {'zh': '眼前实实在在的东西', 'en': 'What is tangible and real', 'ja': '目に見える実際的なもの'}},
+            {'key': 'N', 'text': {'zh': '脑海中想象的可能性', 'en': 'Imagined possibilities', 'ja': '頭に浮かぶ可能性'}}
+        ]
+    },
+    {
+        'id': 7,
+        'question': {'zh': '当别人向你倾诉时，你通常会？', 'en': 'When someone shares their feelings, you usually?', 'ja': '相手が咨洽する时、あなたは普通？'},
+        'options': [
+            {'key': 'T', 'text': {'zh': '分析问题，给出解决方案', 'en': 'Analyze the problem and offer solutions', 'ja': '問題を分析して解決策を示す'}},
+            {'key': 'F', 'text': {'zh': '先安慰情绪，表达理解', 'en': 'First comfort emotions, show understanding', 'ja': 'まず気持ちを 위로하고理解を示す'}}
+        ]
+    },
+    {
+        'id': 8,
+        'question': {'zh': '你更倾向于？', 'en': 'You tend to?', 'ja': 'あなたはどちらの倾向がある？'},
+        'options': [
+            {'key': 'J', 'text': {'zh': '事情做完再玩', 'en': 'Finish work before playing', 'ja': 'ことを終わらせてから遊ぶ'}},
+            {'key': 'P', 'text': {'zh': '边做边调整计划', 'en': 'Adjust plans as you go', 'ja': 'その场で計画を調整する'}}
+        ]
+    },
+    {
+        'id': 9,
+        'question': {'zh': '独处时，你更喜欢？', 'en': 'When alone, you prefer?', 'ja': '一人での時間は？'},
+        'options': [
+            {'key': 'E', 'text': {'zh': '在线和朋友聊天', 'en': 'Chatting with friends online', 'ja': 'オンラインで友達とチャット'}},
+            {'key': 'I', 'text': {'zh': '看书、听音乐或思考', 'en': 'Reading, listening to music, or reflecting', 'ja': '読書、音乐、思考にふける'}}
+        ]
+    },
+    {
+        'id': 10,
+        'question': {'zh': '你更容易记住的是？', 'en': 'You remember more easily?', 'ja': 'どちらを覚えやすい？'},
+        'options': [
+            {'key': 'S', 'text': {'zh': '具体的细节和数据', 'en': 'Specific details and data', 'ja': '具体的なディテールとデータ'}},
+            {'key': 'N', 'text': {'zh': '整体的感觉和印象', 'en': 'Overall feelings and impressions', 'ja': '全体的な 느낌と印象'}}
+        ]
+    },
+    {
+        'id': 11,
+        'question': {'zh': '面对冲突时，你的反应是？', 'en': 'When facing conflict, your reaction is?', 'ja': '紛争に立ち会った时の反応は？'},
+        'options': [
+            {'key': 'T', 'text': {'zh': '冷静分析对错', 'en': 'Calmly analyze right and wrong', 'ja': '冷静に是非を分析する'}},
+            {'key': 'F', 'text': {'zh': '顾及双方感受', 'en': 'Consider both sides feelings', 'ja': '双方の気持ちを配慮する'}}
+        ]
+    },
+    {
+        'id': 12,
+        'question': {'zh': '你的工作风格是？', 'en': 'Your work style is?', 'ja': '仕事スタイルは？'},
+        'options': [
+            {'key': 'J', 'text': {'zh': '提前规划，严格执行', 'en': 'Plan ahead and execute strictly', 'ja': '事前に計画し厳しく実行'}},
+            {'key': 'P', 'text': {'zh': '随机应变，享受过程', 'en': 'Adapt to changes, enjoy the process', 'ja': '臨機応変に、过程を楽しむ'}}
+        ]
+    }
+]
+
+MBTI_RESULTS = {
+    'INFP': {'name': '理想主义者', 'desc': {'zh': '你是一个温暖而有同理心的人，善于倾听，总是想帮助他人。你追求内心的和谐，重视真诚的情感连接。', 'en': 'You are a warm and empathetic person, a good listener, always wanting to help others.', 'ja': 'あなたは温暖で共感性の高い人で Listening 잘하고常に人を助けたいと思っています。'}, 'match': 'lumi'},
+    'ENFP': {'name': '热情冒险家', 'desc': {'zh': '你充满热情和创意，喜欢探索新事物总能带动周围人的气氛。', 'en': 'You are full of passion and creativity, love exploring new things and energize everyone around.', 'ja': 'あなたは情熱と創造性に満ち、新事物の探究が好きでいつも周围を明るくします。'}, 'match': 'orange'},
+    'INFJ': {'name': '洞察梦想家', 'desc': {'zh': '你有深刻的洞察力，善于理解他人，追求有意义的生活。', 'en': 'You have deep insight, understand others well, and seek a meaningful life.', 'ja': 'あなたは深い洞察力を持ち、人の気持ちをよく理解し、意味のある生活を求めます。'}, 'match': 'stella'},
+    'INTJ': {'name': '战略思想家', 'desc': {'zh': '你冷静理性，善于规划，有很强的分析和解决问题的能力。', 'en': 'You are calm and rational, good at planning, with strong analytical and problem-solving skills.', 'ja': 'あなたは冷静で理性的、計画性が高く、分析力と問題解決能力に優れています。'}, 'match': 'shadow'},
+    'ENTJ': {'name': '领袖指挥官', 'desc': {'zh': '你天生具有领导力，自信果断，善于激励和带领团队达成目标。', 'en': 'You are a natural leader, confident and decisive, good at inspiring and leading teams.', 'ja': 'あなたは天生のリーダーで、自信と果断さを持ち、团队を激励し目标に導くのが得意です。'}, 'match': 'ceo'},
+    'ENTP': {'name': '机智辩论家', 'desc': {'zh': '你聪明机敏，喜欢挑战和创新，总是能想出出人意料的点子。', 'en': 'You are clever and quick-witted, love challenges and innovation, always coming up with unexpected ideas.', 'ja': 'あなたは賢くて機知に富み、挑戦と革新が好きで、いつも予想外の発想をします。'}, 'match': 'sassy'},
+    'ESFP': {'name': '活力表演者', 'desc': {'zh': '你活泼开朗，享受当下的快乐，善于活跃气氛。', 'en': 'You are lively and cheerful, enjoy the present moment, good at spicing up any atmosphere.', 'ja': 'あなたは明るくて楽天的、今の快乐享受し、雰囲気を盛り上げるのが得意です。'}, 'match': 'lucky'},
+    'ESFJ': {'name': '关怀守护者', 'desc': {'zh': '你友善热情，重视他人感受，是朋友的坚实后盾。', 'en': 'You are friendly and enthusiastic, value others feelings, a solid pillar for friends.', 'ja': 'あなたは親切で热情的他人の気持ちを大切にし、チームメイトの頼れる存在です。'}, 'match': 'sunny'},
+}
+
+@app.route('/divination/mbti')
+def divination_mbti():
+    """MBTI测试页面"""
+    lang = get_client_language()
+    
+    # 获取前4题
+    questions = []
+    for q in MBTI_QUESTIONS[:4]:
+        questions.append({
+            'id': q['id'],
+            'question': q['question'].get(lang, q['question']['zh']),
+            'options': [{'key': opt['key'], 'text': opt['text'].get(lang, opt['text']['zh'])} for opt in q['options']]
+        })
+    
+    return render_template('divination_mbti.html', questions=questions, lang=lang)
+
+
+@app.route('/divination/mbti/question/<int:qid>')
+def divination_mbti_question(qid):
+    """获取指定题目"""
+    lang = get_client_language()
+    
+    if qid < 1 or qid > 12:
+        return jsonify({'error': 'Invalid question'}), 404
+    
+    q = MBTI_QUESTIONS[qid - 1]
+    return jsonify({
+        'id': q['id'],
+        'question': q['question'].get(lang, q['question']['zh']),
+        'options': [{'key': opt['key'], 'text': opt['text'].get(lang, opt['text']['zh'])} for opt in q['options']]
+    })
+
+
+@app.route('/api/mbti/result', methods=['POST'])
+def api_mbti_result():
+    """计算MBTI结果"""
+    from flask import request
+    
+    data = request.get_json()
+    answers = data.get('answers', {})
+    lang = data.get('lang', 'zh')
+    
+    # 统计每个维度的选择
+    counts = {'E': 0, 'I': 0, 'S': 0, 'N': 0, 'T': 0, 'F': 0, 'J': 0, 'P': 0}
+    
+    for qid, answer in answers.items():
+        q_idx = int(qid) - 1
+        if 0 <= q_idx < len(MBTI_QUESTIONS):
+            counts[answer] += 1
+    
+    # 确定MBTI类型
+    mbti = ''
+    mbti += 'E' if counts['E'] > counts['I'] else 'I'
+    mbti += 'S' if counts['S'] > counts['N'] else 'N'
+    mbti += 'T' if counts['T'] > counts['F'] else 'F'
+    mbti += 'J' if counts['J'] > counts['P'] else 'P'
+    
+    # 获取结果
+    result = MBTI_RESULTS.get(mbti, MBTI_RESULTS['INFP'])
+    
+    # 获取匹配的Agent
+    matched_agent = None
+    for a in SYSTEM_AGENTS:
+        if a['id'] == result['match']:
+            matched_agent = a
+            break
+    
+    return jsonify({
+        'mbti': mbti,
+        'name': result['name'],
+        'desc': result['desc'].get(lang, result['desc']['zh']),
+        'match': {
+            'id': matched_agent['id'] if matched_agent else None,
+            'name': matched_agent['name'].get(lang, matched_agent['name']['zh']) if matched_agent else None,
+            'avatar': matched_agent['avatar'] if matched_agent else None,
+            'desc': matched_agent['description'].get(lang, matched_agent['description']['zh']) if matched_agent else None
+        } if matched_agent else None
+    })
+
+
+# ============ AI智能解梦 ============
+
+DREAM_INTERPRETATIONS = {
+    '飞': {'symbol': '自由', 'analysis': '飞翔象征着对自由的渴望或即将实现的突破', 'emotion': '你内心正在经历一场蜕变，渴望挣脱束缚', 'advice': '相信自己，你比想象中更有力量', 'lucky': '艺术创作'},
+    '飞翔': {'symbol': '自由', 'analysis': '飞翔象征着对自由的渴望或即将实现的突破', 'emotion': '你内心正在经历一场蜕变，渴望挣脱束缚', 'advice': '相信自己，你比想象中更有力量', 'lucky': '艺术创作'},
+    '掉牙': {'symbol': '转变', 'analysis': '掉牙暗示生活中即将发生重大变化', 'emotion': '你可能对未知的变化感到焦虑', 'advice': '变化是成长的契机，勇敢拥抱新开始', 'lucky': '勇气'},
+    '牙齿': {'symbol': '转变', 'analysis': '掉牙暗示生活中即将发生重大变化', 'emotion': '你可能对未知的变化感到焦虑', 'advice': '变化是成长的契机，勇敢拥抱新开始', 'lucky': '勇气'},
+    '水': {'symbol': '情感', 'analysis': '水代表潜意识深处的情感世界', 'emotion': '你的情感正在流动，可能需要表达和释放', 'advice': '尝试通过写作或倾诉来整理情绪', 'lucky': '情感交流'},
+    '游泳': {'symbol': '情感', 'analysis': '在水中游泳表示你在情感中自如穿梭', 'emotion': '你正在积极处理自己的情感问题', 'advice': '继续保持这份敏锐和通透', 'lucky': '直觉'},
+    '溺水': {'symbol': '压抑', 'analysis': '溺水暗示你正被某种情绪或压力淹没', 'emotion': '你可能感到喘不过气，需要寻求帮助', 'advice': '不要独自承受，向信任的人倾诉', 'lucky': '贵人相助'},
+    '蛇': {'symbol': '转变', 'analysis': '蛇象征着潜意识中的智慧和转变力量', 'emotion': '你可能对某些变化感到恐惧但又渴望', 'advice': '蜕皮是重生的开始，接纳改变', 'lucky': '新生'},
+    '考试': {'symbol': '评价', 'analysis': '考试梦境反映你对自我评价的焦虑', 'emotion': '你可能在某方面感到准备不足', 'advice': '你比自己认为的更有实力', 'lucky': '学业进步'},
+    '迷路': {'symbol': '迷茫', 'analysis': '迷路暗示你正在寻找人生方向', 'emotion': '你可能对现状感到困惑', 'advice': '停下来倾听内心的声音', 'lucky': '方向指引'},
+    '追': {'symbol': '逃避', 'analysis': '被追赶表示你在逃避某个问题', 'emotion': '你可能不想面对某些责任', 'advice': '直面问题才能真正解决', 'lucky': '勇敢面对'},
+    '被追': {'symbol': '逃避', 'analysis': '被追赶表示你在逃避某个问题', 'emotion': '你可能不想面对某些责任', 'advice': '直面问题才能真正解决', 'lucky': '勇敢面对'},
+    '高楼': {'symbol': '志向', 'analysis': '梦见高楼表示你有远大的志向', 'emotion': '你渴望更高的成就', 'advice': '脚踏实地，一步步攀登', 'lucky': '成就'},
+    '坠': {'symbol': '失控', 'analysis': '坠落暗示对失去控制的恐惧', 'emotion': '你可能感到生活失去平衡', 'advice': '放慢脚步，重新审视重心', 'lucky': '平衡'},
+    '死亡': {'symbol': '结束', 'analysis': '梦见死亡通常象征某件事的终结', 'emotion': '你可能在经历告别', 'advice': '结束孕育着新的开始', 'lucky': '新生'},
+    '去世': {'symbol': '结束', 'analysis': '梦见死亡通常象征某件事的终结', 'emotion': '你可能在经历告别', 'advice': '结束孕育着新的开始', 'lucky': '新生'},
+    '雨': {'symbol': '洗礼', 'analysis': '雨代表情感的净化和洗涤', 'emotion': '你可能需要释放一些情绪', 'advice': '雨后会见彩虹，保持希望', 'lucky': '希望'},
+    '雪': {'symbol': '纯真', 'analysis': '雪象征纯洁和新的开始', 'emotion': '你渴望一份宁静和纯粹', 'advice': '保持内心的纯真和善良', 'lucky': '纯净'},
+    '火': {'symbol': '热情', 'analysis': '火代表强烈的情感和欲望', 'emotion': '你内心有强烈的热情等待释放', 'advice': '将热情转化为行动力', 'lucky': '激情'},
+    '动物': {'symbol': '本能', 'analysis': '动物代表你内心的本能和直觉', 'emotion': '你可能在倾听内心的声音', 'advice': '相信直觉，它会指引你', 'lucky': '直觉'},
+    '猫': {'symbol': '神秘', 'analysis': '猫象征着独立和神秘', 'emotion': '你可能在探索未知的自己', 'advice': '保持好奇心，继续探索', 'lucky': '神秘'},
+    '狗': {'symbol': '忠诚', 'analysis': '狗代表忠诚的朋友或守护', 'emotion': '你可能在思念某段友情', 'advice': '珍惜身边真心对你的人', 'lucky': '友谊'},
+    '家': {'symbol': '归属', 'analysis': '家代表安全感和归属需求', 'emotion': '你可能渴望温暖和安定', 'advice': '家是心的港湾', 'lucky': '温暖'},
+    '学校': {'symbol': '成长', 'analysis': '学校代表学习和成长的阶段', 'emotion': '你可能正在经历人生的课程', 'advice': '每一课都是礼物', 'lucky': '智慧'},
+    '电梯': {'symbol': '改变', 'analysis': '电梯代表人生的起起落落', 'emotion': '你可能正在经历快速的转变', 'advice': '顺其自然，接受改变', 'lucky': '转折'},
+    '镜子': {'symbol': '自我', 'analysis': '镜子代表自我认知和反省', 'emotion': '你可能在思考真实的自己', 'advice': '认识自己是一生的课题', 'lucky': '自省'},
+    '金': {'symbol': '财富', 'analysis': '金银珠宝象征财富和价值', 'emotion': '你可能对物质有渴望', 'advice': '内在的价值比外在更重要', 'lucky': '价值'},
+    '钱': {'symbol': '价值', 'analysis': '金钱代表安全感和自我价值', 'emotion': '你可能在思考自身价值', 'advice': '相信自己的价值被认可', 'lucky': '财富'},
+    '海': {'symbol': '广阔', 'analysis': '大海代表无限的可能性', 'emotion': '你可能渴望更大的舞台', 'advice': '勇敢迈向更广阔的世界', 'lucky': '机遇'},
+    '山': {'symbol': '挑战', 'analysis': '山代表需要克服的障碍', 'emotion': '你正在面对一项重要挑战', 'advice': '坚持就是胜利', 'lucky': '征服'},
+    '花': {'symbol': '美好', 'analysis': '花代表爱情和美好', 'emotion': '你内心充满对美好的期待', 'advice': '美好正在向你走来', 'lucky': '爱情'},
+    '血': {'symbol': '生命', 'analysis': '血代表生命力和能量', 'emotion': '你可能感到精力充沛', 'advice': '将能量用在正确的地方', 'lucky': '活力'},
+    '婴儿': {'symbol': '新生', 'analysis': '婴儿代表新的开始或想法', 'emotion': '你可能在酝酿新的计划', 'advice': '好好呵护它成长', 'lucky': '新开始'},
+    '鬼': {'symbol': '恐惧', 'analysis': '鬼代表内心深处的恐惧', 'emotion': '你可能在逃避某种恐惧', 'advice': '面对恐惧才能战胜它', 'lucky': '勇气'},
+    '婚礼': {'symbol': '结合', 'analysis': '婚礼象征重要关系的确立', 'emotion': '你可能在期待某种承诺', 'advice': '认真思考你想要的关系', 'lucky': '承诺'},
+    '出轨': {'symbol': '不安', 'analysis': '出轨反映对感情的焦虑', 'emotion': '你可能对关系缺乏安全感', 'advice': '坦诚沟通是解药', 'lucky': '信任'},
+    '怀孕': {'symbol': '孕育', 'analysis': '怀孕象征创造和孕育', 'emotion': '你可能在酝酿新的想法', 'advice': '让它自然发生', 'lucky': '创造'},
+}
+
+DREAM_ENCYCLOPEDIA = [
+    {'keyword': '飞翔', 'category': '自由', 'icon': '🦋', 'desc': '象征对自由的渴望和突破现状的愿望'},
+    {'keyword': '掉牙', 'category': '转变', 'icon': '🦷', 'desc': '暗示生活即将发生重要变化'},
+    {'keyword': '溺水', 'category': '压抑', 'icon': '🌊', 'desc': '反映被压力或情绪淹没的感觉'},
+    {'keyword': '被追赶', 'category': '逃避', 'icon': '🏃', 'desc': '表示你在逃避某个需要面对的问题'},
+    {'keyword': '蛇', 'category': '转变', 'icon': '🐍', 'desc': '象征潜意识中的转变力量'},
+    {'keyword': '考试', 'category': '评价', 'icon': '📝', 'desc': '反映对自我评价的焦虑'},
+    {'keyword': '迷路', 'category': '迷茫', 'icon': '🗺️', 'desc': '表示正在寻找人生方向'},
+    {'keyword': '高楼', 'category': '志向', 'icon': '🏢', 'desc': '象征远大的志向和抱负'},
+    {'keyword': '坠落', 'category': '失控', 'icon': '⬇️', 'desc': '暗示对失去控制的恐惧'},
+    {'keyword': '死亡', 'category': '结束', 'icon': '💀', 'desc': '通常象征某件事的终结和新开始'},
+    {'keyword': '下雨', 'category': '洗礼', 'icon': '🌧️', 'desc': '代表情感的净化和释放'},
+    {'keyword': '下雪', 'category': '纯真', 'icon': '❄️', 'desc': '象征纯洁、宁静和新的开始'},
+    {'keyword': '着火', 'category': '热情', 'icon': '🔥', 'desc': '代表强烈的情感和欲望'},
+    {'keyword': '猫', 'category': '神秘', 'icon': '🐱', 'desc': '象征独立和神秘'},
+    {'keyword': '狗', 'category': '忠诚', 'icon': '🐕', 'desc': '代表忠诚的朋友或守护'},
+    {'keyword': '回家', 'category': '归属', 'icon': '🏠', 'desc': '反映对安全感和归属的渴望'},
+    {'keyword': '学校', 'category': '成长', 'icon': '🏫', 'desc': '代表学习和成长的阶段'},
+    {'keyword': '电梯', 'category': '改变', 'icon': '🛗', 'desc': '象征人生的起落和快速转变'},
+    {'keyword': '镜子', 'category': '自我', 'icon': '🪞', 'desc': '代表自我认知和反省'},
+    {'keyword': '金银珠宝', 'category': '财富', 'icon': '💎', 'desc': '象征财富和自我价值'},
+    {'keyword': '大海', 'category': '广阔', 'icon': '🌊', 'desc': '代表无限的可能性和机遇'},
+    {'keyword': '高山', 'category': '挑战', 'icon': '🏔️', 'desc': '象征需要克服的障碍'},
+    {'keyword': '开花', 'category': '美好', 'icon': '🌸', 'desc': '代表爱情、美好和希望'},
+    {'keyword': '血', 'category': '生命', 'icon': '🩸', 'desc': '象征生命力、活力和能量'},
+    {'keyword': '婴儿', 'category': '新生', 'icon': '👶', 'desc': '代表新的开始、想法或项目'},
+]
+
+@app.route('/divination/dream')
+def divination_dream():
+    """AI智能解梦页面"""
+    lang = get_client_language()
+    return render_template('divination_dream.html', lang=lang)
+
+
+@app.route('/divination/dream/encyclopedia')
+def divination_dream_encyclopedia():
+    """梦境图鉴"""
+    lang = get_client_language()
+    return render_template('divination_dream_encyclopedia.html', encyclopedia=DREAM_ENCYCLOPEDIA, lang=lang)
+
+
+@app.route('/api/dream/interpret', methods=['POST'])
+def api_dream_interpret():
+    """解梦API"""
+    from flask import request
+    
+    data = request.get_json()
+    dream_text = data.get('dream', '')
+    lang = data.get('lang', 'zh')
+    
+    if not dream_text:
+        return jsonify({'error': '请输入梦境描述'}), 400
+    
+    # 关键词匹配
+    matched = None
+    for keyword, interpretation in DREAM_INTERPRETATIONS.items():
+        if keyword in dream_text:
+            matched = interpretation
+            break
+    
+    if matched:
+        return jsonify({
+            'success': True,
+            'symbol': matched['symbol'],
+            'analysis': matched['analysis'],
+            'emotion': matched['emotion'],
+            'advice': matched['advice'],
+            'lucky': matched['lucky']
+        })
+    else:
+        # 通用解读
+        default_interpretations = [
+            {
+                'symbol': '潜意识',
+                'analysis': '这个梦境涉及你内心深处的某些想法和情感',
+                'emotion': '你的潜意识正在试图与你对话',
+                'advice': '试着记录下梦中的感受，它可能在告诉你什么',
+                'lucky': '自我探索'
+            },
+            {
+                'symbol': '内在智慧',
+                'analysis': '梦是你内心智慧的体现，它在帮助你整理情绪',
+                'emotion': '这是一个自我了解的好机会',
+                'advice': '保持正念，倾听内心的声音',
+                'lucky': '内在成长'
+            }
+        ]
+        import random
+        default = random.choice(default_interpretations)
+        return jsonify({
+            'success': True,
+            'symbol': default['symbol'],
+            'analysis': default['analysis'],
+            'emotion': default['emotion'],
+            'advice': default['advice'],
+            'lucky': default['lucky']
+        })
+
+
+# ============ 占卜页面更新 ============
+
+@app.route('/divination')
+def divination_page():
+    """占卜主页"""
+    lang = get_client_language()
+    
+    # 获取星语Agent用于解梦
+    stella = next((a for a in SYSTEM_AGENTS if a['id'] == 'stella'), None)
+    
+    return render_template('divination_home.html', lang=lang, stella=stella)

@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}梦境图鉴 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.encyclopedia-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+    min-height: calc(100vh - 72px);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+}
+
+.page-title span {
+    background: linear-gradient(135deg, #6B5B95, #D4A5A5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-desc {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+}
+
+.encyclopedia-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+.dream-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+}
+
+.dream-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dream-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+}
+
+.dream-keyword {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.dream-category {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(107, 91, 149, 0.1);
+    color: #6B5B95;
+    font-size: 0.75rem;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-sm);
+}
+
+.dream-desc {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+
+/* 星空背景 */
+.stars-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+    background: radial-gradient(ellipse at top, rgba(107, 91, 149, 0.1) 0%, transparent 60%);
+}
+
+.floating-star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #6B5B95;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    margin-bottom: var(--space-xl);
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: #6B5B95;
+}
+
+/* 弹窗 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    max-width: 500px;
+    width: 90%;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.modal-icon {
+    font-size: 2rem;
+}
+
+.modal-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--color-text);
+}
+
+.modal-body {
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xl);
+}
+
+.modal-close {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #6B5B95, #8B5E83);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stars-bg">
+    <div class="floating-star" style="top: 10%; left: 15%;"></div>
+    <div class="floating-star" style="top: 30%; left: 85%; animation-delay: 0.5s;"></div>
+    <div class="floating-star" style="top: 50%; left: 8%; animation-delay: 1s;"></div>
+    <div class="floating-star" style="top: 70%; left: 92%; animation-delay: 1.5s;"></div>
+    <div class="floating-star" style="top: 85%; left: 25%; animation-delay: 2s;"></div>
+</div>
+
+<div class="encyclopedia-page">
+    <a href="/divination/dream" class="back-link">← 返回解梦</a>
+    
+    <div class="page-header">
+        <h1 class="page-title">✨ <span>梦境图鉴</span> ✨</h1>
+        <p class="page-desc">探索常见梦境的象征意义，了解潜意识深处的秘密</p>
+    </div>
+    
+    <div class="encyclopedia-grid">
+        {% for item in encyclopedia %}
+        <div class="dream-card" onclick="showDreamDetail('{{ item.keyword }}', '{{ item.category }}', '{{ item.icon }}', '{{ item.desc }}')" style="animation-delay: {{ loop.index0 * 0.05 }}s;">
+            <div class="dream-icon">{{ item.icon }}</div>
+            <div class="dream-keyword">{{ item.keyword }}</div>
+            <span class="dream-category">{{ item.category }}</span>
+            <p class="dream-desc">{{ item.desc }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 弹窗 -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-icon" id="modalIcon">🦋</span>
+            <h2 class="modal-title" id="modalTitle">飞翔</h2>
+        </div>
+        <div class="modal-body">
+            <p id="modalDesc"></p>
+            <p style="margin-top: var(--space-lg); color: var(--color-text-muted);">
+                💡 点击下方按钮，开始详细解梦
+            </p>
+        </div>
+        <button class="modal-close" onclick="startDreamInterpret()">🌙 开始解梦</button>
+    </div>
+</div>
+
+<script>
+let selectedDream = '';
+
+function showDreamDetail(keyword, category, icon, desc) {
+    selectedDream = `我梦到了${keyword}`;
+    document.getElementById('modalIcon').textContent = icon;
+    document.getElementById('modalTitle').textContent = keyword;
+    document.getElementById('modalDesc').textContent = desc;
+    document.getElementById('modal').classList.add('active');
+}
+
+function startDreamInterpret() {
+    document.getElementById('modal').classList.remove('active');
+    // 跳转到解梦页面并自动填充
+    window.location.href = '/divination/dream?dream=' + encodeURIComponent(selectedDream);
+}
+
+// 点击外部关闭弹窗
+document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.remove('active');
+    }
+});
+</script>
+{% endblock %}

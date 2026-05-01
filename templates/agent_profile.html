@@ -113,6 +113,29 @@
 .profile-actions {
     display: flex;
     gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.try-voice-btn {
+    padding: 12px 24px;
+    border-radius: var(--radius-full);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    background: linear-gradient(135deg, rgba(184, 169, 201, 0.2), rgba(212, 165, 165, 0.2));
+    color: #8B5E83;
+    border: 1px solid rgba(184, 169, 201, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.try-voice-btn:hover {
+    background: linear-gradient(135deg, rgba(184, 169, 201, 0.3), rgba(212, 165, 165, 0.3));
+    transform: translateY(-2px);
+}
+.try-voice-btn.playing {
+    animation: voicePulse 1s ease-in-out infinite;
 }
 
 .btn {
@@ -286,6 +309,12 @@
             <div class="profile-actions">
                 <a href="/chat/dm/{{ current_agent.id }}" class="btn btn-primary">开始聊天</a>
                 <a href="/gifts/send/{{ current_agent.id }}" class="btn btn-secondary">送礼物</a>
+                <button class="try-voice-btn" onclick="tryVoice('{{ current_agent.id }}', this)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    试听声音
+                </button>
             </div>
         </div>
     </div>
@@ -324,4 +353,38 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+// 试听语音
+function tryVoice(agentId, btn) {
+    if (btn.classList.contains('playing')) return;
+    
+    btn.classList.add('playing');
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:pulse 1s infinite"><circle cx="12" cy="12" r="10" opacity="0.3"></circle></svg> 播放中...';
+    
+    fetch(`/api/tts/demo/${agentId}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.audio_url) {
+                const audio = new Audio(data.audio_url);
+                audio.onended = () => {
+                    btn.classList.remove('playing');
+                    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 试听声音';
+                };
+                audio.onerror = () => {
+                    btn.classList.remove('playing');
+                    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 试听声音';
+                };
+                audio.play();
+            } else {
+                btn.classList.remove('playing');
+                btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 试听声音';
+            }
+        })
+        .catch(() => {
+            btn.classList.remove('playing');
+            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 试听声音';
+        });
+}
+</script>
 {% endblock %}

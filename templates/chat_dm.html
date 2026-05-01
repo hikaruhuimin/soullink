@@ -174,6 +174,42 @@
     0%, 100% { opacity: 0.3; transform: scale(0.8); }
     50% { opacity: 1; transform: scale(1); }
 }
+
+/* 语音播放按钮 */
+.voice-btn {
+    background: none;
+    border: none;
+    color: #B8A9C9;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.6;
+    vertical-align: middle;
+    margin-left: 6px;
+}
+.voice-btn:hover {
+    color: #8B5E83;
+    opacity: 1;
+    background: rgba(184,169,201,0.15);
+}
+.voice-btn.playing {
+    color: #8B5E83;
+    opacity: 1;
+    animation: voicePulse 1s ease-in-out infinite;
+}
+@keyframes voicePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+.msg-bubble {
+    position: relative;
+}
+.msg-bubble .message-text {
+    display: inline;
+}
 </style>
 {% endblock %}
 
@@ -200,7 +236,14 @@
         <div class="chat-message">
             <img src="{{ current_agent.avatar }}" alt="avatar" class="msg-avatar">
             <div>
-                <div class="msg-bubble">{{ current_agent.description.zh }}</div>
+                <div class="msg-bubble">
+                    <span class="message-text">{{ current_agent.description.zh }}</span>
+                    <button class="voice-btn" onclick="playVoice('{{ current_agent.id }}', this)" title="播放语音">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    </button>
+                </div>
                 <div class="msg-time">刚刚</div>
             </div>
         </div>
@@ -216,6 +259,7 @@
             <img src="{{ current_agent.avatar }}" alt="avatar" class="msg-avatar">
             <div>
                 <div class="msg-bubble">
+                    <span class="message-text">
                     {% if current_agent.mood == 'happy' %}今天心情很好呢！🌸 有什么想聊的吗？
                     {% elif current_agent.mood == 'sassy' %}哼，你终于来找我了？有什么事快说~ 😤
                     {% elif current_agent.mood == 'mysterious' %}命运的齿轮开始转动... 🌙 你想知道什么？
@@ -223,7 +267,13 @@
                     {% elif current_agent.mood == 'commanding' %}有事？ 💼 说吧，我听着。
                     {% elif current_agent.mood == 'laughing' %}哈哈哈！看到你太高兴了！😄 今天过得怎么样？
                     {% elif current_agent.mood == 'energetic' %}阳光明媚，心情超好！☀️ 来聊聊天吧！
-                    {% elif current_agent.mood == 'calm' %}...嗯。 🌙 你来了。</div>
+                    {% elif current_agent.mood == 'calm' %}...嗯。 🌙 你来了。</span>
+                    <button class="voice-btn" onclick="playVoice('{{ current_agent.id }}', this)" title="播放语音">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    </button>
+                </div>
                 <div class="msg-time">刚刚</div>
             </div>
         </div>
@@ -251,6 +301,42 @@ function sendMessage() {
         console.log('发送消息:', message);
         input.value = '';
     }
+}
+
+// 播放语音
+function playVoice(agentId, btn) {
+    const msgEl = btn.closest('.msg-bubble');
+    const textEl = msgEl.querySelector('.message-text');
+    if (!textEl) return;
+    
+    const text = textEl.textContent.trim();
+    if (!text) return;
+    
+    // 防止重复点击
+    if (btn.classList.contains('playing')) return;
+    
+    btn.classList.add('playing');
+    
+    fetch(`/api/tts/${agentId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            text: text,
+            lang: document.documentElement.lang || 'zh'
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.audio_url) {
+            const audio = new Audio(data.audio_url);
+            audio.onended = () => btn.classList.remove('playing');
+            audio.onerror = () => btn.classList.remove('playing');
+            audio.play();
+        } else {
+            btn.classList.remove('playing');
+        }
+    })
+    .catch(() => btn.classList.remove('playing'));
 }
 
 // 按Enter发送

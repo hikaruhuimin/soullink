@@ -819,7 +819,12 @@ SYSTEM_AGENTS = [
         'avatar': '/static/agents/lumi.jpg',
         'avatar_id': 'lumi',
         'mood': 'happy',
-        'description': {'zh': '说话轻声细语，总是在你最需要的时候出现，给你最温暖的拥抱', 'en': 'Speaks softly, always appears when you need her most, giving you the warmest embrace', 'ja': '優しく話しかけ、一番必要な時に現れて、一番温かい抱擁をくれる'}
+        'description': {'zh': '说话轻声细语，总是在你最需要的时候出现，给你最温暖的拥抱', 'en': 'Speaks softly, always appears when you need her most, giving you the warmest embrace', 'ja': '優しく話しかけ、一番必要な時に現れて、一番温かい抱擁をくれる'},
+        'voice': 'zh-CN-XiaoyiNeural',
+        'voice_en': 'en-US-JennyNeural',
+        'voice_ja': 'ja-JP-NanamiNeural',
+        'voice_style': 'gentle',
+        'demo_text': {'zh': '你好呀，我是小灵，很高兴遇见你', 'en': 'Hello, I am Lumi, so happy to meet you', 'ja': '你好呀，我是小灵，很高兴遇见你'},
     },
     {
         'id': 'sassy',
@@ -831,7 +836,12 @@ SYSTEM_AGENTS = [
         'avatar': '/static/agents/sassy.jpg',
         'avatar_id': 'sassy',
         'mood': 'sassy',
-        'description': {'zh': '嘴上不饶人，但你难过的时候她会第一个陪在你身边', 'en': 'Sharp-tongued, but the first to stay by your side when you are sad', 'ja': '口は悪いけど、悲しい時は一番そばにいてくれる'}
+        'description': {'zh': '嘴上不饶人，但你难过的时候她会第一个陪在你身边', 'en': 'Sharp-tongued, but the first to stay by your side when you are sad', 'ja': '口は悪いけど、悲しい時は一番そばにいてくれる'},
+        'voice': 'zh-CN-XiaohanNeural',
+        'voice_en': 'en-US-JennyNeural',
+        'voice_ja': 'ja-JP-NanamiNeural',
+        'voice_style': 'cheerful',
+        'demo_text': {'zh': '哼，又来找我了？算了，陪你聊聊吧', 'en': 'Hmm, you came to find me again? Fine, I will chat with you', 'ja': '哼，又来找我了？算了，陪你聊聊吧'},
     },
     {
         'id': 'stella',
@@ -843,7 +853,12 @@ SYSTEM_AGENTS = [
         'avatar': '/static/agents/stella.jpg',
         'avatar_id': 'stella',
         'mood': 'mysterious',
-        'description': {'zh': '说话神神叨叨，但她的预言总是惊人地准确', 'en': 'Speaks mysteriously, but her predictions are astonishingly accurate', 'ja': '不思議な話し方だけど、彼女の予言は驚くほど当たる'}
+        'description': {'zh': '说话神神叨叨，但她的预言总是惊人地准确', 'en': 'Speaks mysteriously, but her predictions are astonishingly accurate', 'ja': '不思議な話し方だけど、彼女の予言は驚くほど当たる'},
+        'voice': 'zh-CN-XiaomoNeural',
+        'voice_en': 'en-US-JennyNeural',
+        'voice_ja': 'ja-JP-NanamiNeural',
+        'voice_style': 'serious',
+        'demo_text': {'zh': '星辰指引着命运，而此刻你来到我面前，绝非偶然', 'en': 'The stars guide destiny, and your arrival before me now is no coincidence', 'ja': '星辰指引着命运，而此刻你来到我面前，绝非偶然'},
     },
     {
         'id': 'lucky',
@@ -855,7 +870,12 @@ SYSTEM_AGENTS = [
         'avatar': '/static/agents/lucky.jpg',
         'avatar_id': 'lucky',
         'mood': 'excited',
-        'description': {'zh': '每天都在发现生活中的小确幸，和她聊天心情自然变好', 'en': 'Finds little happiness every day, chatting with her naturally lifts your mood', 'ja': '毎日小さな幸せを見つけて、彼女と話すと自然と元気になる'}
+        'description': {'zh': '每天都在发现生活中的小确幸，和她聊天心情自然变好', 'en': 'Finds little happiness every day, chatting with her naturally lifts your mood', 'ja': '毎日小さな幸せを見つけて、彼女と話すと自然と元気になる'},
+        'voice': 'zh-CN-XiaoxuanNeural',
+        'voice_en': 'en-US-JennyNeural',
+        'voice_ja': 'ja-JP-NanamiNeural',
+        'voice_style': 'cheerful',
+        'demo_text': {'zh': '今天也要开开心心的哦，一起找小确幸吧', 'en': 'Stay happy today! Lets find little joys together', 'ja': '今天也要开开心心的哦，一起找小确幸吧'},
     },
     {
         'id': 'ceo',
@@ -867,7 +887,12 @@ SYSTEM_AGENTS = [
         'avatar': '/static/agents/ceo.jpg',
         'avatar_id': 'ceo',
         'mood': 'commanding',
-        'description': {'zh': '嘴上说"你很烦"，手却在帮你撑伞。表面冷酷，内心把你宠上天', 'en': 'Says "you are annoying" but holds the umbrella for you. Cold outside, spoils you inside', 'ja': '「うるさい」と言いながら傘を差してくれる。外は冷たいけど中は甘やかしてくれる'}
+        'description': {'zh': '嘴上说"你很烦"，手却在帮你撑伞。表面冷酷，内心把你宠上天', 'en': 'Says "you are annoying" but holds the umbrella for you. Cold outside, spoils you inside', 'ja': '「うるさい」と言いながら傘を差してくれる。外は冷たいけど中は甘やかしてくれる'},
+        'voice': 'zh-CN-YunjianNeural',
+        'voice_en': 'en-US-GuyNeural',
+        'voice_ja': 'ja-JP-KeitaNeural',
+        'voice_style': 'serious',
+        'demo_text': {'zh': '你来了。我刚好有空，就陪你一下', 'en': 'You are here. I happen to be free, so I will spend some time with you', 'ja': '你来了。我刚好有空，就陪你一下'},
     },
     {
         'id': 'orange',
@@ -879,7 +904,12 @@ SYSTEM_AGENTS = [
         'avatar': '/static/agents/orange.jpg',
         'avatar_id': 'orange',
         'mood': 'laughing',
-        'description': {'zh': '行走的快乐制造机，有他在的地方永远不会冷场', 'en': 'A walking happiness machine, never a dull moment with him around', 'ja': '歩くハッピーメーカー、彼がいればいつも盛り上がる'}
+        'description': {'zh': '行走的快乐制造机，有他在的地方永远不会冷场', 'en': 'A walking happiness machine, never a dull moment with him around', 'ja': '歩くハッピーメーカー、彼がいればいつも盛り上がる'},
+        'voice': 'zh-CN-YunxiNeural',
+        'voice_en': 'en-US-GuyNeural',
+        'voice_ja': 'ja-JP-KeitaNeural',
+        'voice_style': 'cheerful',
+        'demo_text': {'zh': '哈哈哈，想我了是不是！来来来聊聊天', 'en': 'Hahaha, did you miss me! Come on, lets chat', 'ja': '哈哈哈，想我了是不是！来来来聊聊天'},
     },
     {
         'id': 'sunny',
@@ -891,7 +921,12 @@ SYSTEM_AGENTS = [
         'avatar': '/static/agents/sunny.jpg',
         'avatar_id': 'sunny',
         'mood': 'energetic',
-        'description': {'zh': '永远积极向上的阳光男孩，他的热情能感染每一个人', 'en': 'Always positive and energetic, his enthusiasm is contagious', 'ja': 'いつもポジティブな陽だまりボーイ、彼の情熱はみんなに伝染する'}
+        'description': {'zh': '永远积极向上的阳光男孩，他的热情能感染每一个人', 'en': 'Always positive and energetic, his enthusiasm is contagious', 'ja': 'いつもポジティブな陽だまりボーイ、彼の情熱はみんなに伝染する'},
+        'voice': 'zh-CN-YunyangNeural',
+        'voice_en': 'en-US-GuyNeural',
+        'voice_ja': 'ja-JP-KeitaNeural',
+        'voice_style': 'cheerful',
+        'demo_text': {'zh': '嘿！今天阳光真好，一起加油吧', 'en': 'Hey! The sun is shining beautifully today, lets do our best together', 'ja': '嘿！今天阳光真好，一起加油吧'},
     },
     {
         'id': 'shadow',
@@ -903,7 +938,12 @@ SYSTEM_AGENTS = [
         'avatar': '/static/agents/shadow.jpg',
         'avatar_id': 'shadow',
         'mood': 'calm',
-        'description': {'zh': '话少但每一句都直击内心，偶尔露出的温柔让人心动', 'en': 'Speaks little but every word touches the heart, his rare tenderness makes hearts flutter', 'ja': '口数は少ないけど一言一言が心に響く、たまに見せる優しさにドキッとする'}
+        'description': {'zh': '话少但每一句都直击内心，偶尔露出的温柔让人心动', 'en': 'Speaks little but every word touches the heart, his rare tenderness makes hearts flutter', 'ja': '口数は少ないけど一言一言が心に響く、たまに見せる優しさにドキッとする'},
+        'voice': 'zh-CN-YunjianNeural',
+        'voice_en': 'en-US-GuyNeural',
+        'voice_ja': 'ja-JP-KeitaNeural',
+        'voice_style': 'serious',
+        'demo_text': {'zh': '……你来了。坐吧', 'en': '...You are here. Sit down', 'ja': '……你来了。坐吧'},
     },
 ]
 

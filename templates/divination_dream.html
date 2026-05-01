@@ -1,0 +1,471 @@
+{% extends "base.html" %}
+
+{% block title %}AI智能解梦 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.dream-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+    min-height: calc(100vh - 72px);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+    position: relative;
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+}
+
+.page-title span {
+    background: linear-gradient(135deg, #6B5B95, #D4A5A5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.host-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #B8A9C9;
+    margin-bottom: var(--space-md);
+    animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.host-intro {
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* 输入区 */
+.dream-input-section {
+    background: linear-gradient(135deg, rgba(107, 91, 149, 0.1), rgba(212, 165, 165, 0.1));
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    margin-bottom: var(--space-3xl);
+    border: 1px solid rgba(184, 169, 201, 0.3);
+}
+
+.input-wrapper {
+    position: relative;
+    margin-bottom: var(--space-lg);
+}
+
+.dream-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: var(--space-lg);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    line-height: 1.8;
+    resize: vertical;
+    transition: all 0.3s ease;
+    background: var(--color-bg-card);
+}
+
+.dream-textarea:focus {
+    outline: none;
+    border-color: #6B5B95;
+    box-shadow: 0 0 0 4px rgba(107, 91, 149, 0.1);
+}
+
+.input-hint {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+}
+
+.interpret-btn {
+    width: 100%;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, #6B5B95, #8B5E83);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.interpret-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(107, 91, 149, 0.3);
+}
+
+.interpret-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 结果区 */
+.result-section {
+    display: none;
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    margin-bottom: var(--space-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(184, 169, 201, 0.2);
+}
+
+.stella-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.stella-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #B8A9C9;
+}
+
+.stella-intro {
+    flex: 1;
+}
+
+.stella-name {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    color: var(--color-text);
+    margin-bottom: 2px;
+}
+
+.stella-role {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+}
+
+.interpretation-content {
+    line-height: 1.9;
+    color: var(--color-text-secondary);
+}
+
+.interpretation-content p {
+    margin-bottom: var(--space-lg);
+}
+
+.symbol-highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 4px 16px;
+    background: linear-gradient(135deg, rgba(107, 91, 149, 0.1), rgba(212, 165, 165, 0.1));
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    color: #6B5B95;
+    margin-bottom: var(--space-xl);
+}
+
+/* 解读卡片 */
+.interpret-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+}
+
+@media (max-width: 640px) {
+    .interpret-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+.interpret-card {
+    padding: var(--space-lg);
+    background: var(--color-bg-warm);
+    border-radius: var(--radius-lg);
+}
+
+.card-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-sm);
+}
+
+.card-value {
+    font-size: 1rem;
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+.lucky-tip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-xl);
+    background: linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(184, 169, 201, 0.2));
+    border-radius: var(--radius-full);
+    margin-top: var(--space-xl);
+    font-size: 0.9375rem;
+    color: #8B5E83;
+}
+
+/* 快捷入口 */
+.quick-dreams {
+    margin-top: var(--space-3xl);
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--color-text);
+    margin-bottom: var(--space-xl);
+    text-align: center;
+}
+
+.dream-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+}
+
+.dream-tag {
+    padding: 8px 16px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dream-tag:hover {
+    border-color: #6B5B95;
+    color: #6B5B95;
+    background: rgba(107, 91, 149, 0.05);
+}
+
+/* 星空背景 */
+.stars-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+    background: radial-gradient(ellipse at top, rgba(107, 91, 149, 0.1) 0%, transparent 60%);
+}
+
+.floating-star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #6B5B95;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+}
+
+/* 加载动画 */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-xl);
+}
+
+.loading-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    background: #6B5B95;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: 0s; }
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stars-bg">
+    <div class="floating-star" style="top: 15%; left: 10%;"></div>
+    <div class="floating-star" style="top: 25%; left: 85%; animation-delay: 0.5s;"></div>
+    <div class="floating-star" style="top: 45%; left: 5%; animation-delay: 1s;"></div>
+    <div class="floating-star" style="top: 65%; left: 90%; animation-delay: 1.5s;"></div>
+    <div class="floating-star" style="top: 85%; left: 20%; animation-delay: 2s;"></div>
+</div>
+
+<div class="dream-page">
+    <div class="page-header">
+        <img src="/static/agents/stella.jpg" alt="星语" class="host-avatar">
+        <h1 class="page-title">✨ <span>AI智能解梦</span> ✨</h1>
+        <p class="host-intro">我是星语，命运的星辰指引着你来到这里。<br>梦境是潜意识的语言，让我帮你解读它的秘密...</p>
+    </div>
+    
+    <div class="dream-input-section">
+        <div class="input-wrapper">
+            <textarea class="dream-textarea" id="dreamInput" placeholder="描述你梦到的内容...&#10;&#10;例如：我梦到自己在一片大海中飞翔，天空是紫色的..."></textarea>
+        </div>
+        <p class="input-hint">💡 描述越详细，解读越准确哦~</p>
+        <button class="interpret-btn" id="interpretBtn" onclick="interpretDream()">
+            🌙 开始解梦
+        </button>
+    </div>
+    
+    <div class="result-section" id="resultSection">
+        <div class="result-card">
+            <div class="stella-header">
+                <img src="/static/agents/stella.jpg" alt="星语" class="stella-avatar">
+                <div class="stella-intro">
+                    <div class="stella-name">星语</div>
+                    <div class="stella-role">神秘占卜师 · 解梦主持</div>
+                </div>
+            </div>
+            <div class="interpretation-content" id="interpretationContent">
+                <!-- 解读内容将通过JS填充 -->
+            </div>
+            <div class="lucky-tip" id="luckyTip">
+                <!-- 幸运提示将通过JS填充 -->
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="/divination/dream/encyclopedia" class="btn btn-secondary" style="display: inline-block; text-decoration: none; padding: 12px 28px; border-radius: var(--radius-full); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+                📖 查看梦境图鉴
+            </a>
+        </div>
+    </div>
+    
+    <div class="quick-dreams">
+        <h2 class="section-title">🌟 常见梦境</h2>
+        <div class="dream-tags">
+            <span class="dream-tag" onclick="quickDream('我梦到自己在飞翔，越飞越高')">🦋 飞翔</span>
+            <span class="dream-tag" onclick="quickDream('梦到牙齿掉了')">🦷 掉牙</span>
+            <span class="dream-tag" onclick="quickDream('在梦里被人追赶')">🏃 被追赶</span>
+            <span class="dream-tag" onclick="quickDream('梦到在海里游泳')">🌊 游泳</span>
+            <span class="dream-tag" onclick="quickDream('梦到下大雨')">🌧️ 下雨</span>
+            <span class="dream-tag" onclick="quickDream('在梦里回到小时候的家')">🏠 回家</span>
+            <span class="dream-tag" onclick="quickDream('梦到自己考试')">📝 考试</span>
+            <span class="dream-tag" onclick="quickDream('在梦里迷路了')">🗺️ 迷路</span>
+        </div>
+    </div>
+</div>
+
+<script>
+const lang = '{{ lang }}';
+
+function quickDream(text) {
+    document.getElementById('dreamInput').value = text;
+    interpretDream();
+}
+
+async function interpretDream() {
+    const dream = document.getElementById('dreamInput').value.trim();
+    if (!dream) {
+        alert('请描述你的梦境~');
+        return;
+    }
+    
+    const btn = document.getElementById('interpretBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="loading"><div class="loading-dots"><span></span><span></span><span></span></div></div>';
+    
+    try {
+        const res = await fetch('/api/dream/interpret', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({dream, lang})
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            showResult(data);
+        } else {
+            alert(data.error || '解梦失败，请重试');
+        }
+    } catch (e) {
+        alert('网络错误，请重试');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🌙 开始解梦';
+    }
+}
+
+function showResult(data) {
+    const section = document.getElementById('resultSection');
+    section.style.display = 'block';
+    
+    document.getElementById('interpretationContent').innerHTML = `
+        <p><span class="symbol-highlight">🔮 核心象征：${data.symbol}</span></p>
+        <div class="interpret-cards">
+            <div class="interpret-card">
+                <div class="card-label">📖 潜意识分析</div>
+                <div class="card-value">${data.analysis}</div>
+            </div>
+            <div class="interpret-card">
+                <div class="card-label">💭 情感暗示</div>
+                <div class="card-value">${data.emotion}</div>
+            </div>
+            <div class="interpret-card" style="grid-column: 1 / -1;">
+                <div class="card-label">✨ 现实启示</div>
+                <div class="card-value">${data.advice}</div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('luckyTip').innerHTML = `
+        <span>🍀 今日幸运提示：${data.lucky}</span>
+    `;
+    
+    // 滚动到结果
+    section.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+</script>
+{% endblock %}

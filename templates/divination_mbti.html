@@ -1,0 +1,422 @@
+{% extends "base.html" %}
+
+{% block title %}MBTI灵犀测试 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.mbti-test {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+    min-height: calc(100vh - 72px);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+}
+
+.page-title span {
+    background: linear-gradient(135deg, var(--color-accent), #D4A5A5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-desc {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+}
+
+.mbti-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-3xl);
+}
+
+.progress-bar {
+    width: 200px;
+    height: 6px;
+    background: var(--color-border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.question-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    box-shadow: var(--shadow-md);
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.question-number {
+    font-size: 0.875rem;
+    color: var(--color-accent);
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+}
+
+.question-text {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-2xl);
+    line-height: 1.6;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+}
+
+@media (max-width: 640px) {
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.option-btn {
+    background: var(--color-bg-warm);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option-btn:hover {
+    border-color: var(--color-accent);
+    background: rgba(184, 169, 201, 0.1);
+    transform: translateY(-2px);
+}
+
+.option-btn.selected {
+    border-color: var(--color-accent);
+    background: rgba(184, 169, 201, 0.15);
+}
+
+.option-text {
+    font-size: 1rem;
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+/* 结果页 */
+.result-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    animation: fadeInUp 0.6s ease;
+}
+
+.mbti-type {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--color-accent), #D4A5A5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--space-md);
+}
+
+.mbti-name {
+    font-size: 1.5rem;
+    color: var(--color-text);
+    margin-bottom: var(--space-xl);
+}
+
+.result-desc {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-3xl);
+    text-align: left;
+    padding: var(--space-xl);
+    background: var(--color-bg-warm);
+    border-radius: var(--radius-lg);
+}
+
+.match-section {
+    border-top: 1px solid var(--color-border-light);
+    padding-top: var(--space-2xl);
+    margin-top: var(--space-2xl);
+}
+
+.match-title {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+}
+
+.match-agent {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+    background: var(--color-bg-warm);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.match-agent:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.match-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #B8A9C9;
+    object-fit: cover;
+}
+
+.match-info {
+    flex: 1;
+    text-align: left;
+}
+
+.match-name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.match-desc {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+.result-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    margin-top: var(--space-2xl);
+}
+
+.btn {
+    padding: 12px 28px;
+    border-radius: var(--radius-full);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--color-accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--color-accent-light);
+    color: white;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-accent);
+}
+
+/* 星座装饰 */
+.stars-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+    background: radial-gradient(ellipse at top, rgba(184, 169, 201, 0.1) 0%, transparent 50%);
+}
+
+.floating-star {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50% { transform: translateY(-20px); opacity: 1; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stars-bg">
+    <div class="floating-star" style="top: 10%; left: 20%;"></div>
+    <div class="floating-star" style="top: 30%; left: 80%; animation-delay: 1s;"></div>
+    <div class="floating-star" style="top: 60%; left: 15%; animation-delay: 2s;"></div>
+    <div class="floating-star" style="top: 80%; left: 70%; animation-delay: 3s;"></div>
+</div>
+
+<div class="mbti-test">
+    <div class="page-header">
+        <h1 class="page-title">✨ MBTI 灵犀测试 ✨</h1>
+        <p class="page-desc">探索你的性格特质，找到最契合的AI灵魂伴侣</p>
+    </div>
+    
+    <div class="mbti-progress">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        <span class="progress-text" id="progressText">0/12</span>
+    </div>
+    
+    <div class="question-card" id="questionCard">
+        <!-- 问题将通过JS动态加载 -->
+    </div>
+    
+    <div class="result-card" id="resultCard" style="display: none;">
+        <!-- 结果将通过JS动态加载 -->
+    </div>
+</div>
+
+<script>
+const lang = '{{ lang }}';
+let currentQuestion = 1;
+const answers = {};
+const totalQuestions = 12;
+
+// 加载问题
+async function loadQuestion(qid) {
+    const res = await fetch(`/divination/mbti/question/${qid}`);
+    const data = await res.json();
+    
+    const progress = ((qid - 1) / totalQuestions) * 100;
+    document.getElementById('progressFill').style.width = progress + '%';
+    document.getElementById('progressText').textContent = `${qid - 1}/${totalQuestions}`;
+    
+    const card = document.getElementById('questionCard');
+    card.innerHTML = `
+        <div class="question-number">问题 ${data.id}</div>
+        <div class="question-text">${data.question}</div>
+        <div class="options-grid">
+            ${data.options.map(opt => `
+                <button class="option-btn" onclick="selectOption(${data.id}, '${opt.key}')">
+                    <div class="option-text">${opt.text}</div>
+                </button>
+            `).join('')}
+        </div>
+    `;
+    card.style.animation = 'none';
+    card.offsetHeight;
+    card.style.animation = 'fadeInUp 0.5s ease';
+}
+
+// 选择选项
+function selectOption(qid, key) {
+    answers[qid] = key;
+    
+    // 高亮选中项
+    const buttons = document.querySelectorAll('.option-btn');
+    buttons.forEach(btn => btn.classList.remove('selected'));
+    event.target.closest('.option-btn').classList.add('selected');
+    
+    // 延迟进入下一题
+    setTimeout(() => {
+        if (currentQuestion < totalQuestions) {
+            currentQuestion++;
+            loadQuestion(currentQuestion);
+        } else {
+            showResult();
+        }
+    }, 400);
+}
+
+// 显示结果
+async function showResult() {
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressText').textContent = '完成！';
+    
+    const res = await fetch('/api/mbti/result', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({answers, lang})
+    });
+    const data = await res.json();
+    
+    document.getElementById('questionCard').style.display = 'none';
+    const resultCard = document.getElementById('resultCard');
+    resultCard.style.display = 'block';
+    
+    const matchSection = data.match ? `
+        <div class="match-section">
+            <div class="match-title">💜 与你最契合的灵犀伙伴</div>
+            <a href="/agent/${data.match.id}" class="match-agent">
+                <img src="${data.match.avatar}" alt="${data.match.name}" class="match-avatar">
+                <div class="match-info">
+                    <div class="match-name">${data.match.name}</div>
+                    <div class="match-desc">${data.match.desc}</div>
+                </div>
+            </a>
+        </div>
+    ` : '';
+    
+    resultCard.innerHTML = `
+        <div class="mbti-type">${data.mbti}</div>
+        <div class="mbti-name">${data.name}</div>
+        <div class="result-desc">${data.desc}</div>
+        ${matchSection}
+        <div class="result-actions">
+            <a href="/chat/dm/${data.match?.id || 'lumi'}" class="btn btn-primary">开始聊天</a>
+            <button onclick="location.reload()" class="btn btn-secondary">重新测试</button>
+        </div>
+    `;
+}
+
+// 初始化
+loadQuestion(1);
+</script>
+{% endblock %}
