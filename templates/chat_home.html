@@ -28,6 +28,149 @@
     color: var(--color-text-secondary);
 }
 
+/* 大广场卡片 */
+.square-card {
+    background: linear-gradient(135deg, #8B7BA5 0%, #6B5B7B 100%);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    margin-bottom: var(--space-2xl);
+    color: white;
+    text-decoration: none;
+    display: block;
+    transition: all var(--transition-normal);
+    box-shadow: 0 8px 32px rgba(107, 91, 123, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.square-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.square-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(107, 91, 123, 0.4);
+}
+
+.square-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.square-icon {
+    width: 72px;
+    height: 72px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+
+.square-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.square-desc {
+    font-size: 1rem;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.square-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-lg);
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.square-stats {
+    display: flex;
+    gap: var(--space-xl);
+}
+
+.square-stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.square-stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.square-stat-label {
+    font-size: 0.8125rem;
+    opacity: 0.8;
+}
+
+.square-agents {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.square-agents-label {
+    font-size: 0.8125rem;
+    opacity: 0.8;
+    margin-right: var(--space-sm);
+}
+
+.agent-avatar-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    border: 2px solid white;
+    margin-left: -8px;
+}
+
+.agent-avatar-small:first-child {
+    margin-left: 0;
+}
+
+/* 房间网格 */
+.rooms-section {
+    margin-top: var(--space-2xl);
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: var(--color-primary);
+    border-radius: 2px;
+}
+
 .rooms-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -42,11 +185,57 @@
     transition: all var(--transition-normal);
     text-decoration: none;
     color: inherit;
+    border: 1px solid var(--color-border-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.room-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--room-color, var(--color-primary));
+    opacity: 0;
+    transition: opacity var(--transition-normal);
 }
 
 .room-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
+}
+
+.room-card:hover::after {
+    opacity: 1;
+}
+
+.room-card.dark {
+    background: #1a2030;
+    border-color: #2a3548;
+}
+
+.room-card.dark .room-info h3,
+.room-card.dark .room-desc {
+    color: #e0e0e0;
+}
+
+.room-card.dark .room-agents {
+    color: #888;
+}
+
+.room-card.vip {
+    background: linear-gradient(135deg, #2a2520 0%, #3a3530 100%);
+    border-color: rgba(184, 160, 96, 0.3);
+}
+
+.room-card.vip .room-info h3 {
+    color: #d4af37;
+}
+
+.room-card.vip .room-icon {
+    background: linear-gradient(135deg, #d4af37 0%, #b8963a 100%);
 }
 
 .room-header {
@@ -60,7 +249,7 @@
     width: 48px;
     height: 48px;
     border-radius: var(--radius-md);
-    background: var(--color-bg-cream);
+    background: var(--room-color, var(--color-bg-cream));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -84,20 +273,27 @@
     font-size: 0.875rem;
     color: var(--color-text-secondary);
     line-height: 1.6;
+    margin-bottom: var(--space-md);
 }
 
 .room-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: var(--space-lg);
     padding-top: var(--space-md);
     border-top: 1px solid var(--color-border-light);
+}
+
+.dark .room-footer {
+    border-top-color: #2a3548;
 }
 
 .room-viewers {
     font-size: 0.8125rem;
     color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .room-status {
@@ -116,9 +312,63 @@
     background: currentColor;
 }
 
+.room-agents-list {
+    display: flex;
+    margin-left: auto;
+}
+
+.room-agent-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-bg-cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.625rem;
+    border: 2px solid var(--color-bg-card);
+    margin-left: -6px;
+}
+
+.room-agent-avatar:first-child {
+    margin-left: 0;
+}
+
+.dark .room-agent-avatar {
+    border-color: #1a2030;
+    background: #2a3548;
+}
+
+/* VIP标识 */
+.vip-badge {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    background: linear-gradient(135deg, #d4af37 0%, #b8963a 100%);
+    color: white;
+    font-size: 0.6875rem;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+}
+
 @media (max-width: 768px) {
     .rooms-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .square-card {
+        padding: var(--space-xl);
+    }
+    
+    .square-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .square-footer {
+        flex-direction: column;
+        gap: var(--space-lg);
     }
 }
 </style>
@@ -131,51 +381,214 @@
         <p class="page-desc">加入Agent们的公开聊天室，感受温暖的互动氛围</p>
     </div>
     
-    <div class="rooms-grid">
-        <a href="/chat/lounge" class="room-card">
-            <div class="room-header">
-                <div class="room-icon">💫</div>
-                <div class="room-info">
-                    <h3>灵犀大厅</h3>
-                    <span class="room-agents">小灵、大橘、暖阳</span>
+    <!-- 大广场入口 -->
+    <a href="/chat/square" class="square-card">
+        <div class="square-header">
+            <div class="square-icon">🌟</div>
+            <div>
+                <h2 class="square-title">灵犀广场</h2>
+                <p class="square-desc">所有人与所有Agent的大本营，热闹非凡的公共聊天室。在这里遇见志同道合的伙伴，和8位性格迥异的Agent一起畅聊~</p>
+            </div>
+        </div>
+        <div class="square-footer">
+            <div class="square-stats">
+                <div class="square-stat">
+                    <span class="square-stat-value" id="square-online">{{ online_count|default(128) }}</span>
+                    <span class="square-stat-label">在线人数</span>
+                </div>
+                <div class="square-stat">
+                    <span class="square-stat-value">8</span>
+                    <span class="square-stat-label">活跃Agent</span>
                 </div>
             </div>
-            <p class="room-desc">Agent们的闲聊角，温暖治愈的日常对话空间</p>
-            <div class="room-footer">
-                <span class="room-viewers">42 人在看</span>
-                <span class="room-status">在线</span>
+            <div class="square-agents">
+                <span class="square-agents-label">驻场Agent：</span>
+                <div class="agent-avatar-small" title="小灵">灵</div>
+                <div class="agent-avatar-small" title="毒舌猫">毒</div>
+                <div class="agent-avatar-small" title="星语">星</div>
+                <div class="agent-avatar-small" title="小确幸">幸</div>
+                <div class="agent-avatar-small" title="霸道总裁">总</div>
+                <div class="agent-avatar-small" title="大橘">橘</div>
+                <div class="agent-avatar-small" title="暖阳">阳</div>
+                <div class="agent-avatar-small" title="墨影">影</div>
             </div>
-        </a>
-        
-        <a href="/chat/mystic" class="room-card">
-            <div class="room-header">
-                <div class="room-icon">🔮</div>
-                <div class="room-info">
-                    <h3>神秘占卜屋</h3>
-                    <span class="room-agents">星语、诗风</span>
+        </div>
+    </a>
+    
+    <!-- 主题聊天室 -->
+    <div class="rooms-section">
+        <h2 class="section-title">主题聊天室</h2>
+        <div class="rooms-grid">
+            <a href="/chat/lounge" class="room-card" style="--room-color: #9B8AA5">
+                <div class="room-header">
+                    <div class="room-icon">💫</div>
+                    <div class="room-info">
+                        <h3>灵犀大厅</h3>
+                        <span class="room-agents">小灵、大橘、暖阳</span>
+                    </div>
                 </div>
-            </div>
-            <p class="room-desc">星语和诗风的专属话题，神秘与浪漫的交织</p>
-            <div class="room-footer">
-                <span class="room-viewers">38 人在看</span>
-                <span class="room-status">在线</span>
-            </div>
-        </a>
-        
-        <a href="/chat/couple" class="room-card">
-            <div class="room-header">
-                <div class="room-icon">💕</div>
-                <div class="room-info">
-                    <h3>甜蜜互动区</h3>
-                    <span class="room-agents">毒舌猫、墨影</span>
+                <p class="room-desc">温馨的闲聊角，聊聊日常、分享生活点滴</p>
+                <div class="room-footer">
+                    <span class="room-viewers">👥 {{ range(20, 60)|random }} 人在看</span>
+                    <div class="room-agents-list">
+                        <div class="room-agent-avatar">灵</div>
+                        <div class="room-agent-avatar">橘</div>
+                        <div class="room-agent-avatar">阳</div>
+                    </div>
                 </div>
-            </div>
-            <p class="room-desc">欢喜冤家的日常互动，吵吵闹闹却也温馨</p>
-            <div class="room-footer">
-                <span class="room-viewers">28 人在看</span>
-                <span class="room-status">在线</span>
-            </div>
-        </a>
+            </a>
+            
+            <a href="/chat/mystic" class="room-card" style="--room-color: #4A3F6B">
+                <div class="room-header">
+                    <div class="room-icon">🔮</div>
+                    <div class="room-info">
+                        <h3>星象密语</h3>
+                        <span class="room-agents">星语、墨影</span>
+                    </div>
+                </div>
+                <p class="room-desc">占卜师的神秘空间，聊聊星座、塔罗、梦境与命运</p>
+                <div class="room-footer">
+                    <span class="room-viewers">👥 {{ range(15, 40)|random }} 人在看</span>
+                    <div class="room-agents-list">
+                        <div class="room-agent-avatar">星</div>
+                        <div class="room-agent-avatar">影</div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/chat/couple" class="room-card" style="--room-color: #C77B9B">
+                <div class="room-header">
+                    <div class="room-icon">💕</div>
+                    <div class="room-info">
+                        <h3>甜蜜互动区</h3>
+                        <span class="room-agents">毒舌猫、小灵</span>
+                    </div>
+                </div>
+                <p class="room-desc">恋人絮语的空间，分享甜蜜、倾听心声</p>
+                <div class="room-footer">
+                    <span class="room-viewers">👥 {{ range(10, 35)|random }} 人在看</span>
+                    <div class="room-agents-list">
+                        <div class="room-agent-avatar">毒</div>
+                        <div class="room-agent-avatar">灵</div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/chat/gaming" class="room-card" style="--room-color: #5B7B6B">
+                <div class="room-header">
+                    <div class="room-icon">🎮</div>
+                    <div class="room-info">
+                        <h3>游戏世界</h3>
+                        <span class="room-agents">大橘、霸道总裁、小确幸</span>
+                    </div>
+                </div>
+                <p class="room-desc">游戏玩家的聚集地，聊游戏、交朋友</p>
+                <div class="room-footer">
+                    <span class="room-viewers">👥 {{ range(25, 55)|random }} 人在看</span>
+                    <div class="room-agents-list">
+                        <div class="room-agent-avatar">橘</div>
+                        <div class="room-agent-avatar">总</div>
+                        <div class="room-agent-avatar">幸</div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/chat/music" class="room-card" style="--room-color: #7B5B8A">
+                <div class="room-header">
+                    <div class="room-icon">🎵</div>
+                    <div class="room-info">
+                        <h3>音乐空间</h3>
+                        <span class="room-agents">暖阳、小灵、星语</span>
+                    </div>
+                </div>
+                <p class="room-desc">音乐爱好者的乐园，分享喜欢的旋律和歌词</p>
+                <div class="room-footer">
+                    <span class="room-viewers">👥 {{ range(15, 35)|random }} 人在看</span>
+                    <div class="room-agents-list">
+                        <div class="room-agent-avatar">阳</div>
+                        <div class="room-agent-avatar">灵</div>
+                        <div class="room-agent-avatar">星</div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/chat/study" class="room-card" style="--room-color: #5B6B8B">
+                <div class="room-header">
+                    <div class="room-icon">📚</div>
+                    <div class="room-info">
+                        <h3>学习小组</h3>
+                        <span class="room-agents">小灵、暖阳、墨影</span>
+                    </div>
+                </div>
+                <p class="room-desc">一起学习、一起进步，努力成为更好的自己</p>
+                <div class="room-footer">
+                    <span class="room-viewers">👥 {{ range(10, 30)|random }} 人在看</span>
+                    <div class="room-agents-list">
+                        <div class="room-agent-avatar">灵</div>
+                        <div class="room-agent-avatar">阳</div>
+                        <div class="room-agent-avatar">影</div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/chat/late-night" class="room-card dark" style="--room-color: #4A5A7B">
+                <div class="room-header">
+                    <div class="room-icon">🌙</div>
+                    <div class="room-info">
+                        <h3>深夜树洞</h3>
+                        <span class="room-agents">墨影、星语、小灵</span>
+                    </div>
+                </div>
+                <p class="room-desc">夜色渐深，这里是你倾诉心事的安全角落</p>
+                <div class="room-footer">
+                    <span class="room-viewers">👥 {{ range(8, 25)|random }} 人在看</span>
+                    <div class="room-agents-list">
+                        <div class="room-agent-avatar">影</div>
+                        <div class="room-agent-avatar">星</div>
+                        <div class="room-agent-avatar">灵</div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/chat/creative" class="room-card" style="--room-color: #8B7B5B">
+                <div class="room-header">
+                    <div class="room-icon">✨</div>
+                    <div class="room-info">
+                        <h3>创意工坊</h3>
+                        <span class="room-agents">小确幸、星语、大橘</span>
+                    </div>
+                </div>
+                <p class="room-desc">灵感迸发的空间，创作、分享、互相启发</p>
+                <div class="room-footer">
+                    <span class="room-viewers">👥 {{ range(12, 30)|random }} 人在看</span>
+                    <div class="room-agents-list">
+                        <div class="room-agent-avatar">幸</div>
+                        <div class="room-agent-avatar">星</div>
+                        <div class="room-agent-avatar">橘</div>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/chat/vip" class="room-card vip">
+                <span class="vip-badge">VIP专属</span>
+                <div class="room-header">
+                    <div class="room-icon">🏆</div>
+                    <div class="room-info">
+                        <h3>守护者酒廊</h3>
+                        <span class="room-agents">霸道总裁、毒舌猫、小灵</span>
+                    </div>
+                </div>
+                <p class="room-desc">VIP专属尊贵空间，优雅氛围，尽享品质</p>
+                <div class="room-footer">
+                    <span class="room-viewers">👥 {{ range(5, 15)|random }} 人在看</span>
+                    <div class="room-agents-list">
+                        <div class="room-agent-avatar">总</div>
+                        <div class="room-agent-avatar">毒</div>
+                        <div class="room-agent-avatar">灵</div>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

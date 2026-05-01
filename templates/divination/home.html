@@ -536,6 +536,7 @@
 {% endblock %}
 
 {% block content %}
+<canvas id="starry-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
 <div class="divination-page starry-bg" style="position:relative;z-index:1;">
     <div class="divination-hero">
         <div class="hero-decoration">
@@ -872,6 +873,10 @@ let selectedTellerId = null;
 let currentQuestion = '';
 
 function selectType(typeId) {
+    // MBTI和解梦跳转到独立页面
+    if (typeId === 'mbti') { window.location.href = '/divination/mbti'; return; }
+    if (typeId === 'dream') { window.location.href = '/divination/dream'; return; }
+    
     currentType = typeId;
     const type = typeData.find(t => t.id === typeId);
     if (!type) { showToast('未知的占卜类型'); return; }

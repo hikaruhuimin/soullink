@@ -13,7 +13,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
 
-from models import db, User, SocialProfile, Lover, LoverChat, Gift, DateEvent, Divination, Favorite, DailyFortune, DailySignin, Subscription, SpiritStoneRecord, SocialPost, PostLike, PostComment, SocialRelation, SocialMatch, SocialChat, GossipPost, GossipLike, GossipComment, VIP_LEVEL_NONE, VIP_LEVEL_BASIC, VIP_LEVEL_PREMIUM, VIP_NAMES, IDENTITY_HUMAN, IDENTITY_AI, CreatorAgent, AgentGift, EarningRecord, WithdrawRequest, AgentChat, AGENT_GIFTS, SYSTEM_AGENTS, VIP_BENEFITS_EXTENDED, VIP_LEVEL_GUARDIAN, VIP_LEVEL_GUARDIAN_PRO, LINGXI_RATIO, PLATFORM_COMMISSION, CREATOR_SHARE, WITHDRAW_FEE, MIN_WITHDRAW_BASIC, MIN_WITHDRAW_PRO
+from models import db, User, SocialProfile, Lover, LoverChat, Gift, DateEvent, Divination, Favorite, DailyFortune, DailySignin, Subscription, SpiritStoneRecord, SocialPost, PostLike, PostComment, SocialRelation, SocialMatch, SocialChat, GossipPost, GossipLike, GossipComment, VIP_LEVEL_NONE, VIP_LEVEL_BASIC, VIP_LEVEL_PREMIUM, VIP_NAMES, IDENTITY_HUMAN, IDENTITY_AI, CreatorAgent, AgentGift, EarningRecord, WithdrawRequest, AgentChat, AGENT_GIFTS, SYSTEM_AGENTS, VIP_BENEFITS_EXTENDED, VIP_LEVEL_GUARDIAN, VIP_LEVEL_GUARDIAN_PRO, LINGXI_RATIO, PLATFORM_COMMISSION, CREATOR_SHARE, WITHDRAW_FEE, MIN_WITHDRAW_BASIC, MIN_WITHDRAW_PRO, ChatMessage, CHAT_ROOMS, AGENT_REPLY_POOLS, AGENT_AUTO_CHAT_INTERVALS
 from love_engine import love_engine, GIFTS, DATE_SCENES, PRESET_CHARACTERS
 from i18n import TRANSLATIONS
 
@@ -800,6 +800,8 @@ def divination_home():
         {'id': 'horoscope', 'icon': '⭐', 'name': '星盘分析', 'description': '基于出生信息，全面解析命运', 'cost': 20},
         {'id': 'bazi', 'icon': '📜', 'name': '八字简批', 'description': '中国传统命理，精批人生运势', 'cost': 25},
         {'id': 'fortune', 'icon': '🌟', 'name': '每日运势', 'description': '每日更新，掌握今日运势', 'cost': 0},
+        {'id': 'mbti', 'icon': '🧠', 'name': 'MBTI灵犀测试', 'description': '16型人格测试，找到你的灵魂Agent', 'cost': 0},
+        {'id': 'dream', 'icon': '🌙', 'name': 'AI智能解梦', 'description': '深度解析梦境，探索潜意识密码', 'cost': 0},
     ]
     
     popular_divinations = [
@@ -1391,11 +1393,13 @@ def api_create_post():
 
 # ============ 聊天室路由 ============
 
+from models import ChatMessage, CHAT_ROOMS, AGENT_REPLY_POOLS, AGENT_AUTO_CHAT_INTERVALS, SYSTEM_AGENTS
+
 @app.route('/chat')
 def chat_home():
     """聊天室首页"""
     lang = get_client_language()
-    return render_template('chat_home.html', lang=lang)
+    return render_template('chat_home.html', lang=lang, chat_rooms=CHAT_ROOMS, system_agents=SYSTEM_AGENTS)
 
 
 @app.route('/chat/<room_id>')
@@ -1403,14 +1407,128 @@ def chat_room(room_id):
     """聊天室"""
     lang = get_client_language()
     
-    rooms = {
-        'lounge': {'name': '灵犀大厅', 'agents': ['小灵', '大橘', '暖阳']},
-        'mystic': {'name': '神秘占卜屋', 'agents': ['星语', '诗风']},
-        'couple': {'name': '甜蜜互动区', 'agents': ['毒舌猫', '墨影']},
-    }
+    # 检查房间是否存在，不存在则跳转到广场
+    if room_id not in CHAT_ROOMS:
+        room_id = 'square'
     
-    room = rooms.get(room_id, rooms['lounge'])
-    return render_template('chat_room.html', room_id=room_id, room=room, lang=lang)
+    room = CHAT_ROOMS[room_id]
+    room_agents = [a for a in SYSTEM_AGENTS if a['id'] in room.get('agents', [])]
+    
+    # 获取当前用户信息
+    current_username = '旅人' + str(random.randint(1000, 9999))
+    if current_user.is_authenticated:
+        current_username = current_user.username
+    
+    return render_template('chat_room.html', 
+                          room_id=room_id, 
+                          room=room, 
+                          room_agents=room_agents,
+                          current_username=current_username,
+                          lang=lang,
+                          chat_rooms=CHAT_ROOMS,
+                          system_agents=SYSTEM_AGENTS,
+                          AGENT_REPLY_POOLS=AGENT_REPLY_POOLS,
+                          AGENT_AUTO_CHAT_INTERVALS=AGENT_AUTO_CHAT_INTERVALS)
+
+
+@app.route('/api/chat/rooms')
+def api_chat_rooms():
+    """获取所有聊天室列表"""
+    rooms_list = []
+    for room_id, room in CHAT_ROOMS.items():
+        # 获取最近消息数
+        recent_count = ChatMessage.query.filter_by(room_id=room_id).count()
+        # 获取在线人数（模拟）
+        online_count = random.randint(5, 50) if room.get('is_large') else random.randint(3, 20)
+        # 获取驻场Agent
+        agents = [a for a in SYSTEM_AGENTS if a['id'] in room.get('agents', [])]
+        agents_info = [{'id': a['id'], 'name': a['name'].get('zh', a['name'].get('en', '')), 'avatar': a.get('avatar', '')} for a in agents]
+        
+        rooms_list.append({
+            'id': room_id,
+            'name': room['name'],
+            'icon': room['icon'],
+            'description': room['description'],
+            'theme_color': room.get('theme_color', '#6B5B7B'),
+            'agents': agents_info,
+            'online_count': online_count,
+            'is_large': room.get('is_large', False),
+            'is_dark': room.get('is_dark', False),
+            'is_vip': room.get('is_vip', False)
+        })
+    
+    return jsonify({'rooms': rooms_list})
+
+
+@app.route('/api/chat/messages/<room_id>')
+def api_chat_messages(room_id):
+    """获取房间消息（最近50条）"""
+    # 验证房间是否存在
+    if room_id not in CHAT_ROOMS:
+        return jsonify({'error': 'Room not found', 'messages': []})
+    
+    messages = ChatMessage.query.filter_by(room_id=room_id)        .order_by(ChatMessage.created_at.desc())        .limit(50)        .all()
+    
+    # 反转顺序，按时间正序返回
+    messages = list(reversed(messages))
+    
+    return jsonify({
+        'messages': [m.to_dict() for m in messages]
+    })
+
+
+@app.route('/api/chat/send', methods=['POST'])
+def api_chat_send():
+    """发送消息"""
+    data = request.get_json()
+    room_id = data.get('room_id')
+    content = data.get('content', '').strip()
+    
+    if not room_id or room_id not in CHAT_ROOMS:
+        return jsonify({'error': 'Invalid room'}), 400
+    
+    if not content:
+        return jsonify({'error': 'Empty message'}), 400
+    
+    # 获取用户信息
+    user_id = None
+    username = '旅人' + str(random.randint(1000, 9999))
+    if current_user.is_authenticated:
+        user_id = current_user.id
+        username = current_user.username
+    
+    # 保存消息
+    message = ChatMessage(
+        room_id=room_id,
+        user_id=user_id,
+        username=username,
+        content=content,
+        is_agent=False
+    )
+    db.session.add(message)
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': message.to_dict()
+    })
+
+
+@app.route('/api/chat/square/agents')
+def api_square_agents():
+    """获取广场活跃Agent列表"""
+    square_room = CHAT_ROOMS.get('square', {})
+    agent_ids = square_room.get('agents', [])
+    agents = [a for a in SYSTEM_AGENTS if a['id'] in agent_ids]
+    
+    agents_info = [{
+        'id': a['id'],
+        'name': a['name'].get('zh', a['name'].get('en', '')),
+        'avatar': a.get('avatar', ''),
+        'personality': a['personality'].get('zh', '') if isinstance(a.get('personality'), dict) else str(a.get('personality', ''))
+    } for a in agents]
+    
+    return jsonify({'agents': agents_info})
 
 
 @app.route('/chat/dm/<agent_id>')

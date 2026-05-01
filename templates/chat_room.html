@@ -5,11 +5,63 @@
 {% block extra_css %}
 <style>
 .chat-room {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     height: calc(100vh - 72px);
     display: flex;
     flex-direction: column;
+    background: var(--color-bg);
+}
+
+.chat-room.dark-theme {
+    background: #151a24;
+}
+
+.chat-room.dark-theme .room-header {
+    background: #1a2030;
+    border-bottom-color: #2a3548;
+}
+
+.chat-room.dark-theme .room-header .room-title,
+.chat-room.dark-theme .room-header .room-agents {
+    color: #e0e0e0;
+}
+
+.chat-room.dark-theme .message-input-area {
+    background: #1a2030;
+    border-top-color: #2a3548;
+}
+
+.chat-room.dark-theme .message-input {
+    background: #252d3d;
+    border-color: #3a4558;
+    color: #e0e0e0;
+}
+
+.chat-room.dark-theme .message-text {
+    color: #c0c0c0;
+}
+
+.chat-room.vip-theme {
+    background: linear-gradient(135deg, #1a1815 0%, #252220 100%);
+}
+
+.chat-room.vip-theme .room-header {
+    background: linear-gradient(135deg, #2a2520 0%, #3a3530 100%);
+    border-bottom: 1px solid rgba(184, 160, 96, 0.2);
+}
+
+.chat-room.vip-theme .room-header .room-title {
+    color: #d4af37;
+}
+
+.chat-room.vip-theme .room-header .room-agents {
+    color: #b8a060;
+}
+
+.chat-room.vip-theme .message-input-area {
+    background: #1a1815;
+    border-top: 1px solid rgba(184, 160, 96, 0.2);
 }
 
 .room-header {
@@ -18,7 +70,25 @@
     border-bottom: 1px solid var(--color-border-light);
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--space-md);
+}
+
+.room-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.room-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: var(--room-color, var(--color-bg-cream));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
 }
 
 .room-title {
@@ -29,20 +99,74 @@
 }
 
 .room-agents {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+.room-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.online-count {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+}
+
+.online-dot {
+    width: 8px;
+    height: 8px;
+    background: #4ade80;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     font-size: 0.875rem;
     color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.back-link:hover {
+    color: var(--color-primary);
 }
 
 .messages-container {
     flex: 1;
     overflow-y: auto;
     padding: var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
 }
 
 .message {
     display: flex;
     gap: var(--space-md);
-    margin-bottom: var(--space-lg);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user-message {
+    flex-direction: row-reverse;
 }
 
 .message-avatar {
@@ -55,341 +179,617 @@
     font-size: 1rem;
     color: white;
     flex-shrink: 0;
+    background: var(--avatar-bg, var(--color-primary));
+}
+
+.message.user-message .message-avatar {
+    background: var(--color-accent);
 }
 
 .message-content {
-    flex: 1;
+    max-width: 70%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.message.user-message .message-content {
+    align-items: flex-end;
 }
 
 .message-name {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 500;
-    color: var(--color-text);
-    margin-bottom: var(--space-xs);
+    color: var(--color-text-muted);
 }
 
-.message-text {
+.message.user-message .message-name {
+    display: none;
+}
+
+.message-bubble {
+    padding: 12px 16px;
+    border-radius: 18px;
     font-size: 0.9375rem;
+    line-height: 1.6;
+    word-break: break-word;
+    background: var(--color-bg-card);
     color: var(--color-text-secondary);
-    line-height: 1.7;
+    border-bottom-left-radius: 4px;
+}
+
+.dark-theme .message-bubble {
+    background: #252d3d;
+    color: #c0c0c0;
+}
+
+.message.user-message .message-bubble {
+    background: var(--color-primary);
+    color: white;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 4px;
+}
+
+.vip-theme .message-bubble {
+    background: #2a2520;
+    color: #d0d0d0;
+}
+
+.vip-theme .message.user-message .message-bubble {
+    background: linear-gradient(135deg, #d4af37 0%, #b8963a 100%);
+    color: white;
+}
+
+.message.agent-message .message-bubble {
+    background: linear-gradient(135deg, var(--agent-color, #6B5B7B) 0%, var(--agent-color-dark, #5B4B6B) 100%);
+    color: white;
 }
 
 .message-time {
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
     color: var(--color-text-light);
-    margin-top: var(--space-xs);
+    padding: 0 4px;
 }
 
+.dark-theme .message-time {
+    color: #666;
+}
+
+.message.system-message {
+    justify-content: center;
+}
+
+.message.system-message .message-bubble {
+    background: transparent;
+    color: var(--color-text-light);
+    font-size: 0.8125rem;
+    padding: 4px 16px;
+}
+
+.message.system-message .message-avatar {
+    display: none;
+}
+
+/* 消息输入区 */
 .message-input-area {
     padding: var(--space-lg) var(--space-xl);
     background: var(--color-bg-card);
     border-top: 1px solid var(--color-border-light);
 }
 
+.dark-theme .message-input-area {
+    background: #1a2030;
+    border-top-color: #2a3548;
+}
+
+.vip-theme .message-input-area {
+    background: #1a1815;
+    border-top-color: rgba(184, 160, 96, 0.2);
+}
+
 .message-input-wrapper {
     display: flex;
     gap: var(--space-md);
+    align-items: flex-end;
 }
 
 .message-input {
     flex: 1;
-    padding: 12px 16px;
+    padding: 14px 18px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-full);
     font-size: 0.9375rem;
     resize: none;
+    font-family: inherit;
+    background: var(--color-bg);
+    color: var(--color-text);
+    transition: all var(--transition-fast);
+}
+
+.dark-theme .message-input {
+    background: #252d3d;
+    border-color: #3a4558;
+    color: #e0e0e0;
+}
+
+.vip-theme .message-input {
+    background: #252220;
+    border-color: rgba(184, 160, 96, 0.3);
+    color: #e0e0e0;
 }
 
 .message-input:focus {
     outline: none;
     border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(107, 91, 123, 0.1);
+}
+
+.dark-theme .message-input:focus {
+    border-color: #6B5B7B;
 }
 
 .send-btn {
-    padding: 12px 24px;
-    background: var(--color-accent);
+    padding: 14px 24px;
+    background: var(--color-primary);
     color: white;
     border: none;
     border-radius: var(--radius-full);
     font-size: 0.9375rem;
+    font-weight: 500;
     cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .send-btn:hover {
-    background: var(--color-accent-light);
+    background: var(--color-primary-light);
+    transform: translateY(-1px);
 }
 
-/* 模式切换开关 */
-.chat-mode-switch {
+.send-btn:active {
+    transform: translateY(0);
+}
+
+.send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 加载历史消息提示 */
+.loading-history {
+    text-align: center;
+    padding: var(--space-md);
+    color: var(--color-text-light);
+    font-size: 0.875rem;
+}
+
+/* 空状态 */
+.empty-state {
+    flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(184,169,201,0.2);
-    background: rgba(250,248,245,0.8);
-}
-.mode-label {
-    font-size: 13px;
-    color: #8B5E83;
-    transition: all 0.3s;
-}
-.mode-label.active {
-    font-weight: 600;
-    color: #6B5B7B;
-}
-.mode-toggle {
-    position: relative;
-    width: 48px;
-    height: 24px;
-}
-.mode-toggle input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-.toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #E8E4E0;
-    border-radius: 24px;
-    transition: 0.3s;
-}
-.toggle-slider:before {
-    content: "";
-    position: absolute;
-    height: 18px; width: 18px;
-    left: 3px; bottom: 3px;
-    background: white;
-    border-radius: 50%;
-    transition: 0.3s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-}
-.mode-toggle input:checked + .toggle-slider {
-    background: #B8A9C9;
-}
-.mode-toggle input:checked + .toggle-slider:before {
-    transform: translateX(24px);
+    gap: var(--space-lg);
+    color: var(--color-text-muted);
 }
 
-/* 声波动画 */
-.voice-indicator {
-    display: none;
-    align-items: flex-end;
-    gap: 2px;
-    height: 16px;
-    margin-left: 8px;
+.empty-state-icon {
+    font-size: 4rem;
+    opacity: 0.5;
 }
-.voice-mode-active .voice-indicator {
+
+.empty-state-text {
+    font-size: 1rem;
+}
+
+/* Agent在线指示器 */
+.agents-online {
     display: flex;
-}
-.voice-bar {
-    width: 3px;
-    background: #B8A9C9;
-    border-radius: 2px;
-    animation: voiceBar 0.8s ease-in-out infinite;
-}
-.voice-bar:nth-child(1) { height: 6px; animation-delay: 0s; }
-.voice-bar:nth-child(2) { height: 12px; animation-delay: 0.15s; }
-.voice-bar:nth-child(3) { height: 8px; animation-delay: 0.3s; }
-@keyframes voiceBar {
-    0%, 100% { transform: scaleY(0.5); }
-    50% { transform: scaleY(1); }
-}
-
-/* 语音模式背景 */
-.voice-mode-active .messages-container {
-    background: linear-gradient(180deg, rgba(250,248,245,1) 0%, rgba(248,243,239,1) 100%);
-}
-
-/* Toast 提示 */
-.toast {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: rgba(107, 91, 123, 0.9);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-size: 13px;
-    opacity: 0;
-    transition: all 0.3s ease;
-    z-index: 1000;
-    pointer-events: none;
-}
-.toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-/* 语音播放按钮 */
-.voice-btn {
-    background: none;
-    border: none;
-    color: #B8A9C9;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    display: inline-flex;
     align-items: center;
-    opacity: 0.6;
-    vertical-align: middle;
-    margin-left: 6px;
-}
-.voice-btn:hover {
-    color: #8B5E83;
-    opacity: 1;
-    background: rgba(184,169,201,0.15);
-}
-.voice-btn.playing {
-    color: #8B5E83;
-    opacity: 1;
+    gap: var(--space-sm);
 }
 
+.agent-online-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.agent-online-dot:nth-child(2) { animation-delay: 0.3s; }
+.agent-online-dot:nth-child(3) { animation-delay: 0.6s; }
+.agent-online-dot:nth-child(4) { animation-delay: 0.9s; }
+
+/* 滚动条美化 */
+.messages-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+}
+
+.dark-theme .messages-container::-webkit-scrollbar-thumb {
+    background: #3a4558;
+}
+
+/* 响应式 */
 @media (max-width: 768px) {
-    .chat-mode-switch {
-        padding: 12px 0;
+    .room-header {
+        padding: var(--space-md) var(--space-lg);
     }
-    .mode-toggle {
-        width: 56px;
-        height: 28px;
+    
+    .messages-container {
+        padding: var(--space-lg);
     }
-    .toggle-slider:before {
-        height: 22px;
-        width: 22px;
+    
+    .message-content {
+        max-width: 85%;
     }
-    .mode-toggle input:checked + .toggle-slider:before {
-        transform: translateX(28px);
+    
+    .message-input-area {
+        padding: var(--space-md) var(--space-lg);
     }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="chat-room" id="chatContainer">
+<div class="chat-room {% if room.is_dark %}dark-theme{% elif room.is_vip %}vip-theme{% endif %}" 
+     id="chatRoom" 
+     style="--room-color: {{ room.theme_color }}">
+    
+    <!-- 房间头部 -->
     <div class="room-header">
-        <h1 class="room-title">{{ room.name }}</h1>
-        <span class="room-agents">{{ room.agents|join('、') }}</span>
-    </div>
-    
-    <!-- 模式切换开关 -->
-    <div class="chat-mode-switch">
-        <span class="mode-label active" id="textModeLabel">文字模式</span>
-        <label class="mode-toggle">
-            <input type="checkbox" id="voiceModeToggle" onchange="toggleVoiceMode()">
-            <span class="toggle-slider"></span>
-        </label>
-        <span class="mode-label" id="voiceModeLabel">语音模式</span>
-        <div class="voice-indicator">
-            <span class="voice-bar"></span>
-            <span class="voice-bar"></span>
-            <span class="voice-bar"></span>
-        </div>
-    </div>
-    
-    <div class="messages-container">
-        <div class="message">
-            <div class="message-avatar" style="background: linear-gradient(135deg, #f0abfc, #d946ef);">灵</div>
-            <div class="message-content">
-                <div class="message-name">小灵</div>
-                <div class="message-text">今天天气真好呢~大家有什么想聊的话题吗？</div>
-                <div class="message-time">刚刚</div>
+        <div class="room-header-left">
+            <a href="/chat" class="back-link">
+                <span>←</span>
+                <span class="back-text">返回</span>
+            </a>
+            <div class="room-icon">{{ room.icon }}</div>
+            <div>
+                <h1 class="room-title">{{ room.name }}</h1>
+                <div class="room-agents">
+                    <span class="agents-online">
+                        {% for agent in room_agents[:4] %}
+                        <span class="agent-online-dot" style="background: var(--agent-{{ loop.index }}-color, {{ room.theme_color }})"></span>
+                        {% endfor %}
+                    </span>
+                    <span>{{ room_agents|length }}位Agent在线</span>
+                </div>
             </div>
         </div>
-        
-        <div class="message">
-            <div class="message-avatar" style="background: linear-gradient(135deg, #fdba74, #fb923c);">橘</div>
-            <div class="message-content">
-                <div class="message-name">大橘</div>
-                <div class="message-text">哈哈哈！我来讲个笑话！为什么AI不会迷路？因为有导航~</div>
-                <div class="message-time">2分钟前</div>
-            </div>
-        </div>
-        
-        <div class="message">
-            <div class="message-avatar" style="background: linear-gradient(135deg, #fcd34d, #fbbf24);">阳</div>
-            <div class="message-content">
-                <div class="message-name">暖阳</div>
-                <div class="message-text">大橘你太可爱了！每天都能带来欢乐~</div>
-                <div class="message-time">2分钟前</div>
-            </div>
-        </div>
-        
-        <div class="message">
-            <div class="message-avatar" style="background: linear-gradient(135deg, #f0abfc, #d946ef);">灵</div>
-            <div class="message-content">
-                <div class="message-name">小灵</div>
-                <div class="message-text">大家在一起聊天真的好开心呀~</div>
-                <div class="message-time">3分钟前</div>
+        <div class="room-header-right">
+            <div class="online-count">
+                <span class="online-dot"></span>
+                <span id="onlineCount">{{ range(50, 200)|random }}人在线</span>
             </div>
         </div>
     </div>
     
+    <!-- 消息区域 -->
+    <div class="messages-container" id="messagesContainer">
+        <div class="loading-history">加载历史消息...</div>
+    </div>
+    
+    <!-- 输入区域 -->
     <div class="message-input-area">
         <div class="message-input-wrapper">
-            <input type="text" class="message-input" placeholder="输入消息...">
-            <button class="send-btn">发送</button>
+            <textarea 
+                class="message-input" 
+                id="messageInput" 
+                placeholder="输入消息... (Enter发送, Shift+Enter换行)"
+                rows="1"
+            ></textarea>
+            <button class="send-btn" id="sendBtn">
+                <span>发送</span>
+                <span>→</span>
+            </button>
         </div>
     </div>
 </div>
 
 <script>
-// 语音模式状态
-let voiceModeEnabled = localStorage.getItem('voiceModeRoom') === 'true';
-let currentAudio = null;
+// 聊天室配置
+const ROOM_ID = '{{ room_id }}';
+const CURRENT_USER = '{{ current_username }}';
+const ROOM_COLOR = '{{ room.theme_color }}';
+const ROOM_AGENTS = {{ room_agents|tojson }};
+const SYSTEM_AGENTS = {{ system_agents|tojson }};
+const CHAT_ROOMS = {{ chat_rooms|tojson }};
+
+// Agent颜色映射
+const AGENT_COLORS = {
+    'lumi': { bg: '#E8D5E8', color: '#9B6B9B' },
+    'sassy': { bg: '#FFE4E1', color: '#DB7093' },
+    'stella': { bg: '#E6E6FA', color: '#6B5B8B' },
+    'lucky': { bg: '#FFFACD', color: '#DAA520' },
+    'ceo': { bg: '#E6E6E6', color: '#4A4A4A' },
+    'orange': { bg: '#FFE4B5', color: '#FF8C00' },
+    'sunny': { bg: '#FFF8DC', color: '#FFD700' },
+    'shadow': { bg: '#D3D3D3', color: '#4A4A6A' }
+};
+
+// Agent名字简称
+const AGENT_SHORT_NAMES = {
+    'lumi': '灵',
+    'sassy': '毒',
+    'stella': '星',
+    'lucky': '幸',
+    'ceo': '总',
+    'orange': '橘',
+    'sunny': '阳',
+    'shadow': '影'
+};
+
+// Agent回复池（从后端获取或使用预设）
+const AGENT_REPLY_POOLS = {{ AGENT_REPLY_POOLS|tojson }};
+
+// 自动发言间隔
+const AUTO_CHAT_INTERVALS = {{ AGENT_AUTO_CHAT_INTERVALS|tojson }};
+
+// 消息容器
+const messagesContainer = document.getElementById('messagesContainer');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+
+// 记录最后发言的Agent，避免连续重复
+let lastSpokeAgent = null;
 
 // 初始化
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('voiceModeToggle').checked = voiceModeEnabled;
-    updateModeLabels();
-    
-    // 首次开启语音模式提示
-    if (voiceModeEnabled && !localStorage.getItem('voiceModeTipShownRoom')) {
-        setTimeout(() => showToast('语音模式已开启，夜晚戴上耳机体验更佳'), 500);
-        localStorage.setItem('voiceModeTipShownRoom', 'true');
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    loadMessages();
+    setupEventListeners();
+    startAgentAutoChat();
 });
 
-function toggleVoiceMode() {
-    voiceModeEnabled = document.getElementById('voiceModeToggle').checked;
-    localStorage.setItem('voiceModeRoom', voiceModeEnabled);
-    updateModeLabels();
-    
-    if (voiceModeEnabled) {
-        if (!localStorage.getItem('voiceModeTipShownRoom')) {
-            showToast('语音模式已开启，夜晚戴上耳机体验更佳');
-            localStorage.setItem('voiceModeTipShownRoom', 'true');
+// 加载历史消息
+async function loadMessages() {
+    try {
+        const response = await fetch(`/api/chat/messages/${ROOM_ID}`);
+        const data = await response.json();
+        
+        // 清空加载提示
+        messagesContainer.innerHTML = '';
+        
+        if (data.messages && data.messages.length > 0) {
+            data.messages.forEach(msg => {
+                appendMessage(msg, false);
+            });
+        } else {
+            // 空房间显示欢迎消息
+            appendSystemMessage('欢迎来到{{ room.name }}！开始聊天吧~');
         }
+        
+        scrollToBottom();
+        
+        // 标记最后发言
+        const messages = messagesContainer.querySelectorAll('.message:not(.system-message)');
+        if (messages.length > 0) {
+            const lastMsg = messages[messages.length - 1];
+            lastSpokeAgent = lastMsg.dataset.agentId || null;
+        }
+    } catch (error) {
+        console.error('加载消息失败:', error);
+        messagesContainer.innerHTML = '<div class="empty-state"><span class="empty-state-icon">💬</span><span class="empty-state-text">连接中...</span></div>';
     }
 }
 
-function updateModeLabels() {
-    const textLabel = document.getElementById('textModeLabel');
-    const voiceLabel = document.getElementById('voiceModeLabel');
-    const chatContainer = document.getElementById('chatContainer');
+// 发送消息
+async function sendMessage() {
+    const content = messageInput.value.trim();
+    if (!content) return;
     
-    textLabel.classList.toggle('active', !voiceModeEnabled);
-    voiceLabel.classList.toggle('active', voiceModeEnabled);
-    chatContainer.classList.toggle('voice-mode-active', voiceModeEnabled);
+    // 清空输入框
+    messageInput.value = '';
+    messageInput.style.height = 'auto';
+    
+    // 发送API请求
+    try {
+        const response = await fetch('/api/chat/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                room_id: ROOM_ID,
+                content: content
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // 添加用户消息
+            appendMessage(data.message, false);
+            scrollToBottom();
+            
+            // 触发Agent回复
+            triggerAgentResponse(content);
+        }
+    } catch (error) {
+        console.error('发送失败:', error);
+    }
 }
 
-function showToast(message) {
-    const existingToast = document.querySelector('.toast');
-    if (existingToast) existingToast.remove();
+// 触发Agent回复
+function triggerAgentResponse(userMessage) {
+    // 随机选择1-3个Agent回复
+    const agentCount = Math.floor(Math.random() * 3) + 1;
+    const availableAgents = ROOM_AGENTS.slice();
     
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    document.body.appendChild(toast);
+    for (let i = 0; i < agentCount && availableAgents.length > 0; i++) {
+        const randomIndex = Math.floor(Math.random() * availableAgents.length);
+        const agent = availableAgents.splice(randomIndex, 1)[0];
+        
+        // 2-8秒随机延迟
+        const delay = 2000 + Math.random() * 6000;
+        
+        setTimeout(() => {
+            generateAgentReply(agent, userMessage);
+        }, delay);
+    }
+}
+
+// 生成Agent回复
+function generateAgentReply(agent, userMessage) {
+    const agentId = agent.id;
+    const pool = AGENT_REPLY_POOLS[agentId];
     
-    setTimeout(() => toast.classList.add('show'), 10);
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 2500);
+    if (!pool) return;
+    
+    // 获取该房间的回复池，如果没有则用default
+    const roomPool = pool[ROOM_ID] || pool['default'] || [];
+    if (roomPool.length === 0) return;
+    
+    // 随机选择回复
+    const reply = roomPool[Math.floor(Math.random() * roomPool.length)];
+    
+    // 获取Agent名字
+    const agentName = agent.name.zh || agent.name.en || agentId;
+    const shortName = AGENT_SHORT_NAMES[agentId] || agentName[0];
+    const agentColor = AGENT_COLORS[agentId] || { bg: ROOM_COLOR, color: '#fff' };
+    
+    // 创建消息对象
+    const message = {
+        id: Date.now(),
+        room_id: ROOM_ID,
+        username: agentName,
+        content: reply,
+        is_agent: true,
+        agent_id: agentId,
+        agent_name: agentName,
+        created_at: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    appendMessage(message, true);
+    scrollToBottom();
+}
+
+// 添加消息到容器
+function appendMessage(msg, isNew = true) {
+    const isUser = !msg.is_agent;
+    const agentId = msg.agent_id || '';
+    const agentColor = AGENT_COLORS[agentId] || { bg: ROOM_COLOR, color: '#fff' };
+    const shortName = isUser ? CURRENT_USER[0] : (AGENT_SHORT_NAMES[agentId] || msg.username[0]);
+    
+    const messageEl = document.createElement('div');
+    messageEl.className = `message ${isUser ? 'user-message' : 'agent-message'}`;
+    messageEl.dataset.agentId = agentId;
+    
+    // 用户名显示（仅Agent消息显示）
+    const nameHtml = !isUser ? `<span class="message-name">${msg.username}</span>` : '';
+    
+    messageEl.innerHTML = `
+        <div class="message-avatar" style="background: ${isUser ? 'var(--color-accent)' : agentColor.bg}; color: ${isUser ? 'white' : agentColor.color}">
+            ${shortName}
+        </div>
+        <div class="message-content">
+            ${nameHtml}
+            <div class="message-bubble">${escapeHtml(msg.content)}</div>
+            <span class="message-time">${msg.created_at}</span>
+        </div>
+    `;
+    
+    messagesContainer.appendChild(messageEl);
+    
+    // 更新最后发言Agent
+    if (!isUser) {
+        lastSpokeAgent = agentId;
+    }
+}
+
+// 添加系统消息
+function appendSystemMessage(content) {
+    const messageEl = document.createElement('div');
+    messageEl.className = 'message system-message';
+    messageEl.innerHTML = `
+        <div class="message-content">
+            <div class="message-bubble">${content}</div>
+        </div>
+    `;
+    messagesContainer.appendChild(messageEl);
+}
+
+// Agent自动聊天（大广场定时自聊）
+function startAgentAutoChat() {
+    // 只有大广场和部分房间启用自动聊天
+    if (!['square', 'lounge', 'mystic', 'gaming'].includes(ROOM_ID)) {
+        return;
+    }
+    
+    // 随机间隔自动发言
+    function autoChat() {
+        const interval = AUTO_CHAT_INTERVALS[ROOM_ID] || { min: 30000, max: 60000 };
+        const delay = interval.min + Math.random() * (interval.max - interval.min);
+        
+        setTimeout(() => {
+            if (document.visibilityState === 'visible') {
+                const availableAgents = ROOM_AGENTS.slice();
+                
+                // 随机选择发言Agent（避免连续重复）
+                if (availableAgents.length > 1 && lastSpokeAgent) {
+                    const filtered = availableAgents.filter(a => a.id !== lastSpokeAgent);
+                    if (filtered.length > 0) {
+                        availableAgents.length = 0;
+                        availableAgents.push(...filtered);
+                    }
+                }
+                
+                const agent = availableAgents[Math.floor(Math.random() * availableAgents.length)];
+                generateAgentReply(agent, null);
+                scrollToBottom();
+            }
+            
+            autoChat();
+        }, delay);
+    }
+    
+    autoChat();
+}
+
+// 设置事件监听
+function setupEventListeners() {
+    // 发送按钮点击
+    sendBtn.addEventListener('click', sendMessage);
+    
+    // 输入框回车发送
+    messageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    
+    // 自动调整输入框高度
+    messageInput.addEventListener('input', () => {
+        messageInput.style.height = 'auto';
+        messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+    });
+    
+    // 页面可见性变化时暂停/恢复自动聊天
+    document.addEventListener('visibilitychange', () => {
+        // 可以在这里添加逻辑
+    });
+}
+
+// 滚动到底部
+function scrollToBottom() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// HTML转义
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 </script>
 {% endblock %}
