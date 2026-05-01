@@ -496,37 +496,85 @@ def divination_home():
     """占卜首页"""
     lang = get_client_language()
     
-    divination_types = {
+    # 占卜类型列表（模板期望的格式 - 字典，键为id）
+    type_data = {
         'tarot': {
-            'name': {'zh': '塔罗占卜', 'en': 'Tarot Reading', 'ja': 'タロット占卜'},
+            'id': 'tarot',
             'icon': '🃏',
-            'desc': {'zh': '78张塔罗牌，解读过去现在未来', 'en': '78 tarot cards reveal past, present, future', 'ja': '78枚のタロットカード、過去•現在•未来を解く'}
+            'name': '塔罗占卜',
+            'description': '78张塔罗牌，解读过去现在未来',
+            'cost': 10,
+            'tip': '塔罗擅长解答：未来会发生什么？我应该如何抉择？'
         },
         'love': {
-            'name': {'zh': '恋爱占卜', 'en': 'Love Divination', 'ja': '恋愛占卜'},
+            'id': 'love',
             'icon': '💕',
-            'desc': {'zh': '复合/暗恋/桃花/姻缘', 'en': 'Reunion/Crush/Relationship/Marriage', 'ja': '元カノ/片想い/恋桃花/結婚'}
+            'name': '恋爱占卜',
+            'description': '复合/暗恋/桃花/姻缘',
+            'cost': 15,
+            'tip': '恋爱问题：Ta心里有我吗？我们会在一起吗？'
         },
         'horoscope': {
-            'name': {'zh': '星盘分析', 'en': 'Horoscope Analysis', 'ja': '星盤分析'},
+            'id': 'horoscope',
             'icon': '⭐',
-            'desc': {'zh': '基于出生信息，全面解析命运', 'en': 'Comprehensive fate analysis based on birth info', 'ja': '出生情報に基づく運命の完全解析'}
+            'name': '星盘分析',
+            'description': '基于出生信息，全面解析命运',
+            'cost': 20,
+            'tip': '星盘解读：我的性格天赋是什么？适合什么样的伴侣？'
         },
         'bazi': {
-            'name': {'zh': '八字简批', 'en': 'Bazi Analysis', 'ja': '八字簡批'},
+            'id': 'bazi',
             'icon': '📜',
-            'desc': {'zh': '中国传统命理，精批人生运势', 'en': 'Traditional Chinese fortune-telling', 'ja': '中国传统の運命学'}
+            'name': '八字简批',
+            'description': '中国传统命理，精批人生运势',
+            'cost': 25,
+            'tip': '八字分析：我的命运走向如何？何时姻缘/事业发达？'
         },
         'fortune': {
-            'name': {'zh': '每日运势', 'en': 'Daily Fortune', 'ja': '今日の運勢'},
+            'id': 'fortune',
             'icon': '🌟',
-            'desc': {'zh': '每日更新，掌握今日运势', 'en': 'Updated daily, know your fortune', 'ja': '每日更新、今日の運勢を把握'}
+            'name': '每日运势',
+            'description': '每日更新，掌握今日运势',
+            'cost': 0,
+            'tip': '今日运势：今天需要注意什么？运势如何？'
         }
     }
     
+    # 占卜类型列表（用于模板渲染）
+    divination_types = list(type_data.values())
+    
+    # 热门占卜
+    popular_divinations = [
+        {'id': 'love-reunion', 'icon': '💔→❤️', 'title': '复合占卜', 'subtitle': '他/她还会回来吗？', 'responses': 856},
+        {'id': 'love-crush', 'icon': '🥰', 'title': '暗恋占卜', 'subtitle': '他/她喜欢我吗？', 'responses': 1243},
+        {'id': 'tarot-daily', 'icon': '🃏', 'title': '每日一牌', 'subtitle': '今日塔罗指引', 'responses': 2105},
+        {'id': 'fortune-today', 'icon': '🌟', 'title': '今日运势', 'subtitle': '12星座每日运势', 'responses': 3421},
+    ]
+    
+    # AI占卜师
+    fortune_tellers = [
+        {'id': 'mystica', 'avatar': '🔮', 'avatar_color': '#8b5cf6', 'name': '神秘学家', 'specialty': '塔罗·灵性'},
+        {'id': 'love_guru', 'avatar': '💕', 'avatar_color': '#ec4899', 'name': '情感导师', 'specialty': '恋爱·姻缘'},
+        {'id': 'cosmic', 'avatar': '🌙', 'avatar_color': '#6366f1', 'name': '星象师', 'specialty': '星盘·星座'},
+        {'id': 'wisdom', 'avatar': '📜', 'avatar_color': '#f59e0b', 'name': '命理师', 'specialty': '八字·命理'},
+    ]
+    
+    # 占卜小知识
+    tips = [
+        {'icon': '🃏', 'title': '塔罗占卜礼仪', 'summary': '洗牌时专注于您的问题，心诚则灵'},
+        {'icon': '💕', 'title': '恋爱占卜须知', 'summary': '避免连续占卜同一问题，给宇宙时间回应'},
+        {'icon': '⭐', 'title': '星盘准确性', 'summary': '提供准确的出生时间可获得更精确的分析'},
+    ]
+    
     return render_template('divination/home.html',
                          divination_types=divination_types,
+                         type_data=type_data,
+                         popular_divinations=popular_divinations,
+                         fortune_tellers=fortune_tellers,
+                         tips=tips,
+                         recent_divinations=None,
                          lang=lang)
+
 
 
 # ============ 会员系统 ============
