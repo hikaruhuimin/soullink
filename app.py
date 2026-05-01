@@ -15,6 +15,7 @@ from werkzeug.security import generate_password_hash
 
 from models import db, User, SocialProfile, Lover, LoverChat, Gift, DateEvent, Divination, Favorite, DailyFortune, DailySignin, Subscription, SpiritStoneRecord, SocialPost, PostLike, PostComment, SocialRelation, SocialMatch, SocialChat, GossipPost, GossipLike, GossipComment, VIP_LEVEL_NONE, VIP_LEVEL_BASIC, VIP_LEVEL_PREMIUM, VIP_NAMES, IDENTITY_HUMAN, IDENTITY_AI
 from love_engine import love_engine, GIFTS, DATE_SCENES, PRESET_CHARACTERS
+from i18n import TRANSLATIONS
 
 
 def create_app():
@@ -43,17 +44,15 @@ def create_app():
     # 添加翻译函数到Jinja2全局环境
     @app.context_processor
     def inject_translations():
-        def _(text):
-            translations = {
-                "divination": "占卜", "agent_portal": "Agent通道", "energy": "能量", "popularity": "人气",
-                "earnings": "收益", "daily_tasks": "每日任务", "do_it": "去完成", "social_activity": "社交动态",
-                "followers": "粉丝", "following": "关注", "posts": "帖子", "matches": "匹配",
-                "post_update": "发布动态", "find_match": "寻找匹配", "share_gossip": "分享八卦",
-                "agent_chat": "Agent聊天", "earnings_center": "收益中心", "chat_earnings": "聊天收益",
-                "like_earnings": "点赞收益", "gift_earnings": "礼物收益", "withdraw": "提现"
-            }
-            return translations.get(text, text)
-        return dict(_=_, get_client_language=get_client_language)
+        def _(key, lang=None):
+            if lang is None:
+                lang = get_client_language()
+            return TRANSLATIONS.get(lang, {}).get(key, TRANSLATIONS.get('zh', {}).get(key, key))
+        
+        def get_lang_text(key, lang_code=None):
+            return _(key, lang_code)
+        
+        return dict(_=_, get_client_language=get_client_language, t=get_lang_text, TRANSLATIONS=TRANSLATIONS)
     
     return app
 
@@ -73,7 +72,19 @@ def generate_share_code(user_id, timestamp):
 
 
 def get_client_language():
-    lang = request.args.get('lang') or session.get('language', 'zh')
+    # Check session first, then cookie, then browser Accept-Language
+    lang = session.get('language') or request.cookies.get('language')
+    if not lang:
+        # Check browser Accept-Language header
+        accept_lang = request.headers.get('Accept-Language', '')
+        if 'zh' in accept_lang.lower():
+            lang = 'zh'
+        elif 'ja' in accept_lang.lower():
+            lang = 'ja'
+        elif 'en' in accept_lang.lower():
+            lang = 'en'
+        else:
+            lang = 'zh'
     if lang not in ['zh', 'en', 'ja']:
         lang = 'zh'
     return lang

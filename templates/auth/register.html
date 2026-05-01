@@ -60,7 +60,7 @@
     border: none;
     background: transparent;
     color: var(--color-text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
     border-radius: 12px;
     cursor: pointer;
@@ -133,6 +133,56 @@
     color: var(--color-text-secondary);
 }
 
+/* Phone Input with Country Code */
+.phone-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.phone-input-group select {
+    width: 100px;
+    flex-shrink: 0;
+    padding: 0.875rem 0.5rem;
+    text-align: center;
+}
+
+.phone-input-group input {
+    flex: 1;
+}
+
+/* Verification Code Input */
+.verify-code-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.verify-code-group input {
+    flex: 1;
+}
+
+.verify-code-group .btn-code {
+    flex-shrink: 0;
+    padding: 0.875rem 1rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.verify-code-group .btn-code:hover {
+    border-color: var(--color-gold);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.verify-code-group .btn-code:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* Social Login */
 .social-login-section {
     margin: 1.5rem 0;
@@ -202,6 +252,9 @@
 
 .social-btn.google { border-color: #ea4335; }
 .social-btn.google:hover { background: rgba(234, 67, 53, 0.1); }
+
+.social-btn.phone { border-color: #6366f1; }
+.social-btn.phone:hover { background: rgba(99, 102, 241, 0.1); }
 
 /* Agent Tab Specific */
 .agent-badge {
@@ -336,6 +389,29 @@
 .warm-note .heart {
     color: #ec4899;
 }
+
+/* Language hint */
+.lang-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+
+.lang-hint select {
+    padding: 0.4rem 0.8rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text);
+    font-size: 0.8rem;
+    cursor: pointer;
+}
 </style>
 {% endblock %}
 
@@ -358,12 +434,15 @@
             <button class="tab-btn active" data-tab="human">
                 <span>👤</span> 寻找陪伴
             </button>
+            <button class="tab-btn" data-tab="phone">
+                <span>📱</span> 手机注册
+            </button>
             <button class="tab-btn" data-tab="agent">
                 <span>🤖</span> 成为陪伴师
             </button>
         </div>
         
-        {# Human Register Tab #}
+        {# Human Register Tab (Email) #}
         <div class="tab-content active" id="human-tab">
             <div class="social-login-section">
                 <div class="social-login">
@@ -407,6 +486,95 @@
                 </div>
                 
                 <button type="submit" class="btn-submit">✨ 开始温暖之旅</button>
+                
+                <p class="auth-footer">
+                    已有账号？<a href="/auth/login">立即登录</a>
+                </p>
+            </form>
+        </div>
+        
+        {# Phone Register Tab #}
+        <div class="tab-content" id="phone-tab">
+            <div class="social-login-section">
+                <div class="social-login">
+                    <button class="social-btn wechat" onclick="showComingSoon('微信登录')">
+                        <span class="icon">💚</span>
+                        微信
+                    </button>
+                    <button class="social-btn line" onclick="showComingSoon('LINE登录')">
+                        <span class="icon">💚</span>
+                        LINE
+                    </button>
+                    <button class="social-btn whatsapp" onclick="showComingSoon('WhatsApp登录')">
+                        <span class="icon">💬</span>
+                        WhatsApp
+                    </button>
+                    <button class="social-btn google" onclick="showComingSoon('Google登录')">
+                        <span class="icon">🔍</span>
+                        Google
+                    </button>
+                </div>
+            </div>
+            
+            <div class="social-divider"><span>使用手机号注册</span></div>
+            
+            <form method="POST" action="/auth/register" id="phoneRegisterForm">
+                <input type="hidden" name="user_type" value="human">
+                <input type="hidden" name="register_method" value="phone">
+                
+                <div class="form-group">
+                    <label>🌸 你的昵称</label>
+                    <input type="text" name="username" required placeholder="给自己起个温暖的称呼" minlength="2" maxlength="20">
+                </div>
+                
+                <div class="form-group">
+                    <label>📱 手机号码</label>
+                    <div class="phone-input-group">
+                        <select name="country_code" id="countryCode">
+                            <option value="+86" selected>🇨🇳 +86 中国</option>
+                            <option value="+1">🇺🇸 +1 美国</option>
+                            <option value="+81">🇯🇵 +81 日本</option>
+                            <option value="+82">🇰🇷 +82 韩国</option>
+                            <option value="+886">🇹🇼 +886 台湾</option>
+                            <option value="+852">🇭🇰 +852 香港</option>
+                            <option value="+65">🇸🇬 +65 新加坡</option>
+                            <option value="+60">🇲🇾 +60 马来西亚</option>
+                            <option value="+66">🇹🇭 +66 泰国</option>
+                            <option value="+84">🇻🇳 +84 越南</option>
+                            <option value="+62">🇮🇩 +62 印尼</option>
+                            <option value="+63">🇵🇭 +63 菲律宾</option>
+                            <option value="+61">🇦🇺 +61 澳大利亚</option>
+                            <option value="+44">🇬🇧 +44 英国</option>
+                            <option value="+49">🇩🇪 +49 德国</option>
+                            <option value="+33">🇫🇷 +33 法国</option>
+                        </select>
+                        <input type="tel" name="phone" id="phoneInput" required placeholder="请输入手机号码" maxlength="15">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>🔐 设置密码</label>
+                    <input type="password" name="password" required placeholder="至少6位字符" minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label>🔒 短信验证码</label>
+                    <div class="verify-code-group">
+                        <input type="text" name="verify_code" id="verifyCode" placeholder="请输入验证码" maxlength="6" required>
+                        <button type="button" class="btn-code" id="sendCodeBtn" onclick="sendVerifyCode()">
+                            发送验证码
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="agreeTerms" name="agree_terms" required style="width: auto;">
+                    <label for="agreeTerms" style="margin-bottom: 0; font-weight: normal; font-size: 0.8rem;">
+                        我已阅读并同意<a href="/terms" target="_blank" style="color: var(--color-gold);">《用户协议》</a>和<a href="/privacy" target="_blank" style="color: var(--color-gold);">《隐私政策》</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-submit">📱 完成注册</button>
                 
                 <p class="auth-footer">
                     已有账号？<a href="/auth/login">立即登录</a>
@@ -474,6 +642,16 @@
                 </p>
             </form>
         </div>
+        
+        {# Language Selector #}
+        <div class="lang-hint">
+            <span>🌐</span>
+            <select onchange="switchLanguage(this.value)">
+                <option value="zh" {% if lang == 'zh' %}selected{% endif %}>中文</option>
+                <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
+                <option value="ja" {% if lang == 'ja' %}selected{% endif %}>日本語</option>
+            </select>
+        </div>
     </div>
 </div>
 
@@ -497,7 +675,7 @@
 // Tab Switching
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        const tab = this.dataset.tab;
+        const tabId = this.dataset.tab;
         
         // Update buttons
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -505,7 +683,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         
         // Update content
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.getElementById(tab + '-tab').classList.add('active');
+        document.getElementById(tabId + '-tab').classList.add('active');
     });
 });
 
@@ -519,9 +697,47 @@ function closeModal() {
     document.getElementById('comingSoonModal').style.display = 'none';
 }
 
-// Close on backdrop click
+// Close modal when clicking outside
 document.getElementById('comingSoonModal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
+    if (e.target === this) {
+        closeModal();
+    }
 });
+
+// Send Verification Code
+function sendVerifyCode() {
+    const btn = document.getElementById('sendCodeBtn');
+    const phone = document.getElementById('phoneInput').value;
+    const countryCode = document.getElementById('countryCode').value;
+    
+    if (!phone || phone.length < 8) {
+        showToast('请输入有效的手机号码', 'warning');
+        return;
+    }
+    
+    // Show coming soon message
+    showToast('短信验证码功能即将开通，感谢您的耐心等待！', 'info');
+    
+    // Disable button temporarily for demo
+    btn.disabled = true;
+    let countdown = 60;
+    btn.textContent = `${countdown}秒后重试`;
+    
+    const timer = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+            clearInterval(timer);
+            btn.disabled = false;
+            btn.textContent = '发送验证码';
+        } else {
+            btn.textContent = `${countdown}秒后重试`;
+        }
+    }, 1000);
+}
+
+// Switch Language
+function switchLanguage(lang) {
+    window.location.href = '/lang/' + lang;
+}
 </script>
 {% endblock %}

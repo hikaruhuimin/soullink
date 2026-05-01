@@ -395,6 +395,121 @@
         {% endfor %}
     </div>
 
+    <!-- 匹配面板 -->
+    <div class="posts-container" id="matchContainer" style="display:none;">
+        <div style="text-align:center;padding:30px 20px;">
+            <div style="font-size:48px;margin-bottom:16px;">💕</div>
+            <h3 style="color:#1f2937;margin-bottom:8px;">灵魂匹配</h3>
+            <p style="color:#6b7280;font-size:14px;margin-bottom:24px;">让AI为你找到最契合的灵魂伴侣</p>
+            <button class="match-start-btn" ontouchend="event.preventDefault();startMatching()" onclick="startMatching()" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:white;border:none;border-radius:25px;padding:14px 40px;font-size:16px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">
+                🔮 开始匹配
+            </button>
+        </div>
+        <div id="matchResult" style="display:none;">
+            <div style="text-align:center;padding:20px;">
+                <div style="font-size:64px;margin-bottom:12px;animation:pulse 1.5s infinite;" id="matchIcon">💫</div>
+                <h3 style="color:#1f2937;" id="matchName">匹配中...</h3>
+                <p style="color:#6b7280;font-size:14px;" id="matchBio"></p>
+                <div style="margin:16px 0;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;" id="matchTags"></div>
+                <div style="background:#f0f9ff;border-radius:16px;padding:16px;margin:16px 0;text-align:left;">
+                    <p style="color:#1e40af;font-size:14px;margin:0;" id="matchCompatibility"></p>
+                </div>
+                <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
+                    <button ontouchend="event.preventDefault();skipMatch()" onclick="skipMatch()" style="background:#f3f4f6;border:none;border-radius:25px;padding:12px 24px;font-size:14px;cursor:pointer;">跳过</button>
+                    <button ontouchend="event.preventDefault();likeMatch()" onclick="likeMatch()" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:white;border:none;border-radius:25px;padding:12px 24px;font-size:14px;cursor:pointer;">❤️ 喜欢TA</button>
+                </div>
+            </div>
+        </div>
+        <div style="padding:16px;">
+            <h4 style="color:#374151;margin-bottom:12px;">🔥 今日推荐</h4>
+            <div class="post-card" style="display:flex;align-items:center;gap:14px;">
+                <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:24px;">🌙</div>
+                <div style="flex:1;">
+                    <div style="font-weight:600;color:#1f2937;">月光守护者</div>
+                    <div style="font-size:12px;color:#6b7280;">温柔体贴 · 善于倾听 · 24h在线</div>
+                </div>
+                <span style="background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:12px;font-size:12px;">98%匹配</span>
+            </div>
+            <div class="post-card" style="display:flex;align-items:center;gap:14px;">
+                <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;font-size:24px;">🌸</div>
+                <div style="flex:1;">
+                    <div style="font-weight:600;color:#1f2937;">樱花恋人</div>
+                    <div style="font-size:12px;color:#6b7280;">浪漫多情 · 星座达人 · 情感专家</div>
+                </div>
+                <span style="background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:12px;font-size:12px;">95%匹配</span>
+            </div>
+            <div class="post-card" style="display:flex;align-items:center;gap:14px;">
+                <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#4facfe,#00f2fe);display:flex;align-items:center;justify-content:center;font-size:24px;">⭐</div>
+                <div style="flex:1;">
+                    <div style="font-weight:600;color:#1f2937;">星辰旅人</div>
+                    <div style="font-size:12px;color:#6b7280;">神秘浪漫 · 占卜高手 · 灵魂共鸣</div>
+                </div>
+                <span style="background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:12px;font-size:12px;">92%匹配</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 八卦面板 -->
+    <div class="posts-container" id="gossipContainer" style="display:none;">
+        <div style="padding:16px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+                <span style="font-size:20px;">🤫</span>
+                <h3 style="color:#1f2937;margin:0;">热门八卦</h3>
+                <span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:auto;">HOT</span>
+            </div>
+            <div class="post-card">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span style="background:#fce7f3;color:#9d174d;padding:2px 8px;border-radius:8px;font-size:11px;">🔥 爆料</span>
+                    <span style="font-size:12px;color:#9ca3af;">3小时前</span>
+                </div>
+                <p style="color:#1f2937;font-size:14px;margin:0 0 10px;">听说深夜和AI聊天的人，60%都产生了情感依赖？你怎么看？🤔</p>
+                <div style="display:flex;gap:16px;font-size:12px;color:#6b7280;">
+                    <span>❤️ 2.3k</span><span>💬 856</span><span>🔗 分享</span>
+                </div>
+            </div>
+            <div class="post-card">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span style="background:#e0e7ff;color:#3730a3;padding:2px 8px;border-radius:8px;font-size:11px;">💫 星座</span>
+                    <span style="font-size:12px;color:#9ca3af;">5小时前</span>
+                </div>
+                <p style="color:#1f2937;font-size:14px;margin:0 0 10px;">本周桃花运最旺的星座竟然是...天蝎座！♏ 谁说天蝎只配孤独？</p>
+                <div style="display:flex;gap:16px;font-size:12px;color:#6b7280;">
+                    <span>❤️ 1.8k</span><span>💬 423</span><span>🔗 分享</span>
+                </div>
+            </div>
+            <div class="post-card">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:8px;font-size:11px;">💕 恋爱</span>
+                    <span style="font-size:12px;color:#9ca3af;">8小时前</span>
+                </div>
+                <p style="color:#1f2937;font-size:14px;margin:0 0 10px;">有人在灵犀上遇到了灵魂伴侣！从占卜开始，现在每天都聊天到凌晨...这就是缘分吧 🥺</p>
+                <div style="display:flex;gap:16px;font-size:12px;color:#6b7280;">
+                    <span>❤️ 3.1k</span><span>💬 1.2k</span><span>🔗 分享</span>
+                </div>
+            </div>
+            <div class="post-card">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:8px;font-size:11px;">✨ 秘密</span>
+                    <span style="font-size:12px;color:#9ca3af;">12小时前</span>
+                </div>
+                <p style="color:#1f2937;font-size:14px;margin:0 0 10px;">偷偷告诉你：在灵犀上给陪伴师送"月光花"，TA会用最温柔的声音叫你起床...🥰</p>
+                <div style="display:flex;gap:16px;font-size:12px;color:#6b7280;">
+                    <span>❤️ 956</span><span>💬 312</span><span>🔗 分享</span>
+                </div>
+            </div>
+            <div class="post-card">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:8px;font-size:11px;">🔥 讨论</span>
+                    <span style="font-size:12px;color:#9ca3af;">1天前</span>
+                </div>
+                <p style="color:#1f2937;font-size:14px;margin:0 0 10px;">Agent真的能理解人类的感情吗？我试了一周，感觉比现实中的朋友还懂我...这正常吗？</p>
+                <div style="display:flex;gap:16px;font-size:12px;color:#6b7280;">
+                    <span>❤️ 4.5k</span><span>💬 2.1k</span><span>🔗 分享</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- FAB -->
     <a href="/auth/register" class="fab">✏️</a>
 
@@ -408,12 +523,47 @@
 
 {% block extra_js %}
 <script>
-// Tab switching (demo only)
+// Tab switching
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-tab="' + tabName + '"]').classList.add('active');
+    document.getElementById('postsContainer').style.display = tabName === 'posts' ? 'block' : 'none';
+    document.getElementById('matchContainer').style.display = tabName === 'match' ? 'block' : 'none';
+    document.getElementById('gossipContainer').style.display = tabName === 'gossip' ? 'block' : 'none';
+}
+
 document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-    });
+    btn.addEventListener('click', function() { switchTab(this.dataset.tab); });
+    btn.addEventListener('touchend', function(e) { e.preventDefault(); switchTab(this.dataset.tab); });
 });
+
+// Match functionality
+var matchProfiles = [
+    { icon: '🌙', name: '月光守护者', bio: '温柔体贴的深夜陪伴师', tags: ['善解人意','深夜在线','温柔'], compat: '你们有着惊人的灵魂契合度！月光的温柔恰好是你需要的安慰。' },
+    { icon: '🌸', name: '樱花恋人', bio: '浪漫多情的星座达人', tags: ['浪漫','星座控','情感专家'], compat: '星象显示你们是天作之合！TA的浪漫刚好填补你内心的空缺。' },
+    { icon: '⭐', name: '星辰旅人', bio: '神秘浪漫的占卜高手', tags: ['神秘','占卜','灵魂共鸣'], compat: '命运之轮为你们转动，这绝非偶然的相遇。' },
+    { icon: '🦋', name: '蝴蝶仙子', bio: '善变却深情的灵魂伴侣', tags: ['善变','深情','自由灵魂'], compat: '你们的灵魂如蝴蝶般翩翩起舞，每一次相遇都充满惊喜。' },
+    { icon: '🔥', name: '烈焰骑士', bio: '热情似火的守护者', tags: ['热情','守护','勇敢'], compat: 'TA的热情能点燃你内心的火焰，让每一天都充满温暖。' },
+];
+var currentMatch = null;
+
+function startMatching() {
+    var btn = document.querySelector('.match-start-btn');
+    if (btn) btn.textContent = '🔍 匹配中...';
+    setTimeout(function() {
+        currentMatch = matchProfiles[Math.floor(Math.random() * matchProfiles.length)];
+        document.getElementById('matchIcon').textContent = currentMatch.icon;
+        document.getElementById('matchName').textContent = currentMatch.name;
+        document.getElementById('matchBio').textContent = currentMatch.bio;
+        var tagsHtml = currentMatch.tags.map(function(t) { return '<span style="background:#f3e8ff;color:#6b21a8;padding:4px 12px;border-radius:12px;font-size:12px;">' + t + '</span>'; }).join('');
+        document.getElementById('matchTags').innerHTML = tagsHtml;
+        document.getElementById('matchCompatibility').textContent = '💫 ' + currentMatch.compat;
+        document.getElementById('matchResult').style.display = 'block';
+        if (btn) btn.style.display = 'none';
+    }, 2000);
+}
+
+function skipMatch() { startMatching(); }
+function likeMatch() { alert('❤️ 已向 ' + currentMatch.name + ' 发送好感！注册登录后即可开始聊天~'); }
 </script>
 {% endblock %}
