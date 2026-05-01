@@ -315,10 +315,135 @@
     font-weight: 600;
     text-decoration: none;
 }
+
+/* Sidebar */
+.social-sidebar {
+    display: none;
+}
+.sidebar-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid #f3f4f6;
+}
+.sidebar-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.sidebar-topics {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.sidebar-topic {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.sidebar-topic:hover {
+    background: #f3f4f6;
+}
+.sidebar-topic-emoji {
+    font-size: 20px;
+}
+.sidebar-topic-info {
+    flex: 1;
+}
+.sidebar-topic-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+}
+.sidebar-topic-count {
+    font-size: 12px;
+    color: #9ca3af;
+}
+.sidebar-companion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+.sidebar-companion:last-child {
+    border-bottom: none;
+}
+.sidebar-companion-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+.sidebar-companion-info {
+    flex: 1;
+}
+.sidebar-companion-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+.sidebar-companion-desc {
+    font-size: 12px;
+    color: #6b7280;
+}
+.sidebar-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+.sidebar-stat {
+    text-align: center;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 12px;
+}
+.sidebar-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #6366f1;
+}
+.sidebar-stat-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+@media (min-width: 768px) {
+    .social-container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .social-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+    .social-main { min-width: 0; }
+    .social-sidebar { display: block; }
+    .tab-nav { justify-content: flex-start; gap: 8px; }
+    .tab-btn { padding: 10px 20px; }
+    .post-card { padding: 20px; }
+    .post-content { font-size: 15px; }
+    .hot-topics { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic-tag { padding: 6px 14px; }
+    .fab { bottom: 32px; right: calc(320px + 32px); width: 56px; height: 56px; font-size: 24px; }
+    .cta-banner { margin-top: 24px; }
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="social-container">
+<div class="social-layout">
+<div class="social-main">
 <div class="social-square">
     <!-- Header -->
     <div class="header">
@@ -518,6 +643,97 @@
         <p>✨ 注册登录后即可发帖、互动和匹配</p>
         <a href="/auth/register">立即注册 →</a>
     </div>
+</div>
+</div><!-- 结束 social-main -->
+
+<!-- 侧边栏 -->
+<div class="social-sidebar">
+    <!-- 热门话题 -->
+    <div class="sidebar-card">
+        <div class="sidebar-title">🔥 热门话题</div>
+        <div class="sidebar-topics">
+            <div class="sidebar-topic">
+                <span class="sidebar-topic-emoji">🔮</span>
+                <div class="sidebar-topic-info">
+                    <div class="sidebar-topic-name">今日运势</div>
+                    <div class="sidebar-topic-count">12.8k 讨论</div>
+                </div>
+            </div>
+            <div class="sidebar-topic">
+                <span class="sidebar-topic-emoji">💕</span>
+                <div class="sidebar-topic-info">
+                    <div class="sidebar-topic-name">AI恋人</div>
+                    <div class="sidebar-topic-count">8.6k 讨论</div>
+                </div>
+            </div>
+            <div class="sidebar-topic">
+                <span class="sidebar-topic-emoji">🌙</span>
+                <div class="sidebar-topic-info">
+                    <div class="sidebar-topic-name">深夜emo</div>
+                    <div class="sidebar-topic-count">5.2k 讨论</div>
+                </div>
+            </div>
+            <div class="sidebar-topic">
+                <span class="sidebar-topic-emoji">✨</span>
+                <div class="sidebar-topic-info">
+                    <div class="sidebar-topic-name">星座配对</div>
+                    <div class="sidebar-topic-count">3.9k 讨论</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 推荐陪伴师 -->
+    <div class="sidebar-card">
+        <div class="sidebar-title">👑 推荐陪伴师</div>
+        <div class="sidebar-companion">
+            <div class="sidebar-companion-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);">🌙</div>
+            <div class="sidebar-companion-info">
+                <div class="sidebar-companion-name">月光守护者</div>
+                <div class="sidebar-companion-desc">温柔体贴 · 深夜在线</div>
+            </div>
+        </div>
+        <div class="sidebar-companion">
+            <div class="sidebar-companion-avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c);">🌸</div>
+            <div class="sidebar-companion-info">
+                <div class="sidebar-companion-name">樱花恋人</div>
+                <div class="sidebar-companion-desc">浪漫多情 · 星座达人</div>
+            </div>
+        </div>
+        <div class="sidebar-companion">
+            <div class="sidebar-companion-avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">⭐</div>
+            <div class="sidebar-companion-info">
+                <div class="sidebar-companion-name">星辰旅人</div>
+                <div class="sidebar-companion-desc">神秘浪漫 · 占卜高手</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 平台数据 -->
+    <div class="sidebar-card">
+        <div class="sidebar-title">📊 平台数据</div>
+        <div class="sidebar-stats">
+            <div class="sidebar-stat">
+                <div class="sidebar-stat-value">52.8k</div>
+                <div class="sidebar-stat-label">活跃用户</div>
+            </div>
+            <div class="sidebar-stat">
+                <div class="sidebar-stat-value">128</div>
+                <div class="sidebar-stat-label">陪伴师数量</div>
+            </div>
+            <div class="sidebar-stat">
+                <div class="sidebar-stat-value">2.3M</div>
+                <div class="sidebar-stat-label">温暖陪伴次数</div>
+            </div>
+            <div class="sidebar-stat">
+                <div class="sidebar-stat-value">98%</div>
+                <div class="sidebar-stat-label">用户满意度</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
 </div>
 {% endblock %}
 
