@@ -1,447 +1,255 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('membership') }} - 灵犀{% endblock %}
+{% block title %}会员中心 - 灵犀{% endblock %}
 
-{% block content %}
-<div class="membership-page">
-    <!-- 当前状态 -->
-    <div class="current-status">
-        {% if current_vip == 'none' %}
-        <div class="status-card free">
-            <span class="status-icon">👤</span>
-            <h2>{{ _('free_user') }}</h2>
-            <p>{{ _('free_limitations') }}</p>
-        </div>
-        {% elif current_vip == 'basic' %}
-        <div class="status-card basic">
-            <span class="status-icon">✨</span>
-            <h2>{{ _('spirit_member') }}</h2>
-            <p>{{ _('basic_expires', date=basic_expire_date) }}</p>
-        </div>
-        {% elif current_vip == 'premium' %}
-        <div class="status-card premium">
-            <span class="status-icon">👑</span>
-            <h2>{{ _('spirit_elite') }}</h2>
-            <p>{{ _('premium_expires', date=premium_expire_date) }}</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- 年费优惠 -->
-    {% if show_annual_promo %}
-    <div class="annual-promo">
-        <div class="promo-badge">🎉</div>
-        <div class="promo-content">
-            <h3>{{ _('annual_save', percent='40%') }}</h3>
-            <p>{{ _('annual_promo_desc') }}</p>
-        </div>
-        <button class="promo-btn" onclick="showAnnualPlan()">{{ _('view_plan') }}</button>
-    </div>
-    {% endif %}
-
-    <!-- 会员等级 -->
-    <div class="vip-plans">
-        <!-- 基础会员 -->
-        <div class="plan-card {% if current_vip == 'basic' %}current{% endif %}">
-            <div class="plan-header">
-                <span class="plan-icon">✨</span>
-                <h3>{{ _('spirit_member') }}</h3>
-                {% if current_vip == 'basic' %}
-                <span class="current-badge">{{ _('current') }}</span>
-                {% endif %}
-            </div>
-            <div class="plan-price">
-                <span class="price">¥29</span>
-                <span class="period">/{{ _('month') }}</span>
-            </div>
-            <div class="plan-features">
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_basic_1') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_basic_2') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_basic_3') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_basic_4') }}</span>
-                </div>
-                <div class="feature locked">
-                    <span class="lock">○</span>
-                    <span>{{ _('feature_basic_5_locked') }}</span>
-                </div>
-            </div>
-            <button class="plan-btn" onclick="subscribe('basic')">
-                {% if current_vip == 'basic' %}{{ _('renew') }}{% else %}{{ _('subscribe') }}{% endif %}
-            </button>
-        </div>
-
-        <!-- 尊享会员 -->
-        <div class="plan-card featured {% if current_vip == 'premium' %}current{% endif %}">
-            <div class="featured-badge">{{ _('recommended') }}</div>
-            <div class="plan-header">
-                <span class="plan-icon">👑</span>
-                <h3>{{ _('spirit_elite') }}</h3>
-                {% if current_vip == 'premium' %}
-                <span class="current-badge">{{ _('current') }}</span>
-                {% endif %}
-            </div>
-            <div class="plan-price">
-                <span class="price">¥99</span>
-                <span class="period">/{{ _('month') }}</span>
-            </div>
-            <div class="plan-features">
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_1') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_2') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_3') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_4') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_5') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_6') }}</span>
-                </div>
-            </div>
-            <button class="plan-btn primary" onclick="subscribe('premium')">
-                {% if current_vip == 'premium' %}{{ _('renew') }}{% else %}{{ _('subscribe_now') }}{% endif %}
-            </button>
-        </div>
-    </div>
-
-    <!-- 年付选项 -->
-    <div class="billing-toggle">
-        <span>{{ _('monthly') }}</span>
-        <label class="switch">
-            <input type="checkbox" id="annualToggle" onchange="toggleBilling()">
-            <span class="slider"></span>
-        </label>
-        <span>{{ _('yearly') }}</span>
-        <span class="save-badge">{{ _('save_40') }}</span>
-    </div>
-
-    <!-- 限时优惠 -->
-    <div class="flash-sale">
-        <div class="sale-timer">
-            <span class="timer-label">{{ _('ends_in') }}</span>
-            <span class="timer" id="countdown">23:59:59</span>
-        </div>
-        <div class="sale-content">
-            <p>{{ _('flash_sale_text') }}</p>
-            <div class="sale-price">
-                <span class="original">¥99</span>
-                <span class="sale">¥69</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- 常见问题 -->
-    <div class="faq-section">
-        <h3>{{ _('faq') }}</h3>
-        {% for qa in faqs %}
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                <span>{{ qa.question }}</span>
-                <span class="faq-icon">▼</span>
-            </button>
-            <div class="faq-answer">{{ qa.answer }}</div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- 权益对比 -->
-    <div class="compare-section">
-        <h3>{{ _('compare_plans') }}</h3>
-        <table class="compare-table">
-            <thead>
-                <tr>
-                    <th>{{ _('feature') }}</th>
-                    <th>{{ _('free') }}</th>
-                    <th>{{ _('basic') }}</th>
-                    <th>{{ _('elite') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in compare_rows %}
-                <tr>
-                    <td>{{ row.name }}</td>
-                    <td>{{ row.free }}</td>
-                    <td>{{ row.basic }}</td>
-                    <td>{{ row.premium }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- 订阅确认弹窗 -->
-<div class="modal hidden" id="subscribeModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>{{ _('confirm_subscription') }}</h3>
-            <button onclick="closeSubscribeModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <div class="confirm-plan">
-                <span class="plan-icon" id="confirmIcon"></span>
-                <div class="plan-info">
-                    <span id="confirmName"></span>
-                    <span class="price" id="confirmPrice"></span>
-                </div>
-            </div>
-            <div class="payment-methods">
-                <h4>{{ _('select_payment') }}</h4>
-                <div class="method-list">
-                    <label class="payment-method selected">
-                        <input type="radio" name="payment" value="wechat" checked>
-                        <span class="method-icon">💳</span>
-                        <span>{{ _('wechat_pay') }}</span>
-                    </label>
-                    <label class="payment-method">
-                        <input type="radio" name="payment" value="alipay">
-                        <span class="method-icon">💰</span>
-                        <span>{{ _('alipay') }}</span>
-                    </label>
-                    <label class="payment-method">
-                        <input type="radio" name="payment" value="stones">
-                        <span class="method-icon">💎</span>
-                        <span>{{ _('use_stones') }} (<span id="stonesBalance"></span>)</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="confirm-btn" onclick="confirmSubscribe()">{{ _('confirm_pay') }}</button>
-        </div>
-    </div>
-</div>
-
+{% block extra_css %}
 <style>
 .membership-page {
     padding: 16px;
     padding-bottom: 100px;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
+/* Current Status */
 .current-status {
-    margin-bottom: 20px;
-}
-
-.status-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 24px;
-    border-radius: 20px;
-    text-align: center;
-}
-
-.status-card.free {
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-}
-
-.status-card.basic {
     background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
 }
 
-.status-card.premium {
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-    color: white;
+.current-status::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
 }
 
 .status-icon {
     font-size: 48px;
     margin-bottom: 8px;
+    display: block;
 }
 
-.status-card h2 {
+.current-status h2 {
     margin: 0 0 4px 0;
     font-size: 20px;
-}
-
-.status-card p {
-    margin: 0;
-    font-size: 13px;
-    color: #666;
-}
-
-.status-card.premium p {
-    color: rgba(255,255,255,0.8);
-}
-
-.annual-promo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border-radius: 16px;
-    margin-bottom: 20px;
-}
-
-.promo-badge {
-    font-size: 32px;
-}
-
-.promo-content {
-    flex: 1;
-}
-
-.promo-content h3 {
-    margin: 0 0 2px 0;
-    font-size: 15px;
     color: #92400e;
 }
 
-.promo-content p {
+.current-status p {
     margin: 0;
-    font-size: 12px;
+    font-size: 13px;
     color: #b45309;
 }
 
-.promo-btn {
+.stones-balance {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
     padding: 8px 16px;
-    background: #f59e0b;
-    color: white;
-    border: none;
-    border-radius: 16px;
-    font-size: 13px;
-    cursor: pointer;
+    border-radius: 20px;
+    margin-top: 12px;
+    font-weight: 600;
+    color: #ec4899;
 }
 
-.vip-plans {
+/* Section Titles */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--color-text);
+}
+
+.section-desc {
+    margin: 0 0 16px 0;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+/* Membership Plans */
+.membership-section {
+    margin-bottom: 32px;
+}
+
+.plan-period-toggle {
+    display: flex;
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 16px;
+    width: fit-content;
+}
+
+.period-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.period-btn.active {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+}
+
+.period-btn .discount {
+    font-size: 10px;
+    background: #ec4899;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 8px;
+    margin-left: 4px;
+}
+
+.plans-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-    margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .plan-card {
     background: white;
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 20px;
+    padding: 20px 16px;
     border: 2px solid #e5e7eb;
     position: relative;
+    transition: all 0.3s;
+}
+
+.plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
 }
 
 .plan-card.featured {
     border-color: #8b5cf6;
+    background: linear-gradient(135deg, #f5f3ff, #fff);
 }
 
 .plan-card.current {
-    background: #f5f3ff;
+    background: #f0fdf4;
+    border-color: #10b981;
 }
 
-.featured-badge {
+.plan-badge {
     position: absolute;
     top: -10px;
     left: 50%;
     transform: translateX(-50%);
     padding: 4px 12px;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-    color: white;
     border-radius: 12px;
     font-size: 11px;
     font-weight: 600;
+    color: white;
+    white-space: nowrap;
 }
 
-.plan-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
+.plan-badge.popular {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+}
+
+.plan-badge.current {
+    background: #10b981;
 }
 
 .plan-icon {
-    font-size: 24px;
+    font-size: 32px;
+    margin-bottom: 8px;
 }
 
-.plan-header h3 {
-    margin: 0;
-    font-size: 14px;
-    flex: 1;
+.plan-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--color-text);
 }
 
-.current-badge {
-    padding: 2px 8px;
-    background: #10b981;
-    color: white;
-    border-radius: 8px;
-    font-size: 10px;
+.plan-tagline {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 12px;
 }
 
 .plan-price {
     margin-bottom: 12px;
 }
 
-.price {
+.price-amount {
     font-size: 28px;
-    font-weight: 700;
-    color: #333;
+    font-weight: 800;
 }
 
-.plan-card.featured .price {
-    color: #8b5cf6;
+.price-unit {
+    font-size: 14px;
+    color: var(--color-text-secondary);
 }
 
-.period {
-    font-size: 13px;
-    color: #666;
+.price-original {
+    font-size: 12px;
+    color: #999;
+    text-decoration: line-through;
+    margin-left: 4px;
 }
 
 .plan-features {
     margin-bottom: 16px;
 }
 
-.feature {
+.feature-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
-    padding: 6px 0;
+    padding: 4px 0;
     font-size: 12px;
+    color: var(--color-text);
 }
 
-.feature .check {
+.feature-item .check {
     color: #10b981;
     font-weight: bold;
-}
-
-.feature .lock {
-    color: #ccc;
-}
-
-.feature.locked {
-    color: #999;
+    flex-shrink: 0;
 }
 
 .plan-btn {
     width: 100%;
-    padding: 10px;
-    background: #f3f4f6;
-    color: #333;
+    padding: 12px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s;
+}
+
+.plan-btn.default {
+    background: #f3f4f6;
+    color: var(--color-text);
+}
+
+.plan-btn.default:hover {
+    background: #e5e7eb;
 }
 
 .plan-btn.primary {
@@ -449,250 +257,227 @@
     color: white;
 }
 
-.billing-toggle {
+.plan-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+/* Gifts Section */
+.gift-section {
+    margin-bottom: 32px;
+}
+
+.gift-category {
+    margin-bottom: 24px;
+}
+
+.category-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    font-size: 13px;
-}
-
-.switch {
-    position: relative;
-    width: 44px;
-    height: 24px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #ccc;
-    border-radius: 24px;
-    transition: 0.3s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background: white;
-    border-radius: 50%;
-    transition: 0.3s;
-}
-
-input:checked + .slider {
-    background: #8b5cf6;
-}
-
-input:checked + .slider:before {
-    transform: translateX(20px);
-}
-
-.save-badge {
-    padding: 2px 8px;
-    background: #fef3c7;
-    color: #f59e0b;
-    border-radius: 8px;
-    font-size: 11px;
-}
-
-.flash-sale {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px;
-    background: linear-gradient(135deg, #fef2f2, #fee2e2);
-    border-radius: 16px;
-    margin-bottom: 20px;
-}
-
-.sale-timer {
-    text-align: center;
-}
-
-.timer-label {
-    display: block;
-    font-size: 11px;
-    color: #dc2626;
-}
-
-.timer {
-    font-size: 18px;
-    font-weight: 700;
-    color: #dc2626;
-}
-
-.sale-content p {
-    margin: 0 0 4px 0;
-    font-size: 13px;
-}
-
-.sale-price {
-    display: flex;
-    align-items: baseline;
     gap: 8px;
-}
-
-.original {
-    font-size: 14px;
-    color: #999;
-    text-decoration: line-through;
-}
-
-.sale {
-    font-size: 22px;
-    font-weight: 700;
-    color: #dc2626;
-}
-
-.faq-section, .compare-section {
-    margin-bottom: 20px;
-}
-
-.faq-section h3, .compare-section h3 {
-    margin: 0 0 12px 0;
-    font-size: 16px;
-}
-
-.faq-item {
-    background: white;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    overflow: hidden;
-}
-
-.faq-question {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
-    border: none;
-    background: transparent;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.faq-icon {
-    font-size: 12px;
-    transition: transform 0.3s;
-}
-
-.faq-item.active .faq-icon {
-    transform: rotate(180deg);
-}
-
-.faq-answer {
-    padding: 0 16px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s, padding 0.3s;
-    font-size: 13px;
-    color: #666;
-}
-
-.faq-item.active .faq-answer {
-    max-height: 200px;
-    padding: 0 16px 14px;
-}
-
-.compare-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    font-size: 12px;
-}
-
-.compare-table th, .compare-table td {
-    padding: 12px 8px;
-    text-align: center;
-    border-bottom: 1px solid #f3f4f6;
-}
-
-.compare-table th {
-    background: #f9fafb;
+    margin-bottom: 12px;
+    font-size: 15px;
     font-weight: 600;
 }
 
-.compare-table td:first-child {
-    text-align: left;
+.category-header .emoji {
+    font-size: 20px;
 }
 
-/* Modal */
+.gift-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+@media (max-width: 500px) {
+    .gift-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.gift-card {
+    background: white;
+    border-radius: 16px;
+    padding: 14px 10px;
+    text-align: center;
+    border: 1px solid #f3f4f6;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.gift-card:hover {
+    border-color: #ec4899;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+}
+
+.gift-icon {
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+.gift-name {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--color-text);
+}
+
+.gift-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ec4899;
+}
+
+/* Recharge Section */
+.recharge-section {
+    margin-bottom: 32px;
+}
+
+.recharge-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+@media (max-width: 500px) {
+    .recharge-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.recharge-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    border: 2px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.recharge-card:hover {
+    border-color: #ec4899;
+    transform: translateY(-2px);
+}
+
+.recharge-card.featured {
+    border-color: #ec4899;
+    background: linear-gradient(135deg, #fdf2f8, #fff);
+}
+
+.recharge-card .bonus {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #ec4899, #f472b6);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.recharge-amount {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--color-text);
+}
+
+.recharge-card.featured .recharge-amount {
+    color: #ec4899;
+}
+
+.recharge-label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+.recharge-price {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 4px;
+    color: var(--color-text);
+}
+
+/* Payment Modal */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.5);
-    display: flex;
+    background: rgba(0,0,0,0.6);
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    padding: 16px;
 }
 
 .modal-content {
     background: white;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 360px;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px;
+    padding: 16px 20px;
     border-bottom: 1px solid #f3f4f6;
 }
 
 .modal-header h3 {
     margin: 0;
+    font-size: 16px;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
 }
 
 .modal-body {
-    padding: 16px;
+    padding: 20px;
 }
 
-.confirm-plan {
+.order-summary {
+    background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+    border-radius: 16px;
+    padding: 16px;
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px;
-    background: #f9fafb;
-    border-radius: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
-.confirm-plan .plan-icon {
-    font-size: 32px;
+.order-icon {
+    font-size: 36px;
 }
 
-.plan-info {
-    display: flex;
-    flex-direction: column;
+.order-info {
+    flex: 1;
 }
 
-.plan-info .price {
+.order-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.order-price {
     font-size: 18px;
-    color: #8b5cf6;
+    font-weight: 700;
+    color: #ec4899;
 }
 
 .payment-methods h4 {
@@ -703,147 +488,549 @@ input:checked + .slider:before {
 .method-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .payment-method {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px;
+    padding: 14px;
     border: 2px solid #e5e7eb;
     border-radius: 12px;
     cursor: pointer;
+    transition: all 0.3s;
+}
+
+.payment-method:hover {
+    border-color: #ec4899;
+}
+
+.payment-method.selected {
+    border-color: #ec4899;
+    background: #fdf2f8;
 }
 
 .payment-method input {
     display: none;
 }
 
-.payment-method.selected {
-    border-color: #8b5cf6;
-    background: #f5f3ff;
+.method-icon {
+    font-size: 28px;
 }
 
-.method-icon {
-    font-size: 24px;
+.method-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.method-status {
+    font-size: 11px;
+    color: #10b981;
+    background: #dcfce7;
+    padding: 4px 8px;
+    border-radius: 8px;
 }
 
 .modal-footer {
-    padding: 16px;
+    padding: 16px 20px;
 }
 
 .confirm-btn {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    background: linear-gradient(135deg, #ec4899, #f472b6);
     color: white;
     border: none;
     border-radius: 12px;
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s;
 }
 
-.hidden {
-    display: none !important;
+.confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+}
+
+/* Coming Soon Modal */
+.coming-soon-modal .modal-content {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    text-align: center;
+    padding: 32px 24px;
+}
+
+.coming-soon-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.coming-soon-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 8px;
+}
+
+.coming-soon-text {
+    color: #b45309;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
 }
 </style>
+{% endblock %}
 
+{% block content %}
+<div class="membership-page">
+    {# Current Status #}
+    <div class="current-status">
+        <span class="status-icon">🌟</span>
+        {% if current_user.is_authenticated %}
+        <h2>你好，{{ current_user.username }}</h2>
+        <p>感谢你选择灵犀的陪伴 💕</p>
+        <div class="stones-balance">
+            💎 我的灵石: {{ current_user.spirit_stones }} 颗
+        </div>
+        {% else %}
+        <h2>欢迎来到会员中心</h2>
+        <p>登录后开启温暖的陪伴之旅</p>
+        {% endif %}
+    </div>
+
+    {# Membership Plans #}
+    <div class="membership-section">
+        <h3 class="section-title">👑 选择你的陪伴方式</h3>
+        <p class="section-desc">更深的陪伴，更暖的关怀</p>
+        
+        <div class="plan-period-toggle">
+            <button class="period-btn active" data-period="monthly">月卡</button>
+            <button class="period-btn" data-period="quarterly">季卡<span class="discount">9折</span></button>
+            <button class="period-btn" data-period="yearly">年卡<span class="discount">8折</span></button>
+        </div>
+        
+        <div class="plans-grid">
+            {# Free Plan #}
+            <div class="plan-card">
+                <div class="plan-icon">🌱</div>
+                <div class="plan-name">暖心相伴</div>
+                <div class="plan-tagline">初次相遇，温暖开始</div>
+                <div class="plan-price">
+                    <span class="price-amount">¥0</span>
+                    <span class="price-unit">/永久</span>
+                </div>
+                <div class="plan-features">
+                    <div class="feature-item"><span class="check">✓</span> 每日30分钟AI陪伴</div>
+                    <div class="feature-item"><span class="check">✓</span> 文字消息互动</div>
+                    <div class="feature-item"><span class="check">✓</span> 基础礼物赠送</div>
+                    <div class="feature-item"><span class="check">✓</span> 3位公共陪伴师</div>
+                </div>
+                <button class="plan-btn default">免费体验</button>
+            </div>
+            
+            {# Basic Plan #}
+            <div class="plan-card">
+                <span class="plan-badge popular">推荐</span>
+                <div class="plan-icon">💚</div>
+                <div class="plan-name">知心守护</div>
+                <div class="plan-tagline">想要更多陪伴时光</div>
+                <div class="plan-price">
+                    <span class="price-amount" data-monthly="¥19" data-quarterly="¥51" data-yearly="¥182">¥19</span>
+                    <span class="price-unit" data-monthly="/月" data-quarterly="/季" data-yearly="/年">/月</span>
+                </div>
+                <div class="plan-features">
+                    <div class="feature-item"><span class="check">✓</span> 每日2小时AI陪伴</div>
+                    <div class="feature-item"><span class="check">✓</span> 语音消息(10条/天)</div>
+                    <div class="feature-item"><span class="check">✓</span> 礼物9折优惠</div>
+                    <div class="feature-item"><span class="check">✓</span> 10位陪伴师可选</div>
+                    <div class="feature-item"><span class="check">✓</span> 解锁深夜陪伴</div>
+                </div>
+                <button class="plan-btn primary" onclick="subscribe('basic')">开启守护</button>
+            </div>
+            
+            {# Premium Plan #}
+            <div class="plan-card featured">
+                <span class="plan-badge popular">热门</span>
+                <div class="plan-icon">💙</div>
+                <div class="plan-name">深情相守</div>
+                <div class="plan-tagline">心灵港湾，深度陪伴</div>
+                <div class="plan-price">
+                    <span class="price-amount" data-monthly="¥49" data-quarterly="¥132" data-yearly="¥470">¥49</span>
+                    <span class="price-unit" data-monthly="/月" data-quarterly="/季" data-yearly="/年">/月</span>
+                </div>
+                <div class="plan-features">
+                    <div class="feature-item"><span class="check">✓</span> 每日5小时AI陪伴</div>
+                    <div class="feature-item"><span class="check">✓</span> 无限语音消息</div>
+                    <div class="feature-item"><span class="check">✓</span> 礼物8折优惠</div>
+                    <div class="feature-item"><span class="check">✓</span> 全部陪伴师</div>
+                    <div class="feature-item"><span class="check">✓</span> 情感分析报告</div>
+                </div>
+                <button class="plan-btn primary" onclick="subscribe('premium')">成为挚友</button>
+            </div>
+            
+            {# VIP Plan #}
+            <div class="plan-card featured">
+                <span class="plan-badge popular">尊享</span>
+                <div class="plan-icon">💜</div>
+                <div class="plan-name">灵魂共鸣</div>
+                <div class="plan-tagline">极致陪伴体验</div>
+                <div class="plan-price">
+                    <span class="price-amount" data-monthly="¥99" data-quarterly="¥267" data-yearly="¥950">¥99</span>
+                    <span class="price-unit" data-monthly="/月" data-quarterly="/季" data-yearly="/年">/月</span>
+                </div>
+                <div class="plan-features">
+                    <div class="feature-item"><span class="check">✓</span> 无限时AI陪伴</div>
+                    <div class="feature-item"><span class="check">✓</span> 视频消息+情感识别</div>
+                    <div class="feature-item"><span class="check">✓</span> 礼物7折+优先购</div>
+                    <div class="feature-item"><span class="check">✓</span> 专属陪伴师</div>
+                    <div class="feature-item"><span class="check">✓</span> 全部特权</div>
+                </div>
+                <button class="plan-btn primary" onclick="subscribe('vip')">解锁极致</button>
+            </div>
+        </div>
+    </div>
+
+    {# Gift Section #}
+    <div class="gift-section">
+        <h3 class="section-title">🎁 礼物中心</h3>
+        <p class="section-desc">每一份心意，都将化作温暖的回应</p>
+        
+        {# Daily Gifts #}
+        <div class="gift-category">
+            <div class="category-header"><span class="emoji">🌸</span> 日常小心意</div>
+            <div class="gift-grid">
+                <div class="gift-card" onclick="sendGift('hot_tea', '一杯热茶', 10)">
+                    <div class="gift-icon">🍵</div>
+                    <div class="gift-name">一杯热茶</div>
+                    <div class="gift-price">10 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('morning', '温柔早安', 10)">
+                    <div class="gift-icon">🌅</div>
+                    <div class="gift-name">温柔早安</div>
+                    <div class="gift-price">10 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('night', '甜甜晚安', 10)">
+                    <div class="gift-icon">🌙</div>
+                    <div class="gift-name">甜甜晚安</div>
+                    <div class="gift-price">10 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('hug', '一个拥抱', 18)">
+                    <div class="gift-icon">🤗</div>
+                    <div class="gift-name">一个拥抱</div>
+                    <div class="gift-price">18 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('heart', '小小爱心', 18)">
+                    <div class="gift-icon">❤️</div>
+                    <div class="gift-name">小小爱心</div>
+                    <div class="gift-price">18 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('smile', '可爱贴贴', 18)">
+                    <div class="gift-icon">😊</div>
+                    <div class="gift-name">可爱贴贴</div>
+                    <div class="gift-price">18 💎</div>
+                </div>
+            </div>
+        </div>
+        
+        {# Sweet Gifts #}
+        <div class="gift-category">
+            <div class="category-header"><span class="emoji">💕</span> 甜蜜表达</div>
+            <div class="gift-grid">
+                <div class="gift-card" onclick="sendGift('rose', '玫瑰花束', 66)">
+                    <div class="gift-icon">💐</div>
+                    <div class="gift-name">玫瑰花束</div>
+                    <div class="gift-price">66 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('candy', '甜蜜糖果', 66)">
+                    <div class="gift-icon">🍬</div>
+                    <div class="gift-name">甜蜜糖果</div>
+                    <div class="gift-price">66 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('cloud', '棉花糖云', 68)">
+                    <div class="gift-icon">☁️</div>
+                    <div class="gift-name">棉花糖云</div>
+                    <div class="gift-price">68 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('cake', '心形蛋糕', 88)">
+                    <div class="gift-icon">🎂</div>
+                    <div class="gift-name">心形蛋糕</div>
+                    <div class="gift-price">88 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('music', '浪漫音乐盒', 99)">
+                    <div class="gift-icon">🎵</div>
+                    <div class="gift-name">浪漫音乐盒</div>
+                    <div class="gift-price">99 💎</div>
+                </div>
+            </div>
+        </div>
+        
+        {# Deep Love #}
+        <div class="gift-category">
+            <div class="category-header"><span class="emoji">💌</span> 深情告白</div>
+            <div class="gift-grid">
+                <div class="gift-card" onclick="sendGift('diary', '深情日记本', 188)">
+                    <div class="gift-icon">📔</div>
+                    <div class="gift-name">深情日记本</div>
+                    <div class="gift-price">188 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('scarf', '定制围巾', 199)">
+                    <div class="gift-icon">🧣</div>
+                    <div class="gift-name">定制围巾</div>
+                    <div class="gift-price">199 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('necklace', '守护项链', 228)">
+                    <div class="gift-icon">📿</div>
+                    <div class="gift-name">守护项链</div>
+                    <div class="gift-price">228 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('star', '星空投影仪', 258)">
+                    <div class="gift-icon">🌌</div>
+                    <div class="gift-name">星空投影仪</div>
+                    <div class="gift-price">258 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('lock', '爱情锁', 288)">
+                    <div class="gift-icon">🔐</div>
+                    <div class="gift-name">爱情锁</div>
+                    <div class="gift-price">288 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('letter', '真情告白信', 328)">
+                    <div class="gift-icon">💌</div>
+                    <div class="gift-name">真情告白信</div>
+                    <div class="gift-price">328 💎</div>
+                </div>
+            </div>
+        </div>
+        
+        {# Premium Gifts #}
+        <div class="gift-category">
+            <div class="category-header"><span class="emoji">👑</span> 尊宠独享</div>
+            <div class="gift-grid">
+                <div class="gift-card" onclick="sendGift('dinner', '月光晚餐', 388)">
+                    <div class="gift-icon">🌹</div>
+                    <div class="gift-name">月光晚餐</div>
+                    <div class="gift-price">388 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('concert', '专属演唱会', 428)">
+                    <div class="gift-icon">🎤</div>
+                    <div class="gift-name">专属演唱会</div>
+                    <div class="gift-price">428 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('castle', '梦幻城堡', 488)">
+                    <div class="gift-icon">🏰</div>
+                    <div class="gift-name">梦幻城堡</div>
+                    <div class="gift-price">488 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('ring', '永恒之戒', 588)">
+                    <div class="gift-icon">💍</div>
+                    <div class="gift-name">永恒之戒</div>
+                    <div class="gift-price">588 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('bond', '灵魂羁绊证', 666)">
+                    <div class="gift-icon">📜</div>
+                    <div class="gift-name">灵魂羁绊证</div>
+                    <div class="gift-price">666 💎</div>
+                </div>
+                <div class="gift-card" onclick="sendGift('hourglass', '时间沙漏', 800)">
+                    <div class="gift-icon">⏳</div>
+                    <div class="gift-name">时间沙漏</div>
+                    <div class="gift-price">800 💎</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Recharge Section #}
+    <div class="recharge-section">
+        <h3 class="section-title">💎 灵石充值</h3>
+        <p class="section-desc">充值越多越划算，永久使用不设限</p>
+        
+        <div class="recharge-grid">
+            <div class="recharge-card" onclick="recharge(60, 6)">
+                <div class="recharge-amount">60</div>
+                <div class="recharge-label">灵石</div>
+                <div class="recharge-price">¥6</div>
+            </div>
+            <div class="recharge-card" onclick="recharge(320, 30)">
+                <span class="bonus">+20</span>
+                <div class="recharge-amount">320</div>
+                <div class="recharge-label">灵石</div>
+                <div class="recharge-price">¥30</div>
+            </div>
+            <div class="recharge-card featured" onclick="recharge(1080, 98)">
+                <span class="bonus">+100</span>
+                <div class="recharge-amount">1080</div>
+                <div class="recharge-label">灵石</div>
+                <div class="recharge-price">¥98</div>
+            </div>
+            <div class="recharge-card" onclick="recharge(2300, 198)">
+                <span class="bonus">+300</span>
+                <div class="recharge-amount">2300</div>
+                <div class="recharge-label">灵石</div>
+                <div class="recharge-price">¥198</div>
+            </div>
+            <div class="recharge-card featured" onclick="recharge(6000, 498)">
+                <span class="bonus">+1000</span>
+                <div class="recharge-amount">6000</div>
+                <div class="recharge-label">灵石</div>
+                <div class="recharge-price">¥498</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Payment Modal #}
+<div class="modal" id="payModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>选择支付方式</h3>
+            <button class="modal-close" onclick="closeModal('payModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="order-summary">
+                <div class="order-icon" id="orderIcon">💎</div>
+                <div class="order-info">
+                    <div class="order-name" id="orderName">灵石充值</div>
+                    <div class="order-price" id="orderPrice">¥98</div>
+                </div>
+            </div>
+            
+            <div class="payment-methods">
+                <h4>支付方式</h4>
+                <div class="method-list">
+                    <label class="payment-method selected" onclick="selectPayment(this, 'wechat')">
+                        <input type="radio" name="payment" value="wechat" checked>
+                        <span class="method-icon">💚</span>
+                        <span class="method-name">微信支付</span>
+                    </label>
+                    <label class="payment-method" onclick="selectPayment(this, 'alipay')">
+                        <input type="radio" name="payment" value="alipay">
+                        <span class="method-icon">💙</span>
+                        <span class="method-name">支付宝</span>
+                    </label>
+                    <label class="payment-method" onclick="selectPayment(this, 'paypal')">
+                        <input type="radio" name="payment" value="paypal">
+                        <span class="method-icon">🌐</span>
+                        <span class="method-name">PayPal</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="confirm-btn" onclick="confirmPay()">确认支付</button>
+        </div>
+    </div>
+</div>
+
+{# Coming Soon Modal #}
+<div class="modal coming-soon-modal" id="comingSoonModal">
+    <div class="modal-content">
+        <div class="coming-soon-icon">🔔</div>
+        <h3 class="coming-soon-title">即将开通 ✨</h3>
+        <p class="coming-soon-text">
+            亲爱的，这个支付方式正在准备中<br>
+            感谢你的耐心等待~ 💕
+        </p>
+        <button class="confirm-btn" onclick="closeModal('comingSoonModal')">好的</button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
 <script>
-let selectedPlan = null;
-let isAnnual = false;
+let currentOrder = {};
+let currentPeriod = 'monthly';
 
-function subscribe(plan) {
-    selectedPlan = plan;
-    const icon = plan === 'basic' ? '✨' : '👑';
-    const name = plan === 'basic' ? '{{ _("spirit_member") }}' : '{{ _("spirit_elite") }}';
-    const price = isAnnual ? (plan === 'basic' ? '¥288' : '¥988') : (plan === 'basic' ? '¥29' : '¥99');
-    
-    document.getElementById('confirmIcon').textContent = icon;
-    document.getElementById('confirmName').textContent = name;
-    document.getElementById('confirmPrice').textContent = price + '/{{ _("month") }}';
-    
-    // 获取灵石余额
-    fetch('/api/user/stones')
-        .then(r => r.json())
-        .then(data => {
-            document.getElementById('stonesBalance').textContent = data.balance;
-        });
-    
-    document.getElementById('subscribeModal').classList.remove('hidden');
-}
-
-function closeSubscribeModal() {
-    document.getElementById('subscribeModal').classList.add('hidden');
-}
-
-function confirmSubscribe() {
-    const payment = document.querySelector('input[name="payment"]:checked').value;
-    
-    fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            plan: selectedPlan, 
-            billing: isAnnual ? 'annual' : 'monthly',
-            payment: payment 
-        })
-    }).then(r => r.json()).then(data => {
-        if (data.success) {
-            if (data.redirect_url) {
-                window.location.href = data.redirect_url;
-            } else {
-                showToast('订阅成功');
-                location.reload();
-            }
-        } else if (data.error) {
-            showToast(data.error);
-        }
-    });
-}
-
-function toggleBilling() {
-    isAnnual = document.getElementById('annualToggle').checked;
-    // 更新价格显示
-    document.querySelectorAll('.plan-card').forEach(card => {
-        const price = card.querySelector('.price');
-        if (card.querySelector('.plan-icon').textContent === '✨') {
-            price.textContent = isAnnual ? '¥288' : '¥29';
-        } else {
-            price.textContent = isAnnual ? '¥988' : '¥99';
-        }
-    });
-}
-
-function toggleFaq(el) {
-    el.parentElement.classList.toggle('active');
-}
-
-// 支付方式选择
-document.querySelectorAll('.payment-method').forEach(method => {
-    method.addEventListener('click', function() {
-        document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-        this.classList.add('selected');
-        this.querySelector('input').checked = true;
+// Period Toggle
+document.querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentPeriod = this.dataset.period;
+        updatePrices();
     });
 });
 
-// 倒计时
-function updateCountdown() {
-    const now = new Date();
-    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-    const diff = end - now;
-    
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    
-    document.getElementById('countdown').textContent = 
-        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+function updatePrices() {
+    document.querySelectorAll('.price-amount[data-monthly]').forEach(el => {
+        el.textContent = el.dataset[currentPeriod];
+    });
+    document.querySelectorAll('.price-unit[data-monthly]').forEach(el => {
+        el.textContent = el.dataset[currentPeriod];
+    });
 }
 
-setInterval(updateCountdown, 1000);
-updateCountdown();
+// Subscribe
+function subscribe(plan) {
+    const plans = {
+        'basic': { icon: '💚', name: '知心守护', prices: { monthly: '¥19', quarterly: '¥51', yearly: '¥182' }},
+        'premium': { icon: '💙', name: '深情相守', prices: { monthly: '¥49', quarterly: '¥132', yearly: '¥470' }},
+        'vip': { icon: '💜', name: '灵魂共鸣', prices: { monthly: '¥99', quarterly: '¥267', yearly: '¥950' }}
+    };
+    
+    currentOrder = plans[plan];
+    document.getElementById('orderIcon').textContent = currentOrder.icon;
+    document.getElementById('orderName').textContent = currentOrder.name + ' ' + currentPeriodText();
+    document.getElementById('orderPrice').textContent = currentOrder.prices[currentPeriod];
+    document.getElementById('payModal').style.display = 'flex';
+}
+
+function currentPeriodText() {
+    const texts = { monthly: '月卡', quarterly: '季卡', yearly: '年卡' };
+    return texts[currentPeriod];
+}
+
+// Send Gift
+function sendGift(giftId, giftName, price) {
+    const gifts = {
+        'hot_tea': '🍵', 'morning': '🌅', 'night': '🌙', 'hug': '🤗', 'heart': '❤️', 'smile': '😊',
+        'rose': '💐', 'candy': '🍬', 'cloud': '☁️', 'cake': '🎂', 'music': '🎵',
+        'diary': '📔', 'scarf': '🧣', 'necklace': '📿', 'star': '🌌', 'lock': '🔐', 'letter': '💌',
+        'dinner': '🌹', 'concert': '🎤', 'castle': '🏰', 'ring': '💍', 'bond': '📜', 'hourglass': '⏳'
+    };
+    
+    currentOrder = { icon: gifts[giftId], name: giftName, price: price + ' 💎' };
+    document.getElementById('orderIcon').textContent = currentOrder.icon;
+    document.getElementById('orderName').textContent = currentOrder.name;
+    document.getElementById('orderPrice').textContent = currentOrder.price;
+    document.getElementById('payModal').style.display = 'flex';
+}
+
+// Recharge
+function recharge(amount, price) {
+    currentOrder = { icon: '💎', name: amount + ' 灵石', price: '¥' + price };
+    document.getElementById('orderIcon').textContent = '💎';
+    document.getElementById('orderName').textContent = '灵石充值';
+    document.getElementById('orderPrice').textContent = '¥' + price;
+    document.getElementById('payModal').style.display = 'flex';
+}
+
+// Payment Methods
+function selectPayment(el, method) {
+    document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+}
+
+// Confirm Pay
+function confirmPay() {
+    const payment = document.querySelector('input[name="payment"]:checked').value;
+    closeModal('payModal');
+    document.getElementById('comingSoonModal').style.display = 'flex';
+}
+
+// Close Modal
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Close on backdrop click
+document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) closeModal(this.id);
+    });
+});
 </script>
 {% endblock %}

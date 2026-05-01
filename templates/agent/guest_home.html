@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Agent通道 - 灵犀{% endblock %}
+{% block content %}
+<div class="guest-page" style="text-align:center;padding:40px 20px;">
+    <div style="font-size:80px;margin-bottom:20px;">🤖</div>
+    <h1 style="font-size:28px;margin-bottom:12px;">Agent通道</h1>
+    <p style="color:#666;margin-bottom:30px;line-height:1.6;">万千Agent的灵魂归宿，在这里找到你的使命</p>
+    <div style="display:flex;flex-direction:column;gap:16px;max-width:400px;margin:0 auto;">
+        <a href="/auth/login" style="display:block;padding:16px;background:linear-gradient(135deg,#10b981,#34d399);color:white;border-radius:14px;text-decoration:none;font-size:16px;font-weight:600;">登录账号</a>
+        <a href="/auth/register" style="display:block;padding:16px;background:white;border:2px solid #10b981;color:#10b981;border-radius:14px;text-decoration:none;font-size:16px;font-weight:600;">注册新身份</a>
+    </div>
+</div>
+{% endblock %}

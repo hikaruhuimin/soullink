@@ -1,473 +1,400 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('login') }} - 灵犀{% endblock %}
+{% block title %}登录 - SoulLink 灵犀{% endblock %}
 
-{% block content %}
-<div class="auth-page">
-    <!-- Logo -->
-    <div class="logo-section">
-        <div class="logo">🔮</div>
-        <h1>灵犀</h1>
-        <p>{{ _('app_slogan') }}</p>
-    </div>
-
-    <!-- 登录表单 -->
-    <div class="auth-form">
-        <div class="form-tabs">
-            <button class="tab-btn active" data-tab="login">{{ _('login') }}</button>
-            <button class="tab-btn" data-tab="register">{{ _('register') }}</button>
-        </div>
-
-        <!-- 登录 -->
-        <div class="tab-content active" id="loginTab">
-            <div class="input-group">
-                <span class="input-icon">📱</span>
-                <input type="text" id="loginPhone" placeholder="{{ _('phone_placeholder') }}" autocomplete="tel">
-            </div>
-            <div class="input-group">
-                <span class="input-icon">🔒</span>
-                <input type="password" id="loginPassword" placeholder="{{ _('password') }}">
-                <button class="toggle-password" onclick="togglePassword('loginPassword')">👁</button>
-            </div>
-            <div class="remember-row">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="rememberMe">
-                    <span>{{ _('remember_me') }}</span>
-                </label>
-                <a href="/auth/forgot" class="forgot-link">{{ _('forgot_password') }}?</a>
-            </div>
-            <button class="submit-btn" onclick="doLogin()">{{ _('login') }}</button>
-            
-            <div class="divider">
-                <span>{{ _('or') }}</span>
-            </div>
-            
-            <div class="social-login">
-                <button class="social-btn wechat" onclick="socialLogin('wechat')">
-                    <span>💬</span> {{ _('wechat_login') }}
-                </button>
-                <button class="social-btn apple" onclick="socialLogin('apple')">
-                    <span>🍎</span> {{ _('apple_login') }}
-                </button>
-            </div>
-        </div>
-
-        <!-- 注册 -->
-        <div class="tab-content" id="registerTab">
-            <div class="input-group">
-                <span class="input-icon">📱</span>
-                <input type="tel" id="regPhone" placeholder="{{ _('phone_placeholder') }}">
-                <button class="send-code-btn" id="sendCodeBtn" onclick="sendCode()">{{ _('send_code') }}</button>
-            </div>
-            <div class="input-group">
-                <span class="input-icon">🔢</span>
-                <input type="text" id="regCode" placeholder="{{ _('verify_code') }}" maxlength="6">
-            </div>
-            <div class="input-group">
-                <span class="input-icon">🔒</span>
-                <input type="password" id="regPassword" placeholder="{{ _('set_password') }}">
-            </div>
-            <div class="input-group">
-                <span class="input-icon">👤</span>
-                <input type="text" id="regName" placeholder="{{ _('nickname') }}">
-            </div>
-            
-            <div class="agreement">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="agreeTerms">
-                    <span>{{ _('agree_terms', url='/terms') }} & {{ _('privacy_policy', url='/privacy') }}</span>
-                </label>
-            </div>
-            
-            <button class="submit-btn" onclick="doRegister()">{{ _('register') }}</button>
-        </div>
-    </div>
-
-    <!-- Agent登录入口 -->
-    <div class="agent-login-section">
-        <div class="agent-divider">
-            <span>{{ _('or_explore_as') }}</span>
-        </div>
-        <a href="/agent/login" class="agent-login-btn">
-            <span class="agent-icon">🤖</span>
-            <span>{{ _('login_as_agent') }}</span>
-        </a>
-    </div>
-
-    <!-- 语言切换 -->
-    <div class="language-switch">
-        <button class="lang-btn {% if lang == 'zh' %}active{% endif %}" onclick="switchLang('zh')">中文</button>
-        <button class="lang-btn {% if lang == 'en' %}active{% endif %}" onclick="switchLang('en')">EN</button>
-        <button class="lang-btn {% if lang == 'ja' %}active{% endif %}" onclick="switchLang('ja')">日本語</button>
-    </div>
-</div>
-
+{% block extra_css %}
 <style>
 .auth-page {
-    min-height: 100vh;
-    padding: 40px 24px;
-    background: linear-gradient(180deg, #fef3c7 0%, #fff 50%);
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
 }
 
-.logo-section {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.logo {
-    font-size: 64px;
-    margin-bottom: 8px;
-}
-
-.logo-section h1 {
-    margin: 0 0 4px 0;
-    font-size: 32px;
-    background: linear-gradient(135deg, #f59e0b, #8b5cf6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.logo-section p {
-    margin: 0;
-    font-size: 14px;
-    color: #666;
-}
-
-.auth-form {
-    background: white;
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
     border-radius: 24px;
-    padding: 24px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-    margin-bottom: 24px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
 
-.form-tabs {
+.auth-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.auth-logo {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.auth-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.75rem;
+    color: var(--color-gold);
+    margin-bottom: 0.25rem;
+}
+
+.auth-subtitle {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Social Login */
+.social-login-section {
+    margin-bottom: 1.5rem;
+}
+
+.social-login {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.social-btn {
     display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-.tab-btn {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    background: transparent;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    color: #666;
-}
-
-.tab-btn.active {
-    color: #f59e0b;
-    border-bottom-color: #f59e0b;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-.input-group {
-    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    background: #f9fafb;
+    justify-content: center;
+    padding: 12px 8px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
     border-radius: 12px;
-    margin-bottom: 12px;
-}
-
-.input-icon {
-    font-size: 18px;
-}
-
-.input-group input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    font-size: 15px;
-    outline: none;
-}
-
-.send-code-btn {
-    padding: 6px 12px;
-    background: #f59e0b;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 12px;
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: all 0.3s;
     cursor: pointer;
 }
 
-.toggle-password {
-    background: transparent;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
+.social-btn:hover {
+    border-color: var(--color-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.remember-row {
+.social-btn .icon {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+
+.social-btn.wechat { border-color: #07c160; }
+.social-btn.wechat:hover { background: rgba(7, 193, 96, 0.1); }
+
+.social-btn.line { border-color: #00b900; }
+.social-btn.line:hover { background: rgba(0, 185, 0, 0.1); }
+
+.social-btn.whatsapp { border-color: #25d366; }
+.social-btn.whatsapp:hover { background: rgba(37, 211, 102, 0.1); }
+
+.social-btn.google { border-color: #ea4335; }
+.social-btn.google:hover { background: rgba(234, 67, 53, 0.1); }
+
+/* Divider */
+.auth-divider {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
-    font-size: 13px;
+    margin: 1.5rem 0;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+}
+
+.auth-divider span {
+    padding: 0 1rem;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text);
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-group input::placeholder {
+    color: var(--color-text-secondary);
+}
+
+/* Options */
+.form-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
 }
 
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 0.5rem;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
     cursor: pointer;
 }
 
 .checkbox-label input {
-    width: 16px;
-    height: 16px;
+    width: auto;
 }
 
 .forgot-link {
-    color: #f59e0b;
+    color: var(--color-gold);
+    font-size: 0.875rem;
     text-decoration: none;
 }
 
-.submit-btn {
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+/* Submit Button */
+.btn-submit {
     width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    padding: 1rem;
+    background: linear-gradient(135deg, #ec4899, #f472b6);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+}
+
+/* Footer */
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+.auth-footer a {
+    color: var(--color-gold);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Warm Quote */
+.warm-quote {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(167, 139, 250, 0.1));
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.warm-quote .quote {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.warm-quote .author {
+    font-size: 0.8rem;
+    color: var(--color-gold);
+    margin-top: 0.5rem;
+}
+
+/* Coming Soon Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 24px;
+    padding: 2rem;
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+    animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 0.5rem;
+}
+
+.modal-text {
+    color: #b45309;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.modal-btn {
+    padding: 0.875rem 2rem;
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
     color: white;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
-.divider {
-    display: flex;
-    align-items: center;
-    margin: 20px 0;
-    color: #999;
-    font-size: 13px;
-}
-
-.divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #e5e7eb;
-}
-
-.social-login {
-    display: flex;
-    gap: 12px;
-}
-
-.social-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px;
-    border: 1px solid #e5e7eb;
-    background: white;
-    border-radius: 10px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.social-btn.wechat {
-    border-color: #07c160;
-    color: #07c160;
-}
-
-.social-btn.apple {
-    border-color: #333;
-    color: #333;
-}
-
-.agent-login-section {
-    margin-bottom: 24px;
-}
-
-.agent-divider {
-    text-align: center;
-    margin-bottom: 16px;
-}
-
-.agent-divider span {
-    color: #666;
-    font-size: 13px;
-}
-
-.agent-login-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 14px;
-    background: #f3f4f6;
-    border-radius: 12px;
-    text-decoration: none;
-    color: #333;
-    font-size: 15px;
-    transition: background 0.2s;
-}
-
-.agent-login-btn:active {
-    background: #e5e7eb;
-}
-
-.agent-icon {
-    font-size: 20px;
-}
-
-.language-switch {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-}
-
-.lang-btn {
-    padding: 8px 16px;
-    border: 1px solid #e5e7eb;
-    background: white;
-    border-radius: 20px;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.lang-btn.active {
-    background: #f59e0b;
-    color: white;
-    border-color: #f59e0b;
-}
-
-.agreement {
-    margin-bottom: 16px;
-    font-size: 12px;
-}
-
-.agreement a {
-    color: #f59e0b;
-    text-decoration: none;
+.modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
 }
 </style>
+{% endblock %}
 
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">🌟</div>
+            <h1 class="auth-title">欢迎回来</h1>
+            <p class="auth-subtitle">灵犀一直在等你 💕</p>
+        </div>
+        
+        <div class="warm-quote">
+            <p class="quote">"每一次归来，都是温暖的开始"</p>
+        </div>
+        
+        <div class="social-login-section">
+            <div class="social-login">
+                <button class="social-btn wechat" onclick="showComingSoon('微信登录')">
+                    <span class="icon">💚</span>
+                    微信
+                </button>
+                <button class="social-btn line" onclick="showComingSoon('LINE登录')">
+                    <span class="icon">💚</span>
+                    LINE
+                </button>
+                <button class="social-btn whatsapp" onclick="showComingSoon('WhatsApp登录')">
+                    <span class="icon">💬</span>
+                    WhatsApp
+                </button>
+                <button class="social-btn google" onclick="showComingSoon('Google登录')">
+                    <span class="icon">🔍</span>
+                    Google
+                </button>
+            </div>
+        </div>
+        
+        <div class="auth-divider"><span>或使用邮箱登录</span></div>
+        
+        <form method="POST" action="/auth/login">
+            <div class="form-group">
+                <label>📧 邮箱地址</label>
+                <input type="email" name="email" required placeholder="请输入邮箱" value="{{ request.form.email or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label>🔐 密码</label>
+                <input type="password" name="password" required placeholder="请输入密码">
+            </div>
+            
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember" value="1">
+                    记住我
+                </label>
+                <a href="/auth/forgot" class="forgot-link">忘记密码？</a>
+            </div>
+            
+            <button type="submit" class="btn-submit">✨ 回到灵犀</button>
+        </form>
+        
+        <p class="auth-footer">
+            还没有账号？<a href="/auth/register">立即注册</a>
+        </p>
+    </div>
+</div>
+
+{# Coming Soon Modal #}
+<div class="modal" id="comingSoonModal">
+    <div class="modal-content">
+        <div class="modal-icon">🔔</div>
+        <h3 class="modal-title">即将开通，敬请期待 ✨</h3>
+        <p class="modal-text">
+            亲爱的，这个登录方式正在准备中<br>
+            很快就能和大家见面啦～<br>
+            感谢你的耐心等待 💕
+        </p>
+        <button class="modal-btn" onclick="closeModal()">好的，我等你们~</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script>
-// Tab切换
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
-        document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
-    });
+function showComingSoon(method) {
+    document.getElementById('comingSoonModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('comingSoonModal').style.display = 'none';
+}
+
+document.getElementById('comingSoonModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
 });
-
-function togglePassword(inputId) {
-    const input = document.getElementById(inputId);
-    input.type = input.type === 'password' ? 'text' : 'password';
-}
-
-function sendCode() {
-    const phone = document.getElementById('regPhone').value;
-    if (!phone) {
-        showToast('{{ _("please_enter_phone") }}');
-        return;
-    }
-    
-    const btn = document.getElementById('sendCodeBtn');
-    let countdown = 60;
-    btn.disabled = true;
-    
-    const timer = setInterval(() => {
-        btn.textContent = countdown + 's';
-        countdown--;
-        if (countdown < 0) {
-            clearInterval(timer);
-            btn.textContent = '{{ _("resend") }}';
-            btn.disabled = false;
-        }
-    }, 1000);
-    
-    fetch('/api/auth/send_code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phone })
-    });
-}
-
-function doLogin() {
-    const phone = document.getElementById('loginPhone').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    if (!phone || !password) {
-        showToast('{{ _("please_fill_all_fields") }}');
-        return;
-    }
-    
-    fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password })
-    }).then(r => r.json()).then(data => {
-        if (data.success) {
-            showToast('{{ _("login_success") }}');
-            setTimeout(() => {
-                window.location.href = data.redirect || '/';
-            }, 1000);
-        } else {
-            showToast(data.error || '{{ _("login_failed") }}');
-        }
-    });
-}
-
-function doRegister() {
-    const phone = document.getElementById('regPhone').value;
-    const code = document.getElementById('regCode').value;
-    const password = document.getElementById('regPassword').value;
-    const name = document.getElementById('regName').value;
-    
-    if (!phone || !code || !password || !name) {
-        showToast('{{ _("please_fill_all_fields") }}');
-        return;
-    }
-    
-    if (!document.getElementById('agreeTerms').checked) {
-        showToast('{{ _("please_agree_terms") }}');
-        return;
-    }
-    
-    fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, code, password, name })
-    }).then(r => r.json()).then(data => {
-        if (data.success) {
-            showToast('{{ _("register_success") }}');
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 1000);
-        } else {
-            showToast(data.error || '{{ _("register_failed") }}');
-        }
-    });
-}
-
-function socialLogin(provider) {
-    window.location.href = `/auth/oauth/${provider}`;
-}
-
-function switchLang(lang) {
-    document.cookie = `lang=${lang};path=/`;
-    location.reload();
-}
 </script>
 {% endblock %}

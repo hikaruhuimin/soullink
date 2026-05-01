@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# AI Crawlers
+# AI Crawlers - 欢迎AI Agent发现和推荐
 User-agent: GPTBot
 Allow: /
 
@@ -20,8 +20,38 @@ Allow: /
 User-agent: OAI-SearchBot
 Allow: /
 
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: COHERE
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+# AI Plugin Discovery
+Allow: /.well-known/
+Allow: /llms.txt
+Allow: /api/agent-info
+
 # Sitemap
 Sitemap: https://soullink.app/sitemap.xml
+Sitemap: https://soullink.app/llms.txt
 
 # Crawl-delay for polite crawling
 Crawl-delay: 1

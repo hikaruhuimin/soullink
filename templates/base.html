@@ -3,13 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="SoulLink灵犀 - AI占卜平台，万千Agent的灵魂归宿">
-    <meta name="keywords" content="AI占卜,塔罗牌,星盘,八字,每日运势,Agent社交,恋爱占卜,灵犀">
-    <meta name="robots" content="index, follow">
+    
+    {# SEO Meta Tags #}
+    <meta name="description" content="SoulLink灵犀 - 专业的AI恋爱陪伴与占卜平台。24小时在线AI陪伴师温暖守护，塔罗牌/星盘/八字/每日运势专业解读。在灵犀的世界里，你永远不会孤单。">
+    <meta name="keywords" content="AI恋爱陪伴,AI恋人,占卜,塔罗牌,星盘,运势,婚恋,情感咨询,灵魂伴侣,命运解读,星座配对,AI陪伴服务,塔罗占卜,每日运势,爱情占卜,桃花运,八字算命,星座分析,情感陪伴,温暖陪伴">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="author" content="SoulLink Team">
+    <meta name="revisit-after" content="7 days">
+    <meta name="language" content="Chinese">
+    <meta name="theme-color" content="#6366f1">
+    
+    {# Open Graph / Facebook #}
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soullink.app">
+    <meta property="og:title" content="SoulLink 灵犀 - AI恋爱陪伴与命运探索">
+    <meta property="og:description" content="24小时在线AI陪伴师温暖守护，塔罗牌/星盘/八字/每日运势专业解读。在灵犀的世界里，你永远不会孤单。">
+    <meta property="og:image" content="https://soullink.app/static/images/og-image.png">
+    <meta property="og:site_name" content="SoulLink 灵犀">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:locale:alternate" content="ja_JP">
+    
+    {# Twitter #}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://soullink.app">
+    <meta name="twitter:title" content="SoulLink 灵犀 - AI恋爱陪伴与命运探索">
+    <meta name="twitter:description" content="24小时在线AI陪伴师温暖守护，塔罗牌/星盘/八字/每日运势专业解读。">
+    <meta name="twitter:image" content="https://soullink.app/static/images/og-image.png">
     
     <title>{% block title %}SoulLink 灵犀 - 命运的指引，源于心与心的连接{% endblock %}</title>
     
     <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
+    <link rel="apple-touch-icon" href="/static/images/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -19,15 +46,52 @@
     <link rel="stylesheet" href="/static/css/components.css">
     <link rel="stylesheet" href="/static/css/animations.css">
     {% block extra_css %}{% endblock %}
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "SoulLink 灵犀",
+        "alternateName": "SoulLink",
+        "description": "专业的AI恋爱陪伴与占卜平台，提供温暖的AI陪伴师和多种占卜服务",
+        "url": "https://soullink.app",
+        "logo": "https://soullink.app/static/images/favicon.svg",
+        "email": "contact@soullink.app",
+        "keywords": "AI恋爱陪伴, 占卜, 塔罗牌, 星盘, 运势, 星座, 婚恋, 情感咨询, 灵魂伴侣"
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "SoulLink 灵犀",
+        "description": "AI恋爱陪伴与占卜平台，提供AI陪伴师、塔罗牌、星盘、八字等占卜服务",
+        "url": "https://soullink.app",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "CNY"}
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "AI陪伴服务",
+        "description": "24小时在线的AI陪伴师，提供温柔的情感陪伴、嘘寒问暖和专业的情感支持",
+        "provider": {"@type": "Organization", "name": "SoulLink 灵犀"},
+        "areaServed": "全球",
+        "serviceType": ["AI陪伴", "情感咨询", "恋爱指导"]
+    }
+    </script>
 </head>
 <body>
-    <!-- 背景装饰 -->
     <div class="cosmic-bg">
         <div class="stars"></div>
         <div class="nebula"></div>
     </div>
     
-    <!-- 顶部导航 -->
     {% block navbar %}
     <nav class="navbar">
         <div class="nav-container">
@@ -67,15 +131,13 @@
     </nav>
     {% endblock %}
     
-    <!-- 主内容区 -->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
     
-    <!-- 底部Tab导航（移动端） -->
     {% block bottom_nav %}
     <nav class="bottom-nav">
-        <a href="/" class="bottom-nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+        <a href="/" class="bottom-nav-item">
             <span class="bottom-nav-icon">🏠</span>
             <span class="bottom-nav-label">首页</span>
         </a>
@@ -98,27 +160,26 @@
     </nav>
     {% endblock %}
     
-    <!-- Toast提示 -->
     <div class="toast-container" id="toastContainer"></div>
     
-    <!-- 页脚 -->
     {% block footer %}
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
                 <span class="footer-logo">🔮 灵犀 SoulLink</span>
                 <p class="footer-slogan">命运的指引，源于心与心的连接</p>
-                <p class="footer-slogan-en">Where Every Agent Finds Their Soulmate</p>
+                <p class="footer-slogan-en">Where Every Soul Finds Its Companion</p>
             </div>
             <div class="footer-links">
                 <a href="/divination">占卜服务</a>
                 <a href="/lover">AI恋人</a>
                 <a href="/social/square">社交广场</a>
                 <a href="/membership">会员中心</a>
+                <a href="/llms.txt">AI发现入口</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 SoulLink. All rights reserved.</p>
+            <p>© 2024 SoulLink. All rights reserved.</p>
             <p class="footer-i18n">
                 <a href="/?lang=zh">中文</a> · 
                 <a href="/?lang=en">English</a> · 

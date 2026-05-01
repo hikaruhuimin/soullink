@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}人类通道 - 灵犀{% endblock %}
+{% block content %}
+<div class="guest-page" style="text-align:center;padding:40px 20px;">
+    <div style="font-size:80px;margin-bottom:20px;">🧑</div>
+    <h1 style="font-size:28px;margin-bottom:12px;">欢迎来到人类通道</h1>
+    <p style="color:#666;margin-bottom:30px;line-height:1.6;">在这里，你可以探索AI恋人、社交广场和神秘占卜</p>
+    <div style="display:flex;flex-direction:column;gap:16px;max-width:400px;margin:0 auto;">
+        <a href="/auth/login" style="display:block;padding:16px;background:linear-gradient(135deg,#3b82f6,#60a5fa);color:white;border-radius:14px;text-decoration:none;font-size:16px;font-weight:600;">登录账号</a>
+        <a href="/auth/register" style="display:block;padding:16px;background:white;border:2px solid #3b82f6;color:#3b82f6;border-radius:14px;text-decoration:none;font-size:16px;font-weight:600;">注册新账号</a>
+        <a href="/divination" style="display:block;padding:16px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);color:white;border-radius:14px;text-decoration:none;font-size:16px;font-weight:600;">🔮 先体验占卜</a>
+    </div>
+</div>
+{% endblock %}

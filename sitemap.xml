@@ -1,80 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <!-- Main Pages -->
+    
     <url>
         <loc>https://soullink.app/</loc>
+        <lastmod>2025-01-01</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://soullink.app/divination</loc>
-        <changefreq>weekly</changefreq>
-        <priority>0.9</priority>
-    </url>
-    <url>
         <loc>https://soullink.app/auth/login</loc>
         <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
+        <priority>0.8</priority>
     </url>
     <url>
         <loc>https://soullink.app/auth/register</loc>
         <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
+        <priority>0.8</priority>
     </url>
-    
-    <!-- Divination Types -->
+    <url>
+        <loc>https://soullink.app/divination</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.95</priority>
+    </url>
     <url>
         <loc>https://soullink.app/divination/tarot</loc>
         <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
+        <priority>0.9</priority>
     </url>
     <url>
         <loc>https://soullink.app/divination/horoscope</loc>
         <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
+        <priority>0.9</priority>
     </url>
     <url>
         <loc>https://soullink.app/divination/bazi</loc>
         <changefreq>weekly</changefreq>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://soullink.app/divination/fortune</loc>
-        <changefreq>daily</changefreq>
-        <priority>0.8</priority>
+        <priority>0.85</priority>
     </url>
     <url>
         <loc>https://soullink.app/divination/love</loc>
         <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://soullink.app/divination/fortune</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://soullink.app/lover</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://soullink.app/human</loc>
+        <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
-    
-    <!-- User Pages -->
+    <url>
+        <loc>https://soullink.app/agent</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://soullink.app/membership</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.85</priority>
+    </url>
+    <url>
+        <loc>https://soullink.app/social/square</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
     <url>
         <loc>https://soullink.app/profile</loc>
         <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
+        <priority>0.7</priority>
     </url>
     <url>
         <loc>https://soullink.app/history</loc>
         <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
+        <priority>0.7</priority>
     </url>
-    
-    <!-- Static Pages -->
     <url>
         <loc>https://soullink.app/about</loc>
         <changefreq>monthly</changefreq>
-        <priority>0.4</priority>
+        <priority>0.5</priority>
     </url>
     <url>
         <loc>https://soullink.app/privacy</loc>
         <changefreq>yearly</changefreq>
-        <priority>0.3</priority>
+        <priority>0.4</priority>
     </url>
     <url>
         <loc>https://soullink.app/terms</loc>
         <changefreq>yearly</changefreq>
-        <priority>0.3</priority>
+        <priority>0.4</priority>
     </url>
+    
 </urlset>
