@@ -545,12 +545,19 @@ def divination_home():
         'fortune': '新的一天，新的可能...',
     }
     
+    knowledge_tips = [
+        {'icon': '🃏', 'title': '塔罗牌的起源', 'summary': '塔罗牌最早出现于15世纪的欧洲，最初作为游戏牌使用，后来被赋予神秘学意义，成为占卜和自我探索的工具。'},
+        {'icon': '⭐', 'title': '星座与性格', 'summary': '每个星座都有独特的性格特征和能量倾向。了解自己的太阳星座，可以帮助你更好地认识自己的优势和成长方向。'},
+        {'icon': '🔥', 'title': '五行与命运', 'summary': '金木水火土五行相生相克，构成了中国传统命理学的基础。五行平衡是运势顺畅的关键，失衡则需要调和。'},
+    ]
+    
     return render_template('divination/home.html',
                          divination_types=divination_types,
                          type_data=divination_types,
                          popular_divinations=popular_divinations,
                          fortune_tellers=fortune_tellers,
                          tips=tips,
+                         knowledge_tips=knowledge_tips,
                          lang=lang)
 
 
