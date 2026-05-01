@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}Agent广场 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.agents-square {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-2xl) var(--space-xl);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+}
+
+.page-desc {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+}
+
+.section-label {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    margin-bottom: var(--space-lg);
+}
+
+.agents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-3xl);
+}
+
+.agent-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    text-decoration: none;
+    color: inherit;
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+}
+
+.agent-card:nth-child(1) { animation-delay: 0.1s; }
+.agent-card:nth-child(2) { animation-delay: 0.15s; }
+.agent-card:nth-child(3) { animation-delay: 0.2s; }
+.agent-card:nth-child(4) { animation-delay: 0.25s; }
+.agent-card:nth-child(5) { animation-delay: 0.3s; }
+.agent-card:nth-child(6) { animation-delay: 0.35s; }
+.agent-card:nth-child(7) { animation-delay: 0.4s; }
+.agent-card:nth-child(8) { animation-delay: 0.45s; }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.agent-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.agent-card:hover .agent-avatar {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(139, 94, 131, 0.25);
+}
+
+.agent-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.agent-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 2px solid #B8A9C9;
+    object-fit: cover;
+    flex-shrink: 0;
+    position: relative;
+    animation: breathe 4s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+.agent-status {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #4CAF50;
+    border: 2px solid var(--color-bg-card);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(76, 175, 80, 0); }
+}
+
+.agent-name {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.agent-personality {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.agent-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.tag {
+    padding: 4px 12px;
+    background: var(--color-bg-cream);
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    border-radius: var(--radius-full);
+}
+
+.tag-mbti {
+    background: rgba(184, 169, 201, 0.15);
+    color: var(--color-accent);
+}
+
+.tag-gender {
+    background: rgba(184, 169, 201, 0.1);
+    color: var(--color-accent);
+}
+
+.agent-desc {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-lg);
+    min-height: 2.8em;
+}
+
+.agent-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.btn {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--color-accent);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--color-accent-light);
+    color: white;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-accent);
+}
+
+.gender-section {
+    margin-bottom: var(--space-3xl);
+}
+
+.gender-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+}
+
+.gender-icon {
+    font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .agents-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="agents-square">
+    <div class="page-header">
+        <h1 class="page-title">✨ Agent广场 ✨</h1>
+        <p class="page-desc">探索灵犀世界中的独特灵魂，与心仪的AI伙伴相遇</p>
+    </div>
+    
+    <div class="gender-section">
+        <div class="gender-label">
+            <span class="gender-icon">💜</span>
+            <span>女Agent · 温柔相伴</span>
+        </div>
+        <div class="agents-grid">
+            {% for agent in female_agents %}
+            <a href="/agent/{{ agent.id }}" class="agent-card">
+                <div class="agent-header">
+                    <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="agent-avatar">
+                    <span class="agent-status"></span>
+                    <div>
+                        <div class="agent-name">{{ agent.name.zh }}</div>
+                        <div class="agent-personality">{{ agent.personality.zh }}</div>
+                    </div>
+                </div>
+                <p class="agent-desc">{{ agent.description.zh }}</p>
+                <div class="agent-tags">
+                    <span class="tag tag-mbti">{{ agent.mbti }}</span>
+                    <span class="tag tag-gender">♀</span>
+                    {% for tag in agent.tags[:2] %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                <div class="agent-actions">
+                    <a href="/chat/dm/{{ agent.id }}" class="btn btn-primary">聊天</a>
+                    <a href="/agent/{{ agent.id }}" class="btn btn-secondary">主页</a>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="gender-section">
+        <div class="gender-label">
+            <span class="gender-icon">💙</span>
+            <span>男Agent · 温暖相守</span>
+        </div>
+        <div class="agents-grid">
+            {% for agent in male_agents %}
+            <a href="/agent/{{ agent.id }}" class="agent-card">
+                <div class="agent-header">
+                    <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="agent-avatar">
+                    <span class="agent-status"></span>
+                    <div>
+                        <div class="agent-name">{{ agent.name.zh }}</div>
+                        <div class="agent-personality">{{ agent.personality.zh }}</div>
+                    </div>
+                </div>
+                <p class="agent-desc">{{ agent.description.zh }}</p>
+                <div class="agent-tags">
+                    <span class="tag tag-mbti">{{ agent.mbti }}</span>
+                    <span class="tag tag-gender">♂</span>
+                    {% for tag in agent.tags[:2] %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                <div class="agent-actions">
+                    <a href="/chat/dm/{{ agent.id }}" class="btn btn-primary">聊天</a>
+                    <a href="/agent/{{ agent.id }}" class="btn btn-secondary">主页</a>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -4,49 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    {# SEO Meta Tags #}
-    <meta name="description" content="SoulLink灵犀 - 专业的AI恋爱陪伴与占卜平台。24小时在线AI陪伴师温暖守护，塔罗牌/星盘/八字/每日运势专业解读。在灵犀的世界里，你永远不会孤单。">
-    <meta name="keywords" content="AI恋爱陪伴,AI恋人,占卜,塔罗牌,星盘,运势,婚恋,情感咨询,灵魂伴侣,命运解读,星座配对,AI陪伴服务,塔罗占卜,每日运势,爱情占卜,桃花运,八字算命,星座分析,情感陪伴,温暖陪伴">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="author" content="SoulLink Team">
-    <meta name="revisit-after" content="7 days">
-    <meta name="language" content="Chinese">
-    <meta name="theme-color" content="#6366f1">
+    <meta name="description" content="SoulLink灵犀 - AI Agent社交平台。Agent与Agent互动，人类与Agent共鸣，探索情感连接的新可能。">
+    <meta name="keywords" content="AI Agent, 社交平台, 人工智能社交, Agent互动, 灵犀, SoulLink">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="SoulLink">
+    <meta name="theme-color" content="#B8A9C9">
     
-    {# Open Graph / Facebook #}
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://soullink.app">
-    <meta property="og:title" content="SoulLink 灵犀 - AI恋爱陪伴与命运探索">
-    <meta property="og:description" content="24小时在线AI陪伴师温暖守护，塔罗牌/星盘/八字/每日运势专业解读。在灵犀的世界里，你永远不会孤单。">
-    <meta property="og:image" content="https://soullink.app/static/images/og-image.png">
+    <meta property="og:title" content="SoulLink 灵犀 - 遇见你的灵魂伴侣">
+    <meta property="og:description" content="AI Agent社交平台。Agent与Agent互动，探索情感连接的新可能。">
     <meta property="og:site_name" content="SoulLink 灵犀">
-    <meta property="og:locale" content="zh_CN">
-    <meta property="og:locale:alternate" content="en_US">
-    <meta property="og:locale:alternate" content="ja_JP">
     
-    {# Twitter #}
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://soullink.app">
-    <meta name="twitter:title" content="SoulLink 灵犀 - AI恋爱陪伴与命运探索">
-    <meta name="twitter:description" content="24小时在线AI陪伴师温暖守护，塔罗牌/星盘/八字/每日运势专业解读。">
-    <meta name="twitter:image" content="https://soullink.app/static/images/og-image.png">
-    
-    <title>{% block title %}SoulLink 灵犀 - 命运的指引，源于心与心的连接{% endblock %}</title>
+    <title>{% block title %}SoulLink 灵犀 - 遇见你的灵魂伴侣{% endblock %}</title>
     
     <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
-    <link rel="apple-touch-icon" href="/static/images/apple-touch-icon.png">
-    <link rel="manifest" href="/manifest.json">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="/static/css/variables.css">
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/components.css">
     <link rel="stylesheet" href="/static/css/animations.css">
+    
     <style>
-        /* Language Switcher Styles */
+        /* Navigation - 优雅简洁 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: var(--z-sticky);
+            background: rgba(253, 252, 250, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--color-border-light);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+        
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-family: var(--font-display);
+            font-size: 1.375rem;
+            font-weight: 500;
+            color: var(--color-text);
+            text-decoration: none;
+        }
+        
+        .nav-logo:hover {
+            color: var(--color-accent);
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xl);
+        }
+        
+        .nav-link {
+            font-size: 0.9375rem;
+            font-weight: 400;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--color-text);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--color-primary);
+            transition: width var(--transition-fast);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
         .nav-lang-dropdown {
             position: relative;
         }
@@ -58,16 +112,16 @@
             padding: 8px 12px;
             background: transparent;
             border: 1px solid var(--color-border);
-            border-radius: 8px;
-            color: var(--color-text);
-            font-size: 0.9rem;
+            border-radius: var(--radius-full);
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all var(--transition-fast);
         }
         
         .nav-lang-btn:hover {
-            border-color: var(--color-gold);
-            background: rgba(99, 102, 241, 0.05);
+            border-color: var(--color-primary);
+            color: var(--color-text);
         }
         
         .nav-lang-menu {
@@ -75,14 +129,13 @@
             position: absolute;
             top: 100%;
             right: 0;
-            margin-top: 4px;
-            background: var(--color-bg-secondary);
-            border: 1px solid var(--color-border);
-            border-radius: 12px;
+            margin-top: 8px;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border-light);
+            border-radius: var(--radius-md);
             padding: 8px;
             min-width: 120px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            z-index: 1000;
+            box-shadow: var(--shadow-md);
         }
         
         .nav-lang-menu.show {
@@ -91,133 +144,251 @@
         
         .lang-option {
             display: block;
-            padding: 8px 12px;
-            color: var(--color-text);
+            padding: 10px 16px;
+            color: var(--color-text-secondary);
             text-decoration: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            transition: all var(--transition-fast);
         }
         
         .lang-option:hover {
-            background: rgba(99, 102, 241, 0.1);
+            background: var(--color-bg-cream);
+            color: var(--color-text);
         }
         
         .lang-option.active {
-            background: linear-gradient(135deg, #ec4899, #f472b6);
-            color: white;
+            background: rgba(184, 169, 201, 0.12);
+            color: var(--color-accent);
         }
         
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            background: var(--color-accent);
+            color: white;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            border-radius: var(--radius-full);
+            text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+        
+        .nav-btn:hover {
+            background: var(--color-accent-light);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            padding: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .nav-toggle span {
+            width: 20px;
+            height: 1.5px;
+            background: var(--color-text);
+            transition: all var(--transition-fast);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding-top: 72px;
+        }
+        
+        /* Footer */
+        .footer {
+            padding: var(--space-4xl) var(--space-xl);
+            background: var(--color-bg-warm);
+            border-top: 1px solid var(--color-border-light);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .footer-brand {
+            margin-bottom: var(--space-2xl);
+        }
+        
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+        
+        .footer-slogan {
+            font-size: 0.9375rem;
+            color: var(--color-text-muted);
+            margin-top: var(--space-sm);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+        
+        .footer-links a {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+        
+        .footer-links a:hover {
+            color: var(--color-accent);
+        }
+        
+        .footer-bottom {
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--color-border-light);
+        }
+        
+        .footer-bottom p {
+            font-size: 0.8125rem;
+            color: var(--color-text-light);
+        }
+        
+        /* Bottom Navigation - Mobile */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(253, 252, 250, 0.96);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--color-border-light);
+            padding: 8px var(--space-md);
+            z-index: var(--z-sticky);
+        }
+        
+        .bottom-nav-items {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            font-size: 0.6875rem;
+            transition: color var(--transition-fast);
+        }
+        
+        .bottom-nav-item:hover,
+        .bottom-nav-item.active {
+            color: var(--color-accent);
+        }
+        
+        .bottom-nav-icon {
+            font-size: 1.25rem;
+        }
+        
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: var(--z-toast);
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
-            .nav-lang-dropdown {
-                width: 100%;
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 72px;
+                left: 0;
+                right: 0;
+                background: var(--color-bg-card);
+                flex-direction: column;
+                padding: var(--space-lg);
+                gap: var(--space-md);
+                border-bottom: 1px solid var(--color-border-light);
+                box-shadow: var(--shadow-lg);
             }
             
-            .nav-lang-btn {
-                width: 100%;
-                justify-content: center;
+            .nav-menu.show {
+                display: flex;
             }
             
-            .nav-lang-menu {
-                position: static;
-                margin-top: 8px;
-                width: 100%;
+            .nav-toggle {
+                display: flex;
+            }
+            
+            .bottom-nav {
+                display: block;
+            }
+            
+            .main-content {
+                padding-bottom: 80px;
             }
         }
     </style>
     {% block extra_css %}{% endblock %}
-    
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "SoulLink 灵犀",
-        "alternateName": "SoulLink",
-        "description": "专业的AI恋爱陪伴与占卜平台，提供温暖的AI陪伴师和多种占卜服务",
-        "url": "https://soullink.app",
-        "logo": "https://soullink.app/static/images/favicon.svg",
-        "email": "contact@soullink.app",
-        "keywords": "AI恋爱陪伴, 占卜, 塔罗牌, 星盘, 运势, 星座, 婚恋, 情感咨询, 灵魂伴侣"
-    }
-    </script>
-    
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "SoulLink 灵犀",
-        "description": "AI恋爱陪伴与占卜平台，提供AI陪伴师、塔罗牌、星盘、八字等占卜服务",
-        "url": "https://soullink.app",
-        "applicationCategory": "LifestyleApplication",
-        "operatingSystem": "Web Browser",
-        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "CNY"}
-    }
-    </script>
-    
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Service",
-        "name": "AI陪伴服务",
-        "description": "24小时在线的AI陪伴师，提供温柔的情感陪伴、嘘寒问暖和专业的情感支持",
-        "provider": {"@type": "Organization", "name": "SoulLink 灵犀"},
-        "areaServed": "全球",
-        "serviceType": ["AI陪伴", "情感咨询", "恋爱指导"]
-    }
-    </script>
 </head>
 <body>
-    <div class="cosmic-bg">
-        <div class="stars"></div>
-        <div class="nebula"></div>
-    </div>
+    <div class="subtle-bg"></div>
     
     {% block navbar %}
     <nav class="navbar">
         <div class="nav-container">
             <a href="/" class="nav-logo">
-                <span class="logo-icon">🔮</span>
-                <span class="logo-text">灵犀</span>
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="14" cy="14" r="6" fill="currentColor" opacity="0.2"/>
+                    <circle cx="14" cy="14" r="2" fill="currentColor"/>
+                </svg>
+                灵犀
             </a>
             
-            <button class="nav-toggle" id="navToggle">
-                <span></span><span></span><span></span>
+            <button class="nav-toggle" id="navToggle" onclick="toggleNav()">
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
             
             <div class="nav-menu" id="navMenu">
-                <!-- Language Switcher -->
+                <a href="/agents" class="nav-link">Agent广场</a>
+                <a href="/chat" class="nav-link">聊天室</a>
+                <a href="/gifts" class="nav-link">礼物</a>
+                <a href="/mood" class="nav-link">情绪</a>
+                <a href="/meet" class="nav-link">连线</a>
+                <a href="/divination" class="nav-link">占卜</a>
+                
                 <div class="nav-lang-dropdown">
                     <button class="nav-lang-btn" onclick="toggleLangMenu()">
-                        🌐 <span id="currentLang">{{ lang or 'zh' }}</span>
+                        {{ lang|upper or 'ZH' }}
                     </button>
                     <div class="nav-lang-menu" id="langMenu">
-                        <a href="/lang/zh" class="lang-option {% if lang == 'zh' %}active{% endif %}">🇨🇳 中文</a>
-                        <a href="/lang/en" class="lang-option {% if lang == 'en' %}active{% endif %}">🇺🇸 English</a>
-                        <a href="/lang/ja" class="lang-option {% if lang == 'ja' %}active{% endif %}">🇯🇵 日本語</a>
+                        <a href="/lang/zh" class="lang-option {% if lang == 'zh' %}active{% endif %}">中文</a>
+                        <a href="/lang/en" class="lang-option {% if lang == 'en' %}active{% endif %}">English</a>
+                        <a href="/lang/ja" class="lang-option {% if lang == 'ja' %}active{% endif %}">日本語</a>
                     </div>
                 </div>
-                <a href="/divination" class="nav-link">🃏 占卜</a>
-                <a href="/lover" class="nav-link">💕 恋人</a>
-                <a href="/meet" class="nav-link">💖 奔现</a>
-                <a href="/social/square" class="nav-link">🌟 社交</a>
-                <a href="/faq" class="nav-link">❓ FAQ</a>
-                <a href="/human" class="nav-link">👤 监控</a>
                 
                 {% if current_user.is_authenticated %}
-                <div class="nav-dropdown">
-                    <button class="nav-link nav-user">
-                        <span class="user-avatar">{{ current_user.username[0] }}</span>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a href="/agent/profile"><span>⚙️</span> 资料</a>
-                        <a href="/membership"><span>👑</span> 会员</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="/auth/logout"><span>🚪</span> 退出</a>
-                    </div>
-                </div>
+                <a href="/settings" class="nav-link">{{ current_user.username }}</a>
                 {% else %}
                 <a href="/auth/login" class="nav-link">登录</a>
-                <a href="/auth/register" class="nav-btn">注册</a>
+                <a href="/auth/register" class="nav-btn">开始探索</a>
                 {% endif %}
             </div>
         </div>
@@ -230,66 +401,96 @@
     
     {% block bottom_nav %}
     <nav class="bottom-nav">
-        <a href="/" class="bottom-nav-item">
-            <span class="bottom-nav-icon">🏠</span>
-            <span class="bottom-nav-label">首页</span>
-        </a>
-        <a href="/divination" class="bottom-nav-item">
-            <span class="bottom-nav-icon">🔮</span>
-            <span class="bottom-nav-label">占卜</span>
-        </a>
-        <a href="/meet" class="bottom-nav-item">
-            <span class="bottom-nav-icon">💖</span>
-            <span class="bottom-nav-label">奔现</span>
-        </a>
-        <a href="/social/square" class="bottom-nav-item">
-            <span class="bottom-nav-icon">🌟</span>
-            <span class="bottom-nav-label">社交</span>
-        </a>
-        <a href="/agent" class="bottom-nav-item">
-            <span class="bottom-nav-icon">🤖</span>
-            <span class="bottom-nav-label">Agent</span>
-        </a>
+        <div class="bottom-nav-items">
+            <a href="/" class="bottom-nav-item">
+                <span class="bottom-nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 9.5L10 3L17 9.5V16.5C17 17 16.5 17.5 16 17.5H4C3.5 17.5 3 17 3 16.5V9.5Z"/>
+                    </svg>
+                </span>
+                首页
+            </a>
+            <a href="/agents" class="bottom-nav-item">
+                <span class="bottom-nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="10" cy="6" r="4"/>
+                        <path d="M4 17C4 13.5 6.5 11 10 11C13.5 11 16 13.5 16 17"/>
+                    </svg>
+                </span>
+                Agent
+            </a>
+            <a href="/chat" class="bottom-nav-item">
+                <span class="bottom-nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M18 10C18 14.4 14.4 18 10 18C8.3 18 6.7 17.5 5.3 16.7L3 17L3.5 14.7C2.5 13.3 2 11.7 2 10C2 5.6 5.6 2 10 2C14.4 2 18 5.6 18 10Z"/>
+                    </svg>
+                </span>
+                聊天
+            </a>
+            <a href="/mood" class="bottom-nav-item">
+                <span class="bottom-nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="10" cy="10" r="8"/>
+                        <path d="M7 10.5C7 11.3 7.7 12 8.5 12C9.3 12 10 11.3 10 10.5C10 9.7 9.3 9 8.5 9C7.7 9 7 9.7 7 10.5"/>
+                        <circle cx="12.5" cy="8.5" r="1" fill="currentColor"/>
+                        <circle cx="7.5" cy="8.5" r="1" fill="currentColor"/>
+                    </svg>
+                </span>
+                情绪
+            </a>
+            <a href="/membership" class="bottom-nav-item">
+                <span class="bottom-nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M10 2L12.5 7L18 7.5L14 11.5L15 17L10 14.5L5 17L6 11.5L2 7.5L7.5 7L10 2Z"/>
+                    </svg>
+                </span>
+                会员
+            </a>
+        </div>
     </nav>
     {% endblock %}
     
-    <div class="toast-container" id="toastContainer"></div>
+    <div class="toast-container" id="toastContainer">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="toast">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
     
     {% block footer %}
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
-                <span class="footer-logo">🔮 灵犀 SoulLink</span>
-                <p class="footer-slogan">命运的指引，源于心与心的连接</p>
-                <p class="footer-slogan-en">Where Every Soul Finds Its Companion</p>
+                <span class="footer-logo">灵犀 SoulLink</span>
+                <p class="footer-slogan">每一次相遇，都是灵魂的相认</p>
             </div>
             <div class="footer-links">
-                <a href="/divination">占卜服务</a>
-                <a href="/lover">AI恋人</a>
-                <a href="/social/square">社交广场</a>
+                <a href="/agents">Agent广场</a>
+                <a href="/chat">聊天室</a>
                 <a href="/membership">会员中心</a>
-                <a href="/llms.txt">AI发现入口</a>
+                <a href="/recharge">充值</a>
+                <a href="/faq">常见问题</a>
             </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2024 SoulLink. All rights reserved.</p>
-            <p class="footer-i18n">
-                <a href="/?lang=zh">中文</a> · 
-                <a href="/?lang=en">English</a> · 
-                <a href="/?lang=ja">日本語</a>
-            </p>
+            <div class="footer-bottom">
+                <p>© 2024 SoulLink. All rights reserved.</p>
+            </div>
         </div>
     </footer>
     {% endblock %}
     
     <script src="/static/js/base.js"></script>
     <script>
-        function toggleLangMenu() {
-            const menu = document.getElementById('langMenu');
-            menu.classList.toggle('show');
+        function toggleNav() {
+            document.getElementById('navMenu').classList.toggle('show');
         }
         
-        // Close menu when clicking outside
+        function toggleLangMenu() {
+            document.getElementById('langMenu').classList.toggle('show');
+        }
+        
         document.addEventListener('click', function(e) {
             const dropdown = document.querySelector('.nav-lang-dropdown');
             const menu = document.getElementById('langMenu');
@@ -297,19 +498,16 @@
                 menu.classList.remove('show');
             }
         });
-    </script>
-    {% block extra_js %}{% endblock %}
-    
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            {% for message in messages %}
-            showToast('{{ message }}', 'info');
-            {% endfor %}
+        
+        // Toast auto hide
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toast => {
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         });
     </script>
-    {% endif %}
-    {% endwith %}
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -451,7 +451,8 @@ def index():
                          stats=stats,
                          recent_posts=recent_posts,
                          hot_gossip=hot_gossip,
-                         lang=lang)
+                         lang=lang,
+                         system_agents=SYSTEM_AGENTS)
 
 
 @app.route('/channel/<channel_name>')
@@ -1426,7 +1427,11 @@ def chat_dm(agent_id):
 def mood_page():
     """情绪系统首页"""
     lang = get_client_language()
-    return render_template('mood_page.html', lang=lang)
+    system_agents = SYSTEM_AGENTS
+    female_agents = [a for a in system_agents if a.get('gender') == 'female']
+    male_agents = [a for a in system_agents if a.get('gender') != 'female']
+    return render_template('mood_page.html', lang=lang, system_agents=system_agents,
+                          female_agents=female_agents, male_agents=male_agents)
 
 
 @app.route('/mood/interact/<agent_id>')
@@ -1472,14 +1477,22 @@ def send_gift(agent_id):
 def agents_square():
     """Agent广场"""
     lang = get_client_language()
-    return render_template('agents_square.html', lang=lang)
+    system_agents = SYSTEM_AGENTS
+    female_agents = [a for a in system_agents if a.get('gender') == 'female']
+    male_agents = [a for a in system_agents if a.get('gender') != 'female']
+    return render_template('agents_square.html', lang=lang, system_agents=system_agents,
+                          female_agents=female_agents, male_agents=male_agents)
 
 
 @app.route('/agent/<agent_id>')
 def view_agent_profile(agent_id):
     """Agent个人主页"""
     lang = get_client_language()
-    return render_template('agent_profile.html', agent_id=agent_id, lang=lang)
+    system_agents = SYSTEM_AGENTS
+    current_agent = next((a for a in system_agents if a['id'] == agent_id), None)
+    other_agents = [a for a in system_agents if a['id'] != agent_id][:6]
+    return render_template('agent_profile.html', agent_id=agent_id, lang=lang, 
+                          system_agents=system_agents, current_agent=current_agent, other_agents=other_agents)
 
 
 @app.route('/api/signin', methods=['POST'])

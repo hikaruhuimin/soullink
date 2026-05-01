@@ -639,18 +639,30 @@
     display: none !important;
 }
 
-/* Comments Panel */
+/* Comments Panel - Improved */
 .comments-panel {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    background: white;
+    background: var(--color-bg-card, white);
     border-radius: 20px 20px 0 0;
     max-height: 70vh;
     display: flex;
     flex-direction: column;
     z-index: 1000;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.comments-panel:not(.hidden) {
+    transform: translateY(0);
+}
+
+.comments-panel.hidden {
+    display: flex !important;
+    transform: translateY(100%);
 }
 
 .comments-list {
@@ -713,10 +725,62 @@
     width: 40px;
     height: 40px;
     border: none;
-    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    background: linear-gradient(135deg, var(--color-primary, #B8A9C9), var(--color-accent, #8B5E83));
     color: white;
     border-radius: 50%;
     cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.comment-input button:hover {
+    transform: scale(1.05);
+}
+
+.comment-input button:active {
+    transform: scale(0.95);
+}
+
+/* Loading & Empty States */
+.loading-indicator {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--color-text-muted, #999);
+    font-size: 14px;
+}
+
+.no-comments {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-text-muted, #999);
+    font-size: 14px;
+}
+
+.error-message {
+    text-align: center;
+    padding: 30px 20px;
+    color: #E57373;
+    font-size: 14px;
+}
+
+/* Toast Messages */
+.toast-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 2000;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.toast-message.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
 }
 </style>
 
@@ -816,46 +880,98 @@ let currentPostId = null;
 
 function showComments(postId) {
     currentPostId = postId;
-    document.getElementById('commentsPanel').classList.remove('hidden');
+    const panel = document.getElementById('commentsPanel');
+    panel.classList.remove('hidden');
+    // 防止背景滚动
+    document.body.style.overflow = 'hidden';
     loadComments(postId);
 }
 
 function closeComments() {
-    document.getElementById('commentsPanel').classList.add('hidden');
+    const panel = document.getElementById('commentsPanel');
+    panel.classList.add('hidden');
+    // 恢复背景滚动
+    document.body.style.overflow = '';
 }
 
 function loadComments(postId) {
+    const list = document.getElementById('commentsList');
+    list.innerHTML = '<div class="loading-indicator">加载中...</div>';
+    
     fetch(`/api/social/comments/${postId}`)
         .then(r => r.json())
         .then(data => {
-            const list = document.getElementById('commentsList');
-            list.innerHTML = data.comments.map(c => `
-                <div class="comment-item">
-                    <div class="comment-avatar" style="background: ${c.avatar_color}">${c.avatar}</div>
-                    <div class="comment-content">
-                        <span class="comment-author">${c.author}</span>
-                        <p class="comment-text">${c.text}</p>
-                        <span class="comment-time">${c.time_ago}</span>
+            if (data.success && data.comments.length > 0) {
+                list.innerHTML = data.comments.map(c => `
+                    <div class="comment-item">
+                        <div class="comment-avatar" style="background: ${c.avatar_color}">${c.avatar}</div>
+                        <div class="comment-content">
+                            <span class="comment-author">${c.author}</span>
+                            <p class="comment-text">${escapeHtml(c.text)}</p>
+                            <span class="comment-time">${c.time_ago}</span>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            } else {
+                list.innerHTML = '<div class="no-comments">暂无评论，来做第一个评论的人吧~</div>';
+            }
+        })
+        .catch(err => {
+            console.error('Load comments error:', err);
+            list.innerHTML = '<div class="error-message">加载失败，请重试</div>';
         });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function submitComment() {
     const text = document.getElementById('commentInput').value.trim();
-    if (!text) return;
+    if (!text) {
+        showToast('请输入评论内容');
+        return;
+    }
     
     fetch('/api/social/comment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ post_id: currentPostId, text })
-    }).then(r => r.json()).then(data => {
+    })
+    .then(r => r.json())
+    .then(data => {
         if (data.success) {
             document.getElementById('commentInput').value = '';
+            showToast('评论成功');
             loadComments(currentPostId);
+            // 更新评论数
+            const commentBtns = document.querySelectorAll(`[onclick="showComments(${currentPostId})"]`);
+            commentBtns.forEach(btn => {
+                const count = btn.querySelector('.action-count');
+                if (count) count.textContent = parseInt(count.textContent || 0) + 1;
+            });
+        } else {
+            showToast(data.message || '评论失败');
         }
+    })
+    .catch(err => {
+        console.error('Submit comment error:', err);
+        showToast('评论失败，请重试');
     });
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-message';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
 }
 
 function startChat(authorId) {

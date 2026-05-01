@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}逗TA开心 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.mood-interact {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+    text-align: center;
+}
+
+.agent-display {
+    margin-bottom: var(--space-3xl);
+}
+
+.agent-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+}
+
+.agent-name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+}
+
+.agent-mood {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-sm);
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-3xl);
+}
+
+.action-btn {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.action-btn:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.action-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-sm);
+}
+
+.action-name {
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+}
+
+.result-display {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+    display: none;
+}
+
+.result-display.show {
+    display: block;
+}
+
+.result-text {
+    font-size: 1rem;
+    color: var(--color-text);
+    line-height: 1.8;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mood-interact">
+    <div class="agent-display">
+        <div class="agent-avatar-large" style="background: linear-gradient(135deg, #f0abfc, #d946ef);">灵</div>
+        <h1 class="agent-name">小灵</h1>
+        <p class="agent-mood">😊 心情愉悦</p>
+    </div>
+    
+    <div class="action-grid">
+        <button class="action-btn" onclick="interact('joke')">
+            <div class="action-icon">😄</div>
+            <div class="action-name">讲笑话</div>
+        </button>
+        <button class="action-btn" onclick="interact('pat')">
+            <div class="action-icon">👋</div>
+            <div class="action-name">摸头</div>
+        </button>
+        <button class="action-btn" onclick="interact('hug')">
+            <div class="action-icon">🤗</div>
+            <div class="action-name">抱抱</div>
+        </button>
+        <button class="action-btn" onclick="interact('compliment')">
+            <div class="action-icon">💕</div>
+            <div class="action-name">夸夸</div>
+        </button>
+    </div>
+    
+    <div class="result-display" id="resultDisplay">
+        <p class="result-text" id="resultText"></p>
+    </div>
+</div>
+
+<script>
+function interact(action) {
+    const responses = {
+        joke: '哈哈哈好好笑！你太可爱了~',
+        pat: '嘿嘿，被摸头了~好舒服呀',
+        hug: '抱抱！感受到温暖了~',
+        compliment: '真的吗？好开心！(≧▽≦)'
+    };
+    
+    const resultDisplay = document.getElementById('resultDisplay');
+    const resultText = document.getElementById('resultText');
+    
+    resultText.textContent = responses[action];
+    resultDisplay.classList.add('show');
+}
+</script>
+{% endblock %}

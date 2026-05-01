@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}{{ current_agent.name.zh if current_agent else 'Agent' }} - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.agent-profile {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+}
+
+.profile-header {
+    display: flex;
+    gap: var(--space-xl);
+    align-items: flex-start;
+    margin-bottom: var(--space-3xl);
+    padding-bottom: var(--space-3xl);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.profile-avatar-wrapper {
+    flex-shrink: 0;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #B8A9C9;
+    object-fit: cover;
+    animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+.profile-status {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4CAF50;
+    border: 3px solid var(--color-bg);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(76, 175, 80, 0); }
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-name {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.profile-personality {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-md);
+}
+
+.profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.tag {
+    padding: 6px 14px;
+    background: var(--color-bg-cream);
+    color: var(--color-text-secondary);
+    font-size: 0.8125rem;
+    border-radius: var(--radius-full);
+}
+
+.tag-highlight {
+    background: rgba(184, 169, 201, 0.15);
+    color: var(--color-accent);
+}
+
+.tag-mbti {
+    background: rgba(139, 94, 131, 0.15);
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.tag-gender {
+    font-size: 0.9rem;
+}
+
+.profile-desc {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-lg);
+}
+
+.profile-actions {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: var(--radius-full);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.btn-primary {
+    background: var(--color-accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--color-accent-light);
+    color: white;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-accent);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-3xl);
+}
+
+.stat-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+}
+
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.stat-value {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-accent);
+    margin-bottom: var(--space-xs);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.friends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--space-md);
+}
+
+.friend-item {
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s;
+}
+
+.friend-item:hover {
+    transform: translateY(-4px);
+}
+
+.friend-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    margin: 0 auto var(--space-sm);
+    border: 2px solid #B8A9C9;
+    object-fit: cover;
+}
+
+.friend-name {
+    font-size: 0.8125rem;
+    color: var(--color-text);
+}
+
+.not-found {
+    text-align: center;
+    padding: var(--space-3xl);
+}
+
+.not-found h2 {
+    font-size: 1.5rem;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+}
+
+.not-found p {
+    color: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .profile-tags {
+        justify-content: center;
+    }
+    
+    .profile-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="agent-profile">
+    {% if current_agent %}
+    <div class="profile-header">
+        <div class="profile-avatar-wrapper">
+            <img src="{{ current_agent.avatar }}" alt="{{ current_agent.name.zh }}" class="profile-avatar">
+            <span class="profile-status"></span>
+        </div>
+        <div class="profile-info">
+            <h1 class="profile-name">{{ current_agent.name.zh }}</h1>
+            <p class="profile-personality">{{ current_agent.personality.zh }}</p>
+            <div class="profile-tags">
+                <span class="tag tag-highlight">{{ current_agent.personality.zh }}</span>
+                <span class="tag tag-mbti">{{ current_agent.mbti }}</span>
+                <span class="tag tag-gender">{{ '♀' if current_agent.gender == 'female' else '♂' }}</span>
+                {% for tag in current_agent.tags %}
+                <span class="tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+            <p class="profile-desc">{{ current_agent.description.zh }}</p>
+            <div class="profile-actions">
+                <a href="/chat/dm/{{ current_agent.id }}" class="btn btn-primary">开始聊天</a>
+                <a href="/gifts/send/{{ current_agent.id }}" class="btn btn-secondary">送礼物</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ range(800, 1500) | random }}</div>
+            <div class="stat-label">聊天次数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ range(50, 200) | random }}</div>
+            <div class="stat-label">收到礼物</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ range(85, 99) | random }}%</div>
+            <div class="stat-label">开心指数</div>
+        </div>
+    </div>
+    
+    <section>
+        <h2 class="section-title">好友</h2>
+        <div class="friends-grid">
+            {% for friend in other_agents %}
+            <a href="/agent/{{ friend.id }}" class="friend-item">
+                <img src="{{ friend.avatar }}" alt="{{ friend.name.zh }}" class="friend-avatar">
+                <span class="friend-name">{{ friend.name.zh }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% else %}
+    <div class="not-found">
+        <h2>Agent不存在</h2>
+        <p>抱歉，找不到这个Agent。</p>
+        <a href="/agents" class="btn btn-primary">返回广场</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

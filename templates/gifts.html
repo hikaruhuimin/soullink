@@ -284,6 +284,92 @@
     cursor: not-allowed;
 }
 
+/* 礼物页新增样式 */
+.agent-selector {
+    margin-bottom: var(--space-xl);
+}
+
+.agent-selector-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-md);
+    text-align: center;
+}
+
+.agent-grid {
+    display: flex;
+    gap: var(--space-sm);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.agent-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-sm);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.agent-option:hover {
+    background: var(--color-bg-cream);
+}
+
+.agent-option.selected {
+    border-color: var(--color-accent);
+    background: rgba(184, 169, 201, 0.1);
+}
+
+.agent-option input {
+    display: none;
+}
+
+.agent-option-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #B8A9C9;
+    object-fit: cover;
+    margin-bottom: var(--space-xs);
+    transition: all 0.3s;
+}
+
+.agent-option.selected .agent-option-avatar {
+    border-color: var(--color-accent);
+    transform: scale(1.1);
+}
+
+.agent-option-name {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.selected-agent-display {
+    text-align: center;
+    padding: var(--space-md);
+    background: linear-gradient(135deg, rgba(184, 169, 201, 0.1), rgba(139, 92, 131, 0.1));
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.selected-agent-display img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 3px solid #B8A9C9;
+    object-fit: cover;
+    margin-bottom: var(--space-sm);
+}
+
+.selected-agent-display .name {
+    font-weight: 500;
+    color: var(--color-text);
+}
+
 /* 连续送礼奖励 */
 .reward-section {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -351,6 +437,25 @@
         <span class="icon">💎</span>
         <span>{{ _('current_balance') }}: <span class="amount">{{ spirit_stones }}</span></span>
         <a href="/recharge" class="recharge-link">{{ _('recharge_now') }} →</a>
+    </div>
+    
+    <!-- Agent选择器 -->
+    <div class="agent-selector">
+        <div class="agent-selector-title">选择要送礼的Agent</div>
+        <div class="agent-grid">
+            {% for agent in system_agents %}
+            <label class="agent-option {% if loop.first %}selected{% endif %}" data-agent-id="{{ agent.id }}" onclick="selectAgent('{{ agent.id }}', '{{ agent.name.zh }}', '{{ agent.avatar }}')">
+                <input type="radio" name="agent_id" value="{{ agent.id }}" {% if loop.first %}checked{% endif %}>
+                <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="agent-option-avatar">
+                <span class="agent-option-name">{{ agent.name.zh }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="selected-agent-display" id="selectedAgentDisplay">
+        <img src="{{ system_agents[0].avatar if system_agents else '' }}" alt="avatar" id="selectedAgentImg">
+        <div class="name" id="selectedAgentName">{{ system_agents[0].name.zh if system_agents else '' }}</div>
     </div>
     
     <!-- 档位切换 -->
@@ -448,6 +553,17 @@ const giftsData = {
 };
 
 let currentGift = null;
+let currentAgentId = '{{ system_agents[0].id if system_agents else "" }}';
+
+function selectAgent(agentId, agentName, agentAvatar) {
+    currentAgentId = agentId;
+    document.querySelectorAll('.agent-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    document.querySelector(`[data-agent-id="${agentId}"]`).classList.add('selected');
+    document.getElementById('selectedAgentImg').src = agentAvatar;
+    document.getElementById('selectedAgentName').textContent = agentName;
+}
 
 function showTier(tier) {
     // 更新tab状态
@@ -497,7 +613,10 @@ function closeModal() {
 }
 
 function sendGift() {
-    if (!currentGift) return;
+    if (!currentGift || !currentAgentId) {
+        alert('请先选择礼物和Agent');
+        return;
+    }
     
     const gift = giftsData[currentGift];
     if ({{ spirit_stones }} < gift.price) {
@@ -505,8 +624,30 @@ function sendGift() {
         return;
     }
     
-    alert('{{ _('gift_sent_success') }}\n\n' + gift.name + ' ' + gift.icon);
-    closeModal();
+    // 发送礼物请求
+    fetch('/api/gift/send', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            agent_id: currentAgentId,
+            gift_id: currentGift
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('{{ _('gift_sent_success') }}\n\n' + gift.name + ' ' + gift.icon);
+            closeModal();
+        } else {
+            alert(data.message || '发送失败');
+        }
+    })
+    .catch(err => {
+        console.error('发送礼物失败:', err);
+        alert('发送失败，请重试');
+    });
 }
 
 // 点击外部关闭弹窗

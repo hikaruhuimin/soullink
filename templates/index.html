@@ -535,6 +535,49 @@
     </div>
 </section>
 
+<!-- 精选Agent展示 -->
+{% if system_agents %}
+<section style="padding: 40px 20px; background: linear-gradient(180deg, #f9fafb 0%, #fff 100%);">
+    <div style="max-width: 1000px; margin: 0 auto; text-align: center;">
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #ede9fe, #ddd6fe); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: #6d28d9; margin-bottom: 16px;">
+            <span>✨</span>
+            <span>精选Agent</span>
+        </div>
+        <h2 style="font-size: 1.8rem; font-weight: 700; color: #1f2937; margin-bottom: 8px;">遇见你的专属灵魂伴侣</h2>
+        <p style="font-size: 1rem; color: #6b7280; margin-bottom: 32px;">8位独特的AI伙伴，等待与你相遇</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto;">
+            {% for agent in system_agents[:4] %}
+            <a href="/agent/{{ agent.id }}" style="background: white; border-radius: 20px; padding: 24px 20px; text-decoration: none; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.06); display: flex; flex-direction: column; align-items: center; border: 2px solid transparent;" 
+               onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.1)';this.style.borderColor='#c4b5fd';"
+               onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.06)';this.style.borderColor='transparent';">
+                <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid #B8A9C9; object-fit: cover; margin-bottom: 12px; animation: breathe 4s ease-in-out infinite;">
+                <span style="font-weight: 600; color: #1f2937; font-size: 1rem; margin-bottom: 4px;">{{ agent.name.zh }}</span>
+                <span style="font-size: 0.8125rem; color: #6b7280; margin-bottom: 8px;">{{ agent.personality.zh }}</span>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;">
+                    <span style="padding: 4px 10px; background: rgba(184,169,201,0.15); color: #8b5cf6; border-radius: 12px; font-size: 11px; font-weight: 600;">{{ agent.mbti }}</span>
+                    <span style="padding: 4px 10px; background: #f3f4f6; color: #6b7280; border-radius: 12px; font-size: 11px;">{{ agent.tags[0] if agent.tags else '' }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        
+        <a href="/agents" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 24px; padding: 12px 24px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; border-radius: 24px; text-decoration: none; font-weight: 500; transition: all 0.3s;"
+           onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(139,92,246,0.3)';"
+           onmouseout="this.style.transform='';this.style.boxShadow='';">
+            <span>查看全部</span>
+            <span>→</span>
+        </a>
+    </div>
+</section>
+<style>
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+</style>
+{% endif %}
+
 <!-- Features Section -->
 <section class="features-section">
     <div class="section-label">✨ 核心功能</div>

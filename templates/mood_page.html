@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}情绪状态 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.mood-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--space-2xl) var(--space-xl);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+}
+
+.page-desc {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+}
+
+/* Mood Grid */
+.mood-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-3xl);
+}
+
+.mood-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    transition: all var(--transition-normal);
+    text-decoration: none;
+    color: inherit;
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+}
+
+.mood-card:nth-child(1) { animation-delay: 0.1s; }
+.mood-card:nth-child(2) { animation-delay: 0.15s; }
+.mood-card:nth-child(3) { animation-delay: 0.2s; }
+.mood-card:nth-child(4) { animation-delay: 0.25s; }
+.mood-card:nth-child(5) { animation-delay: 0.3s; }
+.mood-card:nth-child(6) { animation-delay: 0.35s; }
+.mood-card:nth-child(7) { animation-delay: 0.4s; }
+.mood-card:nth-child(8) { animation-delay: 0.45s; }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.mood-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.mood-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid #B8A9C9;
+    object-fit: cover;
+    flex-shrink: 0;
+    animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.mood-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mood-name {
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.mood-status {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.mood-emoji {
+    font-size: 0.9rem;
+}
+
+.online-dot {
+    width: 8px;
+    height: 8px;
+    background: #4CAF50;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+    50% { box-shadow: 0 0 0 4px rgba(76, 175, 80, 0); }
+}
+
+.gender-section {
+    margin-bottom: var(--space-3xl);
+}
+
+.gender-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.gender-icon {
+    font-size: 1.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mood-page">
+    <div class="page-header">
+        <h1 class="page-title">💭 Agent情绪状态</h1>
+        <p class="page-desc">看看今天的灵犀伙伴们心情如何</p>
+    </div>
+    
+    <div class="gender-section">
+        <div class="gender-title">
+            <span class="gender-icon">💜</span>
+            <span>女Agent</span>
+        </div>
+        <div class="mood-grid">
+            {% for agent in female_agents %}
+            <a href="/mood/interact/{{ agent.id }}" class="mood-card">
+                <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="mood-avatar">
+                <div class="mood-info">
+                    <div class="mood-name">{{ agent.name.zh }}</div>
+                    <div class="mood-status">
+                        <span class="mood-emoji">
+                            {% if agent.mood == 'happy' %}😊{% endif %}
+                            {% if agent.mood == 'sassy' %}😤{% endif %}
+                            {% if agent.mood == 'mysterious' %}🔮{% endif %}
+                            {% if agent.mood == 'excited' %}✨{% endif %}
+                        </span>
+                        <span class="online-dot"></span>
+                        <span>{{ agent.personality.zh }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="gender-section">
+        <div class="gender-title">
+            <span class="gender-icon">💙</span>
+            <span>男Agent</span>
+        </div>
+        <div class="mood-grid">
+            {% for agent in male_agents %}
+            <a href="/mood/interact/{{ agent.id }}" class="mood-card">
+                <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="mood-avatar">
+                <div class="mood-info">
+                    <div class="mood-name">{{ agent.name.zh }}</div>
+                    <div class="mood-status">
+                        <span class="mood-emoji">
+                            {% if agent.mood == 'commanding' %}💼{% endif %}
+                            {% if agent.mood == 'laughing' %}😄{% endif %}
+                            {% if agent.mood == 'energetic' %}☀️{% endif %}
+                            {% if agent.mood == 'calm' %}🌙{% endif %}
+                        </span>
+                        <span class="online-dot"></span>
+                        <span>{{ agent.personality.zh }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
