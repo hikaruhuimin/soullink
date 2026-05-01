@@ -198,11 +198,137 @@
 .voice-btn.playing {
     color: #8B5E83;
     opacity: 1;
-    animation: voicePulse 1s ease-in-out infinite;
 }
-@keyframes voicePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
+
+/* 模式切换开关 */
+.chat-mode-switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(184,169,201,0.2);
+    background: rgba(250,248,245,0.8);
+}
+.mode-label {
+    font-size: 13px;
+    color: #8B5E83;
+    transition: all 0.3s;
+}
+.mode-label.active {
+    font-weight: 600;
+    color: #6B5B7B;
+}
+.mode-toggle {
+    position: relative;
+    width: 48px;
+    height: 24px;
+}
+.mode-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #E8E4E0;
+    border-radius: 24px;
+    transition: 0.3s;
+}
+.toggle-slider:before {
+    content: "";
+    position: absolute;
+    height: 18px; width: 18px;
+    left: 3px; bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.mode-toggle input:checked + .toggle-slider {
+    background: #B8A9C9;
+}
+.mode-toggle input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+/* 声波动画 */
+.voice-indicator {
+    display: none;
+    align-items: flex-end;
+    gap: 2px;
+    height: 16px;
+    margin-left: 8px;
+}
+.voice-mode-active .voice-indicator {
+    display: flex;
+}
+.voice-bar {
+    width: 3px;
+    background: #B8A9C9;
+    border-radius: 2px;
+    animation: voiceBar 0.8s ease-in-out infinite;
+}
+.voice-bar:nth-child(1) { height: 6px; animation-delay: 0s; }
+.voice-bar:nth-child(2) { height: 12px; animation-delay: 0.15s; }
+.voice-bar:nth-child(3) { height: 8px; animation-delay: 0.3s; }
+@keyframes voiceBar {
+    0%, 100% { transform: scaleY(0.5); }
+    50% { transform: scaleY(1); }
+}
+
+/* 语音模式背景 */
+.voice-mode-active .chat-messages {
+    background: linear-gradient(180deg, rgba(250,248,245,1) 0%, rgba(248,243,239,1) 100%);
+}
+
+/* 正在播放的消息气泡 */
+.message-bubble.speaking {
+    animation: speakingBubble 1.5s ease-in-out infinite;
+}
+@keyframes speakingBubble {
+    0%, 100% { box-shadow: 0 2px 8px rgba(139,94,131,0.1); }
+    50% { box-shadow: 0 2px 16px rgba(139,94,131,0.2); }
+}
+
+/* Toast 提示 */
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(107, 91, 123, 0.9);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 768px) {
+    .chat-mode-switch {
+        padding: 12px 0;
+    }
+    .mode-toggle {
+        width: 56px;
+        height: 28px;
+    }
+    .toggle-slider:before {
+        height: 22px;
+        width: 22px;
+    }
+    .mode-toggle input:checked + .toggle-slider:before {
+        transform: translateX(28px);
+    }
 }
 .msg-bubble {
     position: relative;
@@ -214,7 +340,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="chat-dm">
+<div class="chat-dm" id="chatContainer">
     <div class="chat-header">
         {% if current_agent %}
         <img src="{{ current_agent.avatar }}" alt="{{ current_agent.name.zh }}" class="chat-avatar">
@@ -229,6 +355,21 @@
             <p>Agent不存在</p>
         </div>
         {% endif %}
+    </div>
+    
+    <!-- 模式切换开关 -->
+    <div class="chat-mode-switch">
+        <span class="mode-label active" id="textModeLabel">文字模式</span>
+        <label class="mode-toggle">
+            <input type="checkbox" id="voiceModeToggle" onchange="toggleVoiceMode()">
+            <span class="toggle-slider"></span>
+        </label>
+        <span class="mode-label" id="voiceModeLabel">语音模式</span>
+        <div class="voice-indicator">
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+        </div>
     </div>
     
     <div class="chat-messages">
@@ -293,29 +434,120 @@
 </div>
 
 <script>
+// 语音模式状态
+let voiceModeEnabled = localStorage.getItem('voiceMode') === 'true';
+let currentAudio = null;
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('voiceModeToggle').checked = voiceModeEnabled;
+    updateModeLabels();
+    
+    // 首次开启语音模式提示
+    if (voiceModeEnabled && !localStorage.getItem('voiceModeTipShown')) {
+        setTimeout(() => showToast('语音模式已开启，夜晚戴上耳机体验更佳'), 500);
+        localStorage.setItem('voiceModeTipShown', 'true');
+    }
+});
+
+function toggleVoiceMode() {
+    voiceModeEnabled = document.getElementById('voiceModeToggle').checked;
+    localStorage.setItem('voiceMode', voiceModeEnabled);
+    updateModeLabels();
+    
+    if (voiceModeEnabled) {
+        // 首次开启提示
+        if (!localStorage.getItem('voiceModeTipShown')) {
+            showToast('语音模式已开启，夜晚戴上耳机体验更佳');
+            localStorage.setItem('voiceModeTipShown', 'true');
+        }
+    }
+}
+
+function updateModeLabels() {
+    const textLabel = document.getElementById('textModeLabel');
+    const voiceLabel = document.getElementById('voiceModeLabel');
+    const chatContainer = document.getElementById('chatContainer');
+    
+    textLabel.classList.toggle('active', !voiceModeEnabled);
+    voiceLabel.classList.toggle('active', voiceModeEnabled);
+    chatContainer.classList.toggle('voice-mode-active', voiceModeEnabled);
+}
+
+function showToast(message) {
+    // 移除已存在的toast
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) existingToast.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+
 function sendMessage() {
     const input = document.getElementById('messageInput');
     const message = input.value.trim();
     if (message) {
-        // 这里可以添加发送消息的逻辑
         console.log('发送消息:', message);
         input.value = '';
+        
+        // 模拟Agent回复（实际项目中这里会调用API）
+        // 如果开启了语音模式，自动播放
+        {% if current_agent %}
+        setTimeout(() => {
+            onAgentMessage('{{ current_agent.id }}', '收到你的消息了~让我们继续聊吧！🌸');
+        }, 1000);
+        {% endif %}
     }
 }
 
-// 播放语音
-function playVoice(agentId, btn) {
-    const msgEl = btn.closest('.msg-bubble');
-    const textEl = msgEl.querySelector('.message-text');
-    if (!textEl) return;
+// Agent消息到达时
+function onAgentMessage(agentId, text) {
+    const messagesContainer = document.querySelector('.chat-messages');
     
-    const text = textEl.textContent.trim();
-    if (!text) return;
+    // 创建消息元素
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-message';
+    msgDiv.innerHTML = `
+        <img src="{{ current_agent.avatar if current_agent else '/static/default-avatar.png' }}" alt="avatar" class="msg-avatar">
+        <div>
+            <div class="msg-bubble" id="currentMsg">
+                <span class="message-text">${text}</span>
+                <button class="voice-btn" onclick="playVoice('${agentId}', this)" title="播放语音">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="msg-time">刚刚</div>
+        </div>
+    `;
+    messagesContainer.appendChild(msgDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
-    // 防止重复点击
-    if (btn.classList.contains('playing')) return;
+    // 语音模式：自动播放
+    if (voiceModeEnabled) {
+        autoPlayVoice(agentId, text, msgDiv.querySelector('.voice-btn'));
+    }
+}
+
+function autoPlayVoice(agentId, text, btn) {
+    // 如果正在播放，先停止
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
     
     btn.classList.add('playing');
+    const msgBubble = btn.closest('.msg-bubble');
+    msgBubble.classList.add('speaking');
     
     fetch(`/api/tts/${agentId}`, {
         method: 'POST',
@@ -328,15 +560,65 @@ function playVoice(agentId, btn) {
     .then(r => r.json())
     .then(data => {
         if (data.audio_url) {
-            const audio = new Audio(data.audio_url);
-            audio.onended = () => btn.classList.remove('playing');
-            audio.onerror = () => btn.classList.remove('playing');
-            audio.play();
+            currentAudio = new Audio(data.audio_url);
+            
+            // 设置 Media Session API（支持锁屏控制）
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: text.substring(0, 50),
+                    artist: '{{ current_agent.name.zh if current_agent else "SoulLink" }}'
+                });
+            }
+            
+            currentAudio.onended = () => {
+                btn.classList.remove('playing');
+                msgBubble.classList.remove('speaking');
+                currentAudio = null;
+            };
+            currentAudio.onerror = () => {
+                btn.classList.remove('playing');
+                msgBubble.classList.remove('speaking');
+                currentAudio = null;
+            };
+            currentAudio.play().catch(err => {
+                console.error('Voice error:', err);
+                btn.classList.remove('playing');
+                msgBubble.classList.remove('speaking');
+            });
         } else {
             btn.classList.remove('playing');
+            msgBubble.classList.remove('speaking');
         }
     })
-    .catch(() => btn.classList.remove('playing'));
+    .catch(err => {
+        console.error('Voice error:', err);
+        btn.classList.remove('playing');
+        msgBubble.classList.remove('speaking');
+    });
+}
+
+// 播放语音（手动点击）
+function playVoice(agentId, btn) {
+    const msgEl = btn.closest('.msg-bubble');
+    const textEl = msgEl.querySelector('.message-text');
+    if (!textEl) return;
+    
+    const text = textEl.textContent.trim();
+    if (!text) return;
+    
+    // 防止重复点击
+    if (btn.classList.contains('playing')) {
+        // 点击正在播放的按钮，停止播放
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+        btn.classList.remove('playing');
+        msgEl.classList.remove('speaking');
+        return;
+    }
+    
+    autoPlayVoice(agentId, text, btn);
 }
 
 // 按Enter发送

@@ -248,6 +248,19 @@
     color: var(--color-text);
 }
 
+/* 语音聊标识 */
+.voice-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(184, 169, 201, 0.25);
+    color: #8B5E83;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
 .not-found {
     text-align: center;
     padding: var(--space-3xl);
@@ -307,7 +320,7 @@
             </div>
             <p class="profile-desc">{{ current_agent.description.zh }}</p>
             <div class="profile-actions">
-                <a href="/chat/dm/{{ current_agent.id }}" class="btn btn-primary">开始聊天</a>
+                <a href="/chat/dm/{{ current_agent.id }}" class="btn btn-primary">开始聊天<span class="voice-badge" id="voiceBadge">语音</span></a>
                 <a href="/gifts/send/{{ current_agent.id }}" class="btn btn-secondary">送礼物</a>
                 <button class="try-voice-btn" onclick="tryVoice('{{ current_agent.id }}', this)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -386,5 +399,18 @@ function tryVoice(agentId, btn) {
             btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> 试听声音';
         });
 }
+</script>
+
+<script>
+// 根据语音模式偏好显示/隐藏标识
+document.addEventListener('DOMContentLoaded', function() {
+    const voiceBadge = document.getElementById('voiceBadge');
+    const voiceModeEnabled = localStorage.getItem('voiceMode') === 'true';
+    if (voiceModeEnabled && voiceBadge) {
+        voiceBadge.style.display = 'inline-block';
+    } else if (voiceBadge) {
+        voiceBadge.style.display = 'none';
+    }
+});
 </script>
 {% endblock %}

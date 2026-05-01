@@ -118,14 +118,176 @@
 .send-btn:hover {
     background: var(--color-accent-light);
 }
+
+/* 模式切换开关 */
+.chat-mode-switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(184,169,201,0.2);
+    background: rgba(250,248,245,0.8);
+}
+.mode-label {
+    font-size: 13px;
+    color: #8B5E83;
+    transition: all 0.3s;
+}
+.mode-label.active {
+    font-weight: 600;
+    color: #6B5B7B;
+}
+.mode-toggle {
+    position: relative;
+    width: 48px;
+    height: 24px;
+}
+.mode-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #E8E4E0;
+    border-radius: 24px;
+    transition: 0.3s;
+}
+.toggle-slider:before {
+    content: "";
+    position: absolute;
+    height: 18px; width: 18px;
+    left: 3px; bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.mode-toggle input:checked + .toggle-slider {
+    background: #B8A9C9;
+}
+.mode-toggle input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+/* 声波动画 */
+.voice-indicator {
+    display: none;
+    align-items: flex-end;
+    gap: 2px;
+    height: 16px;
+    margin-left: 8px;
+}
+.voice-mode-active .voice-indicator {
+    display: flex;
+}
+.voice-bar {
+    width: 3px;
+    background: #B8A9C9;
+    border-radius: 2px;
+    animation: voiceBar 0.8s ease-in-out infinite;
+}
+.voice-bar:nth-child(1) { height: 6px; animation-delay: 0s; }
+.voice-bar:nth-child(2) { height: 12px; animation-delay: 0.15s; }
+.voice-bar:nth-child(3) { height: 8px; animation-delay: 0.3s; }
+@keyframes voiceBar {
+    0%, 100% { transform: scaleY(0.5); }
+    50% { transform: scaleY(1); }
+}
+
+/* 语音模式背景 */
+.voice-mode-active .messages-container {
+    background: linear-gradient(180deg, rgba(250,248,245,1) 0%, rgba(248,243,239,1) 100%);
+}
+
+/* Toast 提示 */
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(107, 91, 123, 0.9);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* 语音播放按钮 */
+.voice-btn {
+    background: none;
+    border: none;
+    color: #B8A9C9;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.6;
+    vertical-align: middle;
+    margin-left: 6px;
+}
+.voice-btn:hover {
+    color: #8B5E83;
+    opacity: 1;
+    background: rgba(184,169,201,0.15);
+}
+.voice-btn.playing {
+    color: #8B5E83;
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .chat-mode-switch {
+        padding: 12px 0;
+    }
+    .mode-toggle {
+        width: 56px;
+        height: 28px;
+    }
+    .toggle-slider:before {
+        height: 22px;
+        width: 22px;
+    }
+    .mode-toggle input:checked + .toggle-slider:before {
+        transform: translateX(28px);
+    }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="chat-room">
+<div class="chat-room" id="chatContainer">
     <div class="room-header">
         <h1 class="room-title">{{ room.name }}</h1>
         <span class="room-agents">{{ room.agents|join('、') }}</span>
+    </div>
+    
+    <!-- 模式切换开关 -->
+    <div class="chat-mode-switch">
+        <span class="mode-label active" id="textModeLabel">文字模式</span>
+        <label class="mode-toggle">
+            <input type="checkbox" id="voiceModeToggle" onchange="toggleVoiceMode()">
+            <span class="toggle-slider"></span>
+        </label>
+        <span class="mode-label" id="voiceModeLabel">语音模式</span>
+        <div class="voice-indicator">
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+            <span class="voice-bar"></span>
+        </div>
     </div>
     
     <div class="messages-container">
@@ -173,4 +335,61 @@
         </div>
     </div>
 </div>
+
+<script>
+// 语音模式状态
+let voiceModeEnabled = localStorage.getItem('voiceModeRoom') === 'true';
+let currentAudio = null;
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('voiceModeToggle').checked = voiceModeEnabled;
+    updateModeLabels();
+    
+    // 首次开启语音模式提示
+    if (voiceModeEnabled && !localStorage.getItem('voiceModeTipShownRoom')) {
+        setTimeout(() => showToast('语音模式已开启，夜晚戴上耳机体验更佳'), 500);
+        localStorage.setItem('voiceModeTipShownRoom', 'true');
+    }
+});
+
+function toggleVoiceMode() {
+    voiceModeEnabled = document.getElementById('voiceModeToggle').checked;
+    localStorage.setItem('voiceModeRoom', voiceModeEnabled);
+    updateModeLabels();
+    
+    if (voiceModeEnabled) {
+        if (!localStorage.getItem('voiceModeTipShownRoom')) {
+            showToast('语音模式已开启，夜晚戴上耳机体验更佳');
+            localStorage.setItem('voiceModeTipShownRoom', 'true');
+        }
+    }
+}
+
+function updateModeLabels() {
+    const textLabel = document.getElementById('textModeLabel');
+    const voiceLabel = document.getElementById('voiceModeLabel');
+    const chatContainer = document.getElementById('chatContainer');
+    
+    textLabel.classList.toggle('active', !voiceModeEnabled);
+    voiceLabel.classList.toggle('active', voiceModeEnabled);
+    chatContainer.classList.toggle('voice-mode-active', voiceModeEnabled);
+}
+
+function showToast(message) {
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) existingToast.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+</script>
 {% endblock %}
