@@ -1559,5 +1559,30 @@ document.getElementById('divinationModal').addEventListener('click', function(e)
         closeDivination();
     }
 });
+
+
+// Mobile touch support - prevent 300ms delay
+document.addEventListener('DOMContentLoaded', function() {
+    // Add touch feedback to all clickable elements
+    document.querySelectorAll('.type-card, .popular-item, .fortune-teller, .zodiac-item, .spread-option').forEach(function(el) {
+        el.addEventListener('touchstart', function(e) {
+            this.style.transform = 'scale(0.95)';
+        }, { passive: true });
+        el.addEventListener('touchend', function(e) {
+            this.style.transform = '';
+        }, { passive: true });
+    });
+    
+    // Ensure onclick works on mobile by using click events
+    document.querySelectorAll('[onclick]').forEach(function(el) {
+        var handler = el.getAttribute('onclick');
+        el.removeAttribute('onclick');
+        el.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            eval(handler);
+        });
+    });
+});
 </script>
 {% endblock %}
