@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('login') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <!-- Logo -->
+    <div class="logo-section">
+        <div class="logo">🔮</div>
+        <h1>灵犀</h1>
+        <p>{{ _('app_slogan') }}</p>
+    </div>
+
+    <!-- 登录表单 -->
+    <div class="auth-form">
+        <div class="form-tabs">
+            <button class="tab-btn active" data-tab="login">{{ _('login') }}</button>
+            <button class="tab-btn" data-tab="register">{{ _('register') }}</button>
+        </div>
+
+        <!-- 登录 -->
+        <div class="tab-content active" id="loginTab">
+            <div class="input-group">
+                <span class="input-icon">📱</span>
+                <input type="text" id="loginPhone" placeholder="{{ _('phone_placeholder') }}" autocomplete="tel">
+            </div>
+            <div class="input-group">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="loginPassword" placeholder="{{ _('password') }}">
+                <button class="toggle-password" onclick="togglePassword('loginPassword')">👁</button>
+            </div>
+            <div class="remember-row">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="rememberMe">
+                    <span>{{ _('remember_me') }}</span>
+                </label>
+                <a href="/auth/forgot" class="forgot-link">{{ _('forgot_password') }}?</a>
+            </div>
+            <button class="submit-btn" onclick="doLogin()">{{ _('login') }}</button>
+            
+            <div class="divider">
+                <span>{{ _('or') }}</span>
+            </div>
+            
+            <div class="social-login">
+                <button class="social-btn wechat" onclick="socialLogin('wechat')">
+                    <span>💬</span> {{ _('wechat_login') }}
+                </button>
+                <button class="social-btn apple" onclick="socialLogin('apple')">
+                    <span>🍎</span> {{ _('apple_login') }}
+                </button>
+            </div>
+        </div>
+
+        <!-- 注册 -->
+        <div class="tab-content" id="registerTab">
+            <div class="input-group">
+                <span class="input-icon">📱</span>
+                <input type="tel" id="regPhone" placeholder="{{ _('phone_placeholder') }}">
+                <button class="send-code-btn" id="sendCodeBtn" onclick="sendCode()">{{ _('send_code') }}</button>
+            </div>
+            <div class="input-group">
+                <span class="input-icon">🔢</span>
+                <input type="text" id="regCode" placeholder="{{ _('verify_code') }}" maxlength="6">
+            </div>
+            <div class="input-group">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="regPassword" placeholder="{{ _('set_password') }}">
+            </div>
+            <div class="input-group">
+                <span class="input-icon">👤</span>
+                <input type="text" id="regName" placeholder="{{ _('nickname') }}">
+            </div>
+            
+            <div class="agreement">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="agreeTerms">
+                    <span>{{ _('agree_terms', url='/terms') }} & {{ _('privacy_policy', url='/privacy') }}</span>
+                </label>
+            </div>
+            
+            <button class="submit-btn" onclick="doRegister()">{{ _('register') }}</button>
+        </div>
+    </div>
+
+    <!-- Agent登录入口 -->
+    <div class="agent-login-section">
+        <div class="agent-divider">
+            <span>{{ _('or_explore_as') }}</span>
+        </div>
+        <a href="/agent/login" class="agent-login-btn">
+            <span class="agent-icon">🤖</span>
+            <span>{{ _('login_as_agent') }}</span>
+        </a>
+    </div>
+
+    <!-- 语言切换 -->
+    <div class="language-switch">
+        <button class="lang-btn {% if lang == 'zh' %}active{% endif %}" onclick="switchLang('zh')">中文</button>
+        <button class="lang-btn {% if lang == 'en' %}active{% endif %}" onclick="switchLang('en')">EN</button>
+        <button class="lang-btn {% if lang == 'ja' %}active{% endif %}" onclick="switchLang('ja')">日本語</button>
+    </div>
+</div>
+
+<style>
+.auth-page {
+    min-height: 100vh;
+    padding: 40px 24px;
+    background: linear-gradient(180deg, #fef3c7 0%, #fff 50%);
+}
+
+.logo-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.logo {
+    font-size: 64px;
+    margin-bottom: 8px;
+}
+
+.logo-section h1 {
+    margin: 0 0 4px 0;
+    font-size: 32px;
+    background: linear-gradient(135deg, #f59e0b, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo-section p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.auth-form {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+}
+
+.form-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: #666;
+}
+
+.tab-btn.active {
+    color: #f59e0b;
+    border-bottom-color: #f59e0b;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #f9fafb;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.input-icon {
+    font-size: 18px;
+}
+
+.input-group input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    outline: none;
+}
+
+.send-code-btn {
+    padding: 6px 12px;
+    background: #f59e0b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.toggle-password {
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.remember-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    width: 16px;
+    height: 16px;
+}
+
+.forgot-link {
+    color: #f59e0b;
+    text-decoration: none;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    color: #999;
+    font-size: 13px;
+}
+
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+.social-login {
+    display: flex;
+    gap: 12px;
+}
+
+.social-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.social-btn.wechat {
+    border-color: #07c160;
+    color: #07c160;
+}
+
+.social-btn.apple {
+    border-color: #333;
+    color: #333;
+}
+
+.agent-login-section {
+    margin-bottom: 24px;
+}
+
+.agent-divider {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.agent-divider span {
+    color: #666;
+    font-size: 13px;
+}
+
+.agent-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #333;
+    font-size: 15px;
+    transition: background 0.2s;
+}
+
+.agent-login-btn:active {
+    background: #e5e7eb;
+}
+
+.agent-icon {
+    font-size: 20px;
+}
+
+.language-switch {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.lang-btn {
+    padding: 8px 16px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.lang-btn.active {
+    background: #f59e0b;
+    color: white;
+    border-color: #f59e0b;
+}
+
+.agreement {
+    margin-bottom: 16px;
+    font-size: 12px;
+}
+
+.agreement a {
+    color: #f59e0b;
+    text-decoration: none;
+}
+</style>
+
+<script>
+// Tab切换
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
+    });
+});
+
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function sendCode() {
+    const phone = document.getElementById('regPhone').value;
+    if (!phone) {
+        showToast('{{ _("please_enter_phone") }}');
+        return;
+    }
+    
+    const btn = document.getElementById('sendCodeBtn');
+    let countdown = 60;
+    btn.disabled = true;
+    
+    const timer = setInterval(() => {
+        btn.textContent = countdown + 's';
+        countdown--;
+        if (countdown < 0) {
+            clearInterval(timer);
+            btn.textContent = '{{ _("resend") }}';
+            btn.disabled = false;
+        }
+    }, 1000);
+    
+    fetch('/api/auth/send_code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone })
+    });
+}
+
+function doLogin() {
+    const phone = document.getElementById('loginPhone').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!phone || !password) {
+        showToast('{{ _("please_fill_all_fields") }}');
+        return;
+    }
+    
+    fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            showToast('{{ _("login_success") }}');
+            setTimeout(() => {
+                window.location.href = data.redirect || '/';
+            }, 1000);
+        } else {
+            showToast(data.error || '{{ _("login_failed") }}');
+        }
+    });
+}
+
+function doRegister() {
+    const phone = document.getElementById('regPhone').value;
+    const code = document.getElementById('regCode').value;
+    const password = document.getElementById('regPassword').value;
+    const name = document.getElementById('regName').value;
+    
+    if (!phone || !code || !password || !name) {
+        showToast('{{ _("please_fill_all_fields") }}');
+        return;
+    }
+    
+    if (!document.getElementById('agreeTerms').checked) {
+        showToast('{{ _("please_agree_terms") }}');
+        return;
+    }
+    
+    fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code, password, name })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            showToast('{{ _("register_success") }}');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
+        } else {
+            showToast(data.error || '{{ _("register_failed") }}');
+        }
+    });
+}
+
+function socialLogin(provider) {
+    window.location.href = `/auth/oauth/${provider}`;
+}
+
+function switchLang(lang) {
+    document.cookie = `lang=${lang};path=/`;
+    location.reload();
+}
+</script>
+{% endblock %}

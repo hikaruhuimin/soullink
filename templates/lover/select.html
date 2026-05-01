@@ -1,0 +1,546 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('choose_lover') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="lover-select-page">
+    <!-- 筛选栏 -->
+    <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">{{ _('all') }}</button>
+        <button class="filter-btn" data-filter="male">♂️</button>
+        <button class="filter-btn" data-filter="female">♀️</button>
+        <button class="filter-btn" data-filter="popular">🔥 {{ _('popular') }}</button>
+        <button class="filter-btn" data-filter="new">✨ {{ _('new') }}</button>
+    </div>
+
+    <!-- 角色网格 -->
+    <div class="lovers-grid">
+        {% for character in characters %}
+        <div class="lover-card" data-id="{{ character.id }}" data-gender="{{ character.gender }}" onclick="selectLover('{{ character.id }}')">
+            <div class="lover-avatar" style="background: linear-gradient(135deg, {{ character.avatar_gradient }})">
+                <span class="avatar-icon">{{ character.avatar_icon }}</span>
+                {% if character.is_new %}<span class="new-badge">NEW</span>{% endif %}
+                {% if character.is_popular %}<span class="hot-badge">HOT</span>{% endif %}
+            </div>
+            <div class="lover-info">
+                <h3 class="lover-name">{{ character.name }}</h3>
+                <p class="lover-role">{{ character.role }}</p>
+                <div class="lover-tags">
+                    {% for tag in character.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                <div class="lover-stats">
+                    <span class="stat">💜 {{ character.affection }}</span>
+                    <span class="stat">🔥 {{ character.hotness }}</span>
+                </div>
+            </div>
+            <div class="vip-lock {% if character.is_vip_locked %}{% else %}unlocked{% endif %}">
+                {% if character.is_vip_locked %}
+                <span class="lock-icon">👑</span>
+                <span class="vip-level">{{ character.required_vip }}</span>
+                {% else %}
+                <span class="select-hint">{{ _('tap_select') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 已选角色 -->
+    <div class="selected-section {% if selected_lovers %}has-selection{% endif %}">
+        <h3>{{ _('my_lovers') }} ({{ selected_count }}/{{ max_lovers }})</h3>
+        <div class="selected-list">
+            {% for lover in selected_lovers %}
+            <div class="selected-item">
+                <div class="selected-avatar" style="background: {{ lover.avatar_color }}">
+                    {{ lover.avatar_icon }}
+                </div>
+                <span class="selected-name">{{ lover.name }}</span>
+                <button class="remove-btn" onclick="removeLover('{{ lover.id }}')">×</button>
+            </div>
+            {% endfor %}
+            {% if max_lovers - selected_count > 0 %}
+            {% for i in range(max_lovers - selected_count) %}
+            <div class="selected-item empty">
+                <span class="empty-icon">+</span>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- 角色详情弹窗 -->
+<div class="character-modal hidden" id="characterModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <div class="modal-header">
+            <div class="modal-avatar" id="modalAvatar"></div>
+            <h2 id="modalName"></h2>
+            <p id="modalRole"></p>
+        </div>
+        <div class="modal-body">
+            <div class="modal-section">
+                <h4>💬 {{ _('about_me') }}</h4>
+                <p id="modalAbout"></p>
+            </div>
+            <div class="modal-section">
+                <h4>💕 {{ _('my_preference') }}</h4>
+                <p id="modalPreference"></p>
+            </div>
+            <div class="modal-section">
+                <h4>🎁 {{ _('ideal_gift') }}</h4>
+                <div class="ideal-gifts" id="modalGifts"></div>
+            </div>
+            <div class="modal-section">
+                <h4>🌙 {{ _('available_dates') }}</h4>
+                <div class="date-list" id="modalDates"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="start-chat-btn" id="startChatBtn" onclick="startChat()">
+                💬 {{ _('start_chatting') }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.lover-select-page {
+    padding: 16px;
+    padding-bottom: 140px;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 20px;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border-color: transparent;
+}
+
+.lovers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.lover-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.lover-card:active {
+    transform: scale(0.98);
+}
+
+.lover-avatar {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.avatar-icon {
+    font-size: 48px;
+}
+
+.new-badge, .hot-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+}
+
+.new-badge {
+    background: #10b981;
+}
+
+.hot-badge {
+    background: #ef4444;
+}
+
+.lover-info {
+    padding: 12px;
+}
+
+.lover-name {
+    margin: 0 0 2px 0;
+    font-size: 15px;
+}
+
+.lover-role {
+    margin: 0 0 8px 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.lover-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.tag {
+    padding: 2px 6px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #666;
+}
+
+.lover-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: #666;
+}
+
+.vip-lock {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.vip-lock.unlocked {
+    display: none;
+}
+
+.lock-icon {
+    font-size: 32px;
+}
+
+.vip-level {
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.select-hint {
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.lover-card:hover .select-hint {
+    opacity: 1;
+}
+
+.selected-section {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 16px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    transform: translateY(100%);
+    transition: transform 0.3s;
+}
+
+.selected-section.has-selection {
+    transform: translateY(0);
+}
+
+.selected-section h3 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.selected-list {
+    display: flex;
+    gap: 8px;
+}
+
+.selected-item {
+    width: 56px;
+    height: 72px;
+    background: #f9fafb;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.selected-item.empty {
+    border: 2px dashed #e5e7eb;
+    background: transparent;
+}
+
+.selected-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.selected-name {
+    font-size: 10px;
+    margin-top: 4px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 50px;
+}
+
+.remove-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.empty-icon {
+    font-size: 24px;
+    color: #ccc;
+}
+
+/* Modal */
+.character-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.modal-header {
+    text-align: center;
+    padding: 24px 16px 16px;
+}
+
+.modal-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+}
+
+.modal-header h2 {
+    margin: 0 0 4px 0;
+}
+
+.modal-header p {
+    margin: 0;
+    color: #666;
+}
+
+.modal-body {
+    padding: 0 16px 16px;
+}
+
+.modal-section {
+    margin-bottom: 16px;
+}
+
+.modal-section h4 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.modal-section p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.ideal-gifts, .date-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ideal-gifts span, .date-list span {
+    padding: 6px 12px;
+    background: #fef3c7;
+    border-radius: 16px;
+    font-size: 13px;
+}
+
+.modal-footer {
+    padding: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.start-chat-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+</style>
+
+<script>
+let currentCharacter = null;
+
+function selectLover(id) {
+    fetch(`/api/lover/info/${id}`)
+        .then(r => r.json())
+        .then(data => {
+            currentCharacter = data;
+            showCharacterModal(data);
+        });
+}
+
+function showCharacterModal(data) {
+    document.getElementById('modalAvatar').style.background = data.avatar_gradient;
+    document.getElementById('modalAvatar').textContent = data.avatar_icon;
+    document.getElementById('modalName').textContent = data.name;
+    document.getElementById('modalRole').textContent = data.role;
+    document.getElementById('modalAbout').textContent = data.about;
+    document.getElementById('modalPreference').textContent = data.preference;
+    
+    document.getElementById('modalGifts').innerHTML = data.ideal_gifts.map(g => `<span>${g}</span>`).join('');
+    document.getElementById('modalDates').innerHTML = data.available_dates.map(d => `<span>${d}</span>`).join('');
+    
+    document.getElementById('characterModal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('characterModal').classList.add('hidden');
+}
+
+function startChat() {
+    if (currentCharacter) {
+        fetch('/api/lover/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ character_id: currentCharacter.id })
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                window.location.href = `/lover/chat/${data.lover_id}`;
+            } else if (data.need_upgrade) {
+                showToast('需要升级会员以解锁更多恋人');
+                window.location.href = '/membership';
+            } else {
+                showToast('创建失败，请重试');
+            }
+        });
+    }
+}
+
+function removeLover(id) {
+    fetch(`/api/lover/remove`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lover_id: id })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+// 筛选
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const filter = this.dataset.filter;
+        
+        document.querySelectorAll('.lover-card').forEach(card => {
+            if (filter === 'all') {
+                card.style.display = '';
+            } else if (filter === 'male' || filter === 'female') {
+                card.style.display = card.dataset.gender === filter ? '' : 'none';
+            } else if (filter === 'popular') {
+                card.style.display = card.querySelector('.hot-badge') ? '' : 'none';
+            } else if (filter === 'new') {
+                card.style.display = card.querySelector('.new-badge') ? '' : 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,792 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lover.name }} - 聊天 - 灵犀{% endblock %}
+
+{% block content %}
+<div class="chat-page">
+    <!-- 顶部导航 -->
+    <div class="chat-header">
+        <a href="/lover/home/{{ lover.id }}" class="back-btn">←</a>
+        <div class="chat-info">
+            <div class="chat-avatar" style="background: linear-gradient(135deg, {{ lover.avatar_gradient }})">
+                <span>{{ lover.avatar_icon }}</span>
+                {% if lover.is_online %}<span class="online-dot"></span>{% endif %}
+            </div>
+            <div class="chat-meta">
+                <span class="chat-name">{{ lover.name }}</span>
+                <span class="chat-status">{{ lover.status_text }}</span>
+            </div>
+        </div>
+        <div class="chat-actions">
+            <button class="action-icon" onclick="showLoverProfile()">👤</button>
+            <button class="action-icon" onclick="showDateRequest()">🌙</button>
+        </div>
+    </div>
+
+    <!-- 消息区域 -->
+    <div class="messages-container" id="messagesContainer">
+        <!-- 日期提示 -->
+        {% if show_date_intro %}
+        <div class="date-intro-card">
+            <div class="date-icon">🌙</div>
+            <p>{{ lover.name }} 邀请你开启一场特别的约会</p>
+            <button onclick="acceptDate()">{{ _('accept_date') }}</button>
+        </div>
+        {% endif %}
+
+        <!-- 历史消息 -->
+        {% for msg in messages %}
+        <div class="message {% if msg.is_mine %}mine{% else %}theirs'%}>
+            {% if not msg.is_mine %}
+            <div class="message-avatar" style="background: linear-gradient(135deg, {{ msg.sender_gradient }})">
+                {{ msg.sender_icon }}
+            </div>
+            {% endif %}
+            <div class="message-content">
+                {% if msg.type == 'text' %}
+                <div class="message-bubble">{{ msg.text }}</div>
+                {% elif msg.type == 'image' %}
+                <div class="message-image" onclick="showFullImage('{{ msg.image_url }}')">
+                    <img src="{{ msg.image_url }}" alt="图片">
+                </div>
+                {% elif msg.type == 'gift' %}
+                <div class="message-gift">
+                    <span class="gift-icon">{{ msg.gift_icon }}</span>
+                    <span class="gift-text">{{ msg.gift_text }}</span>
+                </div>
+                {% elif msg.type == 'date' %}
+                <div class="message-date">
+                    <span class="date-icon">{{ msg.date_icon }}</span>
+                    <p>{{ msg.date_text }}</p>
+                </div>
+                {% elif msg.type == 'voice' %}
+                <div class="message-voice" onclick="playVoice('{{ msg.voice_url }}')">
+                    <span class="voice-icon">🔊</span>
+                    <div class="voice-wave"></div>
+                    <span class="voice-duration">{{ msg.duration }}''</span>
+                </div>
+                {% endif %}
+                <span class="message-time">{{ msg.time }}</span>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- 特殊消息类型 -->
+        {% if locked_message %}
+        <div class="locked-message">
+            <div class="lock-overlay">
+                <span class="lock-icon">🔒</span>
+                <p>{{ locked_message.preview }}</p>
+                <div class="blur-content">{{ locked_message.blurred }}</div>
+                <button class="unlock-btn" onclick="unlockMessage({{ locked_message.id }})">
+                    🔓 {{ _('unlock_content') }} ({{ locked_message.cost }}💎)
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <div id="newMessages"></div>
+    </div>
+
+    <!-- 输入区域 -->
+    <div class="input-area">
+        <div class="input-tools">
+            <button class="tool-btn" onclick="showGiftPanel()">🎁</button>
+            <button class="tool-btn" onclick="showDatePanel()">🌙</button>
+            <button class="tool-btn" onclick="toggleVoice()">🎤</button>
+        </div>
+        
+        <div class="input-wrapper">
+            <input type="text" id="messageInput" placeholder="{{ _('type_message') }}" autocomplete="off">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <!-- 快捷回复 -->
+    {% if quick_replies %}
+    <div class="quick-replies" id="quickReplies">
+        {% for reply in quick_replies %}
+        <button class="quick-reply-btn" onclick="sendQuickReply('{{ reply }}')">{{ reply }}</button>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- 礼物面板 -->
+<div class="gift-panel hidden" id="giftPanel">
+    <div class="panel-header">
+        <h3>{{ _('send_gift') }}</h3>
+        <button onclick="closeGiftPanel()">✕</button>
+    </div>
+    <div class="gift-grid">
+        {% for gift in available_gifts %}
+        <div class="gift-item" onclick="selectGift('{{ gift.id }}')">
+            <span class="gift-icon">{{ gift.icon }}</span>
+            <span class="gift-name">{{ gift.name }}</span>
+            <span class="gift-price">{{ gift.price }}💎</span>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="gift-preview hidden" id="giftPreview">
+        <p>{{ _('selected') }}: <span id="selectedGiftName"></span></p>
+        <textarea id="giftMessage" placeholder="{{ _('gift_message') }}" rows="2"></textarea>
+        <button class="confirm-btn" onclick="confirmGift()">{{ _('confirm_send') }}</button>
+    </div>
+</div>
+
+<!-- 约会面板 -->
+<div class="date-panel hidden" id="datePanel">
+    <div class="panel-header">
+        <h3>{{ _('request_date') }}</h3>
+        <button onclick="closeDatePanel()">✕</button>
+    </div>
+    <div class="date-options">
+        {% for option in date_options %}
+        <div class="date-option" onclick="selectDateOption('{{ option.id }}')">
+            <span class="option-icon">{{ option.icon }}</span>
+            <span class="option-name">{{ option.name }}</span>
+            <span class="option-cost">{{ option.cost }}💎</span>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="date-confirm hidden" id="dateConfirm">
+        <p class="date-description" id="selectedDateDesc"></p>
+        <button class="confirm-btn" onclick="confirmDate()">{{ _('confirm_date') }}</button>
+    </div>
+</div>
+
+<!-- 语音录制 -->
+<div class="voice-recording hidden" id="voiceRecording">
+    <div class="recording-indicator">
+        <span class="recording-dot"></span>
+        <span id="recordingTime">0:00</span>
+    </div>
+    <button class="stop-btn" onclick="stopRecording()">⏹</button>
+</div>
+
+<style>
+.chat-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: calc(100vh - env(safe-area-inset-bottom));
+    background: #f5f5f5;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.back-btn {
+    font-size: 24px;
+    color: #333;
+    text-decoration: none;
+    margin-right: 12px;
+}
+
+.chat-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    position: relative;
+}
+
+.online-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background: #4ade80;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+.chat-name {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.chat-status {
+    font-size: 12px;
+    color: #666;
+}
+
+.chat-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-icon {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.message {
+    display: flex;
+    gap: 8px;
+    max-width: 80%;
+}
+
+.message.mine {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message.theirs {
+    align-self: flex-start;
+}
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.message-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.message.mine .message-content {
+    align-items: flex-end;
+}
+
+.message-bubble {
+    padding: 10px 14px;
+    border-radius: 16px;
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+.message.mine .message-bubble {
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.message.theirs .message-bubble {
+    background: white;
+    color: #333;
+    border-bottom-left-radius: 4px;
+}
+
+.message-time {
+    font-size: 10px;
+    color: #999;
+    margin-top: 2px;
+}
+
+.message-image {
+    max-width: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.message-image img {
+    width: 100%;
+    display: block;
+}
+
+.message-gift, .message-date {
+    padding: 12px 16px;
+    background: white;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.gift-icon, .date-icon {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.message-voice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: white;
+    border-radius: 16px;
+    cursor: pointer;
+    min-width: 120px;
+}
+
+.voice-wave {
+    flex: 1;
+    height: 20px;
+    background: linear-gradient(90deg, #e5e7eb 0%, #f59e0b 50%, #e5e7eb 100%);
+    background-size: 200% 100%;
+    animation: wave 1.5s linear infinite;
+    border-radius: 2px;
+}
+
+@keyframes wave {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+.locked-message {
+    padding: 20px;
+    text-align: center;
+}
+
+.lock-overlay {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.lock-icon {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.blur-content {
+    filter: blur(4px);
+    color: #666;
+    margin: 12px 0;
+    user-select: none;
+}
+
+.unlock-btn {
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.input-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+}
+
+.input-tools {
+    display: flex;
+    gap: 4px;
+}
+
+.tool-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.input-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: #f3f4f6;
+    border-radius: 20px;
+    padding: 0 4px 0 16px;
+}
+
+#messageInput {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 0;
+    font-size: 15px;
+    outline: none;
+}
+
+.send-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.quick-replies {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    overflow-x: auto;
+    background: #f9fafb;
+}
+
+.quick-reply-btn {
+    padding: 6px 12px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 16px;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* 面板样式 */
+.gift-panel, .date-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 16px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    z-index: 200;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.gift-grid, .date-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.gift-item, .date-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gift-item:active, .date-option:active {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.gift-icon {
+    font-size: 28px;
+}
+
+.gift-name {
+    font-size: 12px;
+    margin: 4px 0;
+}
+
+.gift-price {
+    font-size: 11px;
+    color: #f59e0b;
+}
+
+.gift-preview {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.gift-preview textarea {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 8px 0;
+    resize: none;
+}
+
+.confirm-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.voice-recording {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.recording-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recording-dot {
+    width: 12px;
+    height: 12px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.stop-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.date-intro-card {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 16px;
+    margin-bottom: 16px;
+}
+
+.date-intro-card .date-icon {
+    font-size: 48px;
+}
+
+.date-intro-card button {
+    margin-top: 12px;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+}
+</style>
+
+<script>
+// WebSocket连接
+let ws = null;
+let isRecording = false;
+let selectedGift = null;
+let selectedDateOption = null;
+
+function connectWebSocket() {
+    ws = new WebSocket(`wss://${location.host}/ws/lover/{{ lover.id }}`);
+    
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        appendMessage(data);
+    };
+    
+    ws.onclose = function() {
+        setTimeout(connectWebSocket, 3000);
+    };
+}
+
+function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    ws.send(JSON.stringify({ type: 'text', content: text }));
+    input.value = '';
+}
+
+function sendQuickReply(text) {
+    ws.send(JSON.stringify({ type: 'text', content: text }));
+}
+
+function appendMessage(data) {
+    const container = document.getElementById('newMessages');
+    const html = `
+        <div class="message ${data.is_mine ? 'mine' : 'theirs'}">
+            ${!data.is_mine ? `<div class="message-avatar">${data.sender_icon}</div>` : ''}
+            <div class="message-content">
+                <div class="message-bubble">${data.content}</div>
+                <span class="message-time">${data.time}</span>
+            </div>
+        </div>
+    `;
+    container.innerHTML += html;
+    container.parentElement.scrollTop = container.parentElement.scrollHeight;
+}
+
+// 礼物面板
+function showGiftPanel() {
+    document.getElementById('giftPanel').classList.remove('hidden');
+}
+
+function closeGiftPanel() {
+    document.getElementById('giftPanel').classList.add('hidden');
+}
+
+function selectGift(id) {
+    selectedGift = id;
+    document.getElementById('giftPreview').classList.remove('hidden');
+    document.getElementById('selectedGiftName').textContent = event.target.closest('.gift-item').querySelector('.gift-name').textContent;
+}
+
+function confirmGift() {
+    const message = document.getElementById('giftMessage').value;
+    ws.send(JSON.stringify({ type: 'gift', gift_id: selectedGift, message: message }));
+    closeGiftPanel();
+}
+
+// 约会面板
+function showDatePanel() {
+    document.getElementById('datePanel').classList.remove('hidden');
+}
+
+function closeDatePanel() {
+    document.getElementById('datePanel').classList.add('hidden');
+}
+
+function selectDateOption(id) {
+    selectedDateOption = id;
+    document.getElementById('dateConfirm').classList.remove('hidden');
+    document.getElementById('selectedDateDesc').textContent = event.target.closest('.date-option').querySelector('.option-name').textContent;
+}
+
+function confirmDate() {
+    ws.send(JSON.stringify({ type: 'date_request', option_id: selectedDateOption }));
+    closeDatePanel();
+}
+
+// 语音录制
+function toggleVoice() {
+    if (!isRecording) {
+        startRecording();
+    } else {
+        stopRecording();
+    }
+}
+
+function startRecording() {
+    isRecording = true;
+    document.getElementById('voiceRecording').classList.remove('hidden');
+    // 模拟录音时间
+    let seconds = 0;
+    window.recordingTimer = setInterval(() => {
+        seconds++;
+        document.getElementById('recordingTime').textContent = `${Math.floor(seconds/60)}:${(seconds%60).toString().padStart(2,'0')}`;
+    }, 1000);
+}
+
+function stopRecording() {
+    isRecording = false;
+    document.getElementById('voiceRecording').classList.add('hidden');
+    clearInterval(window.recordingTimer);
+    // 发送语音
+    ws.send(JSON.stringify({ type: 'voice', duration: parseInt(document.getElementById('recordingTime').textContent.split(':')[1]) }));
+}
+
+function playVoice(url) {
+    new Audio(url).play();
+}
+
+// 解锁消息
+function unlockMessage(id) {
+    fetch('/api/lover/unlock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message_id: id })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            showToast('灵石不足');
+        }
+    });
+}
+
+// 接受约会
+function acceptDate() {
+    ws.send(JSON.stringify({ type: 'accept_date' }));
+}
+
+function showLoverProfile() {
+    window.location.href = '/social/square?filter=agent&agent_id={{ lover.id }}';
+}
+
+// 初始化
+connectWebSocket();
+
+// 回车发送
+document.getElementById('messageInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+</script>
+{% endblock %}

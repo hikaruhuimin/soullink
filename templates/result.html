@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}占卜结果 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 结果页特殊样式 */
+.result-page {
+    padding: 2rem 1rem;
+    padding-bottom: 6rem;
+}
+
+.result-card {
+    background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
+    border: 1px solid var(--color-gold);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.result-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, var(--color-gold) 0%, transparent 70%);
+    opacity: 0.05;
+    animation: rotate 30s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.result-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-gold);
+    color: var(--color-bg);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.result-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.75rem;
+    color: var(--color-gold);
+    margin-bottom: 0.5rem;
+}
+
+.result-question {
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+    padding: 1rem;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    margin-top: 1rem;
+}
+
+.result-cards-display {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+.result-card-item {
+    background: linear-gradient(145deg, #1a1a2e, #16213e);
+    border: 2px solid var(--color-gold);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    min-width: 100px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.result-card-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+}
+
+.result-card-item .card-name {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.125rem;
+    color: var(--color-gold);
+    margin-bottom: 0.25rem;
+}
+
+.result-card-item .card-position {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.result-card-item .card-meaning {
+    font-size: 0.875rem;
+    color: var(--color-text);
+    line-height: 1.5;
+}
+
+.result-card-item.reversed {
+    border-color: var(--color-purple);
+}
+
+.result-card-item.reversed .card-name {
+    color: var(--color-purple);
+}
+
+.result-interpretation {
+    position: relative;
+    z-index: 1;
+    padding: 1.5rem;
+    background: rgba(0,0,0,0.3);
+    border-radius: 15px;
+    line-height: 1.8;
+    color: var(--color-text);
+}
+
+.result-interpretation p {
+    margin-bottom: 1rem;
+}
+
+.result-interpretation strong {
+    color: var(--color-gold);
+}
+
+.result-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+.share-card {
+    background: var(--color-bg);
+    border-radius: 15px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.share-card p {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+}
+
+.share-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-gold);
+    color: var(--color-bg);
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.share-link:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+}
+
+.result-meta {
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin-top: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="result-page">
+    <a href="/history" class="back-btn">
+        <span>←</span> 返回记录
+    </a>
+    
+    <div class="result-card">
+        <div class="result-header">
+            <span class="result-type">
+                {% if divination.divination_type == 'tarot' %}🃏
+                {% elif divination.divination_type == 'horoscope' %}⭐
+                {% elif divination.divination_type == 'bazi' %}📜
+                {% elif divination.divination_type == 'love' %}💕
+                {% else %}🔮{% endif %}
+                {{ divination.divination_type | upper }}
+            </span>
+            <h1 class="result-title">{{ divination.result_title }}</h1>
+            
+            {% if divination.question %}
+            <div class="result-question">
+                <strong>你的问题：</strong>{{ divination.question }}
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if cards %}
+        <div class="result-cards-display">
+            {% for card in cards %}
+            <div class="result-card-item {% if card.is_reversed %}reversed{% endif %}">
+                <div class="card-position">{{ input_data.positions[loop.index0] if input_data and input_data.positions and input_data.positions[loop.index0] else '第' + (loop.index) + '张' }}</div>
+                <div class="card-name">{{ card.name }}</div>
+                <div class="card-meaning">
+                    {% if card.is_reversed %}逆位 · {% endif %}
+                    {{ card.meaning or '' }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="result-interpretation">
+            {{ divination.result_content | safe }}
+        </div>
+        
+        <div class="result-actions">
+            <button class="btn btn-outline" onclick="shareResult()">
+                <span>📤</span> 分享结果
+            </button>
+            <button class="btn btn-outline" onclick="saveToFavorite()">
+                <span>❤️</span> 收藏
+            </button>
+            <a href="/divination/{{ divination.divination_type }}" class="btn btn-primary">
+                <span>🔮</span> 再占一次
+            </a>
+        </div>
+        
+        <div class="share-card">
+            <p>分享给好友，让他们也感受命运的指引</p>
+            <a href="/divination/shared/{{ divination.share_code }}" class="share-link" id="shareLink">
+                <span>🔗</span>
+                复制链接
+            </a>
+        </div>
+        
+        <div class="result-meta">
+            占卜时间：{{ divination.created_at.strftime('%Y年%m月%d日 %H:%M') }}
+        </div>
+    </div>
+</div>
+
+<!-- Schema.org结构化数据 -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "SoulLink {{ divination.divination_type }} Divination",
+    "description": "{{ divination.result_summary }}",
+    "dateCreated": "{{ divination.created_at.isoformat() }}",
+    "author": {
+        "@type": "Organization",
+        "name": "SoulLink"
+    }
+}
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function shareResult() {
+    const shareCode = '{{ divination.share_code }}';
+    const url = window.location.origin + '/divination/shared/' + shareCode;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'SoulLink 占卜结果',
+            text: '{{ divination.result_summary[:100] }}...',
+            url: url
+        });
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('链接已复制到剪贴板', 'success');
+        });
+    }
+}
+
+function saveToFavorite() {
+    fetch('/api/favorite/{{ divination.id }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast('已添加到收藏', 'success');
+        } else {
+            showToast(data.message || '收藏失败', 'error');
+        }
+    });
+}
+
+document.getElementById('shareLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    shareResult();
+});
+</script>
+{% endblock %}

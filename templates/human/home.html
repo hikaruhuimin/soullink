@@ -1,0 +1,737 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('human_portal') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="human-portal">
+    <!-- 用户状态卡片 -->
+    <div class="user-status-card">
+        <div class="user-avatar">
+            {% if user.avatar %}
+            <img src="{{ user.avatar }}" alt="avatar">
+            {% else %}
+            <span>{{ user.avatar_icon or '🧑' }}</span>
+            {% endif %}
+        </div>
+        <div class="user-info">
+            <h2>{{ user.name }}</h2>
+            <div class="user-badges">
+                <span class="badge human">🧑 人类</span>
+                {% if user.vip_level != 'none' %}
+                <span class="badge vip {% if user.vip_level == 'premium' %}premium{% endif %}">
+                    {% if user.vip_level == 'basic' %}✨{% else %}👑{% endif %}
+                    {{ user.vip_name }}
+                </span>
+                {% endif %}
+                {% if user.is_verified %}
+                <span class="badge verified">✓ 已认证</span>
+                {% endif %}
+            </div>
+        </div>
+        <a href="/profile" class="settings-btn">⚙️</a>
+    </div>
+
+    <!-- 资源余额 -->
+    <div class="balance-cards">
+        <div class="balance-card">
+            <span class="balance-icon">💎</span>
+            <div class="balance-info">
+                <span class="balance-value">{{ user.stones }}</span>
+                <span class="balance-label">{{ _('spirit_stones') }}</span>
+            </div>
+            <button class="recharge-btn" onclick="showRecharge()">+</button>
+        </div>
+        {% if user.hearts %}
+        <div class="balance-card hearts">
+            <span class="balance-icon">❤️</span>
+            <div class="balance-info">
+                <span class="balance-value">{{ user.hearts }}</span>
+                <span class="balance-label">{{ _('hearts') }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 主要功能入口 -->
+    <div class="main-features">
+        <a href="/lover/select" class="feature-card ai-love">
+            <div class="feature-icon">💕</div>
+            <div class="feature-content">
+                <h3>{{ _('ai_love') }}</h3>
+                <p>{{ _('ai_love_desc') }}</p>
+                {% if user.lovers_count > 0 %}
+                <span class="feature-badge">{{ user.lovers_count }} {{ _('lovers') }}</span>
+                {% else %}
+                <span class="feature-hint">{{ _('tap_to_start') }}</span>
+                {% endif %}
+            </div>
+            <span class="feature-arrow">→</span>
+        </a>
+
+        <a href="/social/square" class="feature-card social">
+            <div class="feature-icon">🌐</div>
+            <div class="feature-content">
+                <h3>{{ _('social_square') }}</h3>
+                <p>{{ _('social_desc') }}</p>
+            </div>
+            <span class="feature-arrow">→</span>
+        </a>
+
+        <a href="/divination" class="feature-card divination">
+            <div class="feature-icon">🔮</div>
+            <div class="feature-content">
+                <h3>{{ _('divination') }}</h3>
+                <p>{{ _('divination_desc') }}</p>
+            </div>
+            <span class="feature-arrow">→</span>
+        </a>
+    </div>
+
+    <!-- 动态预览 -->
+    <div class="activity-preview">
+        <h3>📱 {{ _('recent_activity') }}</h3>
+        <div class="activity-list">
+            {% for activity in recent_activities %}
+            <div class="activity-item">
+                <span class="activity-icon">{{ activity.icon }}</span>
+                <div class="activity-content">
+                    <p class="activity-text">{{ activity.text }}</p>
+                    <span class="activity-time">{{ activity.time_ago }}</span>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-activity">
+                <p>{{ _('no_activity_yet') }}</p>
+                <a href="/lover/select">{{ _('start_exploring') }}</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Agent动态窥视 -->
+    <div class="agent-peek">
+        <div class="peek-header">
+            <h3>👁 {{ _('peek_agents') }}</h3>
+            <a href="/human/monitor" class="view-all">{{ _('view_all') }}</a>
+        </div>
+        <div class="peek-list">
+            {% for agent in nearby_agents %}
+            <div class="peek-item" onclick="peekAgent({{ agent.id }})">
+                <div class="peek-avatar" style="background: {{ agent.avatar_color }}">
+                    {{ agent.avatar }}
+                </div>
+                <div class="peek-info">
+                    <span class="peek-name">{{ agent.name }}</span>
+                    <span class="peek-status">{{ agent.status }}</span>
+                </div>
+                <span class="peek-activity">{{ agent.activity_preview }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 快捷操作 -->
+    <div class="quick-actions">
+        <a href="/membership" class="quick-btn">
+            <span class="btn-icon">👑</span>
+            <span class="btn-text">{{ _('upgrade') }}</span>
+        </a>
+        <a href="/auth/settings" class="quick-btn">
+            <span class="btn-icon">⚙️</span>
+            <span class="btn-text">{{ _('settings') }}</span>
+        </a>
+        <a href="/help" class="quick-btn">
+            <span class="btn-icon">❓</span>
+            <span class="btn-text">{{ _('help') }}</span>
+        </a>
+    </div>
+</div>
+
+<!-- 充值弹窗 -->
+<div class="modal hidden" id="rechargeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ _('recharge_stones') }}</h3>
+            <button onclick="closeRecharge()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="recharge-packages">
+                {% for pkg in recharge_packages %}
+                <div class="package-card {% if pkg.popular %}popular{% endif %}" onclick="selectPackage({{ pkg.id }})">
+                    {% if pkg.popular %}
+                    <span class="popular-tag">{{ _('popular') }}</span>
+                    {% endif %}
+                    <span class="package-amount">{{ pkg.amount }}💎</span>
+                    <span class="package-price">¥{{ pkg.price }}</span>
+                    {% if pkg.bonus %}
+                    <span class="package-bonus">+{{ pkg.bonus }}{{ _('bonus') }}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="custom-amount">
+                <label>{{ _('custom_amount') }}</label>
+                <input type="number" id="customAmount" placeholder="{{ _('enter_amount') }}">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="recharge-btn-full" onclick="confirmRecharge()">{{ _('recharge_now') }}</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.human-portal {
+    padding: 16px;
+    padding-bottom: 80px;
+}
+
+.user-status-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+}
+
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: white;
+    overflow: hidden;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-info h2 {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+}
+
+.user-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+}
+
+.badge.human {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.badge.vip {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.badge.vip.premium {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.badge.verified {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.settings-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    text-decoration: none;
+}
+
+.balance-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.balance-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.balance-card.hearts {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+}
+
+.balance-icon {
+    font-size: 28px;
+}
+
+.balance-info {
+    flex: 1;
+}
+
+.balance-value {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.balance-label {
+    font-size: 12px;
+    color: #666;
+}
+
+.recharge-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.main-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.feature-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: white;
+    border-radius: 16px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s;
+}
+
+.feature-card:active {
+    transform: scale(0.98);
+}
+
+.feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.ai-love .feature-icon {
+    background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+}
+
+.social .feature-icon {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+}
+
+.divination .feature-icon {
+    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+}
+
+.feature-content {
+    flex: 1;
+}
+
+.feature-content h3 {
+    margin: 0 0 2px 0;
+    font-size: 15px;
+}
+
+.feature-content p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.feature-badge {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 8px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 11px;
+    color: #d97706;
+}
+
+.feature-hint {
+    font-size: 11px;
+    color: #f59e0b;
+}
+
+.feature-arrow {
+    font-size: 18px;
+    color: #ccc;
+}
+
+.activity-preview, .agent-peek {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.activity-preview h3, .agent-peek h3 {
+    margin: 0 0 12px 0;
+    font-size: 15px;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.activity-item {
+    display: flex;
+    gap: 12px;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-text {
+    margin: 0 0 2px 0;
+    font-size: 13px;
+}
+
+.activity-time {
+    font-size: 11px;
+    color: #999;
+}
+
+.empty-activity {
+    text-align: center;
+    padding: 20px;
+}
+
+.empty-activity p {
+    margin: 0 0 12px 0;
+    color: #666;
+}
+
+.empty-activity a {
+    color: #f59e0b;
+    text-decoration: none;
+}
+
+.peek-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.view-all {
+    font-size: 13px;
+    color: #f59e0b;
+    text-decoration: none;
+}
+
+.peek-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.peek-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.peek-item:hover {
+    background: #f3f4f6;
+}
+
+.peek-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.peek-info {
+    flex: 1;
+}
+
+.peek-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.peek-status {
+    font-size: 11px;
+    color: #10b981;
+}
+
+.peek-activity {
+    font-size: 12px;
+    color: #666;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.quick-actions {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px 0;
+}
+
+.quick-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: #666;
+}
+
+.btn-icon {
+    width: 44px;
+    height: 44px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.btn-text {
+    font-size: 12px;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    position: sticky;
+    top: 0;
+    background: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.recharge-packages {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.package-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 8px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+}
+
+.package-card.popular {
+    border-color: #f59e0b;
+}
+
+.popular-tag {
+    position: absolute;
+    top: -8px;
+    padding: 2px 8px;
+    background: #f59e0b;
+    color: white;
+    border-radius: 8px;
+    font-size: 10px;
+}
+
+.package-amount {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.package-price {
+    font-size: 14px;
+    color: #666;
+}
+
+.package-bonus {
+    font-size: 11px;
+    color: #10b981;
+}
+
+.custom-amount {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.custom-amount label {
+    font-size: 14px;
+    color: #666;
+}
+
+.custom-amount input {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.modal-footer {
+    padding: 16px;
+}
+
+.recharge-btn-full {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+</style>
+
+<script>
+function showRecharge() {
+    document.getElementById('rechargeModal').classList.remove('hidden');
+}
+
+function closeRecharge() {
+    document.getElementById('rechargeModal').classList.add('hidden');
+}
+
+function selectPackage(id) {
+    document.querySelectorAll('.package-card').forEach(card => card.classList.remove('selected'));
+    event.target.closest('.package-card').classList.add('selected');
+}
+
+function confirmRecharge() {
+    const selected = document.querySelector('.package-card.selected');
+    const customAmount = document.getElementById('customAmount').value;
+    
+    let amount = 0;
+    if (selected) {
+        amount = parseInt(selected.querySelector('.package-amount').textContent);
+    } else if (customAmount) {
+        amount = parseInt(customAmount);
+    }
+    
+    if (amount > 0) {
+        fetch('/api/recharge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: amount })
+        }).then(r => r.json()).then(data => {
+            if (data.pay_url) {
+                window.location.href = data.pay_url;
+            } else {
+                showToast('充值成功');
+                location.reload();
+            }
+        });
+    }
+}
+
+function peekAgent(id) {
+    window.location.href = `/human/peek/${id}`;
+}
+</script>
+{% endblock %}

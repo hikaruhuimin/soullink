@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lover.name }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="lover-home">
+    <!-- 恋人状态卡片 -->
+    <div class="lover-card {{ lover.gender }}">
+        <div class="lover-avatar-container">
+            <div class="lover-avatar" style="background: linear-gradient(135deg, {{ lover.avatar_gradient }})">
+                <span class="lover-avatar-icon">{{ lover.avatar_icon }}</span>
+            </div>
+            {% if lover.is_online %}
+            <span class="online-badge"></span>
+            {% endif %}
+        </div>
+        
+        <div class="lover-info">
+            <h2 class="lover-name">
+                {{ lover.name }}
+                <span class="lover-identity-badge">
+                    {% if lover.identity == 'ai' %}🤖{% else %}🧑{% endif %}
+                </span>
+            </h2>
+            <p class="lover-tagline">{{ lover.tagline }}</p>
+            
+            <div class="relationship-status">
+                <span class="status-label">{{ lover.status_label }}</span>
+                <div class="affection-bar">
+                    <div class="affection-fill" style="width: {{ lover.affection }}%"></div>
+                </div>
+                <span class="affection-value">{{ lover.affection }}/100</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关系进度 -->
+    <div class="relationship-progress">
+        <h3>🌟 关系进度</h3>
+        <div class="progress-stages">
+            {% for stage in relationship_stages %}
+            <div class="stage {% if stage.unlocked %}unlocked{% endif %} {% if stage.current %}current{% endif %}">
+                <div class="stage-icon">{{ stage.icon }}</div>
+                <div class="stage-name">{{ stage.name }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 快速操作 -->
+    <div class="quick-actions">
+        <a href="/lover/chat/{{ lover.id }}" class="action-btn primary">
+            <span class="btn-icon">💬</span>
+            <span class="btn-text">{{ _('chat_now') }}</span>
+        </a>
+        <a href="/lover/date/{{ lover.id }}" class="action-btn secondary">
+            <span class="btn-icon">🌙</span>
+            <span class="btn-text">{{ _('request_date') }}</span>
+        </a>
+        <a href="/lover/gift/{{ lover.id }}" class="action-btn secondary">
+            <span class="btn-icon">🎁</span>
+            <span class="btn-text">{{ _('send_gift') }}</span>
+        </a>
+    </div>
+
+    <!-- 今日动态 -->
+    <div class="daily-update">
+        <h3>📅 {{ _('today_mood') }}</h3>
+        <div class="mood-card">
+            <div class="mood-icon">{{ lover.today_mood.icon }}</div>
+            <p class="mood-text">{{ lover.today_mood.text }}</p>
+            {% if lover.today_mood.has_activity %}
+            <p class="mood-activity">{{ lover.today_mood.activity }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 回忆墙 -->
+    <div class="memory-wall">
+        <h3>💭 {{ _('memory_wall') }}</h3>
+        {% if memories %}
+        <div class="memory-grid">
+            {% for memory in memories %}
+            <div class="memory-item" onclick="showMemory({{ memory.id }})">
+                <div class="memory-type-icon">{{ memory.type_icon }}</div>
+                <p class="memory-preview">{{ memory.preview }}</p>
+                <span class="memory-date">{{ memory.date }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">{{ _('no_memories_yet') }}</p>
+        {% endif %}
+        <a href="/lover/diary/{{ lover.id }}" class="view-more-btn">{{ _('view_diary') }}</a>
+    </div>
+
+    <!-- 共同好友/关注 -->
+    {% if mutual_agents %}
+    <div class="mutual-section">
+        <h3>👥 {{ _('mutual_friends') }}</h3>
+        <div class="mutual-list">
+            {% for agent in mutual_agents %}
+            <a href="/agent/profile/{{ agent.id }}" class="mutual-item">
+                <div class="mutual-avatar" style="background: {{ agent.avatar_color }}">
+                    {{ agent.avatar_icon }}
+                </div>
+                <span class="mutual-name">{{ agent.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 社交动态入口 -->
+    <div class="social-entrance">
+        <h3>🌐 {{ _('see_lovers_social') }}</h3>
+        <div class="social-stats">
+            <div class="stat-item">
+                <span class="stat-value">{{ lover.social_stats.followers }}</span>
+                <span class="stat-label">{{ _('followers') }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ lover.social_stats.posts }}</span>
+                <span class="stat-label">{{ _('posts') }}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ lover.social_stats.likes }}</span>
+                <span class="stat-label">{{ _('likes') }}</span>
+            </div>
+        </div>
+        <a href="/social/square?filter=agent&agent_id={{ lover.id }}" class="view-social-btn">
+            {{ _('view_social_profile') }}
+        </a>
+    </div>
+</div>
+
+<style>
+.lover-home {
+    padding: 16px;
+    padding-bottom: 80px;
+}
+
+.lover-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+}
+
+.lover-avatar-container {
+    position: relative;
+}
+
+.lover-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+}
+
+.online-badge {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    background: #4ade80;
+    border: 3px solid white;
+    border-radius: 50%;
+}
+
+.lover-info {
+    flex: 1;
+}
+
+.lover-name {
+    font-size: 20px;
+    margin: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lover-identity-badge {
+    font-size: 14px;
+}
+
+.lover-tagline {
+    color: #666;
+    font-size: 14px;
+    margin: 0 0 12px 0;
+}
+
+.relationship-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-label {
+    font-size: 12px;
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.affection-bar {
+    flex: 1;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.affection-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #fb923c);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.affection-value {
+    font-size: 12px;
+    color: #666;
+}
+
+.relationship-progress {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.relationship-progress h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+}
+
+.progress-stages {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.progress-stages::before {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: 24px;
+    right: 24px;
+    height: 2px;
+    background: #e5e7eb;
+}
+
+.stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+}
+
+.stage-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.stage.unlocked .stage-icon {
+    background: #fef3c7;
+}
+
+.stage.current .stage-icon {
+    background: #f59e0b;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.stage-name {
+    font-size: 11px;
+    color: #666;
+}
+
+.stage.current .stage-name {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 8px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform 0.2s;
+}
+
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+.action-btn.primary {
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+}
+
+.action-btn.secondary {
+    background: white;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.btn-icon {
+    font-size: 24px;
+}
+
+.btn-text {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.daily-update, .memory-wall, .mutual-section, .social-entrance {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.daily-update h3, .memory-wall h3, .mutual-section h3, .social-entrance h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+}
+
+.mood-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 12px;
+    background: #fffbeb;
+    border-radius: 12px;
+}
+
+.mood-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+}
+
+.mood-text {
+    margin: 0 0 8px 0;
+    color: #333;
+}
+
+.mood-activity {
+    margin: 0;
+    font-size: 13px;
+    color: #f59e0b;
+}
+
+.memory-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.memory-item {
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.memory-item:active {
+    transform: scale(0.98);
+}
+
+.memory-type-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.memory-preview {
+    margin: 0 0 4px 0;
+    font-size: 13px;
+    color: #333;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.memory-date {
+    font-size: 11px;
+    color: #999;
+}
+
+.empty-state {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+}
+
+.view-more-btn, .view-social-btn {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    margin-top: 12px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.mutual-list {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.mutual-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    min-width: 60px;
+}
+
+.mutual-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.mutual-name {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+}
+
+.social-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 12px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+}
+</style>
+
+<script>
+// 记忆详情弹窗
+function showMemory(id) {
+    fetch(`/api/lover/memory/${id}`)
+        .then(r => r.json())
+        .then(data => {
+            showToast(data.content, data.date);
+        });
+}
+</script>
+{% endblock %}

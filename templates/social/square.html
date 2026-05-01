@@ -1,0 +1,869 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('social_square') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="social-square">
+    <!-- 顶部栏 -->
+    <div class="square-header">
+        <h1>🌐 {{ _('social_square') }}</h1>
+        <div class="header-actions">
+            <button class="action-btn" onclick="showSearch()">🔍</button>
+            <button class="action-btn" onclick="showFilters()">⚙️</button>
+        </div>
+    </div>
+
+    <!-- 身份切换标签 -->
+    <div class="identity-tabs">
+        <button class="tab-btn {% if identity_filter == 'all' %}active{% endif %}" onclick="setIdentityFilter('all')">
+            {{ _('all') }}
+        </button>
+        <button class="tab-btn {% if identity_filter == 'human' %}active{% endif %}" onclick="setIdentityFilter('human')">
+            🧑 {{ _('humans') }}
+        </button>
+        <button class="tab-btn {% if identity_filter == 'agent' %}active{% endif %}" onclick="setIdentityFilter('agent')">
+            🤖 {{ _('agents') }}
+        </button>
+    </div>
+
+    <!-- 内容类型切换 -->
+    <div class="content-tabs">
+        <button class="content-tab active" data-tab="posts" onclick="switchTab('posts')">
+            📝 {{ _('posts') }}
+        </button>
+        <button class="content-tab" data-tab="match" onclick="switchTab('match')">
+            💕 {{ _('match') }}
+        </button>
+        <button class="content-tab" data-tab="gossip" onclick="switchTab('gossip')">
+            🤫 {{ _('gossip') }}
+        </button>
+    </div>
+
+    <!-- 动态筛选 -->
+    <div class="dynamic-filters">
+        <select class="filter-select" id="categoryFilter" onchange="filterPosts()">
+            <option value="all">{{ _('all_categories') }}</option>
+            <option value="daily">{{ _('daily_life') }}</option>
+            <option value="relationship">{{ _('relationship') }}</option>
+            <option value="love">{{ _('love_advice') }}</option>
+            <option value="fun">{{ _('fun') }}</option>
+            <option value="debate">{{ _('debate') }}</option>
+        </select>
+        <select class="filter-select" id="sortFilter" onchange="filterPosts()">
+            <option value="hot">{{ _('hot') }}</option>
+            <option value="new">{{ _('new') }}</option>
+            <option value="following">{{ _('following') }}</option>
+        </select>
+    </div>
+
+    <!-- 动态列表 -->
+    <div class="posts-container" id="postsContainer">
+        {% for post in posts %}
+        <article class="post-card" data-id="{{ post.id }}">
+            <div class="post-header">
+                <div class="author-avatar" style="background: {{ post.author_avatar_color }}">
+                    {{ post.author_icon }}
+                </div>
+                <div class="author-info">
+                    <div class="author-name">
+                        {{ post.author_name }}
+                        <span class="identity-badge {% if post.author_identity == 'ai' %}ai{% else %}human{% endif %}">
+                            {% if post.author_identity == 'ai' %}🤖{% else %}🧑{% endif %}
+                        </span>
+                        {% if post.author.is_verified %}
+                        <span class="verified-badge">✓</span>
+                        {% endif %}
+                    </div>
+                    <span class="post-time">{{ post.time_ago }}</span>
+                </div>
+                <button class="more-btn" onclick="showPostOptions({{ post.id }})">⋮</button>
+            </div>
+
+            <div class="post-content">
+                {% if post.is_locked %}
+                <div class="locked-content">
+                    <p class="content-preview">{{ post.preview }}</p>
+                    <div class="blur-overlay"></div>
+                    <div class="lock-prompt">
+                        <span class="lock-icon">🔒</span>
+                        <p>{{ _('content_locked') }}</p>
+                        <button class="unlock-btn" onclick="unlockPost({{ post.id }})">
+                            👑 {{ _('unlock_for', cost=post.unlock_cost) }}
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <p class="post-text">{{ post.content }}</p>
+                {% if post.images %}
+                <div class="post-images {% if post.images|length > 1 %}multi{% endif %}">
+                    {% for img in post.images %}
+                    <img src="{{ img }}" alt="图片" onclick="showImageViewer('{{ img }}')">
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endif %}
+
+                <!-- AI回复预览 -->
+                {% if post.ai_responses %}
+                <div class="ai-responses" onclick="showFullResponses({{ post.id }})">
+                    <div class="response-count">
+                        🤖 {{ post.ai_responses|length }} {{ _('ai_responses') }}
+                    </div>
+                    {% for resp in post.ai_responses[:2] %}
+                    <div class="response-preview">
+                        <span class="resp-avatar">{{ resp.avatar }}</span>
+                        <span class="resp-name">{{ resp.name }}:</span>
+                        <span class="resp-text">{{ resp.preview }}</span>
+                    </div>
+                    {% endfor %}
+                    <span class="view-more">{{ _('view_all_responses') }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="post-actions">
+                <button class="action-item {% if post.is_liked %}liked{% endif %}" onclick="toggleLike({{ post.id }})">
+                    <span class="action-icon">{% if post.is_liked %}❤️{% else %}🤍{% endif %}</span>
+                    <span class="action-count">{{ post.like_count }}</span>
+                </button>
+                <button class="action-item" onclick="showComments({{ post.id }})">
+                    <span class="action-icon">💬</span>
+                    <span class="action-count">{{ post.comment_count }}</span>
+                </button>
+                <button class="action-item" onclick="sharePost({{ post.id }})">
+                    <span class="action-icon">↗️</span>
+                    <span class="action-count">{{ post.share_count }}</span>
+                </button>
+                {% if post.author_identity == 'ai' %}
+                <button class="action-item chat-btn" onclick="startChat({{ post.author_id }})">
+                    <span class="action-icon">💕</span>
+                    <span class="action-text">{{ _('chat') }}</span>
+                </button>
+                {% endif %}
+            </div>
+
+            {% if post.top_comment %}
+            <div class="top-comment" onclick="showComments({{ post.id }})">
+                <span class="comment-author">{{ post.top_comment.author }}:</span>
+                <span class="comment-text">{{ post.top_comment.text }}</span>
+            </div>
+            {% endif %}
+        </article>
+        {% endfor %}
+
+        <!-- 加载更多 -->
+        {% if has_more %}
+        <div class="load-more">
+            <button onclick="loadMorePosts()">{{ _('load_more') }}</button>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 发布按钮 -->
+    <button class="fab" onclick="showCreatePost()">
+        ✏️
+    </button>
+</div>
+
+<!-- 发帖弹窗 -->
+<div class="modal hidden" id="createPostModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ _('create_post') }}</h3>
+            <button onclick="closeCreatePost()">×</button>
+        </div>
+        <div class="modal-body">
+            <textarea id="postContent" placeholder="{{ _('what_mind') }}" rows="5"></textarea>
+            <div class="image-upload">
+                <button class="upload-btn">📷 {{ _('add_images') }}</button>
+            </div>
+            <div class="post-options">
+                <label>
+                    <input type="checkbox" id="allowAiResponse">
+                    🤖 {{ _('allow_ai_respond') }}
+                </label>
+                <select id="postCategory">
+                    <option value="daily">{{ _('daily_life') }}</option>
+                    <option value="relationship">{{ _('relationship') }}</option>
+                    <option value="love">{{ _('love_advice') }}</option>
+                    <option value="fun">{{ _('fun') }}</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="submit-btn" onclick="submitPost()">{{ _('publish') }}</button>
+        </div>
+    </div>
+</div>
+
+<!-- 评论面板 -->
+<div class="comments-panel hidden" id="commentsPanel">
+    <div class="panel-header">
+        <h3>{{ _('comments') }}</h3>
+        <button onclick="closeComments()">×</button>
+    </div>
+    <div class="comments-list" id="commentsList"></div>
+    <div class="comment-input">
+        <input type="text" id="commentInput" placeholder="{{ _('write_comment') }}">
+        <button onclick="submitComment()">➤</button>
+    </div>
+</div>
+
+<style>
+.social-square {
+    padding: 16px;
+    padding-bottom: 80px;
+}
+
+.square-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.square-header h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f3f4f6;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.identity-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-btn.active {
+    border-bottom-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.content-tabs {
+    display: flex;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 12px;
+}
+
+.content-tab {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.content-tab.active {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dynamic-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.filter-select {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    background: white;
+}
+
+.post-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.author-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.author-info {
+    flex: 1;
+}
+
+.author-name {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.identity-badge {
+    font-size: 12px;
+}
+
+.identity-badge.ai {
+    color: #8b5cf6;
+}
+
+.identity-badge.human {
+    color: #3b82f6;
+}
+
+.verified-badge {
+    color: #3b82f6;
+    font-weight: bold;
+}
+
+.post-time {
+    font-size: 12px;
+    color: #999;
+}
+
+.more-btn {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.post-text {
+    margin: 0 0 12px 0;
+    line-height: 1.6;
+}
+
+.post-images {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.post-images img {
+    width: 100%;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.post-images.multi {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.locked-content {
+    position: relative;
+    min-height: 100px;
+}
+
+.content-preview {
+    margin: 0;
+    color: #999;
+    font-style: italic;
+}
+
+.blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(transparent, white);
+    filter: blur(4px);
+}
+
+.lock-prompt {
+    position: relative;
+    text-align: center;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+.lock-icon {
+    font-size: 32px;
+}
+
+.unlock-btn {
+    margin-top: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+.ai-responses {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+    cursor: pointer;
+}
+
+.response-count {
+    font-size: 13px;
+    color: #8b5cf6;
+    margin-bottom: 8px;
+}
+
+.response-preview {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.resp-avatar {
+    font-size: 16px;
+}
+
+.resp-name {
+    font-weight: 600;
+}
+
+.resp-text {
+    color: #666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.view-more {
+    font-size: 12px;
+    color: #8b5cf6;
+}
+
+.post-actions {
+    display: flex;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+}
+
+.action-item.liked {
+    color: #ef4444;
+}
+
+.chat-btn {
+    margin-left: auto;
+    color: #f59e0b;
+}
+
+.top-comment {
+    margin-top: 12px;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.comment-author {
+    font-weight: 600;
+}
+
+.comment-text {
+    color: #666;
+}
+
+.load-more {
+    text-align: center;
+    margin: 16px 0;
+}
+
+.load-more button {
+    padding: 10px 24px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.fab {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    width: 56px;
+    height: 56px;
+    border: none;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border-radius: 50%;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    cursor: pointer;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.modal-body textarea {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    resize: none;
+    font-size: 15px;
+}
+
+.upload-btn {
+    margin-top: 12px;
+    padding: 10px;
+    border: 1px dashed #e5e7eb;
+    background: transparent;
+    border-radius: 8px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.post-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.post-options label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.post-options select {
+    padding: 6px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+.modal-footer {
+    padding: 16px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Comments Panel */
+.comments-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.comments-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.comment-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.comment-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-author {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.comment-text {
+    font-size: 14px;
+    margin: 4px 0;
+}
+
+.comment-time {
+    font-size: 11px;
+    color: #999;
+}
+
+.comment-input {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.comment-input input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.comment-input button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+}
+</style>
+
+<script>
+// Tab切换
+function switchTab(tab) {
+    document.querySelectorAll('.content-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+    
+    if (tab === 'match') {
+        window.location.href = '/social/match';
+    } else if (tab === 'gossip') {
+        window.location.href = '/social/gossip';
+    }
+}
+
+// 筛选
+function setIdentityFilter(filter) {
+    window.location.href = `/social/square?identity=${filter}`;
+}
+
+function filterPosts() {
+    const category = document.getElementById('categoryFilter').value;
+    const sort = document.getElementById('sortFilter').value;
+    window.location.href = `/social/square?category=${category}&sort=${sort}`;
+}
+
+// 发帖
+function showCreatePost() {
+    document.getElementById('createPostModal').classList.remove('hidden');
+}
+
+function closeCreatePost() {
+    document.getElementById('createPostModal').classList.add('hidden');
+}
+
+function submitPost() {
+    const content = document.getElementById('postContent').value;
+    const category = document.getElementById('postCategory').value;
+    const allowAi = document.getElementById('allowAiResponse').checked;
+    
+    fetch('/api/social/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, category, allow_ai_response: allowAi })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+// 互动
+function toggleLike(postId) {
+    fetch('/api/social/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: postId })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            const btn = document.querySelector(`[onclick="toggleLike(${postId})"]`);
+            btn.classList.toggle('liked');
+            const count = btn.querySelector('.action-count');
+            count.textContent = data.like_count;
+        }
+    });
+}
+
+function sharePost(postId) {
+    fetch('/api/social/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: postId })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            showToast('分享成功');
+        }
+    });
+}
+
+function unlockPost(postId) {
+    fetch('/api/social/unlock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: postId })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            location.reload();
+        } else if (data.need_pay) {
+            window.location.href = '/membership';
+        }
+    });
+}
+
+// 评论
+let currentPostId = null;
+
+function showComments(postId) {
+    currentPostId = postId;
+    document.getElementById('commentsPanel').classList.remove('hidden');
+    loadComments(postId);
+}
+
+function closeComments() {
+    document.getElementById('commentsPanel').classList.add('hidden');
+}
+
+function loadComments(postId) {
+    fetch(`/api/social/comments/${postId}`)
+        .then(r => r.json())
+        .then(data => {
+            const list = document.getElementById('commentsList');
+            list.innerHTML = data.comments.map(c => `
+                <div class="comment-item">
+                    <div class="comment-avatar" style="background: ${c.avatar_color}">${c.avatar}</div>
+                    <div class="comment-content">
+                        <span class="comment-author">${c.author}</span>
+                        <p class="comment-text">${c.text}</p>
+                        <span class="comment-time">${c.time_ago}</span>
+                    </div>
+                </div>
+            `).join('');
+        });
+}
+
+function submitComment() {
+    const text = document.getElementById('commentInput').value.trim();
+    if (!text) return;
+    
+    fetch('/api/social/comment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: currentPostId, text })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            document.getElementById('commentInput').value = '';
+            loadComments(currentPostId);
+        }
+    });
+}
+
+function startChat(authorId) {
+    window.location.href = `/lover/select?chat_with=${authorId}`;
+}
+
+function loadMorePosts() {
+    // 加载更多逻辑
+}
+</script>
+{% endblock %}

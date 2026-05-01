@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}{{ divination.result_title }} - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 分享结果页样式 - 与结果页类似但无操作按钮 */
+.shared-page {
+    padding: 1rem;
+    padding-bottom: 4rem;
+}
+
+.shared-header {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, var(--color-bg-secondary), transparent);
+    border-radius: 0 0 30px 30px;
+    margin-bottom: 2rem;
+}
+
+.shared-logo {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.shared-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.25rem;
+    color: var(--color-gold);
+}
+
+.shared-subtitle {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="shared-page">
+    <div class="shared-header">
+        <div class="shared-logo">🔮 灵犀</div>
+        <h1 class="shared-title">占卜结果分享</h1>
+        <p class="shared-subtitle">命运的指引，源于心与心的连接</p>
+    </div>
+    
+    <!-- 结果卡片（复用result.html样式） -->
+    <div class="result-card">
+        <div class="result-header">
+            <span class="result-type">
+                {% if divination.divination_type == 'tarot' %}🃏
+                {% elif divination.divination_type == 'horoscope' %}⭐
+                {% elif divination.divination_type == 'bazi' %}📜
+                {% elif divination.divination_type == 'love' %}💕
+                {% else %}🔮{% endif %}
+                {{ divination.divination_type | upper }}
+            </span>
+            <h1 class="result-title">{{ divination.result_title }}</h1>
+            
+            {% if divination.question %}
+            <div class="result-question">
+                <strong>问题：</strong>{{ divination.question }}
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if cards %}
+        <div class="result-cards-display">
+            {% for card in cards %}
+            <div class="result-card-item {% if card.is_reversed %}reversed{% endif %}">
+                <div class="card-position">{{ input_data.positions[loop.index0] if input_data and input_data.positions and input_data.positions[loop.index0] else '第' + (loop.index) + '张' }}</div>
+                <div class="card-name">{{ card.name }}</div>
+                <div class="card-meaning">
+                    {% if card.is_reversed %}逆位 · {% endif %}
+                    {{ card.meaning or '' }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="result-interpretation">
+            {{ divination.result_content | safe }}
+        </div>
+        
+        <div class="result-meta">
+            占卜时间：{{ divination.created_at.strftime('%Y年%m月%d日 %H:%M') }}
+        </div>
+    </div>
+    
+    <!-- CTA -->
+    <div class="shared-cta">
+        <p>你也想探索命运的奥秘吗？</p>
+        <a href="/" class="btn btn-primary btn-lg">
+            <span>🔮</span>
+            前往灵犀占卜
+        </a>
+    </div>
+</div>
+
+<!-- Schema.org -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{ divination.result_title }}",
+    "description": "{{ divination.result_summary }}",
+    "datePublished": "{{ divination.created_at.isoformat() }}",
+    "author": {
+        "@type": "Organization",
+        "name": "SoulLink"
+    }
+}
+</script>
+{% endblock %}

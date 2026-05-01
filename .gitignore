@@ -1,0 +1,57 @@
+# SoulLink - Git忽略文件
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.env
+
+# 数据库
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 临时文件
+*.log
+tmp/
+temp/
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 上传文件
+uploads/
+user_uploads/
+
+# 虚拟环境
+ENV/
+env.bak/
+venv.bak/
+
+# 字节码
+*.pyc
+*.pyo
+
+# 测试
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 打包文件
+*.egg-info/
+dist/
+build/
+data/
+instance/

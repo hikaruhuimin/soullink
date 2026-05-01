@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}选择占卜类型 - SoulLink 灵犀{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">
+        <span class="title-icon">🔮</span>
+        占卜大厅
+    </h1>
+    <p class="page-subtitle">选择你想要探索的命运领域</p>
+</div>
+
+<div class="divination-categories">
+    <!-- 主要占卜 -->
+    <section class="category-section">
+        <h2 class="category-title">
+            <span class="category-icon">✨</span>
+            经典占卜
+        </h2>
+        
+        <div class="category-grid">
+            <a href="/divination/tarot" class="divination-card tarot-card">
+                <div class="card-visual">
+                    <div class="card-stack">
+                        <div class="stack-card"></div>
+                        <div class="stack-card"></div>
+                        <div class="stack-card main"></div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <span class="card-badge">最受欢迎</span>
+                    <h3>塔罗牌占卜</h3>
+                    <p>通过神秘的塔罗牌，解读你的过去、现在与未来</p>
+                    <div class="card-meta">
+                        <span class="meta-item">🃏 78张牌</span>
+                        <span class="meta-item">⏱️ 3-5分钟</span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/divination/horoscope" class="divination-card horoscope-card">
+                <div class="card-visual">
+                    <div class="zodiac-circle">
+                        <span class="zodiac-sym">☉</span>
+                        <div class="orbit orbit-1"></div>
+                        <div class="orbit orbit-2"></div>
+                        <div class="orbit orbit-3"></div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <h3>星盘分析</h3>
+                    <p>基于你的出生信息，揭示你的性格密码与命运轨迹</p>
+                    <div class="card-meta">
+                        <span class="meta-item">⭐ 行星相位</span>
+                        <span class="meta-item">⏱️ 5-10分钟</span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/divination/bazi" class="divination-card bazi-card">
+                <div class="card-visual">
+                    <div class="bazi-symbols">
+                        <span>乾</span><span>坤</span>
+                        <span>震</span><span>巽</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <h3>八字简批</h3>
+                    <p>东方命理智慧，解读你的人生格局与运势</p>
+                    <div class="card-meta">
+                        <span class="meta-item">📜 四柱八字</span>
+                        <span class="meta-item">⏱️ 3-5分钟</span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="/divination/fortune" class="divination-card fortune-card">
+                <div class="card-visual">
+                    <div class="sun-rays">
+                        <div class="ray"></div>
+                        <div class="ray"></div>
+                        <div class="ray"></div>
+                        <div class="ray"></div>
+                        <div class="ray"></div>
+                        <div class="ray"></div>
+                        <div class="ray"></div>
+                        <div class="ray"></div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <span class="card-badge">每日更新</span>
+                    <h3>每日运势</h3>
+                    <p>12星座今日运势，全方位指引你的每一天</p>
+                    <div class="card-meta">
+                        <span class="meta-item">⭐ 12星座</span>
+                        <span class="meta-item">⏱️ 即时</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+    
+    <!-- 恋爱占卜 -->
+    <section class="category-section love-category">
+        <h2 class="category-title">
+            <span class="category-icon">💕</span>
+            恋爱占卜专区
+        </h2>
+        <p class="category-desc">关于爱情，你是否有很多问号？来这里找到答案</p>
+        
+        <div class="love-grid">
+            <a href="/divination/love?type=reunion" class="love-card">
+                <div class="love-card-icon">💔→💕</div>
+                <h4>复合分析</h4>
+                <p>前任能否重归于好？</p>
+                <span class="love-card-tag">热门</span>
+            </a>
+            
+            <a href="/divination/love?type=crush" class="love-card">
+                <div class="love-card-icon">👀💓</div>
+                <h4>暗恋透视</h4>
+                <p>他/她心里有没有你？</p>
+            </a>
+            
+            <a href="/divination/love?type=blossom" class="love-card">
+                <div class="love-card-icon">🌸💫</div>
+                <h4>桃花运势</h4>
+                <p>近期能否遇见真爱？</p>
+            </a>
+            
+            <a href="/divination/love?type=marriage" class="love-card">
+                <div class="love-card-icon">💍✨</div>
+                <h4>姻缘预测</h4>
+                <p>命中注定的另一半？</p>
+            </a>
+        </div>
+    </section>
+</div>
+
+<!-- 提示信息 -->
+<div class="tips-section">
+    <div class="tip-card">
+        <span class="tip-icon">💡</span>
+        <div class="tip-content">
+            <h4>占卜小贴士</h4>
+            <p>找一个安静的环境，放空心灵，专注于你的问题，这样能得到更准确的指引。</p>
+        </div>
+    </div>
+    
+    <div class="tip-card">
+        <span class="tip-icon">🎁</span>
+        <div class="tip-content">
+            <h4>每日免费</h4>
+            <p>每位用户每日可享受3次免费占卜，让命运眷顾每一天的你。</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

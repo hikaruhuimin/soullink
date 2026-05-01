@@ -1,0 +1,785 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('divination') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="divination-page">
+    <!-- Hero区域 -->
+    <div class="divination-hero">
+        <div class="hero-content">
+            <span class="hero-icon">🔮</span>
+            <h1>AI智能占卜</h1>
+            <p>探索你的命运，解锁未来秘密</p>
+        </div>
+        <div class="hero-decoration">
+            <span class="deco-star">✨</span>
+            <span class="deco-moon">🌙</span>
+            <span class="deco-star">⭐</span>
+        </div>
+    </div>
+
+    <!-- 占卜类型 -->
+    <div class="divination-types">
+        <h3>选择占卜类型</h3>
+        <div class="type-grid">
+            {% for type in divination_types %}
+            <div class="type-card" onclick="selectType('{{ type.id }}')">
+                <div class="type-icon">{{ type.icon }}</div>
+                <h4>{{ type.name }}</h4>
+                <p>{{ type.description }}</p>
+                <span class="type-price">{{ type.cost }}💎</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 热门占卜 -->
+    <div class="popular-section">
+        <h3>🔥 热门占卜</h3>
+        <div class="popular-list">
+            {% for item in popular_divinations %}
+            <div class="popular-item" onclick="startDivination('{{ item.id }}')">
+                <div class="popular-icon">{{ item.icon }}</div>
+                <div class="popular-info">
+                    <h4>{{ item.title }}</h4>
+                    <p>{{ item.subtitle }}</p>
+                </div>
+                <span class="popular-responses">{{ item.responses }}人测过</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 历史占卜 -->
+    {% if recent_divinations %}
+    <div class="history-section">
+        <h3>📜 最近占卜</h3>
+        <div class="history-list">
+            {% for div in recent_divinations %}
+            <div class="history-item" onclick="viewDivination({{ div.id }})">
+                <div class="history-icon">{{ div.icon }}</div>
+                <div class="history-content">
+                    <h4>{{ div.type_name }}</h4>
+                    <p class="history-question">{{ div.question }}</p>
+                    <span class="history-date">{{ div.date_ago }}</span>
+                </div>
+                <span class="history-result {% if div.result == 'good' %}good{% elif div.result == 'bad' %}bad{% else %}neutral{% endif %}">
+                    {{ div.result_text }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- AI占卜师 -->
+    <div class="fortune-tellers">
+        <h3>👤 AI占卜师</h3>
+        <div class="tellers-scroll">
+            {% for teller in fortune_tellers %}
+            <div class="teller-card" onclick="selectTeller('{{ teller.id }}')">
+                <div class="teller-avatar" style="background: {{ teller.avatar_color }}">
+                    {{ teller.avatar }}
+                </div>
+                <span class="teller-name">{{ teller.name }}</span>
+                <span class="teller-specialty">{{ teller.specialty }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 占卜知识 -->
+    <div class="knowledge-section">
+        <h3>📚 占卜小知识</h3>
+        <div class="knowledge-cards">
+            {% for tip in tips %}
+            <div class="knowledge-card">
+                <span class="tip-icon">{{ tip.icon }}</span>
+                <div class="tip-content">
+                    <h4>{{ tip.title }}</h4>
+                    <p>{{ tip.summary }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- 占卜弹窗 -->
+<div class="divination-modal hidden" id="divinationModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">开始占卜</h3>
+            <button onclick="closeDivination()">×</button>
+        </div>
+        
+        <div class="modal-body">
+            <!-- 步骤1: 输入问题 -->
+            <div class="step step-1" id="step1">
+                <div class="type-info">
+                    <span class="type-icon" id="selectedTypeIcon"></span>
+                    <h4 id="selectedTypeName"></h4>
+                </div>
+                <textarea id="questionInput" placeholder="请输入你想问的问题..." rows="4"></textarea>
+                <div class="question-tips">
+                    <span>💡 建议</span>
+                    <p id="questionTip"></p>
+                </div>
+                <button class="start-btn" onclick="beginDivination()">开始占卜 🔮</button>
+            </div>
+            
+            <!-- 步骤2: 占卜中 -->
+            <div class="step step-2 hidden" id="step2">
+                <div class="divination-animation">
+                    <div class="crystal-ball">
+                        <span class="crystal-icon">🔮</span>
+                        <div class="crystal-glow"></div>
+                    </div>
+                    <div class="loading-text">
+                        <span>解读中</span>
+                        <span class="dots">...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤3: 结果 -->
+            <div class="step step-3 hidden" id="step3">
+                <div class="result-header">
+                    <span class="result-icon" id="resultIcon"></span>
+                    <div class="result-title">
+                        <h4 id="resultTitle"></h4>
+                        <span class="result-label" id="resultLabel"></span>
+                    </div>
+                </div>
+                <div class="result-content" id="resultContent"></div>
+                <div class="result-advice">
+                    <h5>💡 建议</h5>
+                    <p id="resultAdvice"></p>
+                </div>
+                <div class="result-actions">
+                    <button class="action-btn secondary" onclick="shareResult()">📤 分享</button>
+                    <button class="action-btn" onclick="saveResult()">💾 收藏</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.divination-page {
+    padding-bottom: 80px;
+}
+
+.divination-hero {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    padding: 40px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-icon {
+    font-size: 64px;
+    display: block;
+    margin-bottom: 12px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.hero-content h1 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    color: white;
+}
+
+.hero-content p {
+    margin: 0;
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.hero-decoration {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.deco-star, .deco-moon {
+    font-size: 24px;
+    opacity: 0.3;
+    animation: twinkle 2s infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+.divination-types, .popular-section, .history-section, .fortune-tellers, .knowledge-section {
+    padding: 16px;
+}
+
+.divination-types h3, .popular-section h3, .history-section h3, .fortune-tellers h3, .knowledge-section h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+}
+
+.type-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.type-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s;
+}
+
+.type-card:active {
+    transform: scale(0.98);
+}
+
+.type-icon {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.type-card h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+}
+
+.type-card p {
+    margin: 0 0 8px 0;
+    font-size: 11px;
+    color: #666;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.type-price {
+    font-size: 12px;
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.popular-list, .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.popular-item, .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.popular-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.popular-info, .history-content {
+    flex: 1;
+}
+
+.popular-info h4, .history-content h4 {
+    margin: 0 0 2px 0;
+    font-size: 14px;
+}
+
+.popular-info p, .history-question {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.history-question {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+.history-date {
+    font-size: 11px;
+    color: #999;
+}
+
+.popular-responses {
+    font-size: 11px;
+    color: #f59e0b;
+}
+
+.history-icon {
+    width: 44px;
+    height: 44px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.result-label {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.history-result.good .result-label {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.history-result.bad .result-label {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.history-result.neutral .result-label {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.tellers-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.teller-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    padding: 12px;
+    background: white;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.teller-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+
+.teller-name {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.teller-specialty {
+    font-size: 10px;
+    color: #666;
+}
+
+.knowledge-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.knowledge-card {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    background: white;
+    border-radius: 12px;
+}
+
+.tip-icon {
+    font-size: 28px;
+}
+
+.knowledge-card h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+}
+
+.knowledge-card p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Modal */
+.divination-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.step {
+    display: block;
+}
+
+.step.hidden {
+    display: none;
+}
+
+.type-info {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.type-info .type-icon {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.type-info h4 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.step-1 textarea {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    resize: none;
+    font-size: 15px;
+    margin-bottom: 12px;
+}
+
+.question-tips {
+    background: #fef3c7;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.question-tips span {
+    font-size: 13px;
+    color: #92400e;
+}
+
+.question-tips p {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #b45309;
+}
+
+.start-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.divination-animation {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.crystal-ball {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    position: relative;
+}
+
+.crystal-icon {
+    font-size: 64px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.crystal-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%);
+    animation: glow 2s infinite;
+}
+
+@keyframes glow {
+    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+.loading-text {
+    font-size: 16px;
+    color: #666;
+}
+
+.dots {
+    animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.result-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+.result-title h4 {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+}
+
+.result-content {
+    background: #f9fafb;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+.result-advice {
+    background: #fef3c7;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.result-advice h5 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+}
+
+.result-advice p {
+    margin: 0;
+    font-size: 14px;
+    color: #92400e;
+}
+
+.result-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.action-btn.secondary {
+    background: #f3f4f6;
+    color: #333;
+}
+
+.action-btn:not(.secondary) {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+}
+
+.hidden {
+    display: none !important;
+}
+</style>
+
+<script>
+let selectedType = null;
+let selectedTeller = null;
+
+const typeData = {{ type_data | tojson }};
+
+function selectType(typeId) {
+    selectedType = typeId;
+    const type = typeData[typeId];
+    
+    document.getElementById('selectedTypeIcon').textContent = type.icon;
+    document.getElementById('selectedTypeName').textContent = type.name;
+    document.getElementById('questionTip').textContent = type.tip;
+    
+    document.getElementById('step1').classList.remove('hidden');
+    document.getElementById('step2').classList.add('hidden');
+    document.getElementById('step3').classList.add('hidden');
+    document.getElementById('divinationModal').classList.remove('hidden');
+}
+
+function selectTeller(tellerId) {
+    selectedTeller = tellerId;
+    // 同样的弹窗逻辑
+}
+
+function beginDivination() {
+    const question = document.getElementById('questionInput').value.trim();
+    if (!question) {
+        showToast('请输入您的问题');
+        return;
+    }
+    
+    document.getElementById('step1').classList.add('hidden');
+    document.getElementById('step2').classList.remove('hidden');
+    
+    fetch('/api/divination/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            type: selectedType,
+            teller: selectedTeller,
+            question: question
+        })
+    }).then(r => r.json()).then(data => {
+        setTimeout(() => {
+            showResult(data);
+        }, 2500);
+    });
+}
+
+function showResult(data) {
+    document.getElementById('step2').classList.add('hidden');
+    document.getElementById('step3').classList.remove('hidden');
+    
+    document.getElementById('resultIcon').textContent = data.icon;
+    document.getElementById('resultTitle').textContent = data.title;
+    document.getElementById('resultLabel').textContent = data.label;
+    document.getElementById('resultLabel').style.background = data.label_color;
+    document.getElementById('resultContent').textContent = data.content;
+    document.getElementById('resultAdvice').textContent = data.advice;
+}
+
+function closeDivination() {
+    document.getElementById('divinationModal').classList.add('hidden');
+}
+
+function startDivination(id) {
+    // 快速开始某个占卜
+    selectType(id);
+}
+
+function viewDivination(id) {
+    // 查看历史占卜
+    fetch(`/api/divination/${id}`)
+        .then(r => r.json())
+        .then(data => {
+            showResult(data);
+            document.getElementById('divinationModal').classList.remove('hidden');
+        });
+}
+
+function shareResult() {
+    if (navigator.share) {
+        navigator.share({
+            title: '我的占卜结果',
+            text: document.getElementById('resultContent').textContent
+        });
+    } else {
+        showToast('链接已复制');
+    }
+}
+
+function saveResult() {
+    fetch('/api/divination/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ result_id: '{{ latest_result_id }}' })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            showToast('收藏成功');
+        }
+    });
+}
+</script>
+{% endblock %}

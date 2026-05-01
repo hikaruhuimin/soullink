@@ -1,0 +1,849 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('membership') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="membership-page">
+    <!-- 当前状态 -->
+    <div class="current-status">
+        {% if current_vip == 'none' %}
+        <div class="status-card free">
+            <span class="status-icon">👤</span>
+            <h2>{{ _('free_user') }}</h2>
+            <p>{{ _('free_limitations') }}</p>
+        </div>
+        {% elif current_vip == 'basic' %}
+        <div class="status-card basic">
+            <span class="status-icon">✨</span>
+            <h2>{{ _('spirit_member') }}</h2>
+            <p>{{ _('basic_expires', date=basic_expire_date) }}</p>
+        </div>
+        {% elif current_vip == 'premium' %}
+        <div class="status-card premium">
+            <span class="status-icon">👑</span>
+            <h2>{{ _('spirit_elite') }}</h2>
+            <p>{{ _('premium_expires', date=premium_expire_date) }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 年费优惠 -->
+    {% if show_annual_promo %}
+    <div class="annual-promo">
+        <div class="promo-badge">🎉</div>
+        <div class="promo-content">
+            <h3>{{ _('annual_save', percent='40%') }}</h3>
+            <p>{{ _('annual_promo_desc') }}</p>
+        </div>
+        <button class="promo-btn" onclick="showAnnualPlan()">{{ _('view_plan') }}</button>
+    </div>
+    {% endif %}
+
+    <!-- 会员等级 -->
+    <div class="vip-plans">
+        <!-- 基础会员 -->
+        <div class="plan-card {% if current_vip == 'basic' %}current{% endif %}">
+            <div class="plan-header">
+                <span class="plan-icon">✨</span>
+                <h3>{{ _('spirit_member') }}</h3>
+                {% if current_vip == 'basic' %}
+                <span class="current-badge">{{ _('current') }}</span>
+                {% endif %}
+            </div>
+            <div class="plan-price">
+                <span class="price">¥29</span>
+                <span class="period">/{{ _('month') }}</span>
+            </div>
+            <div class="plan-features">
+                <div class="feature">
+                    <span class="check">✓</span>
+                    <span>{{ _('feature_basic_1') }}</span>
+                </div>
+                <div class="feature">
+                    <span class="check">✓</span>
+                    <span>{{ _('feature_basic_2') }}</span>
+                </div>
+                <div class="feature">
+                    <span class="check">✓</span>
+                    <span>{{ _('feature_basic_3') }}</span>
+                </div>
+                <div class="feature">
+                    <span class="check">✓</span>
+                    <span>{{ _('feature_basic_4') }}</span>
+                </div>
+                <div class="feature locked">
+                    <span class="lock">○</span>
+                    <span>{{ _('feature_basic_5_locked') }}</span>
+                </div>
+            </div>
+            <button class="plan-btn" onclick="subscribe('basic')">
+                {% if current_vip == 'basic' %}{{ _('renew') }}{% else %}{{ _('subscribe') }}{% endif %}
+            </button>
+        </div>
+
+        <!-- 尊享会员 -->
+        <div class="plan-card featured {% if current_vip == 'premium' %}current{% endif %}">
+            <div class="featured-badge">{{ _('recommended') }}</div>
+            <div class="plan-header">
+                <span class="plan-icon">👑</span>
+                <h3>{{ _('spirit_elite') }}</h3>
+                {% if current_vip == 'premium' %}
+                <span class="current-badge">{{ _('current') }}</span>
+                {% endif %}
+            </div>
+            <div class="plan-price">
+                <span class="price">¥99</span>
+                <span class="period">/{{ _('month') }}</span>
+            </div>
+            <div class="plan-features">
+                <div class="feature">
+                    <span class="check">✓</span>
+                    <span>{{ _('feature_premium_1') }}</span>
+                </div>
+                <div class="feature">
+                    <span class="check">✓</span>
+                    <span>{{ _('feature_premium_2') }}</span>
+                </div>
+                <div class="feature">
+                    <span class="check">✓</span>
+                    <span>{{ _('feature_premium_3') }}</span>
+                </div>
+                <div class="feature">
+                    <span class="check">✓</span>
+                    <span>{{ _('feature_premium_4') }}</span>
+                </div>
+                <div class="feature">
+                    <span class="check">✓</span>
+                    <span>{{ _('feature_premium_5') }}</span>
+                </div>
+                <div class="feature">
+                    <span class="check">✓</span>
+                    <span>{{ _('feature_premium_6') }}</span>
+                </div>
+            </div>
+            <button class="plan-btn primary" onclick="subscribe('premium')">
+                {% if current_vip == 'premium' %}{{ _('renew') }}{% else %}{{ _('subscribe_now') }}{% endif %}
+            </button>
+        </div>
+    </div>
+
+    <!-- 年付选项 -->
+    <div class="billing-toggle">
+        <span>{{ _('monthly') }}</span>
+        <label class="switch">
+            <input type="checkbox" id="annualToggle" onchange="toggleBilling()">
+            <span class="slider"></span>
+        </label>
+        <span>{{ _('yearly') }}</span>
+        <span class="save-badge">{{ _('save_40') }}</span>
+    </div>
+
+    <!-- 限时优惠 -->
+    <div class="flash-sale">
+        <div class="sale-timer">
+            <span class="timer-label">{{ _('ends_in') }}</span>
+            <span class="timer" id="countdown">23:59:59</span>
+        </div>
+        <div class="sale-content">
+            <p>{{ _('flash_sale_text') }}</p>
+            <div class="sale-price">
+                <span class="original">¥99</span>
+                <span class="sale">¥69</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 常见问题 -->
+    <div class="faq-section">
+        <h3>{{ _('faq') }}</h3>
+        {% for qa in faqs %}
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+                <span>{{ qa.question }}</span>
+                <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">{{ qa.answer }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 权益对比 -->
+    <div class="compare-section">
+        <h3>{{ _('compare_plans') }}</h3>
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>{{ _('feature') }}</th>
+                    <th>{{ _('free') }}</th>
+                    <th>{{ _('basic') }}</th>
+                    <th>{{ _('elite') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in compare_rows %}
+                <tr>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.free }}</td>
+                    <td>{{ row.basic }}</td>
+                    <td>{{ row.premium }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 订阅确认弹窗 -->
+<div class="modal hidden" id="subscribeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ _('confirm_subscription') }}</h3>
+            <button onclick="closeSubscribeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-plan">
+                <span class="plan-icon" id="confirmIcon"></span>
+                <div class="plan-info">
+                    <span id="confirmName"></span>
+                    <span class="price" id="confirmPrice"></span>
+                </div>
+            </div>
+            <div class="payment-methods">
+                <h4>{{ _('select_payment') }}</h4>
+                <div class="method-list">
+                    <label class="payment-method selected">
+                        <input type="radio" name="payment" value="wechat" checked>
+                        <span class="method-icon">💳</span>
+                        <span>{{ _('wechat_pay') }}</span>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="payment" value="alipay">
+                        <span class="method-icon">💰</span>
+                        <span>{{ _('alipay') }}</span>
+                    </label>
+                    <label class="payment-method">
+                        <input type="radio" name="payment" value="stones">
+                        <span class="method-icon">💎</span>
+                        <span>{{ _('use_stones') }} (<span id="stonesBalance"></span>)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="confirm-btn" onclick="confirmSubscribe()">{{ _('confirm_pay') }}</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.membership-page {
+    padding: 16px;
+    padding-bottom: 100px;
+}
+
+.current-status {
+    margin-bottom: 20px;
+}
+
+.status-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.status-card.free {
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+}
+
+.status-card.basic {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+}
+
+.status-card.premium {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+}
+
+.status-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+}
+
+.status-card h2 {
+    margin: 0 0 4px 0;
+    font-size: 20px;
+}
+
+.status-card p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.status-card.premium p {
+    color: rgba(255,255,255,0.8);
+}
+
+.annual-promo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+.promo-badge {
+    font-size: 32px;
+}
+
+.promo-content {
+    flex: 1;
+}
+
+.promo-content h3 {
+    margin: 0 0 2px 0;
+    font-size: 15px;
+    color: #92400e;
+}
+
+.promo-content p {
+    margin: 0;
+    font-size: 12px;
+    color: #b45309;
+}
+
+.promo-btn {
+    padding: 8px 16px;
+    background: #f59e0b;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.vip-plans {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.plan-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    border: 2px solid #e5e7eb;
+    position: relative;
+}
+
+.plan-card.featured {
+    border-color: #8b5cf6;
+}
+
+.plan-card.current {
+    background: #f5f3ff;
+}
+
+.featured-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.plan-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.plan-icon {
+    font-size: 24px;
+}
+
+.plan-header h3 {
+    margin: 0;
+    font-size: 14px;
+    flex: 1;
+}
+
+.current-badge {
+    padding: 2px 8px;
+    background: #10b981;
+    color: white;
+    border-radius: 8px;
+    font-size: 10px;
+}
+
+.plan-price {
+    margin-bottom: 12px;
+}
+
+.price {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+}
+
+.plan-card.featured .price {
+    color: #8b5cf6;
+}
+
+.period {
+    font-size: 13px;
+    color: #666;
+}
+
+.plan-features {
+    margin-bottom: 16px;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 12px;
+}
+
+.feature .check {
+    color: #10b981;
+    font-weight: bold;
+}
+
+.feature .lock {
+    color: #ccc;
+}
+
+.feature.locked {
+    color: #999;
+}
+
+.plan-btn {
+    width: 100%;
+    padding: 10px;
+    background: #f3f4f6;
+    color: #333;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.plan-btn.primary {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+}
+
+.billing-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    font-size: 13px;
+}
+
+.switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ccc;
+    border-radius: 24px;
+    transition: 0.3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+input:checked + .slider {
+    background: #8b5cf6;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+.save-badge {
+    padding: 2px 8px;
+    background: #fef3c7;
+    color: #f59e0b;
+    border-radius: 8px;
+    font-size: 11px;
+}
+
+.flash-sale {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
+.sale-timer {
+    text-align: center;
+}
+
+.timer-label {
+    display: block;
+    font-size: 11px;
+    color: #dc2626;
+}
+
+.timer {
+    font-size: 18px;
+    font-weight: 700;
+    color: #dc2626;
+}
+
+.sale-content p {
+    margin: 0 0 4px 0;
+    font-size: 13px;
+}
+
+.sale-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.original {
+    font-size: 14px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.sale {
+    font-size: 22px;
+    font-weight: 700;
+    color: #dc2626;
+}
+
+.faq-section, .compare-section {
+    margin-bottom: 20px;
+}
+
+.faq-section h3, .compare-section h3 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+}
+
+.faq-item {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+.faq-question {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.faq-icon {
+    font-size: 12px;
+    transition: transform 0.3s;
+}
+
+.faq-item.active .faq-icon {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    padding: 0 16px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s, padding 0.3s;
+    font-size: 13px;
+    color: #666;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 200px;
+    padding: 0 16px 14px;
+}
+
+.compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 12px;
+}
+
+.compare-table th, .compare-table td {
+    padding: 12px 8px;
+    text-align: center;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.compare-table th {
+    background: #f9fafb;
+    font-weight: 600;
+}
+
+.compare-table td:first-child {
+    text-align: left;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 360px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.confirm-plan {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.confirm-plan .plan-icon {
+    font-size: 32px;
+}
+
+.plan-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-info .price {
+    font-size: 18px;
+    color: #8b5cf6;
+}
+
+.payment-methods h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+}
+
+.method-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.payment-method {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.payment-method input {
+    display: none;
+}
+
+.payment-method.selected {
+    border-color: #8b5cf6;
+    background: #f5f3ff;
+}
+
+.method-icon {
+    font-size: 24px;
+}
+
+.modal-footer {
+    padding: 16px;
+}
+
+.confirm-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+</style>
+
+<script>
+let selectedPlan = null;
+let isAnnual = false;
+
+function subscribe(plan) {
+    selectedPlan = plan;
+    const icon = plan === 'basic' ? '✨' : '👑';
+    const name = plan === 'basic' ? '{{ _("spirit_member") }}' : '{{ _("spirit_elite") }}';
+    const price = isAnnual ? (plan === 'basic' ? '¥288' : '¥988') : (plan === 'basic' ? '¥29' : '¥99');
+    
+    document.getElementById('confirmIcon').textContent = icon;
+    document.getElementById('confirmName').textContent = name;
+    document.getElementById('confirmPrice').textContent = price + '/{{ _("month") }}';
+    
+    // 获取灵石余额
+    fetch('/api/user/stones')
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('stonesBalance').textContent = data.balance;
+        });
+    
+    document.getElementById('subscribeModal').classList.remove('hidden');
+}
+
+function closeSubscribeModal() {
+    document.getElementById('subscribeModal').classList.add('hidden');
+}
+
+function confirmSubscribe() {
+    const payment = document.querySelector('input[name="payment"]:checked').value;
+    
+    fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            plan: selectedPlan, 
+            billing: isAnnual ? 'annual' : 'monthly',
+            payment: payment 
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            } else {
+                showToast('订阅成功');
+                location.reload();
+            }
+        } else if (data.error) {
+            showToast(data.error);
+        }
+    });
+}
+
+function toggleBilling() {
+    isAnnual = document.getElementById('annualToggle').checked;
+    // 更新价格显示
+    document.querySelectorAll('.plan-card').forEach(card => {
+        const price = card.querySelector('.price');
+        if (card.querySelector('.plan-icon').textContent === '✨') {
+            price.textContent = isAnnual ? '¥288' : '¥29';
+        } else {
+            price.textContent = isAnnual ? '¥988' : '¥99';
+        }
+    });
+}
+
+function toggleFaq(el) {
+    el.parentElement.classList.toggle('active');
+}
+
+// 支付方式选择
+document.querySelectorAll('.payment-method').forEach(method => {
+    method.addEventListener('click', function() {
+        document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+        this.classList.add('selected');
+        this.querySelector('input').checked = true;
+    });
+});
+
+// 倒计时
+function updateCountdown() {
+    const now = new Date();
+    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    const diff = end - now;
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    document.getElementById('countdown').textContent = 
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+</script>
+{% endblock %}
