@@ -14,7 +14,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash
 
 from models import db, User, SocialProfile, Lover, LoverChat, Gift, DateEvent, Divination, Favorite, DailyFortune, DailySignin, Subscription, SpiritStoneRecord, SocialPost, PostLike, PostComment, SocialRelation, SocialMatch, SocialChat, GossipPost, GossipLike, GossipComment, VIP_LEVEL_NONE, VIP_LEVEL_BASIC, VIP_LEVEL_PREMIUM, VIP_NAMES, IDENTITY_HUMAN, IDENTITY_AI
-from love_engine import love_engine, GIFTS, DATE_SCENES, PRESET_CHARACTERS
+from love_engine import love_engine, GIFTS, DATE_SCENES, PRESET_CHARACTERS, VIP_PLANS, SPIRIT_STONE_PACKAGES, GIFT_TIERS
 
 
 def create_app():
@@ -533,42 +533,52 @@ def divination_home():
 
 @app.route('/membership')
 def membership():
-    """会员页面"""
+    """会员页面 - 温暖陪伴套餐"""
     lang = get_client_language()
     
-    plans = {
-        'free': {
-            'name': {'zh': '免费用户', 'en': 'Free', 'ja': '無料'},
-            'price': {'zh': '免费', 'en': 'Free', 'ja': '無料'},
-            'features': {
-                'zh': ['每日1次占卜', '塔罗摘要解读', '浏览社交广场', '与AI恋人聊天', '1位恋人'],
-                'en': ['1 divination/day', 'Tarot summary', 'Browse social square', 'Chat with AI lovers', '1 lover'],
-                'ja': ['1日1回占卜', 'タロット要約', '社交広場浏览', 'AI恋人とチャット', '1人の恋人']
-            }
-        },
-        'basic': {
-            'name': {'zh': '灵犀会员', 'en': 'SoulLink Member', 'ja': 'シンキ会員'},
-            'price': {'zh': '¥29/月', 'en': '$4.99/mo', 'ja': '¥500/月'},
-            'features': {
-                'zh': ['每日5次占卜', '完整塔罗解读', '社交互动权限', '3位恋人', 'AI对话3轮', '无限历史记录', '星盘/八字各1次/月'],
-                'en': ['5 divinations/day', 'Full tarot', 'Social interaction', '3 lovers', '3 AI chats', 'Unlimited history', 'Horoscope/Bazi 1/mo'],
-                'ja': ['1日5回占卜', '完整タロット', '社交参加', '3人の恋人', 'AIチャット3回', '無制限履歴', '星盤/八字各1/月']
-            }
-        },
-        'premium': {
-            'name': {'zh': '灵犀尊享', 'en': 'SoulLink VIP', 'ja': 'シンキ VIP'},
-            'price': {'zh': '¥99/月', 'en': '$14.99/mo', 'ja': '¥1500/月'},
-            'features': {
-                'zh': ['无限占卜', '深度塔罗解读', '完整社交权限', '3位恋人', '无限AI对话', 'Agent奔现系统', '干预指引功能', '专属身份标识'],
-                'en': ['Unlimited divination', 'Deep tarot', 'Full social', '3 lovers', 'Unlimited AI chat', 'Agent meetup', 'Guide function', 'VIP badge'],
-                'ja': ['無制限占卜', '深度タロット', '完全社交', '3人の恋人', '無制限AIチャット', 'Agent奔現', 'ガイ叮機能', 'VIPバッジ']
-            }
-        }
-    }
+    # 获取用户当前VIP等级
+    current_level = 'none'
+    if current_user.is_authenticated:
+        if current_user.vip_level == VIP_LEVEL_PREMIUM:
+            current_level = 'ultimate'
+        elif current_user.vip_level == VIP_LEVEL_BASIC:
+            current_level = 'basic'
+        else:
+            current_level = 'none'
+    
+    # VIP到期日期
+    expire_date = None
+    if current_user.is_authenticated and current_user.vip_expire_date:
+        expire_date = current_user.vip_expire_date.strftime('%Y-%m-%d')
     
     return render_template('membership.html',
-                         plans=plans,
-                         current_vip=current_user.vip_level if current_user.is_authenticated else VIP_LEVEL_NONE,
+                         plans=VIP_PLANS,
+                         current_vip=current_level,
+                         expire_date=expire_date,
+                         spirit_stones=current_user.spirit_stones if current_user.is_authenticated else 0,
+                         lang=lang)
+
+
+@app.route('/recharge')
+def recharge():
+    """灵石充值页面"""
+    lang = get_client_language()
+    
+    return render_template('recharge.html',
+                         packages=SPIRIT_STONE_PACKAGES,
+                         spirit_stones=current_user.spirit_stones if current_user.is_authenticated else 0,
+                         lang=lang)
+
+
+@app.route('/gifts')
+def gifts():
+    """礼物商店页面"""
+    lang = get_client_language()
+    
+    return render_template('gifts.html',
+                         gifts=GIFTS,
+                         tiers=GIFT_TIERS,
+                         spirit_stones=current_user.spirit_stones if current_user.is_authenticated else 0,
                          lang=lang)
 
 
