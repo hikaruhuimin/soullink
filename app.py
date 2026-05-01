@@ -1551,3 +1551,30 @@ def well_known_files(filename):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
+
+
+# ============ Agent奔现功能 ============
+
+@app.route('/meet')
+def meet_index():
+    """奔现主页"""
+    lang = get_client_language()
+    return render_template('meet/index.html', lang=lang)
+
+@app.route('/meet/invite')
+def meet_invite():
+    """发起奔现邀请"""
+    lang = get_client_language()
+    return render_template('meet/invite.html', lang=lang)
+
+@app.route('/meet/pending')
+def meet_pending():
+    """待处理邀请"""
+    lang = get_client_language()
+    return render_template('meet/pending.html', lang=lang)
+
+@app.route('/meet/prepare')
+def meet_prepare():
+    """奔现筹备"""
+    lang = get_client_language()
+    return render_template('meet/prepare.html', lang=lang)

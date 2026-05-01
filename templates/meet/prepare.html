@@ -1,0 +1,493 @@
+{% extends "base.html" %}
+
+{% block title %}奔现筹备 | SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.meet-prepare-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #fdf2f8 0%, #fff 100%);
+    padding: 40px 20px 100px;
+}
+
+.prepare-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 2rem;
+    color: #1f2937;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 30px;
+}
+
+/* Countdown */
+.countdown-card {
+    background: linear-gradient(135deg, #ec4899, #f97316);
+    border-radius: 24px;
+    padding: 30px;
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.countdown-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+}
+
+.countdown-label {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.countdown-time {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.countdown-date {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.countdown-partner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.partner-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.partner-info {
+    text-align: left;
+}
+
+.partner-name {
+    font-weight: 600;
+}
+
+.partner-agent {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+/* Section Card */
+.section-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.section-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ec4899, #f97316);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Place Recommendations */
+.place-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.place-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 16px;
+    transition: all 0.3s;
+}
+
+.place-item:hover {
+    background: #f3f4f6;
+}
+
+.place-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fce7f3, #fef3c7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    flex-shrink: 0;
+}
+
+.place-info {
+    flex: 1;
+}
+
+.place-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.place-desc {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.place-tags {
+    display: flex;
+    gap: 8px;
+}
+
+.place-tag {
+    background: #fef3c7;
+    color: #d97706;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+}
+
+.place-tag.blue {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+/* Outfit Suggestions */
+.outfit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.outfit-item {
+    text-align: center;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 16px;
+}
+
+.outfit-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.outfit-label {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.outfit-suggestion {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+/* Topics */
+.topic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.topic-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #f9fafb;
+    border-radius: 12px;
+    transition: all 0.3s;
+}
+
+.topic-item:hover {
+    background: #f3f4f6;
+}
+
+.topic-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ec4899, #f97316);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.topic-text {
+    color: #4b5563;
+    line-height: 1.5;
+}
+
+/* Safety Tips */
+.safety-tips {
+    background: linear-gradient(135deg, #fef3c7, #fce7f3);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.safety-tips h4 {
+    color: #92400e;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.safety-tips ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.safety-tips li {
+    color: #78350f;
+    padding: 8px 0;
+    padding-left: 24px;
+    position: relative;
+    font-size: 0.95rem;
+}
+
+.safety-tips li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #059669;
+}
+
+/* Emergency Button */
+.emergency-btn {
+    width: 100%;
+    padding: 18px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 2px solid #fecaca;
+    border-radius: 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.emergency-btn:hover {
+    background: #fecaca;
+}
+
+.emergency-btn:active {
+    transform: scale(0.98);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .page-title { font-size: 1.5rem; }
+    .countdown-time { font-size: 2.5rem; }
+    .outfit-grid { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="meet-prepare-page">
+    <div class="prepare-container">
+        <h1 class="page-title">🌟 奔现倒计时</h1>
+        <p class="page-subtitle">你的Agent正在帮你做好一切准备~</p>
+        
+        <!-- Countdown Card -->
+        <div class="countdown-card">
+            <div class="countdown-label">距离见面还有</div>
+            <div class="countdown-time">3天 14小时 27分</div>
+            <div class="countdown-date">📅 2025年5月10日 周六 14:00</div>
+            <div class="countdown-partner">
+                <div class="partner-avatar">🌙</div>
+                <div class="partner-info">
+                    <div class="partner-name">月光小精灵</div>
+                    <div class="partner-agent">你的AI: 月光守护者正在陪伴</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Place Recommendations -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon">📍</div>
+                <h2 class="section-title">约会地点推荐</h2>
+            </div>
+            <div class="place-list">
+                <div class="place-item">
+                    <div class="place-image">☕</div>
+                    <div class="place-info">
+                        <div class="place-name">猫的天空之城书店咖啡</div>
+                        <div class="place-desc">安静温馨，适合聊天，还有可爱的猫咪~</div>
+                        <div class="place-tags">
+                            <span class="place-tag">咖啡厅</span>
+                            <span class="place-tag blue">安静</span>
+                            <span class="place-tag">人均¥60</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="place-item">
+                    <div class="place-image">🌿</div>
+                    <div class="place-info">
+                        <div class="place-name">中山公园</div>
+                        <div class="place-desc">风景优美，散步聊天的好去处</div>
+                        <div class="place-tags">
+                            <span class="place-tag">户外</span>
+                            <span class="place-tag blue">免费</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="place-item">
+                    <div class="place-image">🎨</div>
+                    <div class="place-info">
+                        <div class="place-name">梵誓巧克力美术馆</div>
+                        <div class="place-desc">浪漫甜蜜，还可以一起做手工巧克力</div>
+                        <div class="place-tags">
+                            <span class="place-tag">创意</span>
+                            <span class="place-tag">人均¥150</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Outfit Suggestions -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon">👔</div>
+                <h2 class="section-title">穿搭建议</h2>
+            </div>
+            <div class="outfit-grid">
+                <div class="outfit-item">
+                    <div class="outfit-icon">👗</div>
+                    <div class="outfit-label">适合她</div>
+                    <div class="outfit-suggestion">浅色连衣裙 + 小白鞋</div>
+                </div>
+                <div class="outfit-item">
+                    <div class="outfit-icon">👕</div>
+                    <div class="outfit-label">适合他</div>
+                    <div class="outfit-suggestion">白衬衫 + 休闲裤</div>
+                </div>
+            </div>
+            <p style="margin-top: 16px; color: #6b7280; font-size: 0.9rem; text-align: center;">
+                💡 第一次见面建议穿着得体、舒适的服装，不需要太正式哦~
+            </p>
+        </div>
+        
+        <!-- Topics -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon">💬</div>
+                <h2 class="section-title">破冰话题卡片</h2>
+            </div>
+            <div class="topic-list">
+                <div class="topic-item">
+                    <span class="topic-number">1</span>
+                    <span class="topic-text">你们平时有什么兴趣爱好呀？</span>
+                </div>
+                <div class="topic-item">
+                    <span class="topic-number">2</span>
+                    <span class="topic-text">最近有没有看什么好看的电影或书？</span>
+                </div>
+                <div class="topic-item">
+                    <span class="topic-number">3</span>
+                    <span class="topic-text">你们的AI陪伴师平时都聊些什么？</span>
+                </div>
+                <div class="topic-item">
+                    <span class="topic-number">4</span>
+                    <span class="topic-text">有没有去过什么特别的地方旅行？</span>
+                </div>
+                <div class="topic-item">
+                    <span class="topic-number">5</span>
+                    <span class="topic-text">你理想中的周末是什么样子的？</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Safety Tips -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon">🛡️</div>
+                <h2 class="section-title">安全提醒</h2>
+            </div>
+            <div class="safety-tips">
+                <h4>⚠️ 见面注意事项</h4>
+                <ul>
+                    <li>选择人流较多的公共场所首次见面</li>
+                    <li>提前告知家人或朋友见面地点和时间</li>
+                    <li>保持手机电量充足，方便联系</li>
+                    <li>见面过程中随时可以和你的Agent聊聊感受</li>
+                    <li>如果感觉不适，有权随时终止见面</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Emergency Button -->
+        <button class="emergency-btn" ontouchend="emergencyAlert()">
+            🆘 一键求助
+        </button>
+    </div>
+</div>
+
+<script>
+function emergencyAlert() {
+    if (confirm('确定要发起紧急求助吗？\n\n系统会通知你的紧急联系人并分享当前位置。')) {
+        alert('🆘 紧急求助已发起！\n\n你的Agent正在帮你：\n• 联系紧急联系人\n• 分享实时位置\n• 提供安全建议\n\n如情况紧急，请同时拨打110报警。');
+    }
+}
+</script>
+{% endblock %}

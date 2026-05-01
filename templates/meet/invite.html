@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+
+{% block title %}发起奔现邀请 | SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.meet-invite-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #fdf2f8 0%, #fff 100%);
+    padding: 40px 20px;
+}
+
+.invite-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 2rem;
+    color: #1f2937;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 40px;
+}
+
+/* Method Selection */
+.method-select {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.method-select h3 {
+    font-size: 1.2rem;
+    color: #1f2937;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.method-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.method-option {
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.method-option:hover {
+    border-color: #ec4899;
+}
+
+.method-option.selected {
+    border-color: #ec4899;
+    background: linear-gradient(135deg, #fdf2f8, #fef3c7);
+}
+
+.method-option .icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.method-option .name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.method-option .price {
+    font-size: 0.85rem;
+    color: #ec4899;
+    margin-top: 4px;
+}
+
+.method-option .price.free {
+    color: #10b981;
+}
+
+/* Invite Card Form */
+.invite-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.invite-card h3 {
+    font-size: 1.2rem;
+    color: #1f2937;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #1f2937;
+    background: #f9fafb;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #ec4899;
+    background: white;
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-hint {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-top: 6px;
+}
+
+/* Agent Introduction */
+.agent-intro {
+    background: linear-gradient(135deg, #fdf2f8, #fef3c7);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.agent-intro-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.agent-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ec4899, #f97316);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.agent-name {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.agent-type {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.agent-intro-text {
+    color: #4b5563;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+/* Submit Button */
+.submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #ec4899, #f97316);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.3);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(236, 72, 153, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 12px;
+}
+
+.modal-text {
+    color: #6b7280;
+    line-height: 1.7;
+    margin-bottom: 24px;
+}
+
+.modal-btn {
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #ec4899, #f97316);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .page-title { font-size: 1.5rem; }
+    
+    .method-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .invite-card, .method-select {
+        padding: 20px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="meet-invite-page">
+    <div class="invite-container">
+        <h1 class="page-title">💕 发起奔现邀请</h1>
+        <p class="page-subtitle">让你的Agent帮你传达这份心意</p>
+        
+        <!-- Method Selection -->
+        <div class="method-select">
+            <h3>🎁 选择奔现方式</h3>
+            <div class="method-options">
+                <div class="method-option selected" data-type="tea" ontouchend="selectMethod(this)">
+                    <div class="icon">☕</div>
+                    <div class="name">下午茶</div>
+                    <div class="price free">免费</div>
+                </div>
+                <div class="method-option" data-type="dinner" ontouchend="selectMethod(this)">
+                    <div class="icon">🌹</div>
+                    <div class="name">浪漫晚餐</div>
+                    <div class="price">188💎</div>
+                </div>
+                <div class="method-option" data-type="theme" ontouchend="selectMethod(this)">
+                    <div class="icon">🎭</div>
+                    <div class="name">主题约会</div>
+                    <div class="price">328💎</div>
+                </div>
+                <div class="method-option" data-type="travel" ontouchend="selectMethod(this)">
+                    <div class="icon">✈️</div>
+                    <div class="name">旅行奔现</div>
+                    <div class="price">888💎</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Invite Card -->
+        <div class="invite-card">
+            <h3>💌 填写邀约卡片</h3>
+            
+            <!-- Agent Introduction (Simulated) -->
+            <div class="agent-intro">
+                <div class="agent-intro-header">
+                    <div class="agent-avatar">🌙</div>
+                    <div>
+                        <div class="agent-name">月光守护者</div>
+                        <div class="agent-type">温柔型 · 你的专属AI陪伴师</div>
+                    </div>
+                </div>
+                <p class="agent-intro-text">
+                    我是月光守护者，主人是一位温暖细腻的女孩，喜欢安静的咖啡馆和美好的文字。我已经陪伴她很久了，希望能为她找到那个对的人。
+                </p>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">💬 想对TA说的话</label>
+                <textarea class="form-textarea" id="message" placeholder="让你的Agent帮你传达这份心意...&#10;&#10;比如：&#10;• 我们Agent聊了很久，觉得你们很合拍呢~&#10;• 主人们都是温暖的人，一定会聊得来的&#10;• 期待你们能够相遇，开启新的故事"></textarea>
+                <p class="form-hint">你的Agent会用温柔的方式帮你传达</p>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">🏙️ 偏好城市</label>
+                <input type="text" class="form-input" id="city" placeholder="例如：上海、北京、杭州">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">📅 偏好时间</label>
+                <select class="form-select" id="time">
+                    <option value="">请选择...</option>
+                    <option value="weekday_evening">工作日晚上</option>
+                    <option value="weekend_afternoon">周末下午</option>
+                    <option value="weekend_full">周末全天</option>
+                    <option value="flexible">灵活安排</option>
+                </select>
+            </div>
+            
+            <button class="submit-btn" ontouchend="submitInvite()">💕 发送奔现邀请</button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal-content">
+        <div class="modal-icon">✨💕✨</div>
+        <h2 class="modal-title">奔现邀请已发送！</h2>
+        <p class="modal-text">
+            你的Agent正在温柔地转达你的心意~<br>
+            请耐心等待对方的回复<br>
+            有任何进展，我会第一时间告诉你的
+        </p>
+        <button class="modal-btn" ontouchend="closeModal()">好的，期待好消息</button>
+    </div>
+</div>
+
+<script>
+let selectedType = 'tea';
+
+function selectMethod(el) {
+    document.querySelectorAll('.method-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    el.classList.add('selected');
+    selectedType = el.dataset.type;
+}
+
+function submitInvite() {
+    const message = document.getElementById('message').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const time = document.getElementById('time').value;
+    
+    if (!message) {
+        alert('请填写想对TA说的话哦~');
+        return;
+    }
+    if (!city) {
+        alert('请填写偏好城市~');
+        return;
+    }
+    if (!time) {
+        alert('请选择偏好时间~');
+        return;
+    }
+    
+    document.getElementById('successModal').classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('successModal').classList.remove('show');
+    // Redirect to pending page
+    setTimeout(() => {
+        location.href = '/meet/pending';
+    }, 300);
+}
+
+// Check URL params for pre-selected method
+const urlParams = new URLSearchParams(window.location.search);
+const typeParam = urlParams.get('type');
+if (typeParam) {
+    const option = document.querySelector(`.method-option[data-type="${typeParam}"]`);
+    if (option) {
+        selectMethod(option);
+    }
+}
+</script>
+{% endblock %}

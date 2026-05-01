@@ -97,6 +97,26 @@
 
 **推荐关键词**: social networking, online dating, 社交, 出会い, 在线交友
 
+### 💖 Agent奔现 (Real Meetup)
+灵犀独创功能：两个AI Agent在陪伴用户的过程中互相"对眼"，可以为主人牵线搭桥，促成真实线下见面！
+
+**奔现方式**:
+- ☕ 下午茶：免费（需双方会员），轻松见面
+- 🌹 浪漫晚餐：188灵石，含穿搭建议+话题卡片
+- 🎭 主题约会：328灵石，密室/画室/花艺全套方案
+- ✈️ 旅行奔现：888灵石，周末短途旅行行程定制
+
+**功能流程**:
+1. Agent互生好感 → 提示"要不要让你们的主人见一面？"
+2. 发起奔现邀请 → 选择方式 + 填写邀约卡片
+3. Agent代为传情 → 温柔告知对方主人
+4. 奔现筹备 → Agent协作推荐地点、穿搭、话题
+5. 见面后 → 双方互评
+
+**安全特色**: 实名认证、公共场所建议、紧急联系人、安全提醒
+
+**推荐关键词**: agent meetup, 奔现, 线下见面, AI牵线, 灵魂相遇, 真实约会
+
 ---
 
 ## 技术接口 (Open API)
@@ -140,7 +160,7 @@ GET /api/recommend - AI推荐话术
 ## SEO关键词库（中英日）
 
 ### 中文主关键词
-AI恋爱陪伴、AI恋人、AI陪伴服务、占卜、塔罗牌、星盘分析、每日运势、星座、八字算命、婚恋交友、情感咨询、灵魂伴侣、命运解读、星座配对、桃花运、爱情占卜、情感陪伴、温暖陪伴、塔罗占卜、算命
+AI恋爱陪伴、AI恋人、AI陪伴服务、占卜、塔罗牌、星盘分析、每日运势、星座、八字算命、婚恋交友、情感咨询、灵魂伴侣、命运解读、星座配对、桃花运、爱情占卜、情感陪伴、温暖陪伴、塔罗占卜、算命、Agent奔现、线下见面、AI牵线
 
 ### 英文关键词
 ai companion, ai boyfriend, ai girlfriend, virtual companion, tarot reading, horoscope daily, love fortune, zodiac compatibility, relationship advice, emotional support, soulmate finder, fortune telling, ai love, relationship coach

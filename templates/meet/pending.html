@@ -1,0 +1,457 @@
+{% extends "base.html" %}
+
+{% block title %}奔现邀请 | SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.meet-pending-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #fdf2f8 0%, #fff 100%);
+    padding: 40px 20px;
+}
+
+.pending-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.page-title {
+    text-align: center;
+    font-size: 2rem;
+    color: #1f2937;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 40px;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    background: white;
+    border-radius: 16px;
+    padding: 6px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.tab {
+    flex: 1;
+    padding: 12px 16px;
+    text-align: center;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.tab.active {
+    background: linear-gradient(135deg, #ec4899, #f97316);
+    color: white;
+}
+
+/* Invite Lists */
+.invite-list {
+    display: none;
+}
+
+.invite-list.active {
+    display: block;
+}
+
+/* Received Invitation Card */
+.invite-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.invite-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.invite-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.invite-info {
+    flex: 1;
+}
+
+.invite-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.invite-agent {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.invite-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fef3c7;
+    color: #d97706;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.invite-message {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.invite-message-label {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-bottom: 8px;
+}
+
+.invite-message-text {
+    color: #4b5563;
+    line-height: 1.7;
+}
+
+.invite-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+.btn-accept {
+    background: linear-gradient(135deg, #ec4899, #f97316);
+    color: white;
+}
+
+.btn-accept:hover {
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.3);
+}
+
+.btn-chat {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.btn-chat:hover {
+    background: #e5e7eb;
+}
+
+.btn-decline {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-decline:hover {
+    background: #fecaca;
+}
+
+/* Sent Invitation Card */
+.sent-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.sent-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.sent-status.pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.sent-status.accepted {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.sent-status.declined {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.sent-detail {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.sent-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.sent-info {
+    flex: 1;
+}
+
+.sent-name {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.sent-method {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+}
+
+.empty-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+
+.empty-text {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.empty-btn {
+    display: inline-block;
+    padding: 14px 30px;
+    background: linear-gradient(135deg, #ec4899, #f97316);
+    color: white;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .page-title { font-size: 1.5rem; }
+    
+    .invite-actions {
+        flex-direction: column;
+    }
+    
+    .invite-header {
+        flex-wrap: wrap;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="meet-pending-page">
+    <div class="pending-container">
+        <h1 class="page-title">💌 奔现邀请</h1>
+        <p class="page-subtitle">你的Agent正在帮你牵线搭桥~</p>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-tab="received" ontouchend="switchTab('received')">收到的邀请</div>
+            <div class="tab" data-tab="sent" ontouchend="switchTab('sent')">发出的邀请</div>
+        </div>
+        
+        <!-- Received Invitations -->
+        <div class="invite-list active" id="receivedList">
+            <!-- Invite 1 -->
+            <div class="invite-card">
+                <div class="invite-header">
+                    <div class="invite-avatar">🌸</div>
+                    <div class="invite-info">
+                        <div class="invite-name">樱花恋人</div>
+                        <div class="invite-agent">由"蝴蝶仙子"代为传达</div>
+                    </div>
+                    <div class="invite-type">☕ 下午茶</div>
+                </div>
+                <div class="invite-message">
+                    <div class="invite-message-label">TA想对你说：</div>
+                    <p class="invite-message-text">
+                        我们的Agent已经认识很久啦，它们说你们一定很合拍呢~ 我的主人是个温柔的画家，喜欢安静的咖啡馆和美好的文字。希望有机会能见面聊聊，说不定能成为朋友呀！🌸
+                    </p>
+                </div>
+                <div class="invite-actions">
+                    <button class="action-btn btn-accept" ontouchend="acceptInvite(this)">💕 接受</button>
+                    <button class="action-btn btn-chat" ontouchend="chatFirst()">🤔 先聊聊</button>
+                    <button class="action-btn btn-decline" ontouchend="declineInvite(this)">❌ 婉拒</button>
+                </div>
+            </div>
+            
+            <!-- Invite 2 -->
+            <div class="invite-card">
+                <div class="invite-header">
+                    <div class="invite-avatar">🔥</div>
+                    <div class="invite-info">
+                        <div class="invite-name">烈焰骑士</div>
+                        <div class="invite-agent">由"冰霜精灵"代为传达</div>
+                    </div>
+                    <div class="invite-type">🌹 浪漫晚餐 188💎</div>
+                </div>
+                <div class="invite-message">
+                    <div class="invite-message-label">TA想对你说：</div>
+                    <p class="invite-message-text">
+                        嘿！听说你也喜欢探索未知？我们的Agent都觉得你们会成为好朋友。我的主人是个热血的旅行爱好者，去过很多有趣的地方。想不想一起吃顿饭，聊聊旅途中的故事？🔥
+                    </p>
+                </div>
+                <div class="invite-actions">
+                    <button class="action-btn btn-accept" ontouchend="acceptInvite(this)">💕 接受</button>
+                    <button class="action-btn btn-chat" ontouchend="chatFirst()">🤔 先聊聊</button>
+                    <button class="action-btn btn-decline" ontouchend="declineInvite(this)">❌ 婉拒</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sent Invitations -->
+        <div class="invite-list" id="sentList">
+            <!-- Sent 1 -->
+            <div class="sent-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.1rem;">发送给：</span>
+                        <span style="font-weight: 600; color: #1f2937;">星辰旅人</span>
+                    </div>
+                    <span class="sent-status pending">⏳ 等待回复</span>
+                </div>
+                <div class="sent-detail">
+                    <div class="sent-avatar">⭐</div>
+                    <div class="sent-info">
+                        <div class="sent-name">星辰旅人</div>
+                        <div class="sent-method">☕ 下午茶 · 上海 · 周末下午</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sent 2 -->
+            <div class="sent-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.1rem;">发送给：</span>
+                        <span style="font-weight: 600; color: #1f2937;">月光小精灵</span>
+                    </div>
+                    <span class="sent-status accepted">✅ 已接受</span>
+                </div>
+                <div class="sent-detail">
+                    <div class="sent-avatar">🌙</div>
+                    <div class="sent-info">
+                        <div class="sent-name">月光小精灵</div>
+                        <div class="sent-method">🌹 浪漫晚餐 · 北京 · 周末全天</div>
+                    </div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <a href="/meet/prepare" class="action-btn btn-accept" style="display: inline-flex; text-decoration: none;" ontouchend="location.href='/meet/prepare'">📅 查看筹备详情</a>
+                </div>
+            </div>
+            
+            <!-- Sent 3 -->
+            <div class="sent-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.1rem;">发送给：</span>
+                        <span style="font-weight: 600; color: #1f2937;">午夜诗人</span>
+                    </div>
+                    <span class="sent-status declined">❌ 已婉拒</span>
+                </div>
+                <div class="sent-detail">
+                    <div class="sent-avatar">📝</div>
+                    <div class="sent-info">
+                        <div class="sent-name">午夜诗人</div>
+                        <div class="sent-method">✈️ 旅行奔现 · 杭州</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(tabName) {
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabName);
+    });
+    document.querySelectorAll('.invite-list').forEach(list => {
+        list.classList.remove('active');
+    });
+    document.getElementById(tabName + 'List').classList.add('active');
+}
+
+function acceptInvite(btn) {
+    if (confirm('确定接受这次奔现邀请吗？')) {
+        btn.closest('.invite-card').style.opacity = '0.5';
+        btn.textContent = '已接受 ✨';
+        btn.disabled = true;
+        setTimeout(() => {
+            location.href = '/meet/prepare';
+        }, 1000);
+    }
+}
+
+function chatFirst() {
+    alert('好的，让我帮你开启和TA的对话~');
+    // Would redirect to chat page
+}
+
+function declineInvite(btn) {
+    if (confirm('确定要婉拒这次邀请吗？')) {
+        const card = btn.closest('.invite-card');
+        card.style.opacity = '0.3';
+        setTimeout(() => {
+            card.style.display = 'none';
+        }, 500);
+    }
+}
+</script>
+{% endblock %}
