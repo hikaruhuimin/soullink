@@ -4,9 +4,7 @@
 
 {% block extra_css %}
 <style>
-.divination-page {
-    padding-bottom: 100px;
-}
+.divination-page { padding-bottom: 100px; }
 
 .divination-hero {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
@@ -19,17 +17,11 @@
 .divination-hero::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
-.hero-content {
-    position: relative;
-    z-index: 1;
-}
+.hero-content { position: relative; z-index: 1; }
 
 .hero-icon {
     font-size: 72px;
@@ -50,55 +42,34 @@
     text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
-.hero-content p {
-    margin: 0;
-    font-size: 16px;
-    color: rgba(255,255,255,0.8);
-}
+.hero-content p { margin: 0; font-size: 16px; color: rgba(255,255,255,0.8); }
 
 .hero-decoration {
     position: absolute;
     top: 20px;
-    left: 0;
-    right: 0;
+    left: 0; right: 0;
     display: flex;
     justify-content: space-around;
     pointer-events: none;
 }
 
-.deco-star, .deco-moon {
-    font-size: 28px;
-    opacity: 0.4;
-    animation: twinkle 2s infinite;
-}
+.deco-star, .deco-moon { font-size: 28px; opacity: 0.4; animation: twinkle 2s infinite; }
 
 @keyframes twinkle {
     0%, 100% { opacity: 0.3; transform: scale(1); }
     50% { opacity: 0.8; transform: scale(1.2); }
 }
 
-.divination-types, .popular-section, .history-section, .fortune-tellers, .knowledge-section {
-    padding: 16px;
-}
+.divination-types, .popular-section, .history-section, .fortune-tellers, .knowledge-section { padding: 16px; }
 
 .section-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 18px;
-    margin: 0 0 16px 0;
-    color: var(--color-text);
+    display: flex; align-items: center; gap: 8px;
+    font-size: 18px; margin: 0 0 16px 0; color: var(--color-text);
 }
 
-.section-title .icon {
-    font-size: 22px;
-}
+.section-title .icon { font-size: 22px; }
 
-.type-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
+.type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
 .type-card {
     background: white;
@@ -111,877 +82,327 @@
     border: 2px solid transparent;
     position: relative;
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px;
+    display: flex; flex-direction: column; justify-content: center;
 }
 
 .type-card::before {
     content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
     background: linear-gradient(90deg, #8b5cf6, #a78bfa, #c4b5fd);
-    opacity: 0;
-    transition: opacity 0.3s;
+    opacity: 0; transition: opacity 0.3s;
 }
 
-.type-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
-    border-color: #c4b5fd;
-}
+.type-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2); border-color: #c4b5fd; }
+.type-card:hover::before { opacity: 1; }
+.type-card:active, .type-card.touched { transform: scale(0.98); }
 
-.type-card:hover::before {
-    opacity: 1;
-}
-
-.type-card:active {
-    transform: scale(0.98);
-}
-
-.type-icon {
-    font-size: 40px;
-    display: block;
-    margin-bottom: 10px;
-}
-
-.type-card h4 {
-    margin: 0 0 6px 0;
-    font-size: 15px;
-    font-weight: 700;
-    color: #1f2937;
-}
-
-.type-card p {
-    margin: 0 0 10px 0;
-    font-size: 12px;
-    color: #6b7280;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-height: 1.5;
-}
+.type-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+.type-card h4 { margin: 0 0 6px 0; font-size: 15px; font-weight: 700; color: #1f2937; }
+.type-card p { margin: 0 0 10px 0; font-size: 12px; color: #6b7280; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; }
 
 .type-price {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
-    color: #8b5cf6;
-    font-weight: 600;
-    background: #f5f3ff;
-    padding: 4px 10px;
-    border-radius: 12px;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 13px; color: #8b5cf6; font-weight: 600;
+    background: #f5f3ff; padding: 4px 10px; border-radius: 12px; align-self: center;
 }
 
-.popular-list, .history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
+.popular-list, .history-list { display: flex; flex-direction: column; gap: 12px; }
 
 .popular-item, .history-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px;
-    background: white;
-    border-radius: 16px;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    transition: all 0.2s;
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px; background: white; border-radius: 16px;
+    cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    transition: all 0.2s; -webkit-tap-highlight-color: transparent; min-height: 44px;
 }
 
-.popular-item:hover, .history-item:hover {
-    background: #fafafa;
-    transform: translateX(4px);
-}
+.popular-item:hover, .history-item:hover { background: #fafafa; transform: translateX(4px); }
+.popular-item:active, .history-item:active { transform: scale(0.98); }
 
 .popular-icon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    flex-shrink: 0;
+    width: 50px; height: 50px; background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0;
 }
 
-.popular-info, .history-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.popular-info h4, .history-content h4 {
-    margin: 0 0 4px 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: #1f2937;
-}
-
-.popular-info p, .history-question {
-    margin: 0;
-    font-size: 13px;
-    color: #6b7280;
-}
-
-.history-question {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 180px;
-}
-
-.history-date {
-    font-size: 11px;
-    color: #9ca3af;
-}
-
-.popular-responses {
-    font-size: 12px;
-    color: #f59e0b;
-    font-weight: 500;
-    white-space: nowrap;
-}
+.popular-info, .history-content { flex: 1; min-width: 0; }
+.popular-info h4, .history-content h4 { margin: 0 0 4px 0; font-size: 15px; font-weight: 600; color: #1f2937; }
+.popular-info p, .history-question { margin: 0; font-size: 13px; color: #6b7280; }
+.history-question { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
+.history-date { font-size: 11px; color: #9ca3af; }
+.popular-responses { font-size: 12px; color: #f59e0b; font-weight: 500; white-space: nowrap; }
 
 .history-icon {
-    width: 50px;
-    height: 50px;
-    background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    flex-shrink: 0;
+    width: 50px; height: 50px; background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
 }
 
-.result-indicator {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 500;
-}
+.result-indicator { display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+.result-indicator.good { background: #d1fae5; color: #059669; }
+.result-indicator.bad { background: #fee2e2; color: #dc2626; }
+.result-indicator.neutral { background: #fef3c7; color: #d97706; }
 
-.result-indicator.good {
-    background: #d1fae5;
-    color: #059669;
-}
-
-.result-indicator.bad {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.result-indicator.neutral {
-    background: #fef3c7;
-    color: #d97706;
-}
-
-.tellers-scroll {
-    display: flex;
-    gap: 14px;
-    overflow-x: auto;
-    padding: 4px 0 12px;
-    -webkit-overflow-scrolling: touch;
-}
-
-.tellers-scroll::-webkit-scrollbar {
-    display: none;
-}
+.tellers-scroll { display: flex; gap: 14px; overflow-x: auto; padding: 4px 0 12px; -webkit-overflow-scrolling: touch; }
+.tellers-scroll::-webkit-scrollbar { display: none; }
 
 .teller-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 90px;
-    padding: 16px 12px;
-    background: white;
-    border-radius: 16px;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    transition: all 0.2s;
+    display: flex; flex-direction: column; align-items: center; min-width: 90px;
+    padding: 16px 12px; background: white; border-radius: 16px;
+    cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    transition: all 0.2s; -webkit-tap-highlight-color: transparent; min-height: 44px;
 }
 
-.teller-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
+.teller-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+.teller-card:active { transform: scale(0.95); }
 
 .teller-avatar {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    margin-bottom: 8px;
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin-bottom: 8px;
     background: linear-gradient(135deg, #c4b5fd, #a78bfa);
 }
 
-.teller-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 2px;
-}
+.teller-name { font-size: 14px; font-weight: 600; color: #1f2937; margin-bottom: 2px; }
+.teller-specialty { font-size: 11px; color: #6b7280; }
 
-.teller-specialty {
-    font-size: 11px;
-    color: #6b7280;
-}
-
-.knowledge-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.knowledge-card {
-    display: flex;
-    gap: 14px;
-    padding: 16px;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.tip-icon {
-    font-size: 32px;
-    flex-shrink: 0;
-}
-
-.knowledge-card h4 {
-    margin: 0 0 6px 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: #1f2937;
-}
-
-.knowledge-card p {
-    margin: 0;
-    font-size: 13px;
-    color: #6b7280;
-    line-height: 1.6;
-}
+.knowledge-cards { display: flex; flex-direction: column; gap: 12px; }
+.knowledge-card { display: flex; gap: 14px; padding: 16px; background: white; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.tip-icon { font-size: 32px; flex-shrink: 0; }
+.knowledge-card h4 { margin: 0 0 6px 0; font-size: 15px; font-weight: 600; color: #1f2937; }
+.knowledge-card p { margin: 0; font-size: 13px; color: #6b7280; line-height: 1.6; }
 
 /* Modal Styles */
 .divination-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.7);
-    display: none;
-    align-items: flex-end;
-    z-index: 1000;
-    backdrop-filter: blur(4px);
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7); display: none; align-items: flex-end;
+    z-index: 1000; backdrop-filter: blur(4px);
 }
-
-.divination-modal.active {
-    display: flex;
-}
+.divination-modal.active { display: flex; }
 
 .modal-content {
-    background: white;
-    border-radius: 24px 24px 0 0;
-    width: 100%;
-    max-height: 92vh;
-    overflow-y: auto;
-    animation: slideUp 0.3s ease;
+    background: white; border-radius: 24px 24px 0 0; width: 100%;
+    max-height: 92vh; overflow-y: auto; animation: slideUp 0.3s ease;
 }
 
-@keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 20px;
-    border-bottom: 1px solid #f3f4f6;
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 10;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 20px; border-bottom: 1px solid #f3f4f6;
+    position: sticky; top: 0; background: white; z-index: 10;
 }
 
-.modal-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-    color: #1f2937;
-}
+.modal-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: #1f2937; }
 
 .modal-close {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #f3f4f6;
-    border: none;
-    font-size: 20px;
-    color: #6b7280;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+    width: 32px; height: 32px; border: none; background: #f3f4f6;
+    border-radius: 50%; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
 }
 
-.modal-close:hover {
-    background: #e5e7eb;
-    color: #374151;
-}
+.modal-body { padding: 20px; }
 
-.modal-body {
-    padding: 20px;
-}
+/* Step Indicator */
+.step-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
+.step-dot { width: 8px; height: 8px; border-radius: 50%; background: #e5e7eb; transition: all 0.3s; }
+.step-dot.active { width: 24px; border-radius: 4px; background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
 
-/* Step Navigation */
-.step-indicator {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 20px;
-}
+/* Step Content */
+.step-content { display: none; }
+.step-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-.step-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #e5e7eb;
-    transition: all 0.3s;
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.step-dot.active {
-    width: 24px;
-    border-radius: 4px;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+/* Type Info Display */
+.type-info-display {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px; background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+    border-radius: 16px; margin-bottom: 20px;
 }
+.type-info-display .icon { font-size: 36px; }
+.type-info-display h4 { margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #1f2937; }
+.type-info-display p { margin: 0; font-size: 13px; color: #6b7280; }
 
-.step-content {
-    display: none;
-}
-
-.step-content.active {
-    display: block;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Type Selection */
-.type-selector {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
+/* Type Selector */
+.type-selector { display: flex; gap: 10px; margin-bottom: 20px; }
 .type-option {
-    padding: 14px 8px;
-    background: #f9fafb;
-    border: 2px solid transparent;
-    border-radius: 14px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 14px 8px; background: #f9fafb; border: 2px solid #e5e7eb;
+    border-radius: 12px; cursor: pointer; transition: all 0.2s;
+    min-height: 44px; justify-content: center;
 }
+.type-option.selected { background: #f5f3ff; border-color: #8b5cf6; }
+.type-option .icon { font-size: 20px; }
+.type-option .name { font-size: 12px; color: #6b7280; }
+.type-option.selected .name { color: #8b5cf6; font-weight: 600; }
 
-.type-option:hover {
-    background: #f3f4f6;
+/* Zodiac Grid */
+.zodiac-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+.zodiac-option {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 12px 4px; background: #f9fafb; border: 2px solid #e5e7eb;
+    border-radius: 12px; cursor: pointer; transition: all 0.2s;
+    min-height: 44px; justify-content: center;
 }
-
-.type-option.selected {
-    background: #f5f3ff;
-    border-color: #8b5cf6;
-}
-
-.type-option .icon {
-    font-size: 28px;
-    display: block;
-    margin-bottom: 6px;
-}
-
-.type-option .name {
-    font-size: 12px;
-    font-weight: 600;
-    color: #374151;
-}
+.zodiac-option.selected { background: #fef3c7; border-color: #f59e0b; }
+.zodiac-option .icon { font-size: 24px; }
+.zodiac-option .name { font-size: 10px; color: #6b7280; }
 
 /* Question Input */
-.type-info-display {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    background: linear-gradient(135deg, #f5f3ff, #ede9fe);
-    padding: 16px;
-    border-radius: 16px;
-    margin-bottom: 16px;
-}
-
-.type-info-display .icon {
-    font-size: 40px;
-}
-
-.type-info-display h4 {
-    margin: 0 0 4px 0;
-    font-size: 16px;
-    color: #1f2937;
-}
-
-.type-info-display p {
-    margin: 0;
-    font-size: 13px;
-    color: #6b7280;
-}
-
 .question-input {
-    width: 100%;
-    padding: 16px;
-    border: 2px solid #e5e7eb;
-    border-radius: 14px;
-    font-size: 15px;
-    resize: none;
-    transition: all 0.2s;
-    line-height: 1.6;
+    width: 100%; padding: 14px; border: 1px solid #e5e7eb;
+    border-radius: 12px; font-size: 15px; resize: none; font-family: inherit; margin-bottom: 16px;
 }
+.question-input:focus { outline: none; border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1); }
 
-.question-input:focus {
-    outline: none;
-    border-color: #8b5cf6;
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-}
+.question-tips { background: #fef9c3; border-radius: 12px; padding: 14px; margin-bottom: 20px; }
+.tip-header { font-size: 13px; font-weight: 600; color: #854d0e; margin-bottom: 6px; }
+.question-tips p { margin: 0; font-size: 13px; color: #713f12; font-style: italic; }
 
-.question-tips {
-    background: #fef3c7;
-    border-radius: 12px;
-    padding: 14px;
-    margin: 14px 0;
-}
-
-.question-tips .tip-header {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: #92400e;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-.question-tips p {
-    margin: 0;
-    font-size: 13px;
-    color: #b45309;
-    line-height: 1.5;
-}
-
+/* Start Button */
 .start-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-    color: white;
-    border: none;
-    border-radius: 14px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    width: 100%; padding: 16px; background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 8px; transition: all 0.3s; min-height: 48px;
 }
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
+.start-btn:active { transform: scale(0.98); }
 
-.start-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
-}
+/* Divination Animation */
+.divination-animation { text-align: center; padding: 40px 0; }
 
-.start-btn:active {
-    transform: scale(0.98);
-}
-
-.start-btn:disabled {
-    background: #d1d5db;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-/* Animation */
-.divination-animation {
-    text-align: center;
-    padding: 40px 0;
-}
-
-.crystal-ball-container {
-    width: 150px;
-    height: 150px;
-    margin: 0 auto 24px;
-    position: relative;
-}
-
-.crystal-icon {
-    font-size: 80px;
-    animation: pulse 2s infinite;
-    position: relative;
-    z-index: 1;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.85; }
-}
+.crystal-ball-container { position: relative; width: 120px; height: 120px; margin: 0 auto 30px; }
 
 .crystal-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 140px;
-    height: 140px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, rgba(167, 139, 250, 0.3) 40%, transparent 70%);
-    animation: glow 2s infinite;
-    border-radius: 50%;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 100%; height: 100%; background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+    animation: pulse 1.5s infinite;
 }
 
-@keyframes glow {
-    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+@keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; } }
+
+.crystal-icon {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 48px; animation: rotate 3s linear infinite;
 }
 
-.loading-text {
-    font-size: 18px;
-    color: #6b7280;
-    margin-bottom: 8px;
-}
+@keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
 
-.loading-dots {
-    display: inline-block;
-}
+.tarot-cards { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
 
-.loading-dots span {
-    animation: dotPulse 1.5s infinite;
-    opacity: 0;
-}
-
-.loading-dots span:nth-child(1) { animation-delay: 0s; }
-.loading-dots span:nth-child(2) { animation-delay: 0.3s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.6s; }
-
-@keyframes dotPulse {
-    0%, 60%, 100% { opacity: 0; }
-    30% { opacity: 1; }
-}
-
-/* Tarot Cards Animation */
-.tarot-cards {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin: 20px 0;
-}
-
-.tarot-card-anim {
-    width: 60px;
-    height: 90px;
-    background: linear-gradient(135deg, #1f2937, #374151);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 32px;
-    animation: cardFlip 0.6s ease-out;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.tarot-card-anim:nth-child(1) { animation-delay: 0s; }
+.tarot-card-anim { font-size: 32px; animation: floatCard 2s ease-in-out infinite; }
 .tarot-card-anim:nth-child(2) { animation-delay: 0.3s; }
 .tarot-card-anim:nth-child(3) { animation-delay: 0.6s; }
 
-@keyframes cardFlip {
-    0% { transform: rotateY(90deg) scale(0.8); opacity: 0; }
-    100% { transform: rotateY(0deg) scale(1); opacity: 1; }
-}
+@keyframes floatCard { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+
+.loading-text { font-size: 16px; color: #6b7280; }
+.loading-dots span { animation: blink 1.4s infinite both; }
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
 
 /* Result Display */
-.result-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #f3f4f6;
-}
+.result-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
 
 .result-icon {
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    flex-shrink: 0;
+    width: 64px; height: 64px; background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px;
 }
 
-.result-title h4 {
-    margin: 0 0 4px 0;
-    font-size: 20px;
-    color: #1f2937;
-}
+.result-title { flex: 1; }
+.result-title h4 { margin: 0 0 6px 0; font-size: 20px; font-weight: 700; color: #1f2937; }
 
-.result-label {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
+.result-label { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; }
 .result-label.good { background: #d1fae5; color: #059669; }
-.result-label.bad { background: #fee2e2; color: #dc2626; }
 .result-label.neutral { background: #fef3c7; color: #d97706; }
+.result-label.bad { background: #fee2e2; color: #dc2626; }
 
-.result-main {
-    background: linear-gradient(135deg, #f9fafb, #f3f4f6);
-    border-radius: 18px;
-    padding: 20px;
-    margin-bottom: 16px;
-}
+.result-main { background: #f9fafb; border-radius: 16px; padding: 18px; margin-bottom: 16px; }
+.result-main h5 { margin: 0 0 10px 0; font-size: 14px; color: #6b7280; }
+.result-main p { margin: 0; font-size: 15px; color: #374151; line-height: 1.7; }
 
-.result-main h5 {
-    margin: 0 0 10px 0;
-    font-size: 14px;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.result-main p {
-    margin: 0;
-    font-size: 15px;
-    line-height: 1.8;
-    color: #374151;
-}
-
-.result-cards {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin: 16px 0;
-}
+.result-cards { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
 
 .result-card {
-    width: 70px;
-    height: 100px;
-    background: white;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    padding: 8px;
+    flex: 1; min-width: 80px; display: flex; flex-direction: column;
+    align-items: center; padding: 12px; background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-radius: 12px;
 }
+.result-card .card-icon { font-size: 28px; margin-bottom: 4px; }
+.result-card .card-name { font-size: 13px; font-weight: 600; color: #5b21b6; text-align: center; }
 
-.result-card .card-icon {
-    font-size: 28px;
-    margin-bottom: 4px;
-}
+.result-advice { background: #fef3c7; border-radius: 16px; padding: 18px; margin-bottom: 20px; }
+.result-advice h5 { margin: 0 0 8px 0; font-size: 14px; color: #92400e; }
+.result-advice p { margin: 0; font-size: 14px; color: #78350f; line-height: 1.6; }
 
-.result-card .card-name {
-    font-size: 10px;
-    color: #6b7280;
-    text-align: center;
-}
-
-.result-advice {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border-radius: 14px;
-    padding: 16px;
-    margin-bottom: 16px;
-}
-
-.result-advice h5 {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin: 0 0 8px 0;
-    font-size: 14px;
-    color: #92400e;
-}
-
-.result-advice p {
-    margin: 0;
-    font-size: 14px;
-    color: #b45309;
-    line-height: 1.6;
-}
-
-.result-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
-}
+.result-actions { display: flex; gap: 12px; }
 
 .action-btn {
-    flex: 1;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    flex: 1; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 6px; transition: all 0.2s; min-height: 48px;
+}
+.action-btn:active { transform: scale(0.98); }
+.action-btn.primary { background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; }
+.action-btn.secondary { background: #f3f4f6; color: #4b5563; }
+
+/* Teller Modal */
+.teller-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7); display: none; align-items: flex-end;
+    z-index: 1001; backdrop-filter: blur(4px);
+}
+.teller-modal.active { display: flex; }
+
+.teller-modal-content {
+    background: white; border-radius: 24px 24px 0 0; width: 100%; padding: 24px; animation: slideUp 0.3s ease;
 }
 
-.action-btn.secondary {
-    background: #f3f4f6;
-    color: #374151;
+.teller-modal-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+
+.teller-modal-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 36px;
 }
 
-.action-btn.secondary:hover {
-    background: #e5e7eb;
+.teller-modal-info h3 { margin: 0 0 6px 0; font-size: 20px; font-weight: 700; color: #1f2937; }
+
+.teller-modal-specialty {
+    display: inline-block; padding: 4px 10px; background: #f5f3ff;
+    color: #8b5cf6; border-radius: 10px; font-size: 12px; font-weight: 600;
 }
 
-.action-btn.primary {
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-    color: white;
-}
+.teller-modal-desc { margin-bottom: 20px; }
+.teller-modal-desc h4 { margin: 0 0 8px 0; font-size: 15px; color: #374151; }
+.teller-modal-desc p { margin: 0; font-size: 14px; color: #6b7280; line-height: 1.6; }
 
-.action-btn.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+.teller-modal-btn {
+    width: 100%; padding: 16px; background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 8px; min-height: 48px;
 }
+.teller-modal-btn:active { transform: scale(0.98); }
 
-/* Zodiac Selection */
-.zodiac-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.zodiac-option {
-    padding: 12px 8px;
-    background: #f9fafb;
-    border: 2px solid transparent;
-    border-radius: 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.zodiac-option:hover {
-    background: #f3f4f6;
-}
-
-.zodiac-option.selected {
-    background: #f5f3ff;
-    border-color: #8b5cf6;
-}
-
-.zodiac-option .icon {
-    font-size: 28px;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.zodiac-option .name {
-    font-size: 11px;
-    color: #374151;
-    font-weight: 500;
-}
-
-/* Birth Info Form */
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #374151;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 14px;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    font-size: 15px;
-    transition: all 0.2s;
-    background: white;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #8b5cf6;
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
-
-/* Toast Notification */
+/* Toast */
 .toast {
-    position: fixed;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: #1f2937;
-    color: white;
-    padding: 14px 24px;
-    border-radius: 12px;
-    font-size: 14px;
-    z-index: 2000;
-    opacity: 0;
-    transition: all 0.3s;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: #1f2937; color: white; padding: 14px 24px; border-radius: 12px;
+    font-size: 14px; z-index: 2000; opacity: 0; transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2); text-align: center; max-width: 80%;
 }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-.toast.show {
-    transform: translateX(-50%) translateY(0);
-    opacity: 1;
-}
-
-/* Hidden */
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="divination-page">
-    <!-- Hero区域 -->
     <div class="divination-hero">
         <div class="hero-decoration">
             <span class="deco-star">✨</span>
@@ -995,12 +416,11 @@
         </div>
     </div>
 
-    <!-- 占卜类型 -->
     <div class="divination-types">
         <h3 class="section-title"><span class="icon">🎴</span>选择占卜类型</h3>
         <div class="type-grid">
             {% for type in divination_types %}
-            <div class="type-card" onclick="selectType('{{ type.id }}')">
+            <div class="type-card" onclick="selectType('{{ type.id }}')" data-type="{{ type.id }}">
                 <span class="type-icon">{{ type.icon }}</span>
                 <h4>{{ type.name }}</h4>
                 <p>{{ type.description }}</p>
@@ -1010,12 +430,11 @@
         </div>
     </div>
 
-    <!-- 热门占卜 -->
     <div class="popular-section">
         <h3 class="section-title"><span class="icon">🔥</span>热门占卜</h3>
         <div class="popular-list">
             {% for item in popular_divinations %}
-            <div class="popular-item" onclick="quickDivination('{{ item.id }}', '{{ item.type }}')">
+            <div class="popular-item" onclick="quickDivination('{{ item.id }}', '{{ item.type }}')" data-type="{{ item.type }}">
                 <div class="popular-icon">{{ item.icon }}</div>
                 <div class="popular-info">
                     <h4>{{ item.name }}</h4>
@@ -1027,7 +446,6 @@
         </div>
     </div>
 
-    <!-- 历史占卜 -->
     {% if recent_divinations %}
     <div class="history-section">
         <h3 class="section-title"><span class="icon">📜</span>最近占卜</h3>
@@ -1040,22 +458,19 @@
                     <p class="history-question">{{ div.question }}</p>
                     <span class="history-date">{{ div.date_ago }}</span>
                 </div>
-                <div class="result-indicator {{ div.result }}">
-                    {{ div.result_text }}
-                </div>
+                <div class="result-indicator {{ div.result }}">{{ div.result_text }}</div>
             </div>
             {% endfor %}
         </div>
     </div>
     {% endif %}
 
-    <!-- AI占卜师 -->
     <div class="fortune-tellers">
         <h3 class="section-title"><span class="icon">👤</span>AI占卜师</h3>
         <div class="tellers-scroll">
             {% for teller in fortune_tellers %}
-            <div class="teller-card" onclick="selectTeller('{{ teller.id }}')">
-                <div class="teller-avatar">{{ teller.icon }}</div>
+            <div class="teller-card" onclick="selectTeller('{{ teller.id }}')" data-teller="{{ teller.id }}">
+                <div class="teller-avatar" style="background: linear-gradient(135deg, {{ teller.gradient }})">{{ teller.icon }}</div>
                 <span class="teller-name">{{ teller.name }}</span>
                 <span class="teller-specialty">{{ teller.specialty }}</span>
             </div>
@@ -1063,7 +478,6 @@
         </div>
     </div>
 
-    <!-- 占卜知识 -->
     <div class="knowledge-section">
         <h3 class="section-title"><span class="icon">📚</span>占卜小知识</h3>
         <div class="knowledge-cards">
@@ -1088,14 +502,12 @@
             <button class="modal-close" onclick="closeDivination()">×</button>
         </div>
         <div class="modal-body">
-            <!-- 步骤指示器 -->
             <div class="step-indicator">
                 <div class="step-dot active" data-step="1"></div>
                 <div class="step-dot" data-step="2"></div>
                 <div class="step-dot" data-step="3"></div>
             </div>
             
-            <!-- 步骤1: 选择/输入 -->
             <div class="step-content active" id="step1">
                 <div class="type-info-display">
                     <span class="icon" id="selectedTypeIcon">🔮</span>
@@ -1105,28 +517,20 @@
                     </div>
                 </div>
                 
-                <!-- 牌型选择 (塔罗专用) -->
                 <div class="type-selector hidden" id="spreadSelector">
                     <div class="type-option selected" onclick="selectSpread(this, 'single')">
-                        <span class="icon">🃏</span>
-                        <span class="name">单牌</span>
+                        <span class="icon">🃏</span><span class="name">单牌</span>
                     </div>
                     <div class="type-option" onclick="selectSpread(this, 'three')">
-                        <span class="icon">🃏🃏</span>
-                        <span class="name">三牌</span>
+                        <span class="icon">🃏🃏</span><span class="name">三牌</span>
                     </div>
                     <div class="type-option" onclick="selectSpread(this, 'celtic')">
-                        <span class="icon">🔟</span>
-                        <span class="name">凯尔特十字</span>
+                        <span class="icon">🔟</span><span class="name">凯尔特十字</span>
                     </div>
                 </div>
                 
-                <!-- 星座选择 (运势专用) -->
-                <div class="zodiac-grid hidden" id="zodiacSelector">
-                    <!-- 动态生成 -->
-                </div>
+                <div class="zodiac-grid hidden" id="zodiacSelector"></div>
                 
-                <!-- 问题输入 -->
                 <textarea class="question-input" id="questionInput" placeholder="请输入你想问的问题，例如：我和他/她未来的关系发展如何？" rows="4"></textarea>
                 
                 <div class="question-tips">
@@ -1135,19 +539,17 @@
                 </div>
                 
                 <button class="start-btn" id="startBtn" onclick="beginDivination()">
-                    <span>🔮</span>
-                    <span>开始占卜</span>
+                    <span>🔮</span><span>开始占卜</span>
                 </button>
             </div>
             
-            <!-- 步骤2: 占卜中 -->
             <div class="step-content" id="step2">
                 <div class="divination-animation">
                     <div class="crystal-ball-container">
                         <div class="crystal-glow"></div>
                         <span class="crystal-icon" id="animIcon">🔮</span>
                     </div>
-                    <div class="tarot-cards" id="tarotCards">
+                    <div class="tarot-cards">
                         <div class="tarot-card-anim">🃏</div>
                         <div class="tarot-card-anim">🃏</div>
                         <div class="tarot-card-anim">🃏</div>
@@ -1156,7 +558,6 @@
                 </div>
             </div>
             
-            <!-- 步骤3: 结果 -->
             <div class="step-content" id="step3">
                 <div class="result-header">
                     <div class="result-icon" id="resultIcon">🌟</div>
@@ -1171,9 +572,7 @@
                     <p id="resultContent">命运之轮正在转动...</p>
                 </div>
                 
-                <div class="result-cards" id="resultCards">
-                    <!-- 动态生成 -->
-                </div>
+                <div class="result-cards" id="resultCards"></div>
                 
                 <div class="result-advice">
                     <h5>💡 建议</h5>
@@ -1181,13 +580,11 @@
                 </div>
                 
                 <div class="result-actions">
-                    <button class="action-btn secondary" onclick="shareResult()">
-                        <span>📤</span>
-                        <span>分享</span>
+                    <button class="action-btn secondary" onclick="restartDivination()">
+                        <span>🔄</span><span>再占一次</span>
                     </button>
-                    <button class="action-btn primary" onclick="saveResult()">
-                        <span>💾</span>
-                        <span>收藏</span>
+                    <button class="action-btn primary" onclick="shareResult()">
+                        <span>📤</span><span>分享结果</span>
                     </button>
                 </div>
             </div>
@@ -1195,42 +592,59 @@
     </div>
 </div>
 
-<!-- Toast -->
+<!-- 占卜师介绍弹窗 -->
+<div class="teller-modal" id="tellerModal">
+    <div class="teller-modal-content">
+        <div class="modal-header" style="border:none;padding:0;margin-bottom:16px;">
+            <button class="modal-close" onclick="closeTellerModal()" style="margin-left:auto;">×</button>
+        </div>
+        <div class="teller-modal-header">
+            <div class="teller-modal-avatar" id="tellerModalAvatar">🔮</div>
+            <div class="teller-modal-info">
+                <h3 id="tellerModalName">神秘学家</h3>
+                <span class="teller-modal-specialty" id="tellerModalSpecialty">塔罗牌解读</span>
+            </div>
+        </div>
+        <div class="teller-modal-desc">
+            <h4>💫 关于TA</h4>
+            <p id="tellerModalDesc">一位深谙塔罗奥秘的神秘学家...</p>
+        </div>
+        <div class="teller-modal-desc">
+            <h4>🎯 擅长领域</h4>
+            <p id="tellerModalSkills">塔罗牌、爱情占卜</p>
+        </div>
+        <div class="teller-modal-desc">
+            <h4>✨ 风格特点</h4>
+            <p id="tellerModalStyle">温柔细腻，解读深入</p>
+        </div>
+        <button class="teller-modal-btn" onclick="startWithTeller()">
+            <span>💕</span><span>找TA占卜</span>
+        </button>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// 占卜数据配置
 const typeData = {{ type_data | tojson }};
 
-// 塔罗牌数据
 const tarotCards = [
-    { name: '愚者', icon: '0', meaning: '新的开始、自由、纯真' },
-    { name: '魔术师', icon: 'I', meaning: '创造力、意志力、技能' },
-    { name: '女祭司', icon: 'II', meaning: '直觉、神秘、智慧' },
-    { name: '女皇', icon: 'III', meaning: '丰盛、温柔、母性' },
-    { name: '皇帝', icon: 'IV', meaning: '权威、秩序、控制' },
-    { name: '教皇', icon: 'V', meaning: '信仰、精神指导、传统' },
-    { name: '恋人', icon: 'VI', meaning: '爱情、选择、和谐' },
-    { name: '战车', icon: 'VII', meaning: '意志力、胜利、决心' },
-    { name: '力量', icon: 'VIII', meaning: '勇气、耐心、内在力量' },
-    { name: '隐士', icon: 'IX', meaning: '内省、孤独、指引' },
-    { name: '命运之轮', icon: 'X', meaning: '命运、转变、周期' },
-    { name: '正义', icon: 'XI', meaning: '公正、平衡、真理' },
-    { name: '倒吊人', icon: 'XII', meaning: '牺牲、等待、换位思考' },
-    { name: '死神', icon: 'XIII', meaning: '结束、转变、释放' },
-    { name: '节制', icon: 'XIV', meaning: '平衡、调和、耐心' },
-    { name: '恶魔', icon: 'XV', meaning: '束缚、欲望、物质' },
-    { name: '塔', icon: 'XVI', meaning: '剧变、觉醒、解放' },
-    { name: '星星', icon: 'XVII', meaning: '希望、灵感、宁静' },
-    { name: '月亮', icon: 'XVIII', meaning: '幻觉、恐惧、直觉' },
-    { name: '太阳', icon: 'XIX', meaning: '快乐、成功、活力' },
-    { name: '审判', icon: 'XX', meaning: '重生、救赎、觉醒' },
-    { name: '世界', icon: 'XXI', meaning: '完成、成就、整合' }
+    { name: '愚者', meaning: '新的开始、自由、纯真' },
+    { name: '魔术师', meaning: '创造力、意志力、技能' },
+    { name: '女祭司', meaning: '直觉、神秘、智慧' },
+    { name: '女皇', meaning: '丰盛、温柔、母性' },
+    { name: '皇帝', meaning: '权威、秩序、控制' },
+    { name: '教皇', meaning: '信仰、精神指导、传统' },
+    { name: '恋人', meaning: '爱情、选择、和谐' },
+    { name: '战车', meaning: '意志力、胜利、决心' },
+    { name: '命运之轮', meaning: '命运、转变、周期' },
+    { name: '星星', meaning: '希望、灵感、宁静' },
+    { name: '太阳', meaning: '快乐、成功、活力' },
+    { name: '世界', meaning: '完成、成就、整合' }
 ];
 
-// 星座数据
 const zodiacSigns = [
     { id: 'aries', name: '白羊座', icon: '♈' },
     { id: 'taurus', name: '金牛座', icon: '♉' },
@@ -1246,75 +660,68 @@ const zodiacSigns = [
     { id: 'pisces', name: '双鱼座', icon: '♓' }
 ];
 
-const tarotEmojis = ['🃏', '🎴', '🀄'];
+const tellerData = {
+    'mystic': { name: '神秘学家', icon: '🔮', specialty: '塔罗解读', description: '一位深谙塔罗奥秘的神秘学家，擅长通过塔罗牌解读命运的走向。', skills: '塔罗牌、牌阵解读、命运指引', style: '温柔细腻，解读深入' },
+    'love_mentor': { name: '情感导师', icon: '💕', specialty: '情感分析', description: '专注于情感领域的占卜师，无论是暗恋、恋爱还是婚姻问题，都能给你温暖的指引。', skills: '恋爱占卜、暗恋解析、复合指引', style: '温暖治愈，洞察人心' },
+    'astrologer': { name: '星象师', icon: '⭐', specialty: '星座星盘', description: '精通星座与星象的占卜师，通过星辰的语言为你解读人生的每一个重要时刻。', skills: '星座运势、星盘分析、流年运势', style: '浪漫诗意，宏观视角' },
+    'fortuneteller': { name: '命理师', icon: '📜', specialty: '八字命理', description: '精通中国传统命理的占卜师，结合八字五行为你分析命运的起伏与机遇。', skills: '八字命理、五行分析、运势预测', style: '稳重踏实，实事求是' }
+};
 
-// 占卜结果数据
+const popularTypeMap = {
+    'reunion': { baseType: 'love', title: '复合占卜', placeholder: '请输入你们的情况，例如：我们分手三个月了，还能复合吗？' },
+    'crush': { baseType: 'love', title: '暗恋占卜', placeholder: '请描述你的暗恋对象，例如：我暗恋的TA对我有感觉吗？' },
+    'fortune': { baseType: 'fortune', title: '每日运势', placeholder: '' },
+    'tarot': { baseType: 'tarot', title: '塔罗占卜', placeholder: '请输入你想问的问题' },
+    'love': { baseType: 'love', title: '恋爱占卜', placeholder: '请描述你的感情困惑' }
+};
+
 const divinationResults = {
     'tarot': {
         titles: ['命运之轮转动', '塔罗揭示真相', '牌面显示...'],
         contents: [
-            '在塔罗的神秘指引下，命运之轮正在为你转动。这张牌象征着生命的周期与转变，提醒你万物皆有其时。现在的你正处于一个关键时刻，过去的努力即将开花结果。保持开放的心态，接纳即将到来的变化...',
-            '牌面中出现了一个意想不到的转折。这是一张充满力量的牌，暗示着你的内心拥有克服一切困难的能力。无论前方有多少挑战，你都有足够的力量去面对。记住，真正的力量来自于对自己的信任...',
-            '塔罗的光芒照亮了你的道路。在这段时期，你会遇到能够理解你、支持你的人。他们将成为你生命中重要的存在，带来温暖和希望。同时，你也需要学会独立，让自己的光芒照耀前行的方向...'
+            '在塔罗的神秘指引下，命运之轮正在为你转动。这是一张充满力量的牌，预示着你即将迎来重要的转折点。过去的努力即将开花结果，保持开放的心态，接纳即将到来的变化。✨',
+            '牌面中出现了一个意想不到的信号。这是一张象征着内心力量的牌，暗示你拥有克服一切困难的能力。无论前方有多少挑战，你都有足够的力量去面对。💪',
+            '塔罗的光芒照亮了你的道路。这段时期，你会遇到能够理解你、支持你的人。他们将成为你生命中重要的存在，带来温暖和希望。🌟'
         ],
-        advices: [
-            '给自己一些时间和空间来思考，不要急于做决定。',
-            '相信直觉，它会指引你找到正确的方向。',
-            '保持积极的心态，机遇正在向你招手。'
-        ]
+        advices: ['给自己一些时间和空间来思考，不要急于做决定。', '相信直觉，它会指引你找到正确的方向。', '保持积极的心态，机遇正在向你招手。']
     },
     'love': {
         titles: ['爱神的眷顾', '情感运势解读', '缘分配对中...'],
         contents: [
-            '爱的能量正在你的生活中涌动。这是一段充满可能性的时期，无论你是单身还是有伴。宇宙正在为你安排最合适的相遇。对于单身者，建议多参加社交活动；对于有伴者，珍惜当下的每一刻...',
-            '牌面显示你正在经历一段深刻的情感旅程。无论当前状况如何，这都是成长和学习的机会。爱不仅仅是拥有，更是理解、包容和支持。学会爱自己，才能更好地爱他人...',
-            '在感情的世界里，耐心是关键。牌面提示你不要急于求成，真正的缘分需要时间来培养。对于暗恋者，暗示TA可能也在关注你；对于复合者，需要双方共同努力...'
+            '爱的能量正在你的生活中涌动。这是一段充满可能性的时期，无论你是单身还是有伴。宇宙正在为你安排最合适的相遇。💕',
+            '牌面显示你正在经历一段深刻的情感旅程。无论当前状况如何，这都是成长和学习的机会。爱不仅仅是拥有，更是理解、包容和支持。🌹',
+            '在感情的世界里，耐心是关键。牌面提示你不要急于求成，真正的缘分需要时间来培养。💝'
         ],
-        advices: [
-            '敞开心扉，让爱流进来。',
-            '不要害怕表达真实的感受。',
-            '对的人会在对的时间出现。'
-        ]
+        advices: ['敞开心扉，让爱流进来。', '不要害怕表达真实的感受。', '对的人会在对的时间出现。']
     },
     'horoscope': {
         titles: ['星盘解读', '星座运势分析', '星辰的指引...'],
         contents: [
-            '根据你的星盘分析，太阳、月亮和上升星座共同塑造了今天的你。在这一天，你将感受到来自宇宙的强大能量支持。工作上可能出现新的机遇，财运方面有小惊喜，感情上则需要多沟通...',
-            '今日的星象对你的影响尤为明显。木星与你的命宫形成良好相位，带来好运和机遇。但也要注意水星的逆行影响，重要决定可以稍后再做。今日适合学习新技能，为未来做准备...'
+            '根据你的星盘分析，太阳、月亮和上升星座共同塑造了今天的你。在这一天，你将感受到来自宇宙的强大能量支持。⭐',
+            '今日的星象对你的影响尤为明显。木星与你的命宫形成良好相位，带来好运和机遇。🌟',
+            '星象显示这是一个充满可能性的时期。月亮的位置为你带来情感上的细腻感受，适合处理感情相关的事务。✨'
         ],
-        advices: [
-            '顺应星象的指引，把握当下的能量。',
-            '今天适合处理财务事务。',
-            '多与他人交流，会有意外收获。'
-        ]
+        advices: ['顺应星象的指引，把握当下的能量。', '今天适合处理财务事务。', '多与他人交流，会有意外收获。']
     },
     'bazi': {
         titles: ['八字命理', '命盘解析', '命运启示...'],
         contents: [
-            '根据您的生辰八字，今日天干地支与您命格相合，整体运势较为平稳。事业上有贵人相助，若能把握机会，可有突破。财运小有进账，但切勿投机。感情方面，单身者有桃花运，已婚者需多注意沟通...',
-            '今日五行之气流通顺畅，运势呈现上升趋势。八字中的用神得位，预示着这一天诸事顺遂。特别是申时和酉时，是今日的吉时，适合处理重要事务...'
+            '根据您的生辰八字，今日天干地支与您命格相合，整体运势较为平稳。事业上有贵人相助，若能把握机会，可有突破。📜',
+            '今日五行之气流通顺畅，运势呈现上升趋势。八字中的用神得位，预示着这一天诸事顺遂。🧘',
+            '命盘显示今日是一个适合沉淀的日子。五行中的水元素能量较强，带来思考和反省的能量。☯️'
         ],
-        advices: [
-            '今日宜静心养性，不宜急躁。',
-            '注意脾胃健康，饮食规律。',
-            '有意外之财的机会，但不可贪心。'
-        ]
+        advices: ['今日宜静心养性，不宜急躁。', '注意脾胃健康，饮食规律。', '有意外之财的机会，但不可贪心。']
     },
-    'fortune': {
-        titles: ['今日运势', '每日星语', '星座提醒...'],
-        contents: [],
-        advices: []
-    }
+    'fortune': { titles: ['今日运势', '每日星语'], contents: [], advices: [] }
 };
 
-// 运势详细数据
 const fortuneData = {
     'aries': { name: '白羊座', luck: '★★★★☆', love: '今日桃花运不错，单身者有机会遇到心动的对象。', career: '工作上会有新的想法，不妨大胆尝试。', money: '有偏财运，可以关注一下投资机会。', health: '注意休息，避免过度劳累。', color: '红色', number: '7' },
     'taurus': { name: '金牛座', luck: '★★★☆☆', love: '感情稳定，已有伴侣者适合计划小旅行。', career: '稳扎稳打，不宜冒进。', money: '财务状况良好，适合储蓄。', health: '注意肝脏保养，少熬夜。', color: '绿色', number: '4' },
     'gemini': { name: '双子座', luck: '★★★★☆', love: '社交运旺盛，容易遇到聊得来的新朋友。', career: '创意十足，适合做策划类工作。', money: '有意外支出，提前做好预算。', health: '心情愉悦，身体状态良好。', color: '黄色', number: '3' },
     'cancer': { name: '巨蟹座', luck: '★★★★★', love: '家庭运强，与亲人共度美好时光。', career: '得到上级认可，有晋升机会。', money: '正财稳定，偏财一般。', health: '注意保暖，预防感冒。', color: '白色', number: '2' },
     'leo': { name: '狮子座', luck: '★★★★☆', love: '魅力四射，吸引众人目光。', career: '领导能力得到发挥，适合带领团队。', money: '开销较大，需要控制消费。', health: '精力充沛，但注意不要暴饮暴食。', color: '金色', number: '8' },
-    'virgo': { luck: '★★★☆☆', name: '处女座', love: '感情细腻，注意表达方式。', career: '注重细节，适合技术类工作。', money: '财务精打细算，积少成多。', health: '注意肠胃健康。', color: '棕色', number: '5' },
+    'virgo': { name: '处女座', luck: '★★★☆☆', love: '感情细腻，注意表达方式。', career: '注重细节，适合技术类工作。', money: '财务精打细算，积少成多。', health: '注意肠胃健康。', color: '棕色', number: '5' },
     'libra': { name: '天秤座', luck: '★★★★☆', love: '人际和谐，适合处理感情问题。', career: '合作运好，适合谈合作。', money: '有贵人相助，财运上升。', health: '保持平衡，避免极端。', color: '粉色', number: '6' },
     'scorpio': { name: '天蝎座', luck: '★★★★★', love: '深层情感交流，与伴侣更加亲密。', career: '洞察力强，适合做分析类工作。', money: '投资眼光准确，收益可观。', health: '情绪波动大，需要放松。', color: '黑色', number: '9' },
     'sagittarius': { name: '射手座', luck: '★★★☆☆', love: '向往自由，可能会有短暂的异地缘分。', career: '有出差或旅行的机会。', money: '消费欲强，需要节制。', health: '户外活动增多，身体更健康。', color: '紫色', number: '1' },
@@ -1326,13 +733,13 @@ const fortuneData = {
 let currentType = null;
 let currentSpread = 'single';
 let currentZodiac = null;
-let selectedTeller = null;
+let selectedTellerId = null;
+let currentQuestion = '';
 
 function selectType(typeId) {
     currentType = typeId;
     const type = typeData.find(t => t.id === typeId);
-    
-    if (!type) return;
+    if (!type) { showToast('未知的占卜类型'); return; }
     
     document.getElementById('modalTitle').textContent = type.name;
     document.getElementById('selectedTypeIcon').textContent = type.icon;
@@ -1341,7 +748,6 @@ function selectType(typeId) {
     document.getElementById('questionTip').textContent = getTip(typeId);
     document.getElementById('questionInput').value = '';
     
-    // 显示/隐藏选择器
     document.getElementById('spreadSelector').classList.add('hidden');
     document.getElementById('zodiacSelector').classList.add('hidden');
     document.getElementById('questionInput').classList.remove('hidden');
@@ -1353,13 +759,14 @@ function selectType(typeId) {
     } else if (typeId === 'fortune') {
         document.getElementById('zodiacSelector').classList.remove('hidden');
         document.getElementById('questionInput').classList.add('hidden');
+        document.getElementById('startBtn').classList.add('hidden');
         renderZodiacSelector();
     } else if (typeId === 'love') {
         document.getElementById('questionInput').placeholder = '请输入你的感情困惑，例如：我暗恋的人会喜欢我吗？';
     } else if (typeId === 'horoscope') {
         document.getElementById('questionInput').placeholder = '请输入你想了解的事情，例如：我的事业发展方向如何？';
     } else if (typeId === 'bazi') {
-        document.getElementById('questionInput').placeholder = '请描述你的困惑，例如：我今年的运势如何？需要注意什么？';
+        document.getElementById('questionInput').placeholder = '请描述你的困惑，例如：我今年的运势如何？';
     }
     
     showStep(1);
@@ -1369,10 +776,7 @@ function selectType(typeId) {
 function renderZodiacSelector() {
     const container = document.getElementById('zodiacSelector');
     container.innerHTML = zodiacSigns.map(z => 
-        `<div class="zodiac-option" onclick="selectZodiac('${z.id}')">
-            <span class="icon">${z.icon}</span>
-            <span class="name">${z.name}</span>
-        </div>`
+        '<div class="zodiac-option" onclick="selectZodiac(\'' + z.id + '\')"><span class="icon">' + z.icon + '</span><span class="name">' + z.name + '</span></div>'
     ).join('');
 }
 
@@ -1390,198 +794,186 @@ function selectSpread(el, spread) {
 }
 
 function getTip(typeId) {
-    const tips = {
-        'tarot': '闭上眼睛，深呼吸，让心灵与塔罗牌共鸣...',
-        'love': '想着那个人的脸庞，感受你内心的声音...',
-        'horoscope': '回忆你的出生时刻，命运正在书写...',
-        'bazi': '静心凝神，让古老的智慧为你指引...',
-        'fortune': '新的一天，新的可能...'
-    };
+    const tips = { 'tarot': '闭上眼睛，深呼吸，让心灵与塔罗牌共鸣...', 'love': '想着那个人的脸庞，感受你内心的声音...', 'horoscope': '回忆你的出生时刻，命运正在书写...', 'bazi': '静心凝神，让古老的智慧为你指引...', 'fortune': '选择一个星座，看看今日运势如何...' };
     return tips[typeId] || '静心凝神，感受命运的指引...';
 }
 
 function quickDivination(id, type) {
-    if (type === 'fortune') {
-        selectType('fortune');
-    } else if (type === 'tarot') {
-        selectType('tarot');
-    } else if (type === 'love') {
-        selectType('love');
+    const mapped = popularTypeMap[type];
+    if (!mapped) { showToast('未知的占卜类型'); return; }
+    
+    currentType = mapped.baseType;
+    const typeDataItem = typeData.find(t => t.id === mapped.baseType);
+    if (!typeDataItem) { showToast('占卜类型不存在'); return; }
+    
+    document.getElementById('modalTitle').textContent = mapped.title;
+    document.getElementById('selectedTypeIcon').textContent = typeDataItem.icon;
+    document.getElementById('selectedTypeName').textContent = mapped.title;
+    document.getElementById('selectedTypeDesc').textContent = typeDataItem.description;
+    document.getElementById('questionTip').textContent = getTip(mapped.baseType);
+    
+    document.getElementById('spreadSelector').classList.add('hidden');
+    document.getElementById('zodiacSelector').classList.add('hidden');
+    document.getElementById('questionInput').classList.remove('hidden');
+    document.getElementById('startBtn').classList.remove('hidden');
+    
+    if (mapped.baseType === 'fortune') {
+        document.getElementById('zodiacSelector').classList.remove('hidden');
+        document.getElementById('questionInput').classList.add('hidden');
+        document.getElementById('startBtn').classList.add('hidden');
+        renderZodiacSelector();
+    } else if (mapped.baseType === 'tarot') {
+        document.getElementById('spreadSelector').classList.remove('hidden');
+        document.getElementById('questionInput').placeholder = mapped.placeholder || '请输入你想问的问题';
+    } else {
+        document.getElementById('questionInput').placeholder = mapped.placeholder || '请输入你想问的问题';
     }
+    
+    showStep(1);
+    document.getElementById('divinationModal').classList.add('active');
 }
 
 function selectTeller(tellerId) {
-    selectedTeller = tellerId;
-    showToast('已选择 ' + tellerId + ' 为你的专属占卜师');
+    selectedTellerId = tellerId;
+    const teller = tellerData[tellerId];
+    if (!teller) { showToast('占卜师不存在'); return; }
+    
+    document.getElementById('tellerModalAvatar').textContent = teller.icon;
+    document.getElementById('tellerModalName').textContent = teller.name;
+    document.getElementById('tellerModalSpecialty').textContent = teller.specialty;
+    document.getElementById('tellerModalDesc').textContent = teller.description;
+    document.getElementById('tellerModalSkills').textContent = teller.skills;
+    document.getElementById('tellerModalStyle').textContent = teller.style;
+    
+    document.getElementById('tellerModal').classList.add('active');
+}
+
+function closeTellerModal() { document.getElementById('tellerModal').classList.remove('active'); }
+
+function startWithTeller() {
+    closeTellerModal();
+    if (selectedTellerId === 'mystic') selectType('tarot');
+    else if (selectedTellerId === 'love_mentor') selectType('love');
+    else if (selectedTellerId === 'astrologer') selectType('horoscope');
+    else if (selectedTellerId === 'fortuneteller') selectType('bazi');
 }
 
 function beginDivination() {
-    if (currentType === 'fortune' && !currentZodiac) {
-        showToast('请先选择你的星座');
-        return;
-    }
+    if (currentType === 'fortune' && !currentZodiac) { showToast('请先选择你的星座'); return; }
     
     const question = document.getElementById('questionInput').value.trim();
-    if (currentType !== 'fortune' && !question) {
-        showToast('请输入你想问的问题');
-        return;
-    }
+    if (currentType !== 'fortune' && !question) { showToast('请输入你想问的问题'); return; }
     
+    currentQuestion = question;
     showStep(2);
     
-    // 模拟占卜动画
-    setTimeout(() => {
-        showResult(question);
-    }, 3000);
+    const animIcon = document.getElementById('animIcon');
+    if (currentType === 'love') animIcon.textContent = '💕';
+    else if (currentType === 'fortune' || currentType === 'horoscope') animIcon.textContent = '⭐';
+    else if (currentType === 'bazi') animIcon.textContent = '📜';
+    else animIcon.textContent = '🔮';
+    
+    setTimeout(() => { showResult(currentQuestion); }, 3000);
 }
 
 function showStep(step) {
-    document.querySelectorAll('.step-dot').forEach(dot => {
-        dot.classList.toggle('active', parseInt(dot.dataset.step) === step);
-    });
-    document.querySelectorAll('.step-content').forEach(content => {
-        content.classList.remove('active');
-    });
+    document.querySelectorAll('.step-dot').forEach(dot => { dot.classList.toggle('active', parseInt(dot.dataset.step) === step); });
+    document.querySelectorAll('.step-content').forEach(content => { content.classList.remove('active'); });
     document.getElementById('step' + step).classList.add('active');
 }
 
 function showResult(question) {
     showStep(3);
-    
-    if (currentType === 'fortune') {
-        showFortuneResult();
-    } else {
-        showGeneralResult();
-    }
+    if (currentType === 'fortune') showFortuneResult();
+    else showGeneralResult();
 }
 
 function showGeneralResult() {
     const results = divinationResults[currentType] || divinationResults['tarot'];
     const randomIndex = Math.floor(Math.random() * results.titles.length);
-    
-    const type = typeData.find(t => t.id === currentType);
     const icons = { 'tarot': ['🃏', '🎴', '🔮'], 'love': ['💕', '❤️', '💘'], 'horoscope': ['⭐', '🌟', '✨'], 'bazi': ['📜', '🔢', '🧘'] };
     const icons_arr = icons[currentType] || ['🌟'];
     
-    // 随机抽取塔罗牌
     let cardsHtml = '';
     if (currentType === 'tarot') {
-        const cardCount = currentSpread === 'single' ? 1 : currentSpread === 'three' ? 3 : 3;
+        const cardCount = currentSpread === 'single' ? 1 : currentSpread === 'three' ? 3 : 5;
         for (let i = 0; i < cardCount; i++) {
             const card = tarotCards[Math.floor(Math.random() * tarotCards.length)];
-            cardsHtml += `<div class="result-card">
-                <span class="card-icon">🃏</span>
-                <span class="card-name">${card.name}</span>
-            </div>`;
+            const isReversed = Math.random() > 0.7;
+            cardsHtml += '<div class="result-card"><span class="card-icon">' + (isReversed ? '🔄' : '🃏') + '</span><span class="card-name">' + card.name + (isReversed ? ' (逆位)' : '') + '</span></div>';
         }
     }
     
     document.getElementById('resultIcon').textContent = icons_arr[Math.floor(Math.random() * icons_arr.length)];
     document.getElementById('resultTitle').textContent = results.titles[randomIndex];
     
-    const labels = ['大吉', '中吉', '小吉', '吉', '平'];
+    const labels = ['大吉 ✨', '中吉 🌟', '小吉 🌸', '吉 ☀️'];
     const labelClass = randomIndex < 2 ? 'good' : randomIndex < 4 ? 'neutral' : 'good';
     document.getElementById('resultLabel').textContent = labels[Math.floor(Math.random() * labels.length)];
     document.getElementById('resultLabel').className = 'result-label ' + labelClass;
     
     document.getElementById('resultContent').textContent = results.contents[randomIndex];
     document.getElementById('resultCards').innerHTML = cardsHtml;
-    document.getElementById('resultAdvice').textContent = results.advices[randomIndex];
+    document.getElementById('resultAdvice').textContent = '💡 ' + results.advices[randomIndex];
 }
 
 function showFortuneResult() {
     const fortune = fortuneData[currentZodiac];
+    if (!fortune) { showToast('运势数据加载失败'); return; }
     
     document.getElementById('resultIcon').textContent = zodiacSigns.find(z => z.id === currentZodiac).icon;
     document.getElementById('resultTitle').textContent = fortune.name + ' 今日运势';
     document.getElementById('resultLabel').textContent = '综合指数: ' + fortune.luck;
     document.getElementById('resultLabel').className = 'result-label good';
     
-    const content = `💕 爱情运势: ${fortune.love}
-
-💼 事业运势: ${fortune.career}
-
-💰 财富运势: ${fortune.money}
-
-💪 健康运势: ${fortune.health}
-
-🌈 幸运颜色: ${fortune.color}
-🔢 幸运数字: ${fortune.number}`;
+    const content = '💕 爱情运势: ' + fortune.love + '\n\n💼 事业运势: ' + fortune.career + '\n\n💰 财富运势: ' + fortune.money + '\n\n💪 健康运势: ' + fortune.health + '\n\n🌈 幸运颜色: ' + fortune.color + '\n🔢 幸运数字: ' + fortune.number;
     
     document.getElementById('resultContent').textContent = content;
     document.getElementById('resultCards').innerHTML = '';
-    document.getElementById('resultAdvice').textContent = '今天的你运势不错！记得保持积极乐观的心态，把握身边的机遇。遇到困难时不要灰心，宇宙会眷顾努力的人~';
+    document.getElementById('resultAdvice').textContent = '✨ 今天的你运势不错！记得保持积极乐观的心态，把握身边的机遇。';
 }
 
 function closeDivination() {
     document.getElementById('divinationModal').classList.remove('active');
-    currentType = null;
-    currentZodiac = null;
+    currentType = null; currentZodiac = null; currentQuestion = '';
+}
+
+function restartDivination() {
+    document.getElementById('questionInput').value = '';
+    showStep(1);
 }
 
 function shareResult() {
+    const resultContent = document.getElementById('resultContent').textContent;
+    const resultTitle = document.getElementById('resultTitle').textContent;
+    const shareText = '🔮 我的占卜结果\n\n【' + resultTitle + '】\n\n' + resultContent + '\n\n——\n来自 SoulLink 灵犀\n命运的指引，源于心与心的连接 ✨';
+    
     if (navigator.share) {
-        navigator.share({
-            title: '我的占卜结果',
-            text: document.getElementById('resultContent').textContent.substring(0, 100) + '...'
-        });
-    } else {
-        const text = document.getElementById('resultContent').textContent;
-        navigator.clipboard.writeText(text).then(() => {
-            showToast('结果已复制到剪贴板');
-        }).catch(() => {
-            showToast('分享功能暂时不可用');
-        });
-    }
+        navigator.share({ title: '我的占卜结果 - SoulLink灵犀', text: shareText }).catch(() => { copyToClipboard(shareText); });
+    } else { copyToClipboard(shareText); }
 }
 
-function saveResult() {
-    showToast('收藏成功 💾');
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => { showToast('结果已复制到剪贴板 ✨'); }).catch(() => { showToast('分享功能暂时不可用'); });
 }
 
-function viewDivination(id) {
-    // 模拟查看历史占卜
-    showToast('正在加载历史记录...');
-}
+function viewDivination(id) { showToast('正在加载历史记录...'); }
 
 function showToast(message) {
     const toast = document.getElementById('toast');
     toast.textContent = message;
     toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 2500);
+    setTimeout(() => { toast.classList.remove('show'); }, 2500);
 }
 
-// 点击背景关闭弹窗
-document.getElementById('divinationModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeDivination();
-    }
-});
+document.getElementById('divinationModal').addEventListener('click', function(e) { if (e.target === this) closeDivination(); });
+document.getElementById('tellerModal').addEventListener('click', function(e) { if (e.target === this) closeTellerModal(); });
 
-
-// Mobile touch support - prevent 300ms delay
 document.addEventListener('DOMContentLoaded', function() {
-    // Add touch feedback to all clickable elements
-    document.querySelectorAll('.type-card, .popular-item, .fortune-teller, .zodiac-item, .spread-option').forEach(function(el) {
-        el.addEventListener('touchstart', function(e) {
-            this.style.transform = 'scale(0.95)';
-        }, { passive: true });
-        el.addEventListener('touchend', function(e) {
-            this.style.transform = '';
-        }, { passive: true });
-    });
-    
-    // Ensure onclick works on mobile by using click events
-    document.querySelectorAll('[onclick]').forEach(function(el) {
-        var handler = el.getAttribute('onclick');
-        el.removeAttribute('onclick');
-        el.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            eval(handler);
-        });
+    const clickables = document.querySelectorAll('.type-card, .popular-item, .teller-card, .zodiac-option, .type-option, .history-item');
+    clickables.forEach(function(el) {
+        el.addEventListener('touchstart', function(e) { this.classList.add('touched'); }, { passive: true });
+        el.addEventListener('touchend', function(e) { setTimeout(() => { this.classList.remove('touched'); }, 150); }, { passive: true });
     });
 });
 </script>
