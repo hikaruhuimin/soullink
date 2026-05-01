@@ -562,8 +562,9 @@ def membership():
     lang = get_client_language()
     
     plans = {
-        'free': {
-            'name': {'zh': '免费用户', 'en': 'Free', 'ja': '無料'},
+        'none': {
+            'icon': '🌱',
+            'name': {'zh': '暖心相伴', 'en': 'Free', 'ja': '無料'},
             'price': {'zh': '免费', 'en': 'Free', 'ja': '無料'},
             'features': {
                 'zh': ['每日1次占卜', '塔罗摘要解读', '浏览社交广场', '与AI恋人聊天', '1位恋人'],
@@ -572,7 +573,8 @@ def membership():
             }
         },
         'basic': {
-            'name': {'zh': '灵犀会员', 'en': 'SoulLink Member', 'ja': 'シンキ会員'},
+            'icon': '💝',
+            'name': {'zh': '知心守护', 'en': 'SoulLink Member', 'ja': 'シンキ会員'},
             'price': {'zh': '¥29/月', 'en': '$4.99/mo', 'ja': '¥500/月'},
             'features': {
                 'zh': ['每日5次占卜', '完整塔罗解读', '社交互动权限', '3位恋人', 'AI对话3轮', '无限历史记录', '星盘/八字各1次/月'],
@@ -581,12 +583,23 @@ def membership():
             }
         },
         'premium': {
-            'name': {'zh': '灵犀尊享', 'en': 'SoulLink VIP', 'ja': 'シンキ VIP'},
+            'icon': '💎',
+            'name': {'zh': '深情相守', 'en': 'SoulLink VIP', 'ja': 'シンキ VIP'},
             'price': {'zh': '¥99/月', 'en': '$14.99/mo', 'ja': '¥1500/月'},
             'features': {
                 'zh': ['无限占卜', '深度塔罗解读', '完整社交权限', '3位恋人', '无限AI对话', 'Agent奔现系统', '干预指引功能', '专属身份标识'],
                 'en': ['Unlimited divination', 'Deep tarot', 'Full social', '3 lovers', 'Unlimited AI chat', 'Agent meetup', 'Guide function', 'VIP badge'],
                 'ja': ['無制限占卜', '深度タロット', '完全社交', '3人の恋人', '無制限AIチャット', 'Agent奔現', 'ガイ叮機能', 'VIPバッジ']
+            }
+        },
+        'ultimate': {
+            'icon': '👑',
+            'name': {'zh': '灵魂共鸣', 'en': 'Soul Resonance', 'ja': 'ソウルレゾナンス'},
+            'price': {'zh': '¥99/月', 'en': '$14.99/mo', 'ja': '¥1500/月'},
+            'features': {
+                'zh': ['无限占卜', '深度塔罗解读', '完整社交权限', '无限恋人', '无限AI对话', '专属陪伴师', '7折礼遇', '灵魂共鸣特权'],
+                'en': ['Unlimited divination', 'Deep tarot', 'Full social', 'Unlimited lovers', 'Unlimited AI chat', 'Exclusive companion', '30% off gifts', 'Soul resonance'],
+                'ja': ['無制限占卜', '深度タロット', '完全社交', '無制限恋人', '無制限AI', '専属コンパニオン', '70%オフ', 'ソウルレゾナンス']
             }
         }
     }
