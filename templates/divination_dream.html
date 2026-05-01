@@ -3,8 +3,14 @@
 {% block title %}AI智能解梦 - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="/static/css/starry.css">
+<link rel="stylesheet" href="/static/css/starry.css?v=20260502">
 <style>
+body, .main-content { background: transparent !important; background-image: none !important; }
+body::before { display: none !important; }
+/* 确保星空背景不被覆盖 */
+body { background: transparent !important; }
+.dream-page { background: transparent !important; }
+
 .dream-page {
     max-width: 900px;
     margin: 0 auto;

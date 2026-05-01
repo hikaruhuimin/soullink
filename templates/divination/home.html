@@ -3,9 +3,33 @@
 {% block title %}{{ _('divination') }} - 灵犀{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="/static/css/starry.css">
+<link rel="stylesheet" href="/static/css/starry.css?v=20260502">
 <style>
+/* 确保星空背景不被覆盖 */
+body {
+    background: transparent !important;
+}
+
 .divination-page { padding-bottom: 100px; }
+
+/* 强制星空背景 - 覆盖base.html白色背景 */
+body, .main-content {
+    background: transparent !important;
+    background-image: none !important;
+}
+
+body::before {
+    display: none !important;
+}
+
+.starry-bg {
+    background: radial-gradient(ellipse at top, #0a0e27 0%, #0d1137 40%, #020515 100%) !important;
+    min-height: 100vh;
+}
+
+.starry-bg::before {
+    display: none !important;
+}
 
 .divination-hero {
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.3) 0%, rgba(22, 33, 62, 0.3) 50%, rgba(15, 52, 96, 0.3) 100%);
@@ -182,6 +206,69 @@
 .tip-icon { font-size: 32px; flex-shrink: 0; }
 .knowledge-card h4 { margin: 0 0 6px 0; font-size: 15px; font-weight: 600; color: #E8D5C4; }
 .knowledge-card p { margin: 0; font-size: 13px; color: #C4D4E8; line-height: 1.6; }
+
+/* 占卜历史文化版块 */
+.culture-section { padding: 16px; }
+
+.culture-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.culture-card {
+    background: rgba(15, 20, 50, 0.75);
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid rgba(100, 120, 180, 0.2);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.culture-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.culture-icon { font-size: 28px; margin-bottom: 8px; }
+.culture-card h4 { margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #E8D5C4; }
+.culture-card p { margin: 0; font-size: 11px; color: #C4D4E8; line-height: 1.5; }
+
+.culture-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(2, 5, 21, 0.9); display: none; align-items: center;
+    z-index: 1002; backdrop-filter: blur(10px);
+}
+.culture-modal.active { display: flex; }
+
+.culture-modal-content {
+    background: rgba(15, 20, 50, 0.98); border-radius: 20px; width: 90%; max-width: 500px;
+    max-height: 85vh; overflow-y: auto; margin: 0 auto; padding: 24px;
+    border: 1px solid rgba(100, 120, 180, 0.3);
+}
+.culture-modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.culture-modal-icon { font-size: 36px; }
+.culture-modal-title { font-size: 18px; font-weight: 600; color: #E8D5C4; }
+.culture-modal-body { color: #C4D4E8; font-size: 14px; line-height: 1.8; }
+.culture-modal-body p { margin-bottom: 12px; }
+.culture-modal-body strong { color: #C4B5FD; }
+.culture-close {
+    width: 32px; height: 32px; border: none; background: rgba(60, 70, 100, 0.5);
+    border-radius: 50%; font-size: 18px; cursor: pointer; margin-left: auto;
+    display: flex; align-items: center; justify-content: center; color: #C4D4E8;
+}
+
+@media (min-width: 768px) {
+    .culture-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+    .culture-card {
+        padding: 20px;
+    }
+}
 
 /* Modal Styles */
 .divination-modal {
@@ -600,6 +687,53 @@
     </div>
     {% endif %}
 
+    <!-- 占卜历史文化版块 -->
+    <div class="culture-section">
+        <h3 class="section-title"><span class="icon">📜</span>占卜的历史与文化</h3>
+        <div class="culture-grid">
+            <div class="culture-card" onclick="showCultureModal(0)">
+                <div class="culture-icon">🏛️</div>
+                <h4>古埃及占卜</h4>
+                <p>公元前3000年，祭司通过天象梦境预测未来</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(1)">
+                <div class="culture-icon">⚡</div>
+                <h4>古希腊神谕</h4>
+                <p>德尔斐神谕，古希腊最重要的占卜中心</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(2)">
+                <div class="culture-icon">☯️</div>
+                <h4>中国易经</h4>
+                <p>群经之首，5000年智慧结晶</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(3)">
+                <div class="culture-icon">🃏</div>
+                <h4>塔罗牌起源</h4>
+                <p>15世纪意大利，18世纪被赋予神秘意义</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(4)">
+                <div class="culture-icon">⭐</div>
+                <h4>星相学传统</h4>
+                <p>巴比伦人最早系统记录星象</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(5)">
+                <div class="culture-icon">🌸</div>
+                <h4>日本阴阳道</h4>
+                <p>平安时代传入，安倍晴明最著名</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(6)">
+                <div class="culture-icon">🌿</div>
+                <h4>凯尔特符文</h4>
+                <p>北欧维京时代的古老占卜系统</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(7)">
+                <div class="culture-icon">🕉️</div>
+                <h4>印度占星术</h4>
+                <p>吠陀占星术超过5000年历史</p>
+            </div>
+        </div>
+    </div>
+
     <div class="fortune-tellers">
         <h3 class="section-title"><span class="icon">👤</span>AI占卜师</h3>
         <div class="tellers-scroll">
@@ -759,10 +893,22 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- 占卜文化详情弹窗 -->
+<div class="culture-modal" id="cultureModal">
+    <div class="culture-modal-content">
+        <div class="culture-modal-header">
+            <span class="culture-modal-icon" id="cultureModalIcon">🏛️</span>
+            <span class="culture-modal-title" id="cultureModalTitle">古埃及占卜</span>
+            <button class="culture-close" onclick="closeCultureModal()">×</button>
+        </div>
+        <div class="culture-modal-body" id="cultureModalBody"></div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="/static/js/starry.js"></script>
+<script src="/static/js/starry.js?v=20260502"></script>
 <script>
 const typeData = {{ type_data | tojson }};
 
@@ -1108,6 +1254,126 @@ function showToast(message) {
     toast.classList.add('show');
     setTimeout(() => { toast.classList.remove('show'); }, 2500);
 }
+
+// 占卜历史文化数据
+const cultureData = [
+    {
+        icon: '🏛️',
+        title: '古埃及占卜',
+        content: `<p>古埃及占卜术是人类历史上最古老的预言形式之一，起源于<strong>公元前3000年</strong>的法老时代。</p>
+<p><strong>核心特点：</strong></p>
+<p>• <strong>天象观测</strong>：祭司们通过观察太阳、月亮、星辰的位置和运动来预测未来</p>
+<p>• <strong>梦之仪式</strong>：求卜者在伊西斯神殿中入睡，期望神明在梦中给予指引</p>
+<p>• <strong>动物内脏占卜</strong>（Hepatoscopy）：观察动物肝脏的形状和纹理来判断凶吉</p>
+<p>• <strong>纸莎草占卜</strong>：使用特殊的草纸和神秘符号进行占卜</p>
+<p><strong>历史地位：</strong></p>
+<p>伊西斯神殿被誉为最著名的占卜圣地，吸引来自地中海各地的求卜者。这种神秘的传统深刻影响了后来的希腊罗马占卜术。</p>`
+    },
+    {
+        icon: '⚡',
+        title: '古希腊神谕',
+        content: `<p>古希腊神谕是西方文明中最重要的占卜传统，<strong>德尔斐神谕</strong>被认为是古希腊最重要的占卜中心。</p>
+<p><strong>德尔斐神谕的运作：</strong></p>
+<p>• <strong>皮提亚</strong>（Pythia）是德尔斐神庙的女祭司，她被认为能传递阿波罗神的神谕</p>
+<p>• 她会吸入地裂中逸出的神秘气体，进入通灵状态</p>
+<p>• 祭司们将她的呓语翻译成诗句，这就是著名的德尔斐预言</p>
+<p><strong>历史影响：</strong></p>
+<p>苏格拉底曾说<strong>"认识你自己"</strong>——这句铭刻在德尔斐神庙上的箴言，正是神谕核心理念的体现。亚历山大大帝每次出征前都会亲赴德尔斐求取神谕。</p>
+<p>神谕存在了超过800年，直到公元390年才被罗马皇帝关闭。</p>`
+    },
+    {
+        icon: '☯️',
+        title: '中国易经',
+        content: `<p>《易经》是中华文化的智慧源头，距今已有<strong>超过5000年</strong>的历史，被誉为<strong>"群经之首，大道之源"</strong>。</p>
+<p><strong>历史传承：</strong></p>
+<p>• <strong>伏羲画八卦</strong>：传说伏羲观察天地万物，画出八个基本卦象</p>
+<p>• <strong>文王演周易</strong>：周文王被囚禁时推演六十四卦，赋予卦辞和爻辞</p>
+<p>• <strong>孔子作传</strong>：孔子晚年喜读《易经》，<strong>"韦编三绝"</strong>的典故流传至今</p>
+<p><strong>世界影响：</strong></p>
+<p>德国哲学家<strong>莱布尼茨</strong>受易经八卦启发，发明了二进制数学，这成为现代计算机的基础。荣格称易经是<strong>"共时性原理"</strong>的完美体现。</p>`
+    },
+    {
+        icon: '🃏',
+        title: '塔罗牌起源',
+        content: `<p>塔罗牌起源于<strong>15世纪的意大利</strong>，最初只是贵族间流行的娱乐纸牌游戏。</p>
+<p><strong>发展历程：</strong></p>
+<p>• <strong>15世纪</strong>：作为一种名为"Triumphs"的纸牌游戏在意大利贵族中流行</p>
+<p>• <strong>18世纪</strong>：法国神秘学家<strong>安托万·库尔·德·热贝林</strong>首次赋予塔罗牌占卜意义</p>
+<p>• <strong>19-20世纪</strong>：金色黎明等神秘主义组织发展出完整的塔罗理论体系</p>
+<p><strong>牌卡结构：</strong></p>
+<p>• <strong>78张牌</strong>：22张大阿卡纳（Major Arcana）+ 56张小阿卡纳（Minor Arcana）</p>
+<p>• <strong>大阿卡纳</strong>代表人生重大主题：从"愚者"的纯真到"世界"的完成</p>
+<p>• <strong>"愚者之旅"</strong>象征灵魂在物质世界的成长与觉醒</p>`
+    },
+    {
+        icon: '⭐',
+        title: '星相学传统',
+        content: `<p>星相学（占星术）是人类最古老的预言系统之一，<strong>巴比伦人</strong>最早在公元前2000年开始系统记录星象。</p>
+<p><strong>东西方星象发展：</strong></p>
+<p>• <strong>巴比伦</strong>：建立黄道十二宫雏形，发展出系统的星象观测</p>
+<p>• <strong>希腊罗马</strong>：托勒密的《占星四书》奠定了西方占星术的理论基础</p>
+<p>• <strong>中国</strong>：发展出独特的<strong>"二十八宿"</strong>体系，与西方黄道十二宫殊途同归</p>
+<p><strong>科学史上的占星：</strong></p>
+<p>开普勒既是天文学家也是占星师，他说：<strong>"占星学是女儿，天文学是母亲"</strong>。牛顿在研究炼金术和神学的时间远多于研究物理学和数学。</p>
+<p>今天的西方占星术使用的回归黄道系统，与天文学的黄道十二宫有微小差异。</p>`
+    },
+    {
+        icon: '🌸',
+        title: '日本阴阳道',
+        content: `<p>阴阳道是日本平安时代从中国传入的神秘学体系，融合了中国阴阳五行学说与日本本土神道教。</p>
+<p><strong>历史渊源：</strong></p>
+<p>• <strong>飞鸟时代</strong>：通过遣唐使从中国引入阴阳五行思想</p>
+<p>• <strong>平安时代</strong>：阴阳道成为日本贵族社会的必修学问</p>
+<p>• <strong>镰仓室町</strong>：与佛教融合，形成独特的日本密教体系</p>
+<p><strong>核心人物：</strong></p>
+<p><strong>安倍晴明</strong>（921-1005）是最著名的阴阳师，他活跃于平安贵族社会，据传能操控式神、占卜吉凶。他的故事被大量文学、影视作品改编，至今仍是日本文化的重要符号。</p>
+<p><strong>现代传承：</strong></p>
+<p>阴阳道对日本文化影响深远：占卜、驱邪、历法制定等职能延续至今。</p>`
+    },
+    {
+        icon: '🌿',
+        title: '凯尔特符文',
+        content: `<p>凯尔特符文是北欧维京时代的古老占卜系统，由<strong>24个符文</strong>组成，每个符文都有独特的含义和能量。</p>
+<p><strong>神话起源：</strong></p>
+<p>根据北欧神话，<strong>奥丁</strong>为获得符文的智慧，将自己<strong>倒吊在世界树上九天九夜</strong>，献祭自己的一只眼睛，终于领悟了卢恩文字的奥秘。</p>
+<p><strong>符文特点：</strong></p>
+<p>• 每个符文都有名字：Fehu（财富）、Uruz（力量）、Ansuz（智慧）...</p>
+<p>• 不仅用于占卜，也用于书写、魔法和祝福</p>
+<p>• 刻在石头、木材、金属上，具有神圣力量</p>
+<p><strong>现代应用：</strong></p>
+<p>现代符文被广泛应用于<strong>冥想、疗愈和自我探索</strong>。许多北欧后裔会在纹身中使用符文作为精神象征。</p>`
+    },
+    {
+        icon: '🕉️',
+        title: '印度占星术',
+        content: `<p>印度占星术（<strong>Jyotish</strong>，音译"尤尤提须"）拥有超过<strong>5000年</strong>的历史，是印度传统文化的重要组成部分。</p>
+<p><strong>与西方占星的区别：</strong></p>
+<p>• <strong>恒星黄道 vs 回归黄道</strong>：印度占星使用恒星黄道，考虑岁差修正</p>
+<p>• <strong>达夏系统</strong>（Dasha）：将人一生分为不同行星统治期，预测各阶段的运势</p>
+<p>• <strong>27 Nakshatra</strong>：月宿系统，比西方的星座更加精细</p>
+<p><strong>文化地位：</strong></p>
+<p>在印度，<strong>婚礼日期、乔迁新居、商业开业</strong>等重大决策都要请教占星师。虽然现代科学无法证实其准确性，但占星文化已深深融入印度人的日常生活。</p>
+<p>许多宝莱坞电影中的经典台词都引用占星术语，显示出其文化影响力。</p>`
+    }
+];
+
+function showCultureModal(index) {
+    const culture = cultureData[index];
+    if (!culture) return;
+    
+    document.getElementById('cultureModalIcon').textContent = culture.icon;
+    document.getElementById('cultureModalTitle').textContent = culture.title;
+    document.getElementById('cultureModalBody').innerHTML = culture.content;
+    document.getElementById('cultureModal').classList.add('active');
+}
+
+function closeCultureModal() {
+    document.getElementById('cultureModal').classList.remove('active');
+}
+
+document.getElementById('cultureModal').addEventListener('click', function(e) { 
+    if (e.target === this) closeCultureModal(); 
+});
 
 document.getElementById('divinationModal').addEventListener('click', function(e) { if (e.target === this) closeDivination(); });
 document.getElementById('tellerModal').addEventListener('click', function(e) { if (e.target === this) closeTellerModal(); });

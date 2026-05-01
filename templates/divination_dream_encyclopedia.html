@@ -3,8 +3,14 @@
 {% block title %}梦境图鉴 - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="/static/css/starry.css">
+<link rel="stylesheet" href="/static/css/starry.css?v=20260502">
 <style>
+body, .main-content { background: transparent !important; background-image: none !important; }
+body::before { display: none !important; }
+/* 确保星空背景不被覆盖 */
+body { background: transparent !important; }
+.encyclopedia-page { background: transparent !important; }
+
 .encyclopedia-page {
     max-width: 1000px;
     margin: 0 auto;

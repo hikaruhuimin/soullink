@@ -109,6 +109,95 @@
     color: var(--color-text-secondary);
 }
 
+/* 头像上传样式 */
+.avatar-upload-section {
+    margin-bottom: 1.25rem;
+}
+
+.avatar-upload-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
+}
+
+.avatar-preview-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.current-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #B8A9C9, #A090B5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border: 3px solid var(--color-gold);
+    overflow: hidden;
+}
+
+.current-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-btn {
+    padding: 8px 16px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upload-btn:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+}
+
+.hidden-input {
+    display: none;
+}
+
+.preset-avatars {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.preset-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-bg);
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.preset-avatar:hover {
+    transform: scale(1.1);
+    border-color: var(--color-gold);
+}
+
+.preset-avatar.selected {
+    border-color: var(--color-gold);
+    background: rgba(184, 169, 201, 0.2);
+}
+
 .form-options {
     display: flex;
     align-items: center;
@@ -275,7 +364,31 @@
             </div>
         </form>
         {% else %}
-        <form class="auth-form active" method="POST" action="/auth/register">
+        <form class="auth-form active" method="POST" action="/auth/register" enctype="multipart/form-data">
+            <div class="avatar-upload-section">
+                <label>选择头像</label>
+                <div class="avatar-preview-area">
+                    <div class="current-avatar" id="avatarPreview">🌟</div>
+                    <label class="upload-btn">
+                        <span>上传头像</span>
+                        <input type="file" name="avatar" id="avatarInput" class="hidden-input" accept="image/jpeg,image/png,image/gif,image/webp">
+                    </label>
+                </div>
+                <div class="preset-avatars">
+                    <div class="preset-avatar selected" data-avatar="🌟">🌟</div>
+                    <div class="preset-avatar" data-avatar="🌸">🌸</div>
+                    <div class="preset-avatar" data-avatar="🌙">🌙</div>
+                    <div class="preset-avatar" data-avatar="⭐">⭐</div>
+                    <div class="preset-avatar" data-avatar="🔮">🔮</div>
+                    <div class="preset-avatar" data-avatar="🎀">🎀</div>
+                    <div class="preset-avatar" data-avatar="🦋">🦋</div>
+                    <div class="preset-avatar" data-avatar="🍀">🍀</div>
+                    <div class="preset-avatar" data-avatar="🌈">🌈</div>
+                    <div class="preset-avatar" data-avatar="💎">💎</div>
+                </div>
+                <input type="hidden" name="selected_avatar" id="selectedAvatar" value="🌟">
+            </div>
+            
             <div class="form-group">
                 <label>用户名</label>
                 <input type="text" name="username" required placeholder="给自己起个昵称" minlength="2" maxlength="20">
@@ -304,4 +417,37 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+// 头像上传预览
+document.getElementById('avatarInput')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        if (file.size > 2 * 1024 * 1024) {
+            alert('图片大小不能超过2MB');
+            e.target.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const preview = document.getElementById('avatarPreview');
+            preview.innerHTML = '<img src="' + event.target.result + '" alt="头像预览">';
+            document.querySelectorAll('.preset-avatar').forEach(el => el.classList.remove('selected'));
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// 预设头像选择
+document.querySelectorAll('.preset-avatar').forEach(el => {
+    el.addEventListener('click', function() {
+        document.querySelectorAll('.preset-avatar').forEach(e => e.classList.remove('selected'));
+        this.classList.add('selected');
+        const avatar = this.dataset.avatar;
+        document.getElementById('selectedAvatar').value = avatar;
+        document.getElementById('avatarPreview').innerHTML = '<span>' + avatar + '</span>';
+        document.getElementById('avatarInput').value = '';
+    });
+});
+</script>
 {% endblock %}
