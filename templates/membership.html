@@ -1,773 +1,168 @@
 {% extends "base.html" %}
-
-{% block title %}{{ _('companion_tiers') }} - {{ _('app_name') }}{% endblock %}
-
+{% block title %}温暖陪伴套餐 - 灵犀{% endblock %}
 {% block content %}
-<style>
-.membership-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-/* 页面标题 */
-.page-header {
-    text-align: center;
-    padding: 40px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 20px;
-    margin-bottom: 40px;
-    color: white;
-}
-
-.page-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-}
-
-.page-header p {
-    font-size: 1.1rem;
-    opacity: 0.9;
-}
-
-/* 当前状态卡片 */
-.current-status-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
-    background: #fff3e0;
-    border-radius: 15px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
-.status-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.status-item .icon {
-    font-size: 1.5rem;
-}
-
-.status-item .label {
-    color: #666;
-}
-
-.status-item .value {
-    font-weight: bold;
-    color: #e65100;
-}
-
-/* 会员卡片网格 */
-.vip-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-    margin-bottom: 40px;
-}
-
-/* 会员卡片 */
-.vip-card {
-    background: white;
-    border-radius: 20px;
-    padding: 30px 24px;
-    position: relative;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
-    border: 2px solid transparent;
-}
-
-.vip-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-}
-
-.vip-card.recommended {
-    border-color: #9c27b0;
-    transform: scale(1.02);
-}
-
-.vip-card.recommended:hover {
-    transform: scale(1.02) translateY(-5px);
-}
-
-/* 推荐标签 */
-.recommended-badge {
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #9c27b0, #e91e63);
-    color: white;
-    padding: 6px 20px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-/* 卡片头部 */
-.card-header {
-    text-align: center;
-    margin-bottom: 24px;
-}
-
-.card-icon {
-    font-size: 3rem;
-    margin-bottom: 12px;
-}
-
-.card-name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 4px;
-}
-
-.card-tag {
-    font-size: 0.85rem;
-    padding: 4px 12px;
-    border-radius: 20px;
-    display: inline-block;
-}
-
-/* 价格 */
-.card-price {
-    text-align: center;
-    margin-bottom: 24px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #eee;
-}
-
-.price-main {
-    font-size: 2.5rem;
-    font-weight: bold;
-}
-
-.price-unit {
-    font-size: 1rem;
-    color: #999;
-}
-
-.price-period {
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 4px;
-}
-
-.discount-note {
-    font-size: 0.8rem;
-    color: #4caf50;
-    margin-top: 8px;
-}
-
-/* 权益列表 */
-.card-features {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 24px 0;
-}
-
-.card-features li {
-    padding: 10px 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.95rem;
-}
-
-.card-features li .check {
-    color: #4caf50;
-    font-size: 1.2rem;
-}
-
-.card-features li .lock {
-    color: #ccc;
-    font-size: 1.2rem;
-}
-
-.card-features li.disabled {
-    color: #ccc;
-}
-
-/* 标语 */
-.card-slogan {
-    background: #f5f5f5;
-    padding: 16px;
-    border-radius: 12px;
-    font-style: italic;
-    color: #666;
-    text-align: center;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-bottom: 20px;
-}
-
-/* 订阅按钮 */
-.subscribe-btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.subscribe-btn.primary {
-    background: linear-gradient(135deg, #9c27b0, #e91e63);
-    color: white;
-}
-
-.subscribe-btn.secondary {
-    background: linear-gradient(135deg, #4caf50, #8bc34a);
-    color: white;
-}
-
-.subscribe-btn.basic {
-    background: linear-gradient(135deg, #4caf50, #8bc34a);
-    color: white;
-}
-
-.subscribe-btn.free {
-    background: #e0e0e0;
-    color: #666;
-}
-
-.subscribe-btn:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-.subscribe-btn.current {
-    background: #fff3e0;
-    color: #e65100;
-    border: 2px solid #e65100;
-    cursor: default;
-}
-
-.subscribe-btn.current:hover {
-    transform: none;
-    box-shadow: none;
-}
-
-/* 支付周期切换 */
-.billing-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 30px;
-}
-
-.billing-toggle .switch {
-    position: relative;
-    width: 50px;
-    height: 26px;
-}
-
-.billing-toggle .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.billing-toggle .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 26px;
-}
-
-.billing-toggle .slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-.billing-toggle input:checked + .slider {
-    background-color: #9c27b0;
-}
-
-.billing-toggle input:checked + .slider:before {
-    transform: translateX(24px);
-}
-
-.save-badge {
-    background: #ff5722;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-}
-
-/* 特色权益对比表 */
-.compare-section {
-    background: white;
-    border-radius: 20px;
-    padding: 30px;
-    margin-bottom: 30px;
-}
-
-.compare-section h3 {
-    text-align: center;
-    margin-bottom: 24px;
-    font-size: 1.5rem;
-}
-
-.compare-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.compare-table th,
-.compare-table td {
-    padding: 14px 12px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-}
-
-.compare-table th {
-    background: #f5f5f5;
-    font-weight: bold;
-}
-
-.compare-table th:first-child,
-.compare-table td:first-child {
-    text-align: left;
-}
-
-.compare-table td:first-child {
-    font-weight: 500;
-}
-
-.check-icon {
-    color: #4caf50;
-    font-size: 1.2rem;
-}
-
-.x-icon {
-    color: #e0e0e0;
-    font-size: 1.2rem;
-}
-
-/* 常见问题 */
-.faq-section {
-    background: white;
-    border-radius: 20px;
-    padding: 30px;
-}
-
-.faq-section h3 {
-    text-align: center;
-    margin-bottom: 24px;
-    font-size: 1.5rem;
-}
-
-.faq-item {
-    margin-bottom: 12px;
-    border: 1px solid #eee;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.faq-question {
-    width: 100%;
-    padding: 16px 20px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.3s;
-}
-
-.faq-question:hover {
-    background: #f9f9f9;
-}
-
-.faq-icon {
-    transition: transform 0.3s;
-}
-
-.faq-item.active .faq-icon {
-    transform: rotate(180deg);
-}
-
-.faq-answer {
-    padding: 0 20px;
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.3s;
-}
-
-.faq-item.active .faq-answer {
-    padding: 16px 20px;
-    max-height: 200px;
-}
-
-/* 响应式 */
-@media (max-width: 768px) {
-    .vip-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .vip-card.recommended {
-        transform: none;
-        order: -1;
-    }
-    
-    .vip-card.recommended:hover {
-        transform: translateY(-5px);
-    }
-    
-    .compare-table {
-        font-size: 0.85rem;
-    }
-    
-    .compare-table th,
-    .compare-table td {
-        padding: 10px 6px;
-    }
-}
-</style>
-
-<div class="membership-page">
-    <!-- 页面标题 -->
-    <div class="page-header">
-        <h1>💝 {{ _('warm_companionship') }}</h1>
-        <p>{{ _('membership_slogan') }}</p>
+<div style="padding:16px;padding-bottom:80px;max-width:480px;margin:0 auto;">
+
+    <h1 style="font-size:24px;text-align:center;margin-bottom:6px;">👑 温暖陪伴套餐</h1>
+    <p style="text-align:center;color:#666;margin-bottom:24px;">选择最适合你的陪伴方式</p>
+
+    <!-- 价格切换 -->
+    <div style="display:flex;background:#f3f4f6;border-radius:12px;padding:4px;margin-bottom:24px;">
+        <button onclick="switchPeriod('month')" id="btn-month" style="flex:1;padding:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;">月付</button>
+        <button onclick="switchPeriod('quarter')" id="btn-quarter" style="flex:1;padding:10px;background:transparent;border:none;border-radius:10px;font-size:14px;">季付<sn style="color:#10b981;font-size:11px;">省10%</sn></button>
+        <button onclick="switchPeriod('year')" id="btn-year" style="flex:1;padding:10px;background:transparent;border:none;border-radius:10px;font-size:14px;">年付<sn style="color:#10b981;font-size:11px;">省20%</sn></button>
     </div>
-    
-    <!-- 当前状态 -->
-    <div class="current-status-bar">
-        <div class="status-item">
-            <span class="icon">💎</span>
-            <span class="label">{{ _('spirit_stones') }}:</span>
-            <span class="value">{{ spirit_stones }}</span>
+
+    <!-- 暖心相伴 -->
+    <div style="background:white;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="font-size:32px;">🌱</span>
+            <div><h3 style="margin:0;font-size:18px;">暖心相伴</h3><span style="font-size:12px;color:#999;">体验温暖的开始</span></div>
         </div>
-        <div class="status-item">
-            <span class="icon">👑</span>
-            <span class="label">{{ _('current_tier') }}:</span>
-            <span class="value">
-                {% if current_vip == 'ultimate' %}{{ _('tier_soul_resonance') }}
-                {% elif current_vip == 'premium' %}{{ _('tier_deep_devotion') }}
-                {% elif current_vip == 'basic' %}{{ _('tier_heart_guard') }}
-                {% else %}{{ _('tier_warm_companion') }}{% endif %}
-            </span>
+        <div style="font-size:28px;font-weight:700;margin-bottom:12px;">免费</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <span>✅ 每日30分钟陪伴</span>
+            <span>✅ 基础占卜（每日1次）</span>
+            <span>✅ 浏览社交广场</span>
+            <span>✅ 3位陪伴师可选</span>
+            <span style="color:#ccc;">❌ 语音消息</span>
+            <span style="color:#ccc;">❌ 礼物折扣</span>
         </div>
-        {% if expire_date %}
-        <div class="status-item">
-            <span class="icon">📅</span>
-            <span class="label">{{ _('expire_date') }}:</span>
-            <span class="value">{{ expire_date }}</span>
-        </div>
-        {% endif %}
+        <button style="width:100%;margin-top:16px;padding:12px;background:#f3f4f6;border:none;border-radius:12px;font-size:15px;color:#666;cursor:pointer;">当前方案</button>
     </div>
-    
-    <!-- 支付周期切换 -->
-    <div class="billing-toggle">
-        <span>{{ _('monthly') }}</span>
-        <label class="switch">
-            <input type="checkbox" id="billingToggle" onchange="toggleBilling()">
-            <span class="slider"></span>
-        </label>
-        <span>{{ _('yearly') }}</span>
-        <span class="save-badge">{{ _('yearly_discount') }}</span>
+
+    <!-- 知心守护 -->
+    <div style="background:white;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border:2px solid #f59e0b;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:32px;">💝</span>
+                <div><h3 style="margin:0;font-size:18px;">知心守护</h3><span style="font-size:12px;color:#f59e0b;">最受欢迎 ✨</span></div>
+            </div>
+            <span style="padding:4px 10px;background:#fef3c7;color:#d97706;border-radius:8px;font-size:11px;font-weight:600;">热门</span>
+        </div>
+        <div style="margin-bottom:12px;"><span class="price" data-month="19" data-quarter="51" data-year="182" style="font-size:28px;font-weight:700;">¥19</span><span style="color:#999;font-size:14px;">/月</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <span>✅ 每日2小时陪伴</span>
+            <span>✅ 每日5次占卜</span>
+            <span>✅ 社交互动权限</span>
+            <span>✅ 10位陪伴师可选</span>
+            <span>✅ 语音消息</span>
+            <span>✅ 礼物9折优惠</span>
+        </div>
+        <button onclick="showPayModal('知心守护')" style="width:100%;margin-top:16px;padding:12px;background:linear-gradient(135deg,#f59e0b,#fb923c);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">立即开通 💝</button>
     </div>
-    
-    <!-- 会员卡片 -->
-    <div class="vip-grid">
-        <!-- 暖心相伴（免费） -->
-        <div class="vip-card {% if current_vip == 'none' %}current{% endif %}">
-            <div class="card-header">
-                <div class="card-icon">{{ plans.none.icon }}</div>
-                <div class="card-name">{{ plans.none.name.zh }}</div>
-                <span class="card-tag" style="background: #e8f5e9; color: #4caf50;">{{ plans.none.tag.zh }}</span>
-            </div>
-            <div class="card-price">
-                <span class="price-main">{{ plans.none.monthly_price }}</span>
-                <span class="price-unit">{{ _('rmb') }}</span>
-                <div class="price-period">/{{ _('forever') }}</div>
-            </div>
-            <ul class="card-features">
-                {% for feature in plans.none.features %}
-                <li class="{% if not feature.included %}disabled{% endif %}">
-                    <span class="{% if feature.included %}check{% else %}lock{% endif %}">
-                        {% if feature.included %}✓{% else %}✗{% endif %}
-                    </span>
-                    {{ feature.text.zh }}
-                </li>
-                {% endfor %}
-            </ul>
-            <div class="card-slogan">"{{ plans.none.slogan.zh }}"</div>
-            {% if current_vip == 'none' %}
-            <button class="subscribe-btn current">{{ _('current_plan') }}</button>
-            {% else %}
-            <button class="subscribe-btn free" onclick="subscribe('none')">{{ _('select_plan') }}</button>
-            {% endif %}
+
+    <!-- 深情相守 -->
+    <div style="background:white;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="font-size:32px;">💎</span>
+            <div><h3 style="margin:0;font-size:18px;">深情相守</h3><span style="font-size:12px;color:#7c3aed;">深度陪伴体验</span></div>
         </div>
-        
-        <!-- 知心守护 -->
-        <div class="vip-card {% if current_vip == 'basic' %}current{% endif %}">
-            <div class="card-header">
-                <div class="card-icon">{{ plans.basic.icon }}</div>
-                <div class="card-name">{{ plans.basic.name.zh }}</div>
-                <span class="card-tag" style="background: #e8f5e9; color: #4caf50;">{{ plans.basic.tag.zh }}</span>
-            </div>
-            <div class="card-price">
-                <span class="price-main" id="basicPrice">{{ plans.basic.monthly_price }}</span>
-                <span class="price-unit">{{ _('rmb') }}</span>
-                <div class="price-period" id="basicPeriod">/{{ _('month') }}</div>
-                <div class="discount-note" id="basicDiscount" style="display:none;">{{ _('quarterly_save', amount=6) }}</div>
-            </div>
-            <ul class="card-features">
-                {% for feature in plans.basic.features %}
-                <li class="{% if not feature.included %}disabled{% endif %}">
-                    <span class="{% if feature.included %}check{% else %}lock{% endif %}">
-                        {% if feature.included %}✓{% else %}✗{% endif %}
-                    </span>
-                    {{ feature.text.zh }}
-                </li>
-                {% endfor %}
-            </ul>
-            <div class="card-slogan">"{{ plans.basic.slogan.zh }}"</div>
-            {% if current_vip == 'basic' %}
-            <button class="subscribe-btn current">{{ _('current_plan') }}</button>
-            {% else %}
-            <button class="subscribe-btn basic" onclick="subscribe('basic')">{{ _('subscribe_now') }}</button>
-            {% endif %}
+        <div style="margin-bottom:12px;"><span class="price" data-month="49" data-quarter="132" data-year="470" style="font-size:28px;font-weight:700;">¥49</span><span style="color:#999;font-size:14px;">/月</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <span>✅ 每日5小时陪伴</span>
+            <span>✅ 无限占卜</span>
+            <span>✅ 完整社交权限</span>
+            <span>✅ 全部陪伴师可选</span>
+            <span>✅ 无限语音消息</span>
+            <span>✅ 情感分析报告</span>
+            <span>✅ 礼物8折优惠</span>
         </div>
-        
-        <!-- 深情相守 -->
-        <div class="vip-card recommended {% if current_vip == 'premium' %}current{% endif %}">
-            {% if plans.premium.recommended %}
-            <div class="recommended-badge">⭐ {{ _('most_popular') }}</div>
-            {% endif %}
-            <div class="card-header">
-                <div class="card-icon">{{ plans.premium.icon }}</div>
-                <div class="card-name">{{ plans.premium.name.zh }}</div>
-                <span class="card-tag" style="background: #e3f2fd; color: #2196f3;">{{ plans.premium.tag.zh }}</span>
-            </div>
-            <div class="card-price">
-                <span class="price-main" id="premiumPrice">{{ plans.premium.monthly_price }}</span>
-                <span class="price-unit">{{ _('rmb') }}</span>
-                <div class="price-period" id="premiumPeriod">/{{ _('month') }}</div>
-                <div class="discount-note" id="premiumDiscount" style="display:none;">{{ _('yearly_save', amount=118) }}</div>
-            </div>
-            <ul class="card-features">
-                {% for feature in plans.premium.features %}
-                <li class="{% if not feature.included %}disabled{% endif %}">
-                    <span class="{% if feature.included %}check{% else %}lock{% endif %}">
-                        {% if feature.included %}✓{% else %}✗{% endif %}
-                    </span>
-                    {{ feature.text.zh }}
-                </li>
-                {% endfor %}
-            </ul>
-            <div class="card-slogan">"{{ plans.premium.slogan.zh }}"</div>
-            {% if current_vip == 'premium' %}
-            <button class="subscribe-btn current">{{ _('current_plan') }}</button>
-            {% else %}
-            <button class="subscribe-btn primary" onclick="subscribe('premium')">{{ _('subscribe_now') }}</button>
-            {% endif %}
-        </div>
-        
-        <!-- 灵魂共鸣 -->
-        <div class="vip-card {% if current_vip == 'ultimate' %}current{% endif %}">
-            <div class="card-header">
-                <div class="card-icon">{{ plans.ultimate.icon }}</div>
-                <div class="card-name">{{ plans.ultimate.name.zh }}</div>
-                <span class="card-tag" style="background: #f3e5f5; color: #9c27b0;">{{ plans.ultimate.tag.zh }}</span>
-            </div>
-            <div class="card-price">
-                <span class="price-main" id="ultimatePrice">{{ plans.ultimate.monthly_price }}</span>
-                <span class="price-unit">{{ _('rmb') }}</span>
-                <div class="price-period" id="ultimatePeriod">/{{ _('month') }}</div>
-                <div class="discount-note" id="ultimateDiscount" style="display:none;">{{ _('yearly_save', amount=238) }}</div>
-            </div>
-            <ul class="card-features">
-                {% for feature in plans.ultimate.features %}
-                <li class="{% if not feature.included %}disabled{% endif %}">
-                    <span class="{% if feature.included %}check{% else %}lock{% endif %}">
-                        {% if feature.included %}✓{% else %}✗{% endif %}
-                    </span>
-                    {{ feature.text.zh }}
-                </li>
-                {% endfor %}
-            </ul>
-            <div class="card-slogan">"{{ plans.ultimate.slogan.zh }}"</div>
-            {% if current_vip == 'ultimate' %}
-            <button class="subscribe-btn current">{{ _('current_plan') }}</button>
-            {% else %}
-            <button class="subscribe-btn secondary" onclick="subscribe('ultimate')">{{ _('subscribe_now') }}</button>
-            {% endif %}
-        </div>
+        <button onclick="showPayModal('深情相守')" style="width:100%;margin-top:16px;padding:12px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">立即开通 💎</button>
     </div>
-    
-    <!-- 权益对比表 -->
-    <div class="compare-section">
-        <h3>📊 {{ _('benefit_comparison') }}</h3>
-        <table class="compare-table">
-            <thead>
-                <tr>
-                    <th>{{ _('benefit_item') }}</th>
-                    <th>{{ plans.none.name.zh }}</th>
-                    <th>{{ plans.basic.name.zh }}</th>
-                    <th>{{ plans.premium.name.zh }}</th>
-                    <th>{{ plans.ultimate.name.zh }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ _('chat_time') }}</td>
-                    <td>{{ plans.none.benefits.chat_time.zh }}</td>
-                    <td>{{ plans.basic.benefits.chat_time.zh }}</td>
-                    <td>{{ plans.premium.benefits.chat_time.zh }}</td>
-                    <td>{{ plans.ultimate.benefits.chat_time.zh }}</td>
-                </tr>
-                <tr>
-                    <td>{{ _('voice_messages') }}</td>
-                    <td>{{ plans.none.benefits.voice_messages.zh }}</td>
-                    <td>{{ plans.basic.benefits.voice_messages.zh }}</td>
-                    <td>{{ plans.premium.benefits.voice_messages.zh }}</td>
-                    <td>{{ plans.ultimate.benefits.voice_messages.zh }}</td>
-                </tr>
-                <tr>
-                    <td>{{ _('gift_discount') }}</td>
-                    <td>{{ plans.none.benefits.gift_discount.zh }}</td>
-                    <td>{{ plans.basic.benefits.gift_discount.zh }}</td>
-                    <td>{{ plans.premium.benefits.gift_discount.zh }}</td>
-                    <td>{{ plans.ultimate.benefits.gift_discount.zh }}</td>
-                </tr>
-                <tr>
-                    <td>{{ _('companion_count') }}</td>
-                    <td>{{ plans.none.benefits.companions.zh }}</td>
-                    <td>{{ plans.basic.benefits.companions.zh }}</td>
-                    <td>{{ plans.premium.benefits.companions.zh }}</td>
-                    <td>{{ plans.ultimate.benefits.companions.zh }}</td>
-                </tr>
-                <tr>
-                    <td>{{ _('night_mode') }}</td>
-                    <td><span class="x-icon">✗</span></td>
-                    <td><span class="check-icon">✓</span></td>
-                    <td><span class="check-icon">✓</span></td>
-                    <td><span class="check-icon">✓</span></td>
-                </tr>
-                <tr>
-                    <td>{{ _('emotions') }}</td>
-                    <td>{{ plans.none.benefits.emotions.zh }}</td>
-                    <td>{{ plans.basic.benefits.emotions.zh }}</td>
-                    <td>{{ plans.premium.benefits.emotions.zh }}</td>
-                    <td>{{ plans.ultimate.benefits.emotions.zh }}</td>
-                </tr>
-                <tr>
-                    <td>{{ _('memory_storage') }}</td>
-                    <td>{{ plans.none.benefits.memory.zh }}</td>
-                    <td>{{ plans.basic.benefits.memory.zh }}</td>
-                    <td>{{ plans.premium.benefits.memory.zh }}</td>
-                    <td>{{ plans.ultimate.benefits.memory.zh }}</td>
-                </tr>
-            </tbody>
-        </table>
+
+    <!-- 灵魂共鸣 -->
+    <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:16px;padding:20px;margin-bottom:24px;box-shadow:0 4px 16px rgba(245,158,11,0.2);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="font-size:32px;">👑</span>
+            <div><h3 style="margin:0;font-size:18px;">灵魂共鸣</h3><span style="font-size:12px;color:#b45309;">极致陪伴体验</span></div>
+        </div>
+        <div style="margin-bottom:12px;"><span class="price" data-month="99" data-quarter="267" data-year="950" style="font-size:28px;font-weight:700;">¥99</span><span style="color:#999;font-size:14px;">/月</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <span>✅ 无限时长陪伴</span>
+            <span>✅ 无限占卜 + 深度解读</span>
+            <span>✅ 专属陪伴师</span>
+            <span>✅ 优先匹配</span>
+            <span>✅ 灵魂共鸣特权</span>
+            <span>✅ 礼物7折礼遇</span>
+            <span>✅ 节日专属惊喜</span>
+        </div>
+        <button onclick="showPayModal('灵魂共鸣')" style="width:100%;margin-top:16px;padding:12px;background:linear-gradient(135deg,#b45309,#d97706);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">尊享开通 👑</button>
     </div>
-    
-    <!-- 常见问题 -->
-    <div class="faq-section">
-        <h3>❓ {{ _('common_questions') }}</h3>
-        
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                <span>{{ _('faq_q1') }}</span>
-                <span class="faq-icon">▼</span>
-            </button>
-            <div class="faq-answer">
-                {{ _('faq_a1') }}
-            </div>
+
+    <!-- FAQ -->
+    <h3 style="font-size:18px;margin-bottom:16px;">❓ 常见问题</h3>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
+        <div style="background:white;border-radius:12px;padding:14px;">
+            <div style="font-weight:600;margin-bottom:4px;">可以随时取消吗？</div>
+            <div style="color:#666;font-size:13px;">当然可以！随时取消，取消后当前周期内仍可使用。</div>
         </div>
-        
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                <span>{{ _('faq_q2') }}</span>
-                <span class="faq-icon">▼</span>
-            </button>
-            <div class="faq-answer">
-                {{ _('faq_a2') }}
-            </div>
+        <div style="background:white;border-radius:12px;padding:14px;">
+            <div style="font-weight:600;margin-bottom:4px;">灵石是什么？</div>
+            <div style="color:#666;font-size:13px;">灵石是灵犀的虚拟货币，用来送礼物和享受特殊服务。1灵石≈0.1元。</div>
         </div>
-        
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                <span>{{ _('faq_q3') }}</span>
-                <span class="faq-icon">▼</span>
-            </button>
-            <div class="faq-answer">
-                {{ _('faq_a3') }}
-            </div>
-        </div>
-        
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                <span>{{ _('faq_q4') }}</span>
-                <span class="faq-icon">▼</span>
-            </button>
-            <div class="faq-answer">
-                {{ _('faq_a4') }}
-            </div>
+        <div style="background:white;border-radius:12px;padding:14px;">
+            <div style="font-weight:600;margin-bottom:4px;">陪伴师是真人吗？</div>
+            <div style="color:#666;font-size:13px;">陪伴师是精心设计的AI角色，24小时在线，永远温柔以待。</div>
         </div>
     </div>
 </div>
 
+<!-- 支付弹窗 -->
+<div id="payModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:flex-end;">
+    <div style="background:white;border-radius:20px 20px 0 0;width:100%;padding:24px;max-height:60vh;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h3 style="margin:0;">开通 <span id="payPlanName"></span></h3>
+            <button onclick="closePayModal()" style="background:none;border:none;font-size:24px;cursor:pointer;">×</button>
+        </div>
+        <p style="text-align:center;color:#666;margin-bottom:20px;">选择支付方式</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            <button onclick="showToast('微信支付即将开通，敬请期待✨')" style="padding:16px;background:#07c160;color:white;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">💚 微信支付</button>
+            <button onclick="showToast('支付宝即将开通，敬请期待✨')" style="padding:16px;background:#1677ff;color:white;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">💙 支付宝</button>
+            <button onclick="showToast('PayPal即将开通，敬请期待✨')" style="padding:16px;background:#003087;color:white;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;">🅿️ PayPal</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);color:white;padding:14px 24px;border-radius:12px;font-size:14px;z-index:2000;"></div>
+
 <script>
-// 支付周期切换
-function toggleBilling() {
-    const isYearly = document.getElementById('billingToggle').checked;
-    const suffix = isYearly ? '{{ _('year') }}' : '{{ _('month') }}';
-    
-    // 更新价格显示
-    document.getElementById('basicPrice').textContent = isYearly ? {{ plans.basic.yearly_price }} : {{ plans.basic.monthly_price }};
-    document.getElementById('basicPeriod').textContent = '/' + suffix;
-    document.getElementById('basicDiscount').style.display = isYearly ? 'block' : 'none';
-    
-    document.getElementById('premiumPrice').textContent = isYearly ? {{ plans.premium.yearly_price }} : {{ plans.premium.monthly_price }};
-    document.getElementById('premiumPeriod').textContent = '/' + suffix;
-    document.getElementById('premiumDiscount').style.display = isYearly ? 'block' : 'none';
-    
-    document.getElementById('ultimatePrice').textContent = isYearly ? {{ plans.ultimate.yearly_price }} : {{ plans.ultimate.monthly_price }};
-    document.getElementById('ultimatePeriod').textContent = '/' + suffix;
-    document.getElementById('ultimateDiscount').style.display = isYearly ? 'block' : 'none';
+var currentPeriod = 'month';
+
+function switchPeriod(period) {
+    currentPeriod = period;
+    document.querySelectorAll('.price').forEach(function(el) {
+        var price = el.getAttribute('data-' + period);
+        el.textContent = '¥' + price;
+    });
+    ['month','quarter','year'].forEach(function(p) {
+        var btn = document.getElementById('btn-' + p);
+        if (p === period) {
+            btn.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+            btn.style.color = 'white';
+        } else {
+            btn.style.background = 'transparent';
+            btn.style.color = 'inherit';
+        }
+    });
 }
 
-// 订阅
-function subscribe(plan) {
-    const isYearly = document.getElementById('billingToggle').checked;
-    const period = isYearly ? 'yearly' : 'monthly';
-    
-    alert('{{ _('payment_coming_soon') }}\n\n{{ _('plan') }}: ' + plan + '\n{{ _('period') }}: ' + period);
+function showPayModal(planName) {
+    document.getElementById('payPlanName').textContent = planName;
+    document.getElementById('payModal').style.display = 'flex';
 }
 
-// FAQ切换
-function toggleFaq(btn) {
-    const item = btn.parentElement;
-    item.classList.toggle('active');
+function closePayModal() {
+    document.getElementById('payModal').style.display = 'none';
+}
+
+function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(function() { t.style.display = 'none'; }, 2000);
+    closePayModal();
 }
 </script>
 {% endblock %}
