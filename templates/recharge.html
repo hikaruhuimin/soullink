@@ -171,17 +171,18 @@
     font-size: 1.3rem;
 }
 
+/* 支付方式网格 - 新样式 */
 .payment-methods {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
 }
 
 .payment-method {
-    padding: 16px 32px;
+    background: #fafafa;
     border: 2px solid #eee;
-    border-radius: 12px;
+    border-radius: 16px;
+    padding: 20px 16px;
     cursor: pointer;
     transition: all 0.3s;
     text-align: center;
@@ -189,21 +190,30 @@
 
 .payment-method:hover {
     border-color: #9c27b0;
-    background: #f9f9f9;
+    background: #fff;
 }
 
 .payment-method.selected {
     border-color: #9c27b0;
-    background: #f3e5f5;
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    box-shadow: 0 4px 15px rgba(156, 39, 176, 0.2);
 }
 
 .payment-method .icon {
-    font-size: 2rem;
+    font-size: 2.5rem;
     margin-bottom: 8px;
 }
 
 .payment-method .name {
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.payment-method .subtitle {
+    font-size: 0.75rem;
+    color: #999;
 }
 
 /* 确认按钮 */
@@ -274,6 +284,462 @@
     color: #ff9800;
 }
 
+/* ========== 支付弹窗样式 ========== */
+.payment-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.payment-modal.active {
+    display: flex;
+}
+
+.payment-modal-content {
+    background: white;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+    position: relative;
+    animation: modalSlideUp 0.3s ease;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: #f5f5f5;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background: #e0e0e0;
+}
+
+/* 支付方式头部 */
+.pay-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.pay-header .pay-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.pay-header .pay-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.pay-header .pay-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* 订单信息 */
+.order-info {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.order-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.order-row:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.order-label {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.order-value {
+    font-weight: 600;
+    color: #333;
+}
+
+.order-value.highlight {
+    color: #9c27b0;
+    font-size: 1.1rem;
+}
+
+/* 二维码区域 */
+.qr-section {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.qr-placeholder {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.qr-grid {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 2px;
+}
+
+.qr-cell {
+    background: #333;
+    border-radius: 1px;
+}
+
+.qr-cell.empty {
+    background: transparent;
+}
+
+.qr-logo {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 8px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.qr-hint {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* 倒计时 */
+.countdown {
+    text-align: center;
+    margin: 16px 0;
+}
+
+.countdown-label {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 4px;
+}
+
+.countdown-time {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff5722;
+}
+
+/* 钱包地址区域 */
+.wallet-section {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.wallet-address {
+    background: #f5f5f5;
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #333;
+}
+
+.sol-amount {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #9945FF;
+    margin-bottom: 8px;
+}
+
+.sol-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.copy-btn {
+    background: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.copy-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(153, 69, 255, 0.3);
+}
+
+.copy-btn.copied {
+    background: #4caf50;
+}
+
+/* PayPal按钮 */
+.paypal-btn {
+    display: inline-block;
+    background: #0070ba;
+    color: white;
+    padding: 14px 32px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.paypal-btn:hover {
+    background: #005ea6;
+    transform: scale(1.02);
+}
+
+/* Apple Pay / Google Pay 按钮 */
+.biometric-section {
+    text-align: center;
+    padding: 30px 0;
+}
+
+.biometric-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.biometric-hint {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.biometric-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.biometric-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* 底部确认按钮 */
+.modal-confirm-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #9c27b0, #e91e63);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 16px;
+}
+
+.modal-confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+}
+
+.modal-confirm-btn:active {
+    transform: translateY(0);
+}
+
+/* ========== 支付成功动画 ========== */
+.success-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 11000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.success-modal.active {
+    display: flex;
+}
+
+.success-content {
+    background: white;
+    border-radius: 24px;
+    padding: 48px 32px;
+    text-align: center;
+    max-width: 340px;
+    width: 100%;
+    animation: successPop 0.5s ease;
+}
+
+@keyframes successPop {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.success-checkmark {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    animation: checkBounce 0.6s ease 0.2s both;
+}
+
+@keyframes checkBounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.success-checkmark::after {
+    content: '✓';
+    font-size: 40px;
+    color: white;
+}
+
+.success-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.success-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 24px;
+}
+
+.success-stones {
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.success-stones .icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.success-stones .amount {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #9c27b0;
+}
+
+.success-stones .label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.success-hint {
+    font-size: 0.85rem;
+    color: #999;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    z-index: 12000;
+    display: none;
+}
+
+.toast.show {
+    display: block;
+    animation: toastFade 0.3s ease;
+}
+
+@keyframes toastFade {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
 /* 响应式 */
 @media (max-width: 768px) {
     .package-grid {
@@ -281,15 +747,52 @@
     }
     
     .payment-methods {
+        grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
     
     .payment-method {
-        padding: 12px 20px;
+        padding: 16px 12px;
     }
     
     .payment-method .icon {
-        font-size: 1.5rem;
+        font-size: 2rem;
+    }
+    
+    .payment-method .name {
+        font-size: 0.9rem;
+    }
+    
+    .payment-modal {
+        align-items: flex-end;
+        padding: 0;
+    }
+    
+    .payment-modal-content {
+        border-radius: 24px 24px 0 0;
+        max-width: 100%;
+        padding: 24px 20px;
+        padding-bottom: 40px;
+    }
+    
+    .success-modal {
+        align-items: flex-end;
+    }
+    
+    .success-content {
+        border-radius: 24px 24px 0 0;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 769px) {
+    .payment-modal-content {
+        animation: modalFadeIn 0.3s ease;
+    }
+    
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
     }
 }
 </style>
@@ -313,6 +816,7 @@
         {% for package in packages %}
         <div class="package-card {% if package.id == 'true_feeling' %}best-value{% endif %}" 
              onclick="selectPackage('{{ package.id }}')" 
+             ontouchend="selectPackage('{{ package.id }}')"
              id="pkg-{{ package.id }}">
             
             {% if package.bonus > 0 %}
@@ -342,24 +846,42 @@
         <h3>{{ _('select_payment_method') }}</h3>
         
         <div class="payment-methods">
-            <div class="payment-method" onclick="selectPayment('wechat')" id="pay-wechat">
+            <div class="payment-method" onclick="selectPayment('wechat')" ontouchend="selectPayment('wechat')" id="pay-wechat">
                 <div class="icon">💚</div>
-                <div class="name">{{ _('wechat_pay') }}</div>
+                <div class="name">微信支付</div>
+                <div class="subtitle">心意即刻送达</div>
             </div>
-            <div class="payment-method" onclick="selectPayment('alipay')" id="pay-alipay">
+            <div class="payment-method" onclick="selectPayment('alipay')" ontouchend="selectPayment('alipay')" id="pay-alipay">
                 <div class="icon">💙</div>
-                <div class="name">{{ _('alipay') }}</div>
+                <div class="name">支付宝</div>
+                <div class="subtitle">便捷支付体验</div>
             </div>
-            <div class="payment-method" onclick="selectPayment('paypal')" id="pay-paypal">
-                <div class="icon">💜</div>
-                <div class="name">{{ _('paypal') }}</div>
+            <div class="payment-method" onclick="selectPayment('paypal')" ontouchend="selectPayment('paypal')" id="pay-paypal">
+                <div class="icon">🅿️</div>
+                <div class="name">PayPal</div>
+                <div class="subtitle">全球支付，心意无界</div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('sol')" ontouchend="selectPayment('sol')" id="pay-sol">
+                <div class="icon">🪙</div>
+                <div class="name">Sol Pay</div>
+                <div class="subtitle">用未来货币，表达真挚心意</div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('apple')" ontouchend="selectPayment('apple')" id="pay-apple">
+                <div class="icon">🍎</div>
+                <div class="name">Apple Pay</div>
+                <div class="subtitle">轻轻一触，完成支付</div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('google')" ontouchend="selectPayment('google')" id="pay-google">
+                <div class="icon">🤖</div>
+                <div class="name">Google Pay</div>
+                <div class="subtitle">安全快捷支付</div>
             </div>
         </div>
     </div>
     
     <!-- 确认按钮 -->
     <div class="confirm-section">
-        <button class="confirm-btn" id="confirmBtn" onclick="confirmRecharge()" disabled>
+        <button class="confirm-btn" id="confirmBtn" onclick="confirmRecharge()" ontouchend="confirmRecharge()" disabled>
             {{ _('confirm_recharge') }}
         </button>
         <p class="info-text">{{ _('recharge_note') }}</p>
@@ -377,51 +899,473 @@
     </div>
 </div>
 
+<!-- 支付弹窗 -->
+<div class="payment-modal" id="paymentModal">
+    <div class="payment-modal-content" id="paymentModalContent">
+        <!-- 内容由JS动态填充 -->
+    </div>
+</div>
+
+<!-- 支付成功弹窗 -->
+<div class="success-modal" id="successModal">
+    <div class="success-content">
+        <div class="success-checkmark"></div>
+        <div class="success-title">支付成功</div>
+        <div class="success-subtitle">您的灵石已到账</div>
+        <div class="success-stones">
+            <div class="icon">💎</div>
+            <div class="amount" id="successAmount">+100</div>
+            <div class="label">灵石已到账</div>
+        </div>
+        <div class="success-hint">页面即将刷新...</div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
 <script>
 let selectedPackage = null;
 let selectedPayment = null;
+let countdownTimer = null;
+let currentOrderInfo = null;
+
+// 套餐数据
+const packages = {
+    'light_feeling': { name: '轻触心动', amount: 10, price: 6, bonus: 0, icon: '✨' },
+    'sweet_moment': { name: '甜蜜时光', amount: 50, price: 28, bonus: 5, icon: '🌸' },
+    'true_feeling': { name: '真心实意', amount: 100, price: 50, bonus: 15, icon: '💖' },
+    'deep_connection': { name: '深度连接', amount: 200, price: 98, bonus: 40, icon: '💝' },
+    'soul_tie': { name: '灵魂羁绊', amount: 500, price: 238, bonus: 120, icon: '💕' },
+    'eternal_bond': { name: '永恒之约', amount: 1000, price: 468, bonus: 300, icon: '👑' }
+};
 
 function selectPackage(id) {
-    // 移除之前的选中状态
     document.querySelectorAll('.package-card').forEach(card => {
         card.classList.remove('selected');
     });
-    
-    // 设置新的选中状态
     document.getElementById('pkg-' + id).classList.add('selected');
     selectedPackage = id;
-    
     updateConfirmButton();
 }
 
 function selectPayment(method) {
-    // 移除之前的选中状态
     document.querySelectorAll('.payment-method').forEach(el => {
         el.classList.remove('selected');
     });
-    
-    // 设置新的选中状态
     document.getElementById('pay-' + method).classList.add('selected');
     selectedPayment = method;
-    
     updateConfirmButton();
 }
 
 function updateConfirmButton() {
     const btn = document.getElementById('confirmBtn');
-    if (selectedPackage && selectedPayment) {
-        btn.disabled = false;
-    } else {
-        btn.disabled = true;
-    }
+    btn.disabled = !(selectedPackage && selectedPayment);
 }
 
 function confirmRecharge() {
     if (!selectedPackage || !selectedPayment) return;
     
-    alert('{{ _('payment_coming_soon') }}\n\n' +
-          '{{ _('selected_package') }}: ' + selectedPackage + '\n' +
-          '{{ _('payment_method') }}: ' + selectedPayment);
+    const pkg = packages[selectedPackage];
+    const totalStones = pkg.amount + pkg.bonus;
+    currentOrderInfo = {
+        packageId: selectedPackage,
+        packageName: pkg.name,
+        stones: pkg.amount,
+        bonus: pkg.bonus,
+        total: totalStones,
+        price: pkg.price,
+        paymentMethod: selectedPayment
+    };
+    
+    showPaymentModal(selectedPayment, currentOrderInfo);
 }
+
+function showPaymentModal(method, order) {
+    const modal = document.getElementById('paymentModal');
+    const content = document.getElementById('paymentModalContent');
+    
+    let html = '';
+    
+    switch(method) {
+        case 'wechat':
+            html = getWechatPayHTML(order);
+            break;
+        case 'alipay':
+            html = getAlipayHTML(order);
+            break;
+        case 'paypal':
+            html = getPaypalHTML(order);
+            break;
+        case 'sol':
+            html = getSolPayHTML(order);
+            break;
+        case 'apple':
+            html = getApplePayHTML(order);
+            break;
+        case 'google':
+            html = getGooglePayHTML(order);
+            break;
+    }
+    
+    content.innerHTML = html;
+    modal.classList.add('active');
+    
+    // 启动倒计时
+    if (method === 'wechat' || method === 'alipay') {
+        startCountdown();
+    }
+}
+
+function getWechatPayHTML(order) {
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">💚</div>
+            <div class="pay-title">微信支付</div>
+            <div class="pay-subtitle">心意即刻送达</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">支付金额</span>
+                <span class="order-value highlight">¥${order.price}</span>
+            </div>
+        </div>
+        <div class="qr-section">
+            <div class="qr-placeholder">
+                <div class="qr-grid">
+                    ${generateQRGrid()}
+                </div>
+                <div class="qr-logo">微</div>
+            </div>
+            <p class="qr-hint">请使用微信扫码支付</p>
+        </div>
+        <div class="countdown">
+            <div class="countdown-label">剩余支付时间</div>
+            <div class="countdown-time" id="countdown">15:00</div>
+        </div>
+        <button class="modal-confirm-btn" onclick="confirmPayment('wechat')">我已完成支付</button>
+    `;
+}
+
+function getAlipayHTML(order) {
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">💙</div>
+            <div class="pay-title">支付宝</div>
+            <div class="pay-subtitle">便捷支付体验</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">支付金额</span>
+                <span class="order-value highlight">¥${order.price}</span>
+            </div>
+        </div>
+        <div class="qr-section">
+            <div class="qr-placeholder" style="background: linear-gradient(135deg, #f5f5f5 0%, #e3f2fd 100%);">
+                <div class="qr-grid">
+                    ${generateQRGrid()}
+                </div>
+                <div class="qr-logo" style="color: #1677ff;">支</div>
+            </div>
+            <p class="qr-hint">请使用支付宝扫码支付</p>
+        </div>
+        <div class="countdown">
+            <div class="countdown-label">剩余支付时间</div>
+            <div class="countdown-time" id="countdown">15:00</div>
+        </div>
+        <button class="modal-confirm-btn" onclick="confirmPayment('alipay')">我已完成支付</button>
+    `;
+}
+
+function getPaypalHTML(order) {
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">🅿️</div>
+            <div class="pay-title">PayPal</div>
+            <div class="pay-subtitle">全球支付，心意无界</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">支付金额</span>
+                <span class="order-value highlight">¥${order.price}</span>
+            </div>
+        </div>
+        <div style="text-align: center; padding: 20px 0;">
+            <a href="https://www.paypal.com" target="_blank" class="paypal-btn" onclick="simulatePaypal()">
+                跳转到 PayPal 完成支付 🡕
+            </a>
+            <p style="color: #999; font-size: 0.85rem; margin-top: 16px;">
+                点击按钮后在新窗口完成支付
+            </p>
+        </div>
+        <button class="modal-confirm-btn" onclick="confirmPayment('paypal')" style="background: #4caf50;">返回确认支付</button>
+    `;
+}
+
+function getSolPayHTML(order) {
+    // 简化的SOL价格，约0.1 SOL起步
+    const solPrice = 150; // 假设SOL价格150 USDT
+    const solAmount = (order.price / solPrice).toFixed(4);
+    const walletAddress = 'SoL' + generateRandomString(42);
+    
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">🪙</div>
+            <div class="pay-title">Solana Pay</div>
+            <div class="pay-subtitle">用未来货币，表达真挚心意</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+        </div>
+        <div class="wallet-section">
+            <div class="sol-amount">${solAmount} SOL</div>
+            <div class="sol-label">发送到此钱包地址</div>
+            <div class="qr-placeholder" style="background: linear-gradient(135deg, #9945FF 0%, #14F195 100%); height: 180px;">
+                <div class="qr-grid" style="filter: brightness(0) invert(1);">
+                    ${generateQRGrid()}
+                </div>
+            </div>
+            <div class="wallet-address">${walletAddress}</div>
+            <button class="copy-btn" id="copyBtn" onclick="copyWalletAddress('${walletAddress}')">
+                📋 复制钱包地址
+            </button>
+        </div>
+        <p style="text-align: center; color: #999; font-size: 0.85rem; margin-bottom: 16px;">
+            发送完成后点击确认，我们会在确认后立即到账
+        </p>
+        <button class="modal-confirm-btn" onclick="confirmPayment('sol')">我已发送 SOL</button>
+    `;
+}
+
+function getApplePayHTML(order) {
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">🍎</div>
+            <div class="pay-title">Apple Pay</div>
+            <div class="pay-subtitle">轻轻一触，完成支付</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">支付金额</span>
+                <span class="order-value highlight">¥${order.price}</span>
+            </div>
+        </div>
+        <div class="biometric-section">
+            <div class="biometric-icon">👆</div>
+            <div class="biometric-hint">将手指放在 Touch ID 上确认支付</div>
+            <button class="biometric-btn" onclick="confirmPayment('apple')">
+                使用 Touch ID 确认
+            </button>
+        </div>
+    `;
+}
+
+function getGooglePayHTML(order) {
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">🤖</div>
+            <div class="pay-title">Google Pay</div>
+            <div class="pay-subtitle">安全快捷支付</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">支付金额</span>
+                <span class="order-value highlight">¥${order.price}</span>
+            </div>
+        </div>
+        <div class="biometric-section">
+            <div class="biometric-icon">🔐</div>
+            <div class="biometric-hint">确认使用 Google Pay 完成支付</div>
+            <button class="biometric-btn" onclick="confirmPayment('google')" style="background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);">
+                确认支付 ¥${order.price}
+            </button>
+        </div>
+    `;
+}
+
+function generateQRGrid() {
+    let html = '';
+    for (let i = 0; i < 64; i++) {
+        const rand = Math.random();
+        if (rand < 0.3) {
+            html += '<div class="qr-cell empty"></div>';
+        } else {
+            html += '<div class="qr-cell"></div>';
+        }
+    }
+    return html;
+}
+
+function generateRandomString(length) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
+function startCountdown() {
+    let minutes = 14;
+    let seconds = 59;
+    
+    const updateTimer = () => {
+        const countdownEl = document.getElementById('countdown');
+        if (countdownEl) {
+            countdownEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        
+        if (seconds > 0) {
+            seconds--;
+        } else if (minutes > 0) {
+            minutes--;
+            seconds = 59;
+        } else {
+            clearInterval(countdownTimer);
+            showToast('支付已超时，请重新发起支付');
+            closePaymentModal();
+        }
+    };
+    
+    updateTimer();
+    countdownTimer = setInterval(updateTimer, 1000);
+}
+
+function closePaymentModal() {
+    if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+    }
+    document.getElementById('paymentModal').classList.remove('active');
+}
+
+function copyWalletAddress(address) {
+    navigator.clipboard.writeText(address).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✓ 已复制';
+        btn.classList.add('copied');
+        setTimeout(() => {
+            btn.textContent = '📋 复制钱包地址';
+            btn.classList.remove('copied');
+        }, 2000);
+    }).catch(() => {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = address;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('钱包地址已复制');
+    });
+}
+
+function simulatePaypal() {
+    // 模拟打开PayPal窗口
+    showToast('正在跳转到 PayPal...');
+}
+
+function confirmPayment(method) {
+    closePaymentModal();
+    
+    // 显示支付成功
+    setTimeout(() => {
+        showPaymentSuccess(currentOrderInfo);
+    }, 300);
+}
+
+function showPaymentSuccess(order) {
+    const modal = document.getElementById('successModal');
+    const amountEl = document.getElementById('successAmount');
+    
+    amountEl.textContent = '+' + order.total;
+    modal.classList.add('active');
+    
+    // 2秒后关闭并刷新
+    setTimeout(() => {
+        modal.classList.remove('active');
+        // 模拟增加灵石
+        showToast(`充值成功！获得 ${order.total} 灵石`);
+        // 刷新页面
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    }, 2500);
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2000);
+}
+
+// 点击弹窗外部关闭
+document.getElementById('paymentModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePaymentModal();
+    }
+});
+
+document.getElementById('successModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        // 不允许点击外部关闭成功弹窗
+    }
+});
 </script>
 {% endblock %}

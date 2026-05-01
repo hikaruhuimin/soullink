@@ -895,6 +895,86 @@ def membership():
                          lang=lang)
 
 
+# ============ 灵石充值 ============
+
+@app.route('/recharge')
+def recharge():
+    """灵石充值页面"""
+    lang = get_client_language()
+    
+    # 翻译
+    i18n = {
+        'zh': {
+            'recharge': '充值灵石',
+            'recharge_slogan': '为TA充值一份心意',
+            'current_balance': '当前余额',
+            'spirit_stones_unit': '灵石',
+            'select_payment_method': '选择支付方式',
+            'confirm_recharge': '确认充值',
+            'recharge_note': '充值后灵石将立即到账',
+            'recharge_tips': '充值须知',
+            'tip_1': '灵石充值后不支持提现或转让',
+            'tip_2': '支付成功后可联系客服开具发票',
+            'tip_3': '如有疑问请联系在线客服',
+            'tip_4': '更多优惠活动请关注官方公告',
+            'best_value': '最划算',
+            'stones': '灵石',
+            'bonus': '赠送'
+        },
+        'en': {
+            'recharge': 'Recharge',
+            'recharge_slogan': 'Recharge love for your companion',
+            'current_balance': 'Current Balance',
+            'spirit_stones_unit': 'Stones',
+            'select_payment_method': 'Select Payment Method',
+            'confirm_recharge': 'Confirm Recharge',
+            'recharge_note': 'Stones will be credited immediately',
+            'recharge_tips': 'Recharge Tips',
+            'tip_1': 'Stones cannot be withdrawn or transferred',
+            'tip_2': 'Contact customer service for invoice',
+            'tip_3': 'Contact online support for questions',
+            'tip_4': 'More deals follow our official announcements',
+            'best_value': 'Best Value',
+            'stones': 'stones',
+            'bonus': 'bonus'
+        },
+        'ja': {
+            'recharge': '有料',
+            'recharge_slogan': '伴侶に気持ちを届けよう',
+            'current_balance': '現在の残高',
+            'spirit_stones_unit': '石',
+            'select_payment_method': '支払い方法を選択',
+            'confirm_recharge': '有料を確認する',
+            'recharge_note': '石は即座にチャージされます',
+            'recharge_tips': 'チャージ注意事項',
+            'tip_1': '石は換金・転送できません',
+            'tip_2': '領収書は客服に連絡してください',
+            'tip_3': 'ご質問はオンライン客服へ',
+            'tip_4': '更多优惠请关注官方公告',
+            'best_value': '一番お得',
+            'stones': '石',
+            'bonus': 'ボーナス'
+        }
+    }
+    
+    t = i18n.get(lang, i18n['zh'])
+    
+    packages = [
+        {'id': 'light_feeling', 'name': {'zh': '轻触心动', 'en': 'Light Touch', 'ja': '軽やか'}, 'amount': 10, 'price': 6, 'bonus': 0, 'icon': '✨'},
+        {'id': 'sweet_moment', 'name': {'zh': '甜蜜时光', 'en': 'Sweet Moment', 'ja': '甜蜜'}, 'amount': 50, 'price': 28, 'bonus': 5, 'icon': '🌸'},
+        {'id': 'true_feeling', 'name': {'zh': '真心实意', 'en': 'True Feeling', 'ja': '真心'}, 'amount': 100, 'price': 50, 'bonus': 15, 'icon': '💖'},
+        {'id': 'deep_connection', 'name': {'zh': '深度连接', 'en': 'Deep Connection', 'ja': '深度'}, 'amount': 200, 'price': 98, 'bonus': 40, 'icon': '💝'},
+        {'id': 'soul_tie', 'name': {'zh': '灵魂羁绊', 'en': 'Soul Tie', 'ja': '魂の絆'}, 'amount': 500, 'price': 238, 'bonus': 120, 'icon': '💕'},
+        {'id': 'eternal_bond', 'name': {'zh': '永恒之约', 'en': 'Eternal Bond', 'ja': '永遠の約束'}, 'amount': 1000, 'price': 468, 'bonus': 300, 'icon': '👑'}
+    ]
+    
+    return render_template('recharge.html',
+                         spirit_stones=current_user.spirit_stones if current_user.is_authenticated else 0,
+                         packages=packages,
+                         lang=lang,
+                         **t)
+
+
 # ============ 用户认证 ============
 
 @app.route('/auth/register', methods=['GET', 'POST'])
