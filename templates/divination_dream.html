@@ -3,6 +3,7 @@
 {% block title %}AI智能解梦 - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="/static/css/starry.css">
 <style>
 .dream-page {
     max-width: 900px;
@@ -21,12 +22,12 @@
     font-family: var(--font-display);
     font-size: 2rem;
     font-weight: 500;
-    color: var(--color-text);
+    color: #E8D5C4;
     margin-bottom: var(--space-md);
 }
 
 .page-title span {
-    background: linear-gradient(135deg, #6B5B95, #D4A5A5);
+    background: linear-gradient(135deg, #C4B5FD, #E8D5C4);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -36,7 +37,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    border: 2px solid #B8A9C9;
+    border: 2px solid rgba(196, 181, 253, 0.5);
     margin-bottom: var(--space-md);
     animation: breathe 4s ease-in-out infinite;
 }
@@ -48,7 +49,7 @@
 
 .host-intro {
     font-size: 0.9375rem;
-    color: var(--color-text-secondary);
+    color: #C4D4E8;
     line-height: 1.8;
     max-width: 500px;
     margin: 0 auto;
@@ -56,11 +57,13 @@
 
 /* 输入区 */
 .dream-input-section {
-    background: linear-gradient(135deg, rgba(107, 91, 149, 0.1), rgba(212, 165, 165, 0.1));
+    background: rgba(15, 20, 50, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius-xl);
     padding: var(--space-2xl);
     margin-bottom: var(--space-3xl);
-    border: 1px solid rgba(184, 169, 201, 0.3);
+    border: 1px solid rgba(100, 120, 180, 0.2);
 }
 
 .input-wrapper {
@@ -72,33 +75,38 @@
     width: 100%;
     min-height: 150px;
     padding: var(--space-lg);
-    border: 2px solid var(--color-border);
+    border: 1px solid rgba(100, 120, 180, 0.25);
     border-radius: var(--radius-lg);
     font-size: 1rem;
     line-height: 1.8;
     resize: vertical;
     transition: all 0.3s ease;
-    background: var(--color-bg-card);
+    background: rgba(10, 15, 40, 0.6);
+    color: #E8E0F0;
 }
 
 .dream-textarea:focus {
     outline: none;
-    border-color: #6B5B95;
-    box-shadow: 0 0 0 4px rgba(107, 91, 149, 0.1);
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+}
+
+.dream-textarea::placeholder {
+    color: rgba(180, 190, 210, 0.5);
 }
 
 .input-hint {
     font-size: 0.8125rem;
-    color: var(--color-text-muted);
+    color: #A0A8C0;
     margin-bottom: var(--space-lg);
 }
 
 .interpret-btn {
     width: 100%;
     padding: 16px 32px;
-    background: linear-gradient(135deg, #6B5B95, #8B5E83);
+    background: linear-gradient(135deg, rgba(107, 91, 149, 0.9), rgba(139, 94, 131, 0.9));
     color: white;
-    border: none;
+    border: 1px solid rgba(196, 181, 253, 0.3);
     border-radius: var(--radius-full);
     font-size: 1rem;
     font-weight: 500;
@@ -108,7 +116,7 @@
 
 .interpret-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(107, 91, 149, 0.3);
+    box-shadow: 0 8px 25px rgba(107, 91, 149, 0.35);
 }
 
 .interpret-btn:disabled {
@@ -129,12 +137,14 @@
 }
 
 .result-card {
-    background: var(--color-bg-card);
+    background: rgba(15, 20, 50, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius-xl);
     padding: var(--space-2xl);
     margin-bottom: var(--space-xl);
-    box-shadow: var(--shadow-md);
-    border: 1px solid rgba(184, 169, 201, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(100, 120, 180, 0.2);
 }
 
 .stella-header {
@@ -143,14 +153,14 @@
     gap: var(--space-md);
     margin-bottom: var(--space-xl);
     padding-bottom: var(--space-lg);
-    border-bottom: 1px solid var(--color-border-light);
+    border-bottom: 1px solid rgba(100, 120, 180, 0.15);
 }
 
 .stella-avatar {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    border: 2px solid #B8A9C9;
+    border: 2px solid rgba(196, 181, 253, 0.4);
 }
 
 .stella-intro {
@@ -160,18 +170,18 @@
 .stella-name {
     font-family: var(--font-display);
     font-size: 1.125rem;
-    color: var(--color-text);
+    color: #E8D5C4;
     margin-bottom: 2px;
 }
 
 .stella-role {
     font-size: 0.8125rem;
-    color: var(--color-text-muted);
+    color: #A0A8C0;
 }
 
 .interpretation-content {
     line-height: 1.9;
-    color: var(--color-text-secondary);
+    color: #C4D4E8;
 }
 
 .interpretation-content p {
@@ -182,11 +192,12 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
-    padding: 4px 16px;
-    background: linear-gradient(135deg, rgba(107, 91, 149, 0.1), rgba(212, 165, 165, 0.1));
+    padding: 6px 16px;
+    background: rgba(107, 91, 149, 0.25);
+    border: 1px solid rgba(139, 92, 246, 0.25);
     border-radius: var(--radius-full);
     font-weight: 600;
-    color: #6B5B95;
+    color: #C4B5FD;
     margin-bottom: var(--space-xl);
 }
 
@@ -206,21 +217,22 @@
 
 .interpret-card {
     padding: var(--space-lg);
-    background: var(--color-bg-warm);
+    background: rgba(15, 20, 50, 0.5);
     border-radius: var(--radius-lg);
+    border: 1px solid rgba(100, 120, 180, 0.15);
 }
 
 .card-label {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--color-text-muted);
+    color: #A0A8C0;
     margin-bottom: var(--space-sm);
 }
 
 .card-value {
     font-size: 1rem;
-    color: var(--color-text);
+    color: #C4D4E8;
     line-height: 1.6;
 }
 
@@ -230,11 +242,12 @@
     justify-content: center;
     gap: var(--space-sm);
     padding: var(--space-md) var(--space-xl);
-    background: linear-gradient(135deg, rgba(212, 165, 165, 0.2), rgba(184, 169, 201, 0.2));
+    background: rgba(196, 181, 253, 0.1);
     border-radius: var(--radius-full);
     margin-top: var(--space-xl);
     font-size: 0.9375rem;
-    color: #8B5E83;
+    color: #C4B5FD;
+    border: 1px solid rgba(196, 181, 253, 0.2);
 }
 
 /* 快捷入口 */
@@ -242,10 +255,10 @@
     margin-top: var(--space-3xl);
 }
 
-.section-title {
+.quick-dreams .section-title {
     font-family: var(--font-display);
     font-size: 1.25rem;
-    color: var(--color-text);
+    color: #E8D5C4;
     margin-bottom: var(--space-xl);
     text-align: center;
 }
@@ -259,45 +272,19 @@
 
 .dream-tag {
     padding: 8px 16px;
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
+    background: rgba(15, 20, 50, 0.6);
+    border: 1px solid rgba(100, 120, 180, 0.2);
     border-radius: var(--radius-full);
     font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    color: #C4D4E8;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .dream-tag:hover {
-    border-color: #6B5B95;
-    color: #6B5B95;
-    background: rgba(107, 91, 149, 0.05);
-}
-
-/* 星空背景 */
-.stars-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: -1;
-    background: radial-gradient(ellipse at top, rgba(107, 91, 149, 0.1) 0%, transparent 60%);
-}
-
-.floating-star {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    background: #6B5B95;
-    border-radius: 50%;
-    animation: twinkle 3s ease-in-out infinite;
-}
-
-@keyframes twinkle {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.5); }
+    border-color: rgba(139, 92, 246, 0.5);
+    color: #C4B5FD;
+    background: rgba(107, 91, 149, 0.2);
 }
 
 /* 加载动画 */
@@ -317,7 +304,7 @@
 .loading-dots span {
     width: 8px;
     height: 8px;
-    background: #6B5B95;
+    background: #C4B5FD;
     border-radius: 50%;
     animation: bounce 1.4s infinite ease-in-out;
 }
@@ -334,15 +321,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="stars-bg">
-    <div class="floating-star" style="top: 15%; left: 10%;"></div>
-    <div class="floating-star" style="top: 25%; left: 85%; animation-delay: 0.5s;"></div>
-    <div class="floating-star" style="top: 45%; left: 5%; animation-delay: 1s;"></div>
-    <div class="floating-star" style="top: 65%; left: 90%; animation-delay: 1.5s;"></div>
-    <div class="floating-star" style="top: 85%; left: 20%; animation-delay: 2s;"></div>
+<!-- 星空背景层 -->
+<div class="stars-container">
+    <div class="stars-sm"></div>
+    <div class="stars-md"></div>
+    <div class="stars-lg"></div>
 </div>
+<div class="nebula nebula-purple"></div>
+<div class="nebula nebula-blue"></div>
+<div class="nebula nebula-deep"></div>
+<div class="nebula nebula-cyan"></div>
 
-<div class="dream-page">
+<div class="dream-page starry-bg" style="position:relative;z-index:1;">
     <div class="page-header">
         <img src="/static/agents/stella.jpg" alt="星语" class="host-avatar">
         <h1 class="page-title">✨ <span>AI智能解梦</span> ✨</h1>
@@ -377,7 +367,7 @@
         </div>
         
         <div style="text-align: center;">
-            <a href="/divination/dream/encyclopedia" class="btn btn-secondary" style="display: inline-block; text-decoration: none; padding: 12px 28px; border-radius: var(--radius-full); border: 1px solid var(--color-border); color: var(--color-text-secondary);">
+            <a href="/divination/dream/encyclopedia" class="dream-tag" style="display: inline-block; text-decoration: none; padding: 12px 28px; border-radius: var(--radius-full); border: 1px solid rgba(139, 92, 246, 0.3); color: #C4B5FD;">
                 📖 查看梦境图鉴
             </a>
         </div>
@@ -398,6 +388,7 @@
     </div>
 </div>
 
+<script src="/static/js/starry.js"></script>
 <script>
 const lang = '{{ lang }}';
 

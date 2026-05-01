@@ -3,6 +3,7 @@
 {% block title %}梦境图鉴 - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="/static/css/starry.css">
 <style>
 .encyclopedia-page {
     max-width: 1000px;
@@ -20,12 +21,12 @@
     font-family: var(--font-display);
     font-size: 2rem;
     font-weight: 500;
-    color: var(--color-text);
+    color: #E8D5C4;
     margin-bottom: var(--space-md);
 }
 
 .page-title span {
-    background: linear-gradient(135deg, #6B5B95, #D4A5A5);
+    background: linear-gradient(135deg, #C4B5FD, #E8D5C4);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -33,7 +34,7 @@
 
 .page-desc {
     font-size: 1rem;
-    color: var(--color-text-secondary);
+    color: #C4D4E8;
     line-height: 1.8;
 }
 
@@ -44,19 +45,23 @@
 }
 
 .dream-card {
-    background: var(--color-bg-card);
+    background: rgba(15, 20, 50, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     cursor: pointer;
     animation: fadeInUp 0.5s ease forwards;
     opacity: 0;
+    border: 1px solid rgba(100, 120, 180, 0.2);
 }
 
 .dream-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 30px rgba(107, 91, 149, 0.25);
+    border-color: rgba(139, 92, 246, 0.3);
 }
 
 @keyframes fadeInUp {
@@ -73,64 +78,39 @@
     font-family: var(--font-display);
     font-size: 1.25rem;
     font-weight: 500;
-    color: var(--color-text);
+    color: #E8D5C4;
     margin-bottom: var(--space-xs);
 }
 
 .dream-category {
     display: inline-block;
     padding: 4px 12px;
-    background: rgba(107, 91, 149, 0.1);
-    color: #6B5B95;
+    background: rgba(107, 91, 149, 0.25);
+    color: #C4B5FD;
     font-size: 0.75rem;
     border-radius: var(--radius-full);
     margin-bottom: var(--space-sm);
+    border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .dream-desc {
     font-size: 0.875rem;
-    color: var(--color-text-muted);
+    color: #A0A8C0;
     line-height: 1.6;
-}
-
-/* 星空背景 */
-.stars-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: -1;
-    background: radial-gradient(ellipse at top, rgba(107, 91, 149, 0.1) 0%, transparent 60%);
-}
-
-.floating-star {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    background: #6B5B95;
-    border-radius: 50%;
-    animation: twinkle 3s ease-in-out infinite;
-}
-
-@keyframes twinkle {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.5); }
 }
 
 .back-link {
     display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
-    color: var(--color-text-secondary);
+    color: #A0A8C0;
     text-decoration: none;
     margin-bottom: var(--space-xl);
     transition: color 0.3s ease;
 }
 
 .back-link:hover {
-    color: #6B5B95;
+    color: #C4B5FD;
 }
 
 /* 弹窗 */
@@ -140,7 +120,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(2, 5, 21, 0.85);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -156,13 +137,16 @@
 }
 
 .modal-content {
-    background: var(--color-bg-card);
+    background: rgba(15, 20, 50, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: var(--radius-xl);
     padding: var(--space-2xl);
     max-width: 500px;
     width: 90%;
     transform: scale(0.9);
     transition: transform 0.3s ease;
+    border: 1px solid rgba(100, 120, 180, 0.2);
 }
 
 .modal-overlay.active .modal-content {
@@ -183,21 +167,21 @@
 .modal-title {
     font-family: var(--font-display);
     font-size: 1.5rem;
-    color: var(--color-text);
+    color: #E8D5C4;
 }
 
 .modal-body {
     line-height: 1.8;
-    color: var(--color-text-secondary);
+    color: #C4D4E8;
     margin-bottom: var(--space-xl);
 }
 
 .modal-close {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(135deg, #6B5B95, #8B5E83);
+    background: linear-gradient(135deg, rgba(107, 91, 149, 0.9), rgba(139, 94, 131, 0.9));
     color: white;
-    border: none;
+    border: 1px solid rgba(196, 181, 253, 0.3);
     border-radius: var(--radius-full);
     font-size: 0.9375rem;
     cursor: pointer;
@@ -211,15 +195,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="stars-bg">
-    <div class="floating-star" style="top: 10%; left: 15%;"></div>
-    <div class="floating-star" style="top: 30%; left: 85%; animation-delay: 0.5s;"></div>
-    <div class="floating-star" style="top: 50%; left: 8%; animation-delay: 1s;"></div>
-    <div class="floating-star" style="top: 70%; left: 92%; animation-delay: 1.5s;"></div>
-    <div class="floating-star" style="top: 85%; left: 25%; animation-delay: 2s;"></div>
+<!-- 星空背景层 -->
+<div class="stars-container">
+    <div class="stars-sm"></div>
+    <div class="stars-md"></div>
+    <div class="stars-lg"></div>
 </div>
+<div class="nebula nebula-purple"></div>
+<div class="nebula nebula-blue"></div>
+<div class="nebula nebula-deep"></div>
+<div class="nebula nebula-cyan"></div>
 
-<div class="encyclopedia-page">
+<div class="encyclopedia-page starry-bg" style="position:relative;z-index:1;">
     <a href="/divination/dream" class="back-link">← 返回解梦</a>
     
     <div class="page-header">
@@ -280,4 +267,5 @@ document.getElementById('modal').addEventListener('click', function(e) {
     }
 });
 </script>
+<script src="/static/js/starry.js"></script>
 {% endblock %}

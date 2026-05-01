@@ -3,6 +3,7 @@
 {% block title %}MBTI灵犀测试 - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="/static/css/starry.css">
 <style>
 .mbti-test {
     max-width: 800px;
@@ -20,12 +21,12 @@
     font-family: var(--font-display);
     font-size: 2rem;
     font-weight: 500;
-    color: var(--color-text);
+    color: #E8D5C4;
     margin-bottom: var(--space-md);
 }
 
 .page-title span {
-    background: linear-gradient(135deg, var(--color-accent), #D4A5A5);
+    background: linear-gradient(135deg, #C4B5FD, #E8D5C4);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -33,7 +34,7 @@
 
 .page-desc {
     font-size: 1rem;
-    color: var(--color-text-secondary);
+    color: #C4D4E8;
     line-height: 1.8;
 }
 
@@ -48,29 +49,32 @@
 .progress-bar {
     width: 200px;
     height: 6px;
-    background: var(--color-border);
+    background: rgba(100, 120, 180, 0.2);
     border-radius: 3px;
     overflow: hidden;
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    background: linear-gradient(90deg, #8b5cf6, #C4B5FD);
     border-radius: 3px;
     transition: width 0.5s ease;
 }
 
 .progress-text {
     font-size: 0.875rem;
-    color: var(--color-text-muted);
+    color: #A0A8C0;
 }
 
 .question-card {
-    background: var(--color-bg-card);
+    background: rgba(15, 20, 50, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius-xl);
     padding: var(--space-3xl);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     animation: fadeInUp 0.5s ease;
+    border: 1px solid rgba(100, 120, 180, 0.2);
 }
 
 @keyframes fadeInUp {
@@ -80,7 +84,7 @@
 
 .question-number {
     font-size: 0.875rem;
-    color: var(--color-accent);
+    color: #C4B5FD;
     font-weight: 600;
     margin-bottom: var(--space-md);
 }
@@ -89,7 +93,7 @@
     font-family: var(--font-display);
     font-size: 1.5rem;
     font-weight: 500;
-    color: var(--color-text);
+    color: #E8D5C4;
     margin-bottom: var(--space-2xl);
     line-height: 1.6;
 }
@@ -107,8 +111,8 @@
 }
 
 .option-btn {
-    background: var(--color-bg-warm);
-    border: 2px solid var(--color-border);
+    background: rgba(15, 20, 50, 0.6);
+    border: 2px solid rgba(100, 120, 180, 0.2);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     text-align: left;
@@ -117,37 +121,40 @@
 }
 
 .option-btn:hover {
-    border-color: var(--color-accent);
-    background: rgba(184, 169, 201, 0.1);
+    border-color: rgba(139, 92, 246, 0.5);
+    background: rgba(107, 91, 149, 0.2);
     transform: translateY(-2px);
 }
 
 .option-btn.selected {
-    border-color: var(--color-accent);
-    background: rgba(184, 169, 201, 0.15);
+    border-color: #C4B5FD;
+    background: rgba(107, 91, 149, 0.25);
 }
 
 .option-text {
     font-size: 1rem;
-    color: var(--color-text);
+    color: #C4D4E8;
     line-height: 1.6;
 }
 
 /* 结果页 */
 .result-card {
-    background: var(--color-bg-card);
+    background: rgba(15, 20, 50, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius-xl);
     padding: var(--space-3xl);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     text-align: center;
     animation: fadeInUp 0.6s ease;
+    border: 1px solid rgba(100, 120, 180, 0.2);
 }
 
 .mbti-type {
     font-family: var(--font-display);
     font-size: 4rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--color-accent), #D4A5A5);
+    background: linear-gradient(135deg, #C4B5FD, #E8D5C4);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -156,30 +163,31 @@
 
 .mbti-name {
     font-size: 1.5rem;
-    color: var(--color-text);
+    color: #E8D5C4;
     margin-bottom: var(--space-xl);
 }
 
 .result-desc {
     font-size: 1.125rem;
-    color: var(--color-text-secondary);
+    color: #C4D4E8;
     line-height: 1.8;
     margin-bottom: var(--space-3xl);
     text-align: left;
     padding: var(--space-xl);
-    background: var(--color-bg-warm);
+    background: rgba(15, 20, 50, 0.5);
     border-radius: var(--radius-lg);
+    border: 1px solid rgba(100, 120, 180, 0.15);
 }
 
 .match-section {
-    border-top: 1px solid var(--color-border-light);
+    border-top: 1px solid rgba(100, 120, 180, 0.15);
     padding-top: var(--space-2xl);
-    margin-top: var(--space-2xl);
+    margin-top: var(--space-2xl;
 }
 
 .match-title {
     font-size: 1rem;
-    color: var(--color-text-muted);
+    color: #A0A8C0;
     margin-bottom: var(--space-lg);
 }
 
@@ -188,23 +196,25 @@
     align-items: center;
     gap: var(--space-xl);
     padding: var(--space-xl);
-    background: var(--color-bg-warm);
+    background: rgba(15, 20, 50, 0.5);
     border-radius: var(--radius-lg);
     text-decoration: none;
     color: inherit;
     transition: all 0.3s ease;
+    border: 1px solid rgba(100, 120, 180, 0.15);
 }
 
 .match-agent:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
+    background: rgba(107, 91, 149, 0.2);
+    border-color: rgba(139, 92, 246, 0.3);
 }
 
 .match-avatar {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 3px solid #B8A9C9;
+    border: 3px solid rgba(196, 181, 253, 0.4);
     object-fit: cover;
 }
 
@@ -216,13 +226,13 @@
 .match-name {
     font-family: var(--font-display);
     font-size: 1.25rem;
-    color: var(--color-text);
+    color: #E8D5C4;
     margin-bottom: var(--space-xs);
 }
 
 .match-desc {
     font-size: 0.875rem;
-    color: var(--color-text-muted);
+    color: #A0A8C0;
     line-height: 1.5;
 }
 
@@ -245,63 +255,42 @@
 }
 
 .btn-primary {
-    background: var(--color-accent);
+    background: linear-gradient(135deg, rgba(107, 91, 149, 0.9), rgba(139, 94, 131, 0.9));
     color: white;
+    border: 1px solid rgba(196, 181, 253, 0.3);
 }
 
 .btn-primary:hover {
-    background: var(--color-accent-light);
+    background: linear-gradient(135deg, rgba(127, 111, 169, 0.95), rgba(159, 114, 151, 0.95));
     color: white;
 }
 
 .btn-secondary {
     background: transparent;
-    color: var(--color-text-secondary);
-    border: 1px solid var(--color-border);
+    color: #A0A8C0;
+    border: 1px solid rgba(100, 120, 180, 0.25);
 }
 
 .btn-secondary:hover {
-    border-color: var(--color-primary);
-    color: var(--color-accent);
-}
-
-/* 星座装饰 */
-.stars-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: -1;
-    background: radial-gradient(ellipse at top, rgba(184, 169, 201, 0.1) 0%, transparent 50%);
-}
-
-.floating-star {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: var(--color-accent);
-    border-radius: 50%;
-    animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); opacity: 0.5; }
-    50% { transform: translateY(-20px); opacity: 1; }
+    border-color: rgba(139, 92, 246, 0.5);
+    color: #C4B5FD;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="stars-bg">
-    <div class="floating-star" style="top: 10%; left: 20%;"></div>
-    <div class="floating-star" style="top: 30%; left: 80%; animation-delay: 1s;"></div>
-    <div class="floating-star" style="top: 60%; left: 15%; animation-delay: 2s;"></div>
-    <div class="floating-star" style="top: 80%; left: 70%; animation-delay: 3s;"></div>
+<!-- 星空背景层 -->
+<div class="stars-container">
+    <div class="stars-sm"></div>
+    <div class="stars-md"></div>
+    <div class="stars-lg"></div>
 </div>
+<div class="nebula nebula-purple"></div>
+<div class="nebula nebula-blue"></div>
+<div class="nebula nebula-deep"></div>
+<div class="nebula nebula-cyan"></div>
 
-<div class="mbti-test">
+<div class="mbti-test starry-bg" style="position:relative;z-index:1;">
     <div class="page-header">
         <h1 class="page-title">✨ MBTI 灵犀测试 ✨</h1>
         <p class="page-desc">探索你的性格特质，找到最契合的AI灵魂伴侣</p>
@@ -419,4 +408,5 @@ async function showResult() {
 // 初始化
 loadQuestion(1);
 </script>
+<script src="/static/js/starry.js"></script>
 {% endblock %}
