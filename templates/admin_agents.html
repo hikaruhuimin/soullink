@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SoulLink Admin - Agents</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#F5F3F0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#333}
+.nav{background:#fff;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
+.nav h1{font-size:18px;color:#6B5B7B}.nav a{color:#8B5E83;text-decoration:none;font-size:14px;margin-left:20px}
+.container{max-width:1100px;margin:24px auto;padding:0 24px}
+.section{background:#fff;border-radius:12px;padding:24px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+.section h2{font-size:16px;color:#6B5B7B;margin-bottom:16px}
+.agent-card{display:flex;gap:20px;align-items:center;padding:16px;border-bottom:1px solid #F0EDEA}
+.agent-card:last-child{border-bottom:none}
+.agent-img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #E8E4E0}
+.agent-info{flex:1}
+.agent-info h3{font-size:15px;color:#333;margin-bottom:4px}
+.agent-info p{font-size:13px;color:#B8A9C9}
+.agent-stats{display:flex;gap:24px;font-size:13px;color:#6B5B7B}
+.agent-stats span{font-weight:600}
+.level-dist{display:flex;gap:8px;margin-top:8px}
+.level-dist .lvl{padding:2px 8px;border-radius:8px;font-size:11px;background:#F0EDEA;color:#6B5B7B}
+</style></head>
+<body>
+<div class="nav">
+<h1>SoulLink Admin</h1>
+<div><a href="/admin">仪表盘</a><a href="/admin/users">用户</a><a href="/admin/agents">Agent</a><a href="/admin/finance">财务</a><a href="/admin/logout">退出</a></div>
+</div>
+<div class="container">
+<div class="section">
+<h2>Agent 数据总览</h2>
+{% for d in agents_data %}
+<div class="agent-card">
+<img class="agent-img" src="{{ d.agent.avatar }}" alt="{{ d.agent.name.zh }}">
+<div class="agent-info">
+<h3>{{ d.agent.name.zh }} / {{ d.agent.name.en }}</h3>
+<p>{{ d.agent.personality.zh }} · {{ d.agent.mbti }}</p>
+<div class="level-dist">
+{% for lvl, count in d.level_dist.items() %}
+<span class="lvl">{{ intimacy_levels[lvl].name.zh }}: {{ count }}</span>
+{% endfor %}
+</div>
+</div>
+<div class="agent-stats">
+<div>关系数 <span>{{ d.rel_count }}</span></div>
+<div>收到礼物 <span>{{ d.gift_count }}</span></div>
+</div>
+</div>
+{% endfor %}
+</div>
+</div>
+</body></html>

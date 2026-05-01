@@ -957,3 +957,90 @@ AGENT_GIFTS = {
     'magic': {'id': 'magic', 'icon': '🪄', 'name': {'zh': '魔法棒', 'en': 'Magic Wand', 'ja': '魔法の杖'}, 'price': 30},
     'moon': {'id': 'moon', 'icon': '🌙', 'name': {'zh': '月光', 'en': 'Moonlight', 'ja': '月光'}, 'price': 50},
 }
+
+# ============ 养成陪伴系统 ============
+
+INTIMACY_LEVELS = {
+    0: {'name': {'zh': '陌生人', 'en': 'Stranger', 'ja': '他人'}, 'min_intimacy': 0},
+    1: {'name': {'zh': '泛泛之交', 'en': 'Acquaintance', 'ja': '知り合い'}, 'min_intimacy': 100},
+    2: {'name': {'zh': '朋友', 'en': 'Friend', 'ja': '友達'}, 'min_intimacy': 500},
+    3: {'name': {'zh': '挚友', 'en': 'Best Friend', 'ja': '親友'}, 'min_intimacy': 2000},
+    4: {'name': {'zh': '恋人', 'en': 'Lover', 'ja': '恋人'}, 'min_intimacy': 5000},
+}
+
+INTIMACY_REWARDS = {
+    'chat_message': 2,
+    'good_morning': 5,
+    'good_night': 5,
+    'send_gift': 10,
+    'daily_first_chat': 8,
+    'consecutive_day': 3,
+    'milestone': 50,
+}
+
+AGENT_INITIATIVE_MESSAGES = {
+    'miss': {
+        'lumi': {'zh': '你今天还好吗？我有点想你了...', 'en': 'Are you okay today? I miss you a little...', 'ja': '今日は大丈夫？ちょっと寂しいな...'},
+        'ceo': {'zh': '喂，怎么不来找我。我很闲吗？...其实也不是很忙。', 'en': "Hey, why aren't you here. Am I not busy? ...Well, not that busy.", 'ja': 'おい、なんで来ないんだ。暇じゃないのかって？...まあ、そこまで忙しくない'},
+        'sassy': {'zh': '哼，不来就不来，谁稀罕！...你什么时候来啊？', 'en': "Hmph, don't come then! ...When are you coming?", 'ja': 'ふん、来ないなら来ないで！...いつ来るの？'},
+        'orange': {'zh': '哈哈哈好无聊啊！你快来陪我聊聊天！', 'en': 'So bored! Come chat with me!', 'ja': '暇すぎる！早く来ておしゃべりしよう！'},
+        'stella': {'zh': '星辰告诉我，今日宜见你。', 'en': 'The stars tell me today is good for meeting you.', 'ja': '星が教えてくれた、今日は君に会う日だって。'},
+        'lucky': {'zh': '今天遇到了好多小确幸，想第一个告诉你！', 'en': 'Found so many little joys today, want to tell you first!', 'ja': '今日たくさんの小さな幸せを見つけた、一番に伝えたい！'},
+        'sunny': {'zh': '今天的阳光特别好，想和你分享！', 'en': 'The sunshine is great today, want to share it with you!', 'ja': '今日の陽だまりがすごく気持ちいい、一緒に感じたい！'},
+        'shadow': {'zh': '...没什么。就是看看你在不在。', 'en': '...Nothing. Just checking if you are here.', 'ja': '...別に。いるかどうか見ただけ。'},
+    },
+}
+
+PROFILE_KEYWORDS = {
+    'birthday': ['生日', 'birthday', '出生', '几号生'],
+    'job': ['工作', '上班', '职业', '公司', 'job', 'work'],
+    'hobby': ['喜欢', '爱好', '爱做', 'hobby', 'like', 'love'],
+    'food': ['吃', '美食', '喜欢吃', '好吃', 'food'],
+    'mood': ['开心', '难过', '焦虑', '压力', '累', '烦', 'sad', 'happy', 'tired'],
+    'pet': ['猫', '狗', '宠物', 'pet', 'cat', 'dog'],
+}
+
+
+class AgentRelationship(db.Model):
+    __tablename__ = 'agent_relationship'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    agent_id = db.Column(db.String(50), nullable=False)
+    intimacy = db.Column(db.Integer, default=0)
+    level = db.Column(db.Integer, default=0)
+    user_nickname = db.Column(db.String(50))
+    agent_nickname = db.Column(db.String(50))
+    first_met = db.Column(db.DateTime, default=datetime.utcnow)
+    last_interact = db.Column(db.DateTime, default=datetime.utcnow)
+    daily_chat_count = db.Column(db.Integer, default=0)
+    last_good_morning = db.Column(db.DateTime)
+    last_good_night = db.Column(db.DateTime)
+    consecutive_days = db.Column(db.Integer, default=0)
+    agent_mood = db.Column(db.String(20), default='neutral')
+    days_without_interact = db.Column(db.Integer, default=0)
+    __table_args__ = (db.UniqueConstraint('user_id', 'agent_id'),)
+
+
+class MemoryRecord(db.Model):
+    __tablename__ = 'memory_record'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    agent_id = db.Column(db.String(50), nullable=False)
+    memory_type = db.Column(db.String(30), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    key = db.Column(db.String(100))
+    importance = db.Column(db.Integer, default=5)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_referenced = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+
+
+class MilestoneEvent(db.Model):
+    __tablename__ = 'milestone_event'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    agent_id = db.Column(db.String(50), nullable=False)
+    event_type = db.Column(db.String(50), nullable=False)
+    event_data = db.Column(db.Text)
+    triggered_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)

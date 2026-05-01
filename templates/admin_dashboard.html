@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SoulLink Admin - Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#F5F3F0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#333}
+.nav{background:#fff;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
+.nav h1{font-size:18px;color:#6B5B7B}.nav a{color:#8B5E83;text-decoration:none;font-size:14px;margin-left:20px}
+.container{max-width:1100px;margin:24px auto;padding:0 24px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px}
+.stat-card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+.stat-card h3{font-size:13px;color:#B8A9C9;margin-bottom:8px}.stat-card .num{font-size:32px;font-weight:600;color:#6B5B7B}
+.section{background:#fff;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+.section h2{font-size:16px;color:#6B5B7B;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:10px 12px;color:#B8A9C9;border-bottom:2px solid #F0EDEA;font-size:12px;font-weight:600}
+td{padding:10px 12px;border-bottom:1px solid #F0EDEA}
+tr:hover td{background:#FAF8F5}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-vip{background:#F0E6F6;color:#8B5E83}.badge-free{background:#F0F0F0;color:#999}
+</style></head>
+<body>
+<div class="nav">
+<h1>SoulLink Admin</h1>
+<div><a href="/admin">仪表盘</a><a href="/admin/users">用户</a><a href="/admin/agents">Agent</a><a href="/admin/finance">财务</a><a href="/admin/logout">退出</a></div>
+</div>
+<div class="container">
+<div class="stats">
+<div class="stat-card"><h3>总用户</h3><div class="num">{{ total_users }}</div></div>
+<div class="stat-card"><h3>今日新增</h3><div class="num">{{ new_today }}</div></div>
+<div class="stat-card"><h3>关系总数</h3><div class="num">{{ total_rels }}</div></div>
+<div class="stat-card"><h3>礼物总数</h3><div class="num">{{ total_gifts }}</div></div>
+</div>
+<div class="section">
+<h2>Agent 受欢迎排行</h2>
+<table><thead><tr><th>Agent</th><th>性格</th><th>关系数</th><th>收到礼物</th></tr></thead><tbody>
+{% for s in agents_stats %}
+<tr><td><strong>{{ s.agent.name.zh }}</strong></td><td>{{ s.agent.personality.zh }}</td><td>{{ s.rel_count }}</td><td>{{ s.gift_count }}</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+<div class="section">
+<h2>最近注册用户</h2>
+<table><thead><tr><th>ID</th><th>用户名</th><th>邮箱</th><th>VIP</th></tr></thead><tbody>
+{% for u in recent_users %}
+<tr><td>{{ u.id }}</td><td>{{ u.username }}</td><td>{{ u.email }}</td><td><span class="badge badge-vip if u.vip_level else badge-free">{{ 'VIP' if u.vip_level else '免费' }}</span></td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+</div>
+</body></html>

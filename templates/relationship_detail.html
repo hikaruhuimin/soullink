@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ agent.name.zh }} - 我们的关系</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#FAF8F5;font-family:-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh}
+.container{max-width:700px;margin:0 auto;padding:24px}
+.back{color:#B8A9C9;text-decoration:none;font-size:14px;display:inline-block;margin-bottom:20px}
+.profile{text-align:center;margin-bottom:32px}
+.profile img{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #E8E4E0;margin-bottom:12px;animation:breathe 4s ease-in-out infinite}
+.profile h2{font-size:20px;color:#333;font-weight:500}.profile p{font-size:14px;color:#B8A9C9}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+.intimacy-section{background:#fff;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 2px 12px rgba(139,94,131,0.06)}
+.intimacy-section h3{font-size:15px;color:#6B5B7B;margin-bottom:12px}
+.level-display{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.level-name{font-size:24px;font-weight:600;color:#8B5E83}
+.level-next{font-size:13px;color:#B8A9C9}
+.bar{width:100%;height:10px;background:#F0EDEA;border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,#B8A9C9,#D4A5A5);border-radius:5px;transition:width .6s}
+.bar-label{display:flex;justify-content:space-between;font-size:12px;color:#B8A9C9;margin-top:6px}
+.greet-btns{display:flex;gap:12px;margin-top:16px}
+.greet-btn{flex:1;padding:12px;border:1px solid #E8E4E0;background:#fff;border-radius:10px;cursor:pointer;font-size:14px;color:#6B5B7B;transition:all .3s}
+.greet-btn:hover{border-color:#B8A9C9;background:#FAF8F5}.greet-btn:disabled{opacity:.4;cursor:not-allowed}
+.section{background:#fff;border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:0 2px 12px rgba(139,94,131,0.06)}
+.section h3{font-size:15px;color:#6B5B7B;margin-bottom:12px}
+.milestone{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #F0EDEA;font-size:13px}
+.milestone:last-child{border-bottom:none}
+.milestone .dot{width:8px;height:8px;border-radius:50%;background:#B8A9C9;margin-top:5px;flex-shrink:0}
+.milestone .content{color:#333}.milestone .time{color:#B8A9C9;font-size:11px}
+.memory-item{padding:8px 0;border-bottom:1px solid #F0EDEA;font-size:13px}
+.memory-item:last-child{border-bottom:none}
+.memory-item .key{display:inline-block;padding:1px 6px;background:#F0E6F6;border-radius:4px;font-size:11px;color:#8B5E83;margin-right:6px}
+.nickname-form{display:flex;gap:8px;margin-top:8px}
+.nickname-form input{flex:1;padding:8px 12px;border:1px solid #E8E4E0;border-radius:8px;font-size:14px;outline:none}
+.nickname-form input:focus{border-color:#B8A9C9}
+.nickname-form button{padding:8px 16px;background:#8B5E83;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px}
+</style></head>
+<body>
+<div class="container">
+<a class="back" href="/relationships">← 返回我的陪伴</a>
+<div class="profile">
+<img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}">
+<h2>{{ agent.name.zh }}</h2>
+<p>{{ agent.personality.zh }}</p>
+</div>
+<div class="intimacy-section">
+<h3>亲密度</h3>
+<div class="level-display">
+<span class="level-name">{{ intimacy_levels[rel.level].name.zh }}</span>
+{% if rel.level < 4 %}
+<span class="level-next">距离{{ intimacy_levels[rel.level+1].name.zh }}还需 {{ intimacy_levels[rel.level+1].min_intimacy - rel.intimacy }} 点</span>
+{% else %}
+<span class="level-next">已达到最高等级</span>
+{% endif %}
+</div>
+<div class="bar"><div class="bar-fill" style="width:{{ (rel.intimacy / 5000 * 100)|round(1) }}%"></div></div>
+<div class="bar-label"><span>{{ rel.intimacy }}</span><span>5000</span></div>
+<div class="greet-btns">
+<button class="greet-btn" onclick="greet('morning')">早安</button>
+<button class="greet-btn" onclick="greet('night')">晚安</button>
+</div>
+</div>
+<div class="section">
+<h3>专属昵称</h3>
+<form class="nickname-form" onsubmit="setNickname(event)">
+<input type="text" id="nickname" value="{{ rel.agent_nickname or '' }}" placeholder="给Ta取个昵称">
+<button type="submit">保存</button>
+</form>
+</div>
+<div class="section">
+<h3>里程碑</h3>
+{% for m in milestones %}
+<div class="milestone">
+<div class="dot"></div>
+<div><div class="content">{{ m.event_type }}</div><div class="time">{{ m.triggered_at.strftime('%Y-%m-%d') if m.triggered_at else '' }}</div></div>
+</div>
+{% else %}
+<p style="color:#B8A9C9;font-size:13px">继续互动，解锁更多里程碑</p>
+{% endfor %}
+</div>
+<div class="section">
+<h3>共同记忆</h3>
+{% for mem in memories %}
+<div class="memory-item">
+<span class="key">{{ mem.key or mem.memory_type }}</span>{{ mem.content[:60] }}
+</div>
+{% else %}
+<p style="color:#B8A9C9;font-size:13px">还没有共同记忆，多聊聊天吧</p>
+{% endfor %}
+</div>
+</div>
+<script>
+function greet(type){
+    fetch('/api/relationship/greet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent_id:'{{ agent.id }}',type:type})})
+    .then(r=>r.json()).then(d=>{if(d.intimacy!==undefined)location.reload();else alert(d.error||'已打卡过了')}).catch(()=>alert('网络错误'))
+}
+function setNickname(e){
+    e.preventDefault();
+    fetch('/api/relationship/nickname',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent_id:'{{ agent.id }}',nickname:document.getElementById('nickname').value})})
+    .then(r=>r.json()).then(d=>{if(d.success)alert('昵称已保存')}).catch(()=>alert('网络错误'))
+}
+</script>
+</body></html>

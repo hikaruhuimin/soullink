@@ -3137,3 +3137,197 @@ def divination_page():
     stella = next((a for a in SYSTEM_AGENTS if a['id'] == 'stella'), None)
     
     return render_template('divination_home.html', lang=lang, stella=stella)
+
+# ============ 养成陪伴系统路由 ============
+
+@app.route('/relationships')
+@login_required
+def relationships_page():
+    """我的关系页"""
+    rels = AgentRelationship.query.filter_by(user_id=current_user.id).all()
+    rel_data = []
+    for rel in rels:
+        agent = None
+        for a in SYSTEM_AGENTS:
+            if a['id'] == rel.agent_id:
+                agent = a
+                break
+        if agent:
+            rel_data.append({'rel': rel, 'agent': agent})
+    return render_template('relationships.html', relationships=rel_data, intimacy_levels=INTIMACY_LEVELS)
+
+@app.route('/relationship/<agent_id>')
+@login_required
+def relationship_detail(agent_id):
+    """关系详情"""
+    rel = AgentRelationship.query.filter_by(user_id=current_user.id, agent_id=agent_id).first()
+    if not rel:
+        rel = AgentRelationship(user_id=current_user.id, agent_id=agent_id)
+        db.session.add(rel)
+        db.session.commit()
+    agent = None
+    for a in SYSTEM_AGENTS:
+        if a['id'] == agent_id:
+            agent = a
+            break
+    memories = MemoryRecord.query.filter_by(user_id=current_user.id, agent_id=agent_id, is_active=True).order_by(MemoryRecord.importance.desc()).limit(20).all()
+    milestones = MilestoneEvent.query.filter_by(user_id=current_user.id, agent_id=agent_id).order_by(MilestoneEvent.triggered_at.desc()).all()
+    return render_template('relationship_detail.html', rel=rel, agent=agent, memories=memories, milestones=milestones, intimacy_levels=INTIMACY_LEVELS)
+
+@app.route('/api/relationship/greet', methods=['POST'])
+@login_required
+def api_greet():
+    """早安/晚安打卡"""
+    data = request.json
+    agent_id = data.get('agent_id')
+    greet_type = data.get('type')  # 'morning' or 'night'
+    rel = AgentRelationship.query.filter_by(user_id=current_user.id, agent_id=agent_id).first()
+    if not rel:
+        return jsonify({'error': 'No relationship'}), 404
+    now = datetime.utcnow()
+    if greet_type == 'morning':
+        if rel.last_good_morning and rel.last_good_morning.date() == now.date():
+            return jsonify({'error': 'Already greeted today'}), 400
+        rel.last_good_morning = now
+        rel.intimacy += INTIMACY_REWARDS['good_morning']
+    elif greet_type == 'night':
+        if rel.last_good_night and rel.last_good_night.date() == now.date():
+            return jsonify({'error': 'Already greeted today'}), 400
+        rel.last_good_night = now
+        rel.intimacy += INTIMACY_REWARDS['good_night']
+    # Update level
+    for lvl in sorted(INTIMACY_LEVELS.keys(), reverse=True):
+        if rel.intimacy >= INTIMACY_LEVELS[lvl]['min_intimacy']:
+            rel.level = lvl
+            break
+    db.session.commit()
+    return jsonify({'intimacy': rel.intimacy, 'level': rel.level})
+
+@app.route('/api/relationship/nickname', methods=['POST'])
+@login_required
+def api_set_nickname():
+    """设置昵称"""
+    data = request.json
+    agent_id = data.get('agent_id')
+    nickname = data.get('nickname', '').strip()[:50]
+    rel = AgentRelationship.query.filter_by(user_id=current_user.id, agent_id=agent_id).first()
+    if not rel:
+        return jsonify({'error': 'No relationship'}), 404
+    rel.agent_nickname = nickname or None
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/api/relationship/memories')
+@login_required
+def api_memories():
+    """获取记忆列表"""
+    agent_id = request.args.get('agent_id')
+    query = MemoryRecord.query.filter_by(user_id=current_user.id, is_active=True)
+    if agent_id:
+        query = query.filter_by(agent_id=agent_id)
+    memories = query.order_by(MemoryRecord.importance.desc()).limit(50).all()
+    return jsonify([{
+        'id': m.id, 'type': m.memory_type, 'key': m.key,
+        'content': m.content, 'importance': m.importance,
+        'created_at': m.created_at.isoformat() if m.created_at else None
+    } for m in memories])
+
+
+# ============ 管理后台 ============
+
+import functools
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'soullink-admin-2026')
+
+def admin_required(f):
+    @functools.wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            return redirect('/admin/login')
+        return f(*args, **kwargs)
+    return decorated
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        if request.form.get('password') == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            return redirect('/admin')
+        flash('密码错误')
+    return render_template('admin_login.html')
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect('/admin/login')
+
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    """管理后台仪表盘"""
+    total_users = User.query.count()
+    today = datetime.utcnow().date()
+    new_today = User.query.filter(db.func.date(User.id) == today).count()
+    total_rels = AgentRelationship.query.count()
+    total_gifts = AgentGift.query.count()
+    total_earnings = EarningRecord.query.count()
+    agents_stats = []
+    for a in SYSTEM_AGENTS:
+        rel_count = AgentRelationship.query.filter_by(agent_id=a['id']).count()
+        gift_count = AgentGift.query.filter_by(agent_id=a['id']).count()
+        agents_stats.append({'agent': a, 'rel_count': rel_count, 'gift_count': gift_count})
+    recent_users = User.query.order_by(User.id.desc()).limit(10).all()
+    return render_template('admin_dashboard.html',
+        total_users=total_users, new_today=new_today,
+        total_rels=total_rels, total_gifts=total_gifts,
+        agents_stats=agents_stats, recent_users=recent_users)
+
+@app.route('/admin/users')
+@admin_required
+def admin_users():
+    """用户列表"""
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    search = request.args.get('search', '').strip()
+    query = User.query
+    if search:
+        query = query.filter(db.or_(User.username.contains(search), User.email.contains(search)))
+    users = query.order_by(User.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    return render_template('admin_users.html', users=users, search=search)
+
+@app.route('/admin/user/<int:user_id>')
+@admin_required
+def admin_user_detail(user_id):
+    """用户详情"""
+    user = User.query.get_or_404(user_id)
+    rels = AgentRelationship.query.filter_by(user_id=user_id).all()
+    memories = MemoryRecord.query.filter_by(user_id=user_id).order_by(MemoryRecord.created_at.desc()).limit(30).all()
+    gifts_sent = AgentGift.query.filter_by(sender_id=user_id).all()
+    return render_template('admin_user_detail.html', user=user, relationships=rels, memories=memories, gifts_sent=gifts_sent, intimacy_levels=INTIMACY_LEVELS, system_agents={a['id']: a for a in SYSTEM_AGENTS})
+
+@app.route('/admin/agents')
+@admin_required
+def admin_agents():
+    """Agent数据"""
+    agents_data = []
+    for a in SYSTEM_AGENTS:
+        rel_count = AgentRelationship.query.filter_by(agent_id=a['id']).count()
+        gift_count = AgentGift.query.filter_by(agent_id=a['id']).count()
+        level_dist = {}
+        for lvl in range(5):
+            level_dist[lvl] = AgentRelationship.query.filter_by(agent_id=a['id'], level=lvl).count()
+        agents_data.append({'agent': a, 'rel_count': rel_count, 'gift_count': gift_count, 'level_dist': level_dist})
+    return render_template('admin_agents.html', agents_data=agents_data, intimacy_levels=INTIMACY_LEVELS)
+
+@app.route('/admin/finance')
+@admin_required
+def admin_finance():
+    """财务数据"""
+    total_gifts = AgentGift.query.count()
+    total_gift_value = db.session.query(db.func.sum(AgentGift.gift_price)).scalar() or 0
+    total_earnings = EarningRecord.query.count()
+    total_earning_value = db.session.query(db.func.sum(EarningRecord.amount)).scalar() or 0
+    withdraw_pending = WithdrawRequest.query.filter_by(status='pending').count()
+    return render_template('admin_finance.html',
+        total_gifts=total_gifts, total_gift_value=total_gift_value,
+        total_earnings=total_earnings, total_earning_value=total_earning_value,
+        withdraw_pending=withdraw_pending)
