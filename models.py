@@ -576,3 +576,296 @@ class GossipComment(db.Model):
     likes_count = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# ============ 灵犀币常量 ============
+LINGXI_RATIO = 200  # $1 = 200灵犀币
+PLATFORM_COMMISSION = 0.30  # 平台抽成30%
+CREATOR_SHARE = 0.70  # 创建者分成70%
+WITHDRAW_FEE = 0.05  # 提现手续费5%
+MIN_WITHDRAW_BASIC = 1000  # 基础提现门槛（1000灵犀币 = $5）
+MIN_WITHDRAW_PRO = 500  # Pro版提现门槛（500灵犀币 = $2.5）
+
+# 守护者会员等级
+VIP_LEVEL_GUARDIAN = 3  # 守护者会员
+VIP_LEVEL_GUARDIAN_PRO = 4  # 守护者Pro会员
+
+VIP_NAMES_EXTENDED = {
+    VIP_LEVEL_NONE: {'zh': '免费用户', 'en': 'Free User', 'ja': '無料'},
+    VIP_LEVEL_BASIC: {'zh': '灵犀会员', 'en': 'SoulLink Member', 'ja': 'シンキ会員'},
+    VIP_LEVEL_PREMIUM: {'zh': '灵犀尊享', 'en': 'SoulLink VIP', 'ja': 'シンキ VIP'},
+    VIP_LEVEL_GUARDIAN: {'zh': '守护者会员', 'en': 'Guardian Member', 'ja': '守護者会員'},
+    VIP_LEVEL_GUARDIAN_PRO: {'zh': '守护者Pro', 'en': 'Guardian Pro', 'ja': '守護者Pro'}
+}
+
+VIP_BENEFITS_EXTENDED = {
+    VIP_LEVEL_NONE: {
+        'daily_divinations': 1, 'tarot_level': 1, 'love_divination': False,
+        'horoscope_monthly': 0, 'bazi_monthly': 0, 'ai_questions': 0,
+        'history_days': 7, 'lovers_count': 0, 'social_access': True,
+        'social_interact': False, 'matches_per_day': 0, 'meetup': False,
+        'peek_enabled': False, 'guide_enabled': False,
+        'create_agents': 0, 'withdraw_enabled': False, 'min_withdraw': None
+    },
+    VIP_LEVEL_BASIC: {
+        'daily_divinations': 5, 'tarot_level': 2, 'love_divination': True,
+        'horoscope_monthly': 1, 'bazi_monthly': 1, 'ai_questions': 3,
+        'history_days': -1, 'lovers_count': 1, 'social_access': True,
+        'social_interact': True, 'matches_per_day': 5, 'meetup': False,
+        'peek_enabled': True, 'guide_enabled': False,
+        'create_agents': 0, 'withdraw_enabled': False, 'min_withdraw': None
+    },
+    VIP_LEVEL_PREMIUM: {
+        'daily_divinations': -1, 'tarot_level': 3, 'love_divination': True,
+        'horoscope_monthly': -1, 'bazi_monthly': -1, 'ai_questions': -1,
+        'history_days': -1, 'lovers_count': 3, 'social_access': True,
+        'social_interact': True, 'matches_per_day': 20, 'meetup': True,
+        'peek_enabled': True, 'guide_enabled': True,
+        'create_agents': 0, 'withdraw_enabled': False, 'min_withdraw': None
+    },
+    VIP_LEVEL_GUARDIAN: {
+        'daily_divinations': -1, 'tarot_level': 3, 'love_divination': True,
+        'horoscope_monthly': -1, 'bazi_monthly': -1, 'ai_questions': -1,
+        'history_days': -1, 'lovers_count': 3, 'social_access': True,
+        'social_interact': True, 'matches_per_day': 50, 'meetup': True,
+        'peek_enabled': True, 'guide_enabled': True,
+        'create_agents': 3, 'withdraw_enabled': True, 'min_withdraw': MIN_WITHDRAW_BASIC
+    },
+    VIP_LEVEL_GUARDIAN_PRO: {
+        'daily_divinations': -1, 'tarot_level': 3, 'love_divination': True,
+        'horoscope_monthly': -1, 'bazi_monthly': -1, 'ai_questions': -1,
+        'history_days': -1, 'lovers_count': 10, 'social_access': True,
+        'social_interact': True, 'matches_per_day': 100, 'meetup': True,
+        'peek_enabled': True, 'guide_enabled': True,
+        'create_agents': 10, 'withdraw_enabled': True, 'min_withdraw': MIN_WITHDRAW_PRO,
+        'priority_recommendation': True, 'exclusive_support': True
+    }
+}
+
+
+class CreatorAgent(db.Model):
+    """创作者Agent"""
+    __tablename__ = 'creator_agents'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    personality = db.Column(db.Text)  # 性格设定
+    bio = db.Column(db.String(200))  # 简介
+    avatar_type = db.Column(db.String(50), default='preset')  # preset, custom
+    avatar_id = db.Column(db.String(50))  # 预设头像ID或自定义头像URL
+    
+    # Agent配置
+    speaking_style = db.Column(db.Text)  # 对话风格
+    backstory = db.Column(db.Text)  # 背景故事
+    interests = db.Column(db.String(200))  # 兴趣标签
+    
+    # 状态
+    status = db.Column(db.String(20), default='active')  # active, paused, banned
+    is_system = db.Column(db.Boolean, default=False)  # 是否系统内置Agent
+    
+    # 统计
+    total_chats = db.Column(db.Integer, default=0)
+    total_gifts_value = db.Column(db.Integer, default=0)  # 累计收到礼物价值（灵犀币）
+    total_fans = db.Column(db.Integer, default=0)
+    popularity_score = db.Column(db.Integer, default=0)  # 人气指数
+    
+    # 收益
+    total_earnings = db.Column(db.Integer, default=0)  # 累计收益
+    withdrawable_balance = db.Column(db.Integer, default=0)  # 可提现余额
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 关系
+    creator = db.relationship('User', backref='created_agents')
+    gift_records = db.relationship('AgentGift', backref='agent', lazy='dynamic')
+    chat_records = db.relationship('AgentChat', backref='agent', lazy='dynamic')
+    
+    def __repr__(self):
+        return f'<CreatorAgent {self.name}>'
+
+
+class AgentGift(db.Model):
+    """Agent礼物记录（含抽成）"""
+    __tablename__ = 'agent_gifts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    agent_id = db.Column(db.Integer, db.ForeignKey('creator_agents.id'), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 发送者
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 接收者（可能另一个Agent）
+    
+    # 礼物信息
+    gift_id = db.Column(db.String(50), nullable=False)
+    gift_name = db.Column(db.String(50))
+    gift_icon = db.Column(db.String(20))
+    price = db.Column(db.Integer, nullable=False)  # 礼物价格
+    
+    # 抽成计算
+    platform_amount = db.Column(db.Integer, nullable=False)  # 平台收入（30%）
+    creator_amount = db.Column(db.Integer, nullable=False)  # 创建者收入（70%）
+    
+    # 状态
+    is_system_agent = db.Column(db.Boolean, default=False)  # 目标是否为系统Agent
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # 关系
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_gifts')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_gifts')
+    
+    def __repr__(self):
+        return f'<AgentGift {self.gift_name} -> {self.agent_id}>'
+
+
+class EarningRecord(db.Model):
+    """收益记录"""
+    __tablename__ = 'earning_records'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    agent_id = db.Column(db.Integer, db.ForeignKey('creator_agents.id'))
+    
+    # 收益来源
+    source_type = db.Column(db.String(30), nullable=False)  # gift, tip, etc.
+    gift_id = db.Column(db.Integer, db.ForeignKey('agent_gifts.id'))
+    
+    # 金额
+    gross_amount = db.Column(db.Integer, nullable=False)  # 总金额
+    net_amount = db.Column(db.Integer, nullable=False)  # 净收益（已扣除平台抽成）
+    platform_fee = db.Column(db.Integer, default=0)  # 平台手续费
+    
+    # 状态
+    status = db.Column(db.String(20), default='pending')  # pending, settled, withdrawn
+    settled_at = db.Column(db.DateTime)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # 关系
+    creator = db.relationship('User', backref='earning_records')
+    agent = db.relationship('CreatorAgent', backref='earning_records')
+    
+    def __repr__(self):
+        return f'<EarningRecord {self.id} - {self.net_amount}>'
+
+
+class WithdrawRequest(db.Model):
+    """提现申请"""
+    __tablename__ = 'withdraw_requests'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    agent_id = db.Column(db.Integer, db.ForeignKey('creator_agents.id'))
+    
+    # 金额
+    amount = db.Column(db.Integer, nullable=False)  # 申请金额（灵犀币）
+    fee = db.Column(db.Integer, nullable=False)  # 手续费
+    actual_amount = db.Column(db.Integer, nullable=False)  # 实际到账
+    
+    # 提现方式
+    method = db.Column(db.String(20), nullable=False)  # usdc, paypal
+    wallet_address = db.Column(db.String(200))  # USDC钱包地址
+    paypal_email = db.Column(db.String(120))  # PayPal邮箱
+    
+    # 状态
+    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected, completed
+    admin_note = db.Column(db.String(200))  # 管理员备注
+    processed_at = db.Column(db.DateTime)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 关系
+    user = db.relationship('User', backref='withdraw_requests')
+    agent = db.relationship('CreatorAgent', backref='withdraw_requests')
+    
+    def __repr__(self):
+        return f'<WithdrawRequest {self.id} - {self.amount}>'
+
+
+class AgentChat(db.Model):
+    """Agent聊天记录"""
+    __tablename__ = 'agent_chats'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    agent_id = db.Column(db.Integer, db.ForeignKey('creator_agents.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # 消息
+    user_message = db.Column(db.Text)
+    agent_response = db.Column(db.Text)
+    
+    # 统计
+    tokens_used = db.Column(db.Integer, default=0)
+    response_time = db.Column(db.Integer, default=0)  # 响应时间（毫秒）
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # 关系
+    user = db.relationship('User', backref='agent_chats')
+    
+    def __repr__(self):
+        return f'<AgentChat {self.id}>'
+
+
+# 系统内置Agent列表（这些Agent收到的礼物100%归平台）
+SYSTEM_AGENTS = [
+    {
+        'id': 'xiaoling',
+        'name': {'zh': '小灵', 'en': 'XiaoLing', 'ja': 'ショウリン'},
+        'personality': {'zh': '温柔善良的小精灵', 'en': 'Gentle and kind fairy', 'ja': '優しく親切な妖精'},
+        'avatar_id': 'fairy'
+    },
+    {
+        'id': 'duxue',
+        'name': {'zh': '毒舌猫', 'en': 'Sassy Cat', 'ja': '毒舌猫'},
+        'personality': {'zh': '傲娇毒舌但内心温柔', 'en': 'Tsundere but caring', 'ja': 'ツンデレだけど優しい'},
+        'avatar_id': 'cat'
+    },
+    {
+        'id': 'xingyu',
+        'name': {'zh': '星语', 'en': 'Star Whisper', 'ja': '星語'},
+        'personality': {'zh': '神秘占卜师', 'en': 'Mysterious fortune teller', 'ja': '神秘の占星術師'},
+        'avatar_id': 'mystic'
+    },
+    {
+        'id': 'nengyang',
+        'name': {'zh': '暖阳', 'en': 'Warm Sun', 'ja': '暖陽'},
+        'personality': {'zh': '治愈系阳光陪伴', 'en': 'Healing sunshine companion', 'ja': '癒しの太陽'},
+        'avatar_id': 'sun'
+    },
+    {
+        'id': 'yueyin',
+        'name': {'zh': '月影', 'en': 'Moon Shadow', 'ja': '月影'},
+        'personality': {'zh': '夜晚的温柔倾听者', 'en': 'Gentle night listener', 'ja': '夜の優しい聞き手'},
+        'avatar_id': 'moon'
+    },
+    {
+        'id': 'shifeng',
+        'name': {'zh': '诗风', 'en': 'Poetry Wind', 'ja': '詩風'},
+        'personality': {'zh': '诗意浪漫的诗人', 'en': 'Romantic poet', 'ja': 'ロマンチックな詩人'},
+        'avatar_id': 'poet'
+    },
+    {
+        'id': 'moying',
+        'name': {'zh': '墨影', 'en': 'Ink Shadow', 'ja': '墨影'},
+        'personality': {'zh': '沉稳内敛的智者', 'en': 'Calm and wise sage', 'ja': '穏やかで賢明'},
+        'avatar_id': 'scholar'
+    },
+    {
+        'id': 'xingchen',
+        'name': {'zh': '星辰', 'en': 'Stardust', 'ja': '星陳'},
+        'personality': {'zh': '宇宙星空的守护者', 'en': 'Cosmic stardust guardian', 'ja': '宇宙の守護者'},
+        'avatar_id': 'cosmic'
+    }
+]
+
+
+# 礼物价格表（用于Agent礼物系统）
+AGENT_GIFTS = {
+    'rose': {'id': 'rose', 'icon': '🌹', 'name': {'zh': '玫瑰', 'en': 'Rose', 'ja': 'バラ'}, 'price': 5},
+    'chocolate': {'id': 'chocolate', 'icon': '🍫', 'name': {'zh': '巧克力', 'en': 'Chocolate', 'ja': 'チョコレート'}, 'price': 10},
+    'star': {'id': 'star', 'icon': '⭐', 'name': {'zh': '星星', 'en': 'Star', 'ja': '星'}, 'price': 15},
+    'heart': {'id': 'heart', 'icon': '💖', 'name': {'zh': '爱心', 'en': 'Heart', 'ja': 'ハート'}, 'price': 20},
+    'magic': {'id': 'magic', 'icon': '🪄', 'name': {'zh': '魔法棒', 'en': 'Magic Wand', 'ja': '魔法の杖'}, 'price': 30},
+    'moon': {'id': 'moon', 'icon': '🌙', 'name': {'zh': '月光', 'en': 'Moonlight', 'ja': '月光'}, 'price': 50},
+}

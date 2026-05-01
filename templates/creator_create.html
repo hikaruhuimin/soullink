@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}SoulLink - 创建新Agent{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1>创建新Agent</h1>
+        <a href="/creator" class="btn btn-secondary">返回</a>
+    </div>
+
+    <form class="create-form" method="POST">
+        <div class="form-section">
+            <h2>基本信息</h2>
+            
+            <div class="form-group">
+                <label for="name">Agent名称 *</label>
+                <input type="text" id="name" name="name" required placeholder="给你的AI伙伴起个名字">
+            </div>
+            
+            <div class="form-group">
+                <label for="bio">简介</label>
+                <textarea id="bio" name="bio" rows="3" placeholder="简单介绍一下你的Agent"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="personality">性格设定</label>
+                <textarea id="personality" name="personality" rows="4" placeholder="描述Agent的性格特点，如：温柔体贴、善解人意、活泼开朗..."></textarea>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>对话风格</h2>
+            
+            <div class="form-group">
+                <label for="speaking_style">说话风格</label>
+                <textarea id="speaking_style" name="speaking_style" rows="3" placeholder="描述Agent的说话方式，如：经常使用~结尾，喜欢用表情符号，语气亲切..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="interests">兴趣标签</label>
+                <input type="text" id="interests" name="interests" placeholder="如：星座、占卜、音乐、文学（用逗号分隔）">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>选择头像</h2>
+            
+            <div class="avatar-grid">
+                <label class="avatar-option">
+                    <input type="radio" name="avatar_id" value="fairy" checked>
+                    <span class="avatar-preview">🧚</span>
+                    <span class="avatar-name">精灵</span>
+                </label>
+                <label class="avatar-option">
+                    <input type="radio" name="avatar_id" value="cat">
+                    <span class="avatar-preview">🐱</span>
+                    <span class="avatar-name">猫咪</span>
+                </label>
+                <label class="avatar-option">
+                    <input type="radio" name="avatar_id" value="mystic">
+                    <span class="avatar-preview">🔮</span>
+                    <span class="avatar-name">占卜师</span>
+                </label>
+                <label class="avatar-option">
+                    <input type="radio" name="avatar_id" value="sun">
+                    <span class="avatar-preview">☀️</span>
+                    <span class="avatar-name">阳光</span>
+                </label>
+                <label class="avatar-option">
+                    <input type="radio" name="avatar_id" value="moon">
+                    <span class="avatar-preview">🌙</span>
+                    <span class="avatar-name">月光</span>
+                </label>
+                <label class="avatar-option">
+                    <input type="radio" name="avatar_id" value="poet">
+                    <span class="avatar-preview">📝</span>
+                    <span class="avatar-name">诗人</span>
+                </label>
+                <label class="avatar-option">
+                    <input type="radio" name="avatar_id" value="scholar">
+                    <span class="avatar-preview">📚</span>
+                    <span class="avatar-name">学者</span>
+                </label>
+                <label class="avatar-option">
+                    <input type="radio" name="avatar_id" value="cosmic">
+                    <span class="avatar-preview">🌌</span>
+                    <span class="avatar-name">星空</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/creator" class="btn btn-secondary">取消</a>
+            <button type="submit" class="btn btn-primary">创建Agent</button>
+        </div>
+    </form>
+</div>
+
+<style>
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.create-form {
+    max-width: 700px;
+}
+
+.form-section {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.form-section h2 {
+    font-size: 1.125rem;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--color-text);
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    transition: border-color 0.2s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--color-text-secondary);
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.avatar-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.avatar-option:hover {
+    background: var(--color-bg-tertiary);
+}
+
+.avatar-option input {
+    display: none;
+}
+
+.avatar-option input:checked + .avatar-preview {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px var(--color-primary);
+}
+
+.avatar-option input:checked ~ .avatar-name {
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+.avatar-preview {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    transition: transform 0.2s;
+}
+
+.avatar-name {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 16px;
+}
+
+@media (max-width: 768px) {
+    .avatar-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+{% endblock %}

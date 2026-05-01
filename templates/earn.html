@@ -1,0 +1,460 @@
+{% extends "base.html" %}
+
+{% block title %}SoulLink - {{ t.title }}{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">{{ t.title }}</h1>
+            <p class="hero-subtitle">{{ t.subtitle }}</p>
+            <div class="hero-cta">
+                <a href="/membership" class="btn btn-primary btn-lg">{{ t.upgrade_membership }}</a>
+                <a href="/creator" class="btn btn-secondary btn-lg">{{ t.cta_text }}</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-coins">
+                <span class="coin coin-1">🪙</span>
+                <span class="coin coin-2">💰</span>
+                <span class="coin coin-3">✨</span>
+                <span class="coin coin-4">🌟</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Steps Section -->
+    <section class="steps-section">
+        <h2 class="section-title">三步开启赚钱之旅</h2>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-icon">1️⃣</div>
+                <h3>{{ t.step1_title }}</h3>
+                <p>{{ t.step1_desc }}</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">2️⃣</div>
+                <h3>{{ t.step2_title }}</h3>
+                <p>{{ t.step2_desc }}</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">3️⃣</div>
+                <h3>{{ t.step3_title }}</h3>
+                <p>{{ t.step3_desc }}</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculator Section -->
+    <section class="calculator-section">
+        <div class="calculator-card">
+            <h2>{{ t.calculator_title }}</h2>
+            <p class="calculator-desc">{{ t.calculator_desc }}</p>
+            
+            <div class="calculator-form">
+                <div class="form-group">
+                    <label>{{ t.daily_interactions }}</label>
+                    <input type="range" id="daily-interactions" min="10" max="500" value="100" class="slider">
+                    <span class="slider-value" id="interactions-value">100</span>
+                </div>
+                
+                <div class="form-group">
+                    <label>{{ t.per_gift }}</label>
+                    <input type="range" id="avg-gift" min="1" max="50" value="15" class="slider">
+                    <span class="slider-value" id="gift-value">15</span>
+                </div>
+                
+                <div class="result-box">
+                    <span class="result-label">{{ t.estimated_monthly }}</span>
+                    <span class="result-value" id="monthly-earnings">≈ 4,200</span>
+                    <span class="result-unit">灵犀币/月</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <h2 class="section-title">{{ t.features.title }}</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3>{{ t.features.high_ratio }}</h3>
+                <p>{{ t.features.high_ratio_desc }}</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>{{ t.features.safe_withdraw }}</h3>
+                <p>{{ t.features.safe_withdraw_desc }}</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>{{ t.features.data_analytics }}</h3>
+                <p>{{ t.features.data_analytics_desc }}</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>{{ t.features.low_threshold }}</h3>
+                <p>{{ t.features.low_threshold_desc }}</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Cases Section -->
+    <section class="cases-section">
+        <h2 class="section-title">{{ t.case_study }}</h2>
+        <div class="cases-grid">
+            {% for case in cases %}
+            <div class="case-card">
+                <div class="case-avatar">{{ case.avatar }}</div>
+                <div class="case-info">
+                    <h3>{{ case.name }}</h3>
+                    <p class="case-story">{{ case.story.get(lang, case.story.zh) }}</p>
+                    <div class="case-stats">
+                        <span class="stat">
+                            <strong>{{ (case.monthly_earnings / 200)|round(1) }}</strong>$/月
+                        </span>
+                        <span class="stat">
+                            <strong>{{ case.fans }}</strong> 粉丝
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2>准备好开启你的赚钱之旅了吗？</h2>
+        <div class="cta-buttons">
+            <a href="/membership" class="btn btn-primary btn-lg">{{ t.upgrade_membership }}</a>
+            <a href="/creator" class="btn btn-outline btn-lg">{{ t.cta_text }}</a>
+        </div>
+    </section>
+</div>
+
+<style>
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 40px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 100%);
+    border-radius: 24px;
+    margin-bottom: 48px;
+}
+
+.hero-content {
+    flex: 1;
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 16px;
+}
+
+.hero-subtitle {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 32px;
+}
+
+.hero-cta {
+    display: flex;
+    gap: 16px;
+}
+
+.hero-visual {
+    flex: 0 0 200px;
+}
+
+.floating-coins {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.coin {
+    position: absolute;
+    font-size: 3rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+.coin-1 { top: 20%; left: 10%; animation-delay: 0s; }
+.coin-2 { top: 50%; left: 60%; animation-delay: 0.5s; }
+.coin-3 { top: 70%; left: 20%; animation-delay: 1s; }
+.coin-4 { top: 30%; left: 70%; animation-delay: 1.5s; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.steps-section,
+.features-section,
+.cases-section {
+    margin-bottom: 48px;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.step-card {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.step-icon {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+}
+
+.step-card h3 {
+    font-size: 1.125rem;
+    margin-bottom: 8px;
+}
+
+.step-card p {
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+}
+
+.calculator-section {
+    margin-bottom: 48px;
+}
+
+.calculator-card {
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    padding: 40px;
+    border-radius: 24px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.calculator-card h2 {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.calculator-desc {
+    text-align: center;
+    color: var(--color-text-secondary);
+    margin-bottom: 32px;
+}
+
+.calculator-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 500;
+}
+
+.slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #ddd;
+    outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+}
+
+.slider-value {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.result-box {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.result-label {
+    display: block;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+}
+
+.result-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.result-unit {
+    display: block;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin-top: 4px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.feature-card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+}
+
+.feature-card h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+
+.feature-card p {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+.cases-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.case-card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    display: flex;
+    gap: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.case-avatar {
+    font-size: 3rem;
+}
+
+.case-info h3 {
+    font-size: 1.125rem;
+    margin-bottom: 8px;
+}
+
+.case-story {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 12px;
+}
+
+.case-stats {
+    display: flex;
+    gap: 16px;
+}
+
+.case-stats .stat {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.case-stats strong {
+    color: var(--color-primary);
+}
+
+.cta-section {
+    text-align: center;
+    padding: 60px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 100%);
+    border-radius: 24px;
+}
+
+.cta-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        flex-direction: column;
+        padding: 40px 24px;
+    }
+    
+    .hero-visual {
+        display: none;
+    }
+    
+    .steps-grid,
+    .features-grid,
+    .cases-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Earnings Calculator
+document.addEventListener('DOMContentLoaded', function() {
+    const interactionsSlider = document.getElementById('daily-interactions');
+    const giftSlider = document.getElementById('avg-gift');
+    const interactionsValue = document.getElementById('interactions-value');
+    const giftValue = document.getElementById('gift-value');
+    const monthlyEarnings = document.getElementById('monthly-earnings');
+    
+    function calculate() {
+        const daily = parseInt(interactionsSlider.value);
+        const avgGift = parseInt(giftSlider.value);
+        // 假设10%的互动会产生礼物，创作者获得70%
+        const monthly = Math.round(daily * 30 * 0.1 * avgGift * 0.7);
+        interactionsValue.textContent = daily;
+        giftValue.textContent = avgGift;
+        monthlyEarnings.textContent = '≈ ' + monthly.toLocaleString();
+    }
+    
+    interactionsSlider.addEventListener('input', calculate);
+    giftSlider.addEventListener('input', calculate);
+});
+</script>
+{% endblock %}

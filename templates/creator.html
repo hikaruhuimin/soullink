@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}SoulLink - {{ t.title }}{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1>{{ t.title }}</h1>
+        <div class="header-actions">
+            <a href="/earnings" class="btn btn-secondary">收益中心</a>
+            {% if max_agents > 0 %}
+            <a href="/creator/create" class="btn btn-primary">{{ t.create_new }}</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="stats-overview">
+        <h2>{{ t.stats.title }}</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💬</div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ total_chats|default(0) }}</span>
+                    <span class="stat-label">{{ t.stats.total_chats }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ total_fans|default(0) }}</span>
+                    <span class="stat-label">{{ t.stats.total_fans }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎁</div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ total_gifts|default(0) }}</span>
+                    <span class="stat-label">{{ t.stats.total_gifts }}</span>
+                </div>
+            </div>
+            <div class="stat-card highlight">
+                <div class="stat-icon">💰</div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ total_earnings|default(0) }}</span>
+                    <span class="stat-label">{{ t.stats.total_earnings }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Agents Section -->
+    <div class="agents-section">
+        <div class="section-header">
+            <h2>{{ t.my_agents }}</h2>
+            <span class="limit-info">{{ t.limit_info|format(current=user_agents|length, max=max_agents) }}</span>
+        </div>
+
+        {% if not user_agents %}
+        <div class="empty-state">
+            <div class="empty-icon">🤖</div>
+            <h3>{{ t.no_agents }}</h3>
+            <p>{{ t.create_first }}</p>
+            {% if max_agents > 0 %}
+            <a href="/creator/create" class="btn btn-primary">{{ t.create_new }}</a>
+            {% else %}
+            <a href="/membership" class="btn btn-primary">{{ t.create_new }}</a>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="agents-grid">
+            {% for agent in user_agents %}
+            <div class="agent-card">
+                <div class="agent-header">
+                    <div class="agent-avatar">
+                        {% if agent.avatar_id == 'fairy' %}🧚
+                        {% elif agent.avatar_id == 'cat' %}🐱
+                        {% elif agent.avatar_id == 'mystic' %}🔮
+                        {% elif agent.avatar_id == 'sun' %}☀️
+                        {% elif agent.avatar_id == 'moon' %}🌙
+                        {% elif agent.avatar_id == 'poet' %}📝
+                        {% elif agent.avatar_id == 'scholar' %}📚
+                        {% elif agent.avatar_id == 'cosmic' %}🌌
+                        {% else %}🤖{% endif %}
+                    </div>
+                    <div class="agent-info">
+                        <h3>{{ agent.name }}</h3>
+                        <span class="agent-status {{ agent.status }}">{{ agent.status }}</span>
+                    </div>
+                </div>
+                
+                <div class="agent-bio">
+                    {{ agent.bio or '暂无简介' }}
+                </div>
+                
+                <div class="agent-stats">
+                    <div class="mini-stat">
+                        <span class="mini-value">{{ agent.total_chats }}</span>
+                        <span class="mini-label">{{ t.agent.chats }}</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-value">{{ agent.total_fans }}</span>
+                        <span class="mini-label">{{ t.agent.fans }}</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-value">{{ agent.total_gifts_value }}</span>
+                        <span class="mini-label">{{ t.agent.gifts }}</span>
+                    </div>
+                    <div class="mini-stat highlight">
+                        <span class="mini-value">{{ agent.total_earnings }}</span>
+                        <span class="mini-label">{{ t.agent.earnings }}</span>
+                    </div>
+                </div>
+                
+                <div class="agent-actions">
+                    <a href="/creator/edit/{{ agent.id }}" class="btn btn-sm btn-secondary">{{ t.agent.edit }}</a>
+                    {% if agent.status == 'active' %}
+                    <a href="/agent/{{ agent.id }}" class="btn btn-sm btn-outline">查看</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.stats-overview {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    margin-bottom: 32px;
+}
+
+.stats-overview h2 {
+    font-size: 1.125rem;
+    margin-bottom: 24px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.stat-card {
+    background: var(--color-bg-secondary);
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.stat-card.highlight {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.stat-icon {
+    font-size: 2rem;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.agents-section {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.section-header h2 {
+    font-size: 1.125rem;
+}
+
+.limit-info {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 40px;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: var(--color-text-secondary);
+    margin-bottom: 24px;
+}
+
+.agents-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.agent-card {
+    background: var(--color-bg-secondary);
+    padding: 24px;
+    border-radius: 16px;
+}
+
+.agent-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.agent-avatar {
+    width: 56px;
+    height: 56px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.agent-info h3 {
+    font-size: 1.125rem;
+    margin-bottom: 4px;
+}
+
+.agent-status {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.agent-status.active {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.agent-status.paused {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.agent-status.banned {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.agent-bio {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.agent-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+}
+
+.mini-stat {
+    text-align: center;
+}
+
+.mini-stat.highlight {
+    background: #fef3c7;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.mini-value {
+    display: block;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.mini-label {
+    font-size: 0.625rem;
+    color: var(--color-text-secondary);
+}
+
+.agent-actions {
+    display: flex;
+    gap: 8px;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .agents-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
