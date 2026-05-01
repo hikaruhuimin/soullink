@@ -152,6 +152,7 @@
     padding: 16px 12px; background: white; border-radius: 16px;
     cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
     transition: all 0.2s; -webkit-tap-highlight-color: transparent; min-height: 44px;
+    border: none; outline: none; font-family: inherit; -webkit-appearance: none; appearance: none;
 }
 
 .teller-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
@@ -420,7 +421,7 @@
         <h3 class="section-title"><span class="icon">🎴</span>选择占卜类型</h3>
         <div class="type-grid">
             {% for type in divination_types %}
-            <div class="type-card" onclick="selectType('{{ type.id }}')" data-type="{{ type.id }}">
+            <div class="type-card" ontouchend="event.preventDefault();selectType('{{ type.id }}')" onclick="selectType('{{ type.id }}')" data-type="{{ type.id }}">
                 <span class="type-icon">{{ type.icon }}</span>
                 <h4>{{ type.name }}</h4>
                 <p>{{ type.description }}</p>
@@ -434,7 +435,7 @@
         <h3 class="section-title"><span class="icon">🔥</span>热门占卜</h3>
         <div class="popular-list">
             {% for item in popular_divinations %}
-            <div class="popular-item" onclick="quickDivination('{{ item.id }}', '{{ item.type }}')" data-type="{{ item.type }}">
+            <div class="popular-item" ontouchend="event.preventDefault();quickDivination('{{ item.id }}', '{{ item.type }}')" onclick="quickDivination('{{ item.id }}', '{{ item.type }}')" data-type="{{ item.type }}">
                 <div class="popular-icon">{{ item.icon }}</div>
                 <div class="popular-info">
                     <h4>{{ item.name }}</h4>
@@ -469,11 +470,11 @@
         <h3 class="section-title"><span class="icon">👤</span>AI占卜师</h3>
         <div class="tellers-scroll">
             {% for teller in fortune_tellers %}
-            <div class="teller-card" onclick="selectTeller('{{ teller.id }}')" data-teller="{{ teller.id }}">
-                <div class="teller-avatar" style="background: linear-gradient(135deg, {{ teller.gradient }})">{{ teller.icon }}</div>
+            <button class="teller-card" type="button" ontouchend="event.preventDefault();selectTeller('{{ teller.id }}')" onclick="selectTeller('{{ teller.id }}')" data-teller="{{ teller.id }}">
+                <div class="teller-avatar">{{ teller.icon }}</div>
                 <span class="teller-name">{{ teller.name }}</span>
-                <span class="teller-specialty">{{ teller.specialty }}</span>
-            </div>
+                <span class="teller-specialty">{{ teller.desc }}</span>
+            </button>
             {% endfor %}
         </div>
     </div>
@@ -499,7 +500,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="modalTitle">开始占卜</h3>
-            <button class="modal-close" onclick="closeDivination()">×</button>
+            <button class="modal-close" ontouchend="event.preventDefault();closeDivination()" onclick="closeDivination()">×</button>
         </div>
         <div class="modal-body">
             <div class="step-indicator">
@@ -538,7 +539,7 @@
                     <p id="questionTip">闭上眼睛，深呼吸，让心灵与塔罗牌共鸣...</p>
                 </div>
                 
-                <button class="start-btn" id="startBtn" onclick="beginDivination()">
+                <button class="start-btn" id="startBtn" ontouchend="event.preventDefault();beginDivination()" onclick="beginDivination()">
                     <span>🔮</span><span>开始占卜</span>
                 </button>
             </div>
@@ -596,7 +597,7 @@
 <div class="teller-modal" id="tellerModal">
     <div class="teller-modal-content">
         <div class="modal-header" style="border:none;padding:0;margin-bottom:16px;">
-            <button class="modal-close" onclick="closeTellerModal()" style="margin-left:auto;">×</button>
+            <button class="modal-close" ontouchend="event.preventDefault();closeTellerModal()" onclick="closeTellerModal()" style="margin-left:auto;">×</button>
         </div>
         <div class="teller-modal-header">
             <div class="teller-modal-avatar" id="tellerModalAvatar">🔮</div>
@@ -617,7 +618,7 @@
             <h4>✨ 风格特点</h4>
             <p id="tellerModalStyle">温柔细腻，解读深入</p>
         </div>
-        <button class="teller-modal-btn" onclick="startWithTeller()">
+        <button class="teller-modal-btn" ontouchend="event.preventDefault();startWithTeller()" onclick="startWithTeller()">
             <span>💕</span><span>找TA占卜</span>
         </button>
     </div>
@@ -661,10 +662,10 @@ const zodiacSigns = [
 ];
 
 const tellerData = {
-    'mystic': { name: '神秘学家', icon: '🔮', specialty: '塔罗解读', description: '一位深谙塔罗奥秘的神秘学家，擅长通过塔罗牌解读命运的走向。每一张牌都是命运的低语，让我为你倾听。', skills: '塔罗牌、牌阵解读、命运指引', style: '温柔细腻，解读深入' },
-    'empath': { name: '情感导师', icon: '💝', specialty: '情感分析', description: '专注于情感领域的占卜师，无论是暗恋、恋爱还是婚姻问题，都能给你温暖的指引。你的心，我懂。', skills: '恋爱占卜、暗恋解析、复合指引', style: '温暖治愈，洞察人心' },
-    'astro': { name: '星象师', icon: '⭐', specialty: '星座星盘', description: '精通星座与星象的占卜师，通过星辰的语言为你解读人生的每一个重要时刻。星辰为你闪耀。', skills: '星座运势、星盘分析、流年运势', style: '浪漫诗意，宏观视角' },
-    'oracle': { name: '命理师', icon: '📜', specialty: '八字命理', description: '精通中国传统命理的占卜师，结合八字五行为你分析命运的起伏与机遇。千年智慧，为你指路。', skills: '八字命理、五行分析、运势预测', style: '稳重踏实，实事求是' }
+    'mystic': { name: '神秘学家', icon: '🔮', specialty: '塔罗解读', gradient: 'linear-gradient(135deg, #667eea, #764ba2)', description: '一位深谙塔罗奥秘的神秘学家，擅长通过塔罗牌解读命运的走向。每一张牌都是命运的低语，让我为你倾听。', skills: '塔罗牌、牌阵解读、命运指引', style: '温柔细腻，解读深入' },
+    'empath': { name: '情感导师', icon: '💝', specialty: '情感分析', gradient: 'linear-gradient(135deg, #f093fb, #f5576c)', description: '专注于情感领域的占卜师，无论是暗恋、恋爱还是婚姻问题，都能给你温暖的指引。你的心，我懂。', skills: '恋爱占卜、暗恋解析、复合指引', style: '温暖治愈，洞察人心' },
+    'astro': { name: '星象师', icon: '⭐', specialty: '星座星盘', gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)', description: '精通星座与星象的占卜师，通过星辰的语言为你解读人生的每一个重要时刻。星辰为你闪耀。', skills: '星座运势、星盘分析、流年运势', style: '浪漫诗意，宏观视角' },
+    'oracle': { name: '命理师', icon: '📜', specialty: '八字命理', gradient: 'linear-gradient(135deg, #fa709a, #fee140)', description: '精通中国传统命理的占卜师，结合八字五行为你分析命运的起伏与机遇。千年智慧，为你指路。', skills: '八字命理、五行分析、运势预测', style: '稳重踏实，实事求是' }
 };
 
 const popularTypeMap = {
@@ -838,7 +839,9 @@ function selectTeller(tellerId) {
     const teller = tellerData[tellerId];
     if (!teller) { showToast('占卜师不存在'); return; }
     
-    document.getElementById('tellerModalAvatar').textContent = teller.icon;
+    var avatarEl = document.getElementById('tellerModalAvatar');
+    avatarEl.textContent = teller.icon;
+    avatarEl.style.background = teller.gradient || 'linear-gradient(135deg, #667eea, #764ba2)';
     document.getElementById('tellerModalName').textContent = teller.name;
     document.getElementById('tellerModalSpecialty').textContent = teller.specialty;
     document.getElementById('tellerModalDesc').textContent = teller.description;
@@ -846,6 +849,7 @@ function selectTeller(tellerId) {
     document.getElementById('tellerModalStyle').textContent = teller.style;
     
     document.getElementById('tellerModal').classList.add('active');
+    showToast('已选择' + teller.name);
 }
 
 function closeTellerModal() { document.getElementById('tellerModal').classList.remove('active'); }
