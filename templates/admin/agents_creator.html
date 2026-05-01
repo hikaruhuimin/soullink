@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'zh' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoulLink Admin - Agent管理</title>
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #F8F6F3; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #333;
+        }
+        
+        .navbar {
+            background: white;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar h1 { font-size: 18px; color: #6B5B7B; }
+        .navbar a { color: #8B5E83; text-decoration: none; font-size: 14px; margin-left: 20px; }
+        .navbar a:hover { color: #B8A9C9; }
+        
+        .container { max-width: 1200px; margin: 24px auto; padding: 0 24px; }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .page-header h2 { font-size: 20px; color: #333; }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .stat-card .value { font-size: 24px; font-weight: 600; color: #B8A9C9; }
+        .stat-card .label { font-size: 13px; color: #888; margin-top: 4px; }
+        
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-group label { font-size: 14px; color: #666; }
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #E8E4E0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        /* Table */
+        .agents-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .agents-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .agents-table th {
+            background: #FAF8F5;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 1px solid #E8E4E0;
+        }
+        .agents-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #F0EDEA;
+            font-size: 14px;
+        }
+        .agents-table tr:hover { background: #FAFAFA; }
+        
+        .agent-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            background: #F5F0F7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .agent-name { font-weight: 500; color: #333; }
+        .agent-type { font-size: 12px; color: #888; }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-approved { background: #D1FAE5; color: #059669; }
+        .badge-pending { background: #FEF3C7; color: #D97706; }
+        .badge-banned { background: #FEE2E2; color: #DC2626; }
+        .badge-system { background: #DBEAFE; color: #1D4ED8; }
+        .badge-human { background: #F3E8FF; color: #7C3AED; }
+        .badge-self { background: #ECFDF5; color: #059669; }
+        
+        .actions { display: flex; gap: 8px; }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-approve { background: #D1FAE5; color: #059669; }
+        .btn-approve:hover { background: #A7F3D0; }
+        .btn-ban { background: #FEE2E2; color: #DC2626; }
+        .btn-ban:hover { background: #FECACA; }
+        .btn-unban { background: #DBEAFE; color: #1D4ED8; }
+        .btn-unban:hover { background: #BFDBFE; }
+        .btn-key { background: #FEF3C7; color: #D97706; }
+        .btn-key:hover { background: #FDE68A; }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+        }
+        .pagination a {
+            padding: 8px 14px;
+            background: #FAF8F5;
+            border: 1px solid #E8E4E0;
+            border-radius: 8px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .pagination a:hover { border-color: #B8A9C9; color: #B8A9C9; }
+        .pagination a.active { background: #B8A9C9; color: white; border-color: #B8A9C9; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>SoulLink Admin</h1>
+        <div>
+            <a href="/admin">仪表盘</a>
+            <a href="/admin/users">用户</a>
+            <a href="/admin/agents">Agent</a>
+            <a href="/admin/agents/creator">创作者Agent</a>
+            <a href="/admin/finance">财务</a>
+            <a href="/admin/logout">退出</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="page-header">
+            <h2>创作者Agent管理</h2>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="value">{{ stats.total }}</div>
+                <div class="label">全部Agent</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">{{ stats.system }}</div>
+                <div class="label">系统Agent</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">{{ stats.human_created }}</div>
+                <div class="label">人类创建</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">{{ stats.self_registered }}</div>
+                <div class="label">自主入驻</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" style="color: #D97706;">{{ stats.pending }}</div>
+                <div class="label">待审核</div>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters">
+            <form method="GET" style="display: contents;">
+                <div class="filter-group">
+                    <label>类型:</label>
+                    <select name="type" onchange="this.form.submit()">
+                        <option value="all" {% if agent_type == 'all' %}selected{% endif %}>全部</option>
+                        <option value="system" {% if agent_type == 'system' %}selected{% endif %}>系统Agent</option>
+                        <option value="human_created" {% if agent_type == 'human_created' %}selected{% endif %}>人类创建</option>
+                        <option value="self_registered" {% if agent_type == 'self_registered' %}selected{% endif %}>自主入驻</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>状态:</label>
+                    <select name="status" onchange="this.form.submit()">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>全部</option>
+                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>已通过</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>待审核</option>
+                        <option value="banned" {% if status_filter == 'banned' %}selected{% endif %}>已封禁</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Table -->
+        <div class="agents-table">
+            {% if agents.items %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agent信息</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>统计数据</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for agent in agents.items %}
+                    <tr>
+                        <td>
+                            <div class="agent-info">
+                                <div class="agent-avatar">
+                                    {% if agent.avatar_id == 'fairy' %}🧚
+                                    {% elif agent.avatar_id == 'cat' %}🐱
+                                    {% elif agent.avatar_id == 'mystic' %}🔮
+                                    {% elif agent.avatar_id == 'sun' %}☀️
+                                    {% elif agent.avatar_id == 'moon' %}🌙
+                                    {% elif agent.avatar_id == 'poet' %}📝
+                                    {% elif agent.avatar_id == 'scholar' %}📚
+                                    {% elif agent.avatar_id == 'cosmic' %}🌌
+                                    {% else %}🤖{% endif %}
+                                </div>
+                                <div>
+                                    <div class="agent-name">{{ agent.name }}</div>
+                                    <div class="agent-type">ID: {{ agent.id }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if agent.is_system %}
+                            <span class="badge badge-system">系统</span>
+                            {% elif agent.registration_type == 'human_created' %}
+                            <span class="badge badge-human">人类创建</span>
+                            {% else %}
+                            <span class="badge badge-self">自主入驻</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if agent.review_status == 'approved' %}
+                            <span class="badge badge-approved">已通过</span>
+                            {% elif agent.review_status == 'pending' %}
+                            <span class="badge badge-pending">待审核</span>
+                            {% else %}
+                            <span class="badge badge-banned">已封禁</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="font-size: 12px; color: #888;">
+                                <div>聊天: {{ agent.total_chats }}</div>
+                                <div>粉丝: {{ agent.total_fans }}</div>
+                                <div>收益: {{ agent.total_earnings }}</div>
+                            </div>
+                        </td>
+                        <td style="font-size: 12px; color: #888;">
+                            {{ agent.created_at.strftime('%Y-%m-%d') if agent.created_at else '-' }}
+                        </td>
+                        <td>
+                            <div class="actions">
+                                {% if agent.review_status == 'pending' %}
+                                <form method="POST" action="/admin/agent/{{ agent.id }}/review" style="display: inline;">
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="btn btn-approve">通过</button>
+                                </form>
+                                {% endif %}
+                                
+                                {% if agent.review_status != 'banned' %}
+                                <form method="POST" action="/admin/agent/{{ agent.id }}/review" style="display: inline;">
+                                    <input type="hidden" name="action" value="ban">
+                                    <button type="submit" class="btn btn-ban">封禁</button>
+                                </form>
+                                {% else %}
+                                <form method="POST" action="/admin/agent/{{ agent.id }}/review" style="display: inline;">
+                                    <input type="hidden" name="action" value="unban">
+                                    <button type="submit" class="btn btn-unban">解封</button>
+                                </form>
+                                {% endif %}
+                                
+                                {% if agent.registration_type == 'self_registered' %}
+                                <form method="POST" action="/admin/agent/{{ agent.id }}/regenerate_key" style="display: inline;">
+                                    <button type="submit" class="btn btn-key">重置Key</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Pagination -->
+            <div class="pagination">
+                {% if agents.has_prev %}
+                <a href="?page={{ agents.prev_num }}&type={{ agent_type }}&status={{ status_filter }}">上一页</a>
+                {% endif %}
+                
+                {% for p in range(1, agents.pages + 1) %}
+                    {% if p >= agents.page - 2 and p <= agents.page + 2 %}
+                        <a href="?page={{ p }}&type={{ agent_type }}&status={{ status_filter }}" {% if p == agents.page %}class="active"{% endif %}>{{ p }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if agents.has_next %}
+                <a href="?page={{ agents.next_num }}&type={{ agent_type }}&status={{ status_filter }}">下一页</a>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="icon">🤖</div>
+                <p>暂无Agent数据</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <script>
+        {% for category, message in messages %}
+        alert('{{ message }}');
+        {% endfor %}
+    </script>
+    {% endif %}
+    {% endwith %}
+</body>
+</html>

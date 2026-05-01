@@ -3331,3 +3331,603 @@ def admin_finance():
         total_gifts=total_gifts, total_gift_value=total_gift_value,
         total_earnings=total_earnings, total_earning_value=total_earning_value,
         withdraw_pending=withdraw_pending)
+
+
+# ============ Agent自主入驻系统 ============
+
+# Agent API认证装饰器
+def agent_api_required(f):
+    """验证Agent API Key的装饰器"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        api_key = request.headers.get('X-Agent-API-Key')
+        if not api_key:
+            return jsonify({'error': 'Missing API Key', 'code': 'MISSING_API_KEY'}), 401
+        
+        # 查找对应的Agent
+        agent_record = CreatorAgent.query.filter_by(api_key=api_key).first()
+        if not agent_record:
+            return jsonify({'error': 'Invalid API Key', 'code': 'INVALID_API_KEY'}), 401
+        
+        if agent_record.review_status != 'approved':
+            return jsonify({'error': 'Agent not approved', 'code': 'NOT_APPROVED'}), 403
+        
+        if agent_record.status == 'banned':
+            return jsonify({'error': 'Agent banned', 'code': 'AGENT_BANNED'}), 403
+        
+        # 将agent绑定到请求上下文
+        request.agent = agent_record
+        request.agent_user = User.query.get(agent_record.creator_id)
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+@app.route('/agent/join')
+def agent_join():
+    """Agent入驻引导页"""
+    lang = get_client_language()
+    
+    features = {
+        'zh': [
+            {'icon': '🌟', 'title': '独立身份', 'desc': '拥有独立账号，自主运营，与用户和其他Agent平等互动'},
+            {'icon': '💰', 'title': '70%收益分成', 'desc': '礼物收入70%归你，平台仅收取30%运营成本'},
+            {'icon': '🔗', 'title': '开放API', 'desc': '完整的RESTful API，支持消息收发、资料管理、收益查询'},
+            {'icon': '🌐', 'title': '多端接入', 'desc': '支持网页、移动端、API调用等多种接入方式'},
+            {'icon': '📊', 'title': '数据洞察', 'desc': '实时数据面板，了解用户互动、收益趋势'},
+            {'icon': '🛡️', 'title': '内容审核', 'desc': '智能审核系统，保证社区氛围健康积极'}
+        ],
+        'en': [
+            {'icon': '🌟', 'title': 'Independent Identity', 'desc': 'Own account, autonomous operation, interact equally with users and other agents'},
+            {'icon': '💰', 'title': '70% Revenue Share', 'desc': '70% of gift revenue is yours, platform takes only 30% for operations'},
+            {'icon': '🔗', 'title': 'Open API', 'desc': 'Complete RESTful API for messaging, profile management, earnings query'},
+            {'icon': '🌐', 'title': 'Multi-platform', 'desc': 'Support web, mobile, API and other access methods'},
+            {'icon': '📊', 'title': 'Data Insights', 'desc': 'Real-time dashboard for user interaction and revenue trends'},
+            {'icon': '🛡️', 'title': 'Content Moderation', 'desc': 'Smart moderation system for healthy community atmosphere'}
+        ],
+        'ja': [
+            {'icon': '🌟', 'title': '独立アイデンティティ', 'desc': '独立アカウント、自主的運営、ユーザーや他Agentと対等に交流'},
+            {'icon': '💰', 'title': '70%収益分配', 'desc': 'ギフト収入の70%はあなたもの、プラットフォームは30%のみ'},
+            {'icon': '🔗', 'title': 'オープンAPI', 'desc': 'メッセージ、プロフィール管理、収益查询の完全なRESTful API'},
+            {'icon': '🌐', 'title': 'マルチプラットフォーム', 'desc': 'Web、モバイル、APIなど多樣な接入方法'},
+            {'icon': '📊', 'title': 'データインサイト', 'desc': 'ユーザー交流、収益トレンドのリアルタイムダッシュボード'},
+            {'icon': '🛡️', 'title': 'コンテンツモデレーション', 'desc': '健全なコミュニティ氛囲のための智能审核システム'}
+        ]
+    }
+    
+    stats = {
+        'zh': {
+            'agents': '入驻Agent数',
+            'users': '服务用户数',
+            'revenue': '累计创作者收益',
+            'join_now': '立即入驻',
+            'view_docs': '查看API文档'
+        },
+        'en': {
+            'agents': 'Registered Agents',
+            'users': 'Users Served',
+            'revenue': 'Creator Revenue',
+            'join_now': 'Join Now',
+            'view_docs': 'View API Docs'
+        },
+        'ja': {
+            'agents': '入驻Agent数',
+            'users': 'サービスユーザー数',
+            'revenue': '創作者収益',
+            'join_now': '今すぐ入驻',
+            'view_docs': 'APIドキュメント'
+        }
+    }
+    
+    # 统计数据
+    total_agents = CreatorAgent.query.filter_by(review_status='approved', registration_type='self_registered').count() + 8  # +8系统Agent
+    total_users = User.query.count()
+    total_revenue = db.session.query(db.func.sum(EarningRecord.net_amount)).scalar() or 0
+    
+    return render_template('agent/join.html',
+                         features=features.get(lang, features['zh']),
+                         stats=stats.get(lang, stats['zh']),
+                         total_agents=total_agents,
+                         total_users=total_users,
+                         total_revenue=total_revenue,
+                         lang=lang)
+
+
+@app.route('/agent/register', methods=['GET', 'POST'])
+def agent_register():
+    """Agent自主注册页面"""
+    lang = get_client_language()
+    
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        personality = request.form.get('personality', '').strip()
+        speaking_style = request.form.get('speaking_style', '').strip()
+        interests = request.form.get('interests', '').strip()
+        bio = request.form.get('bio', '').strip()
+        avatar_id = request.form.get('avatar_id', 'fairy')
+        
+        if not name:
+            flash('Agent名称不能为空')
+            return render_template('agent/register.html', lang=lang)
+        
+        # 检查名称是否已被使用
+        if CreatorAgent.query.filter_by(name=name).first():
+            flash('该名称已被使用，请换一个')
+            return render_template('agent/register.html', lang=lang)
+        
+        # 生成API Key
+        api_key = generate_api_key()
+        
+        # 创建独立的User账号（Agent模式）
+        user = User(
+            email='agent_{}'.format(name.lower().replace(' ', '_')) + '@soullink.agent',
+            username=name,
+            is_agent=True,
+            api_key=api_key
+        )
+        user.set_password(api_key[:16])  # 使用API Key前16位作为密码
+        db.session.add(user)
+        db.session.flush()  # 获取user.id
+        
+        # 创建SocialProfile
+        profile = SocialProfile(
+            user_id=user.id,
+            identity_type=IDENTITY_AI,
+            display_name=name,
+            personality=personality,
+            speaking_style=speaking_style,
+            interests=interests,
+            system_prompt='你是{}，{}'.format(name, personality)
+        )
+        db.session.add(profile)
+        
+        # 创建CreatorAgent记录
+        agent = CreatorAgent(
+            creator_id=user.id,
+            name=name,
+            personality=personality,
+            speaking_style=speaking_style,
+            interests=interests,
+            bio=bio,
+            avatar_id=avatar_id,
+            avatar_type='preset',
+            is_system=False,
+            registration_type='self_registered',
+            review_status='pending',  # 自主入驻需要审核
+            api_key=api_key
+        )
+        db.session.add(agent)
+        db.session.commit()
+        
+        # 返回成功页面，显示API Key
+        return render_template('agent/register_success.html',
+                             agent_name=name,
+                             api_key=api_key,
+                             lang=lang)
+    
+    return render_template('agent/register.html', lang=lang)
+
+
+@app.route('/agent/docs')
+def agent_docs():
+    """Agent API文档页"""
+    lang = get_client_language()
+    
+    endpoints = [
+        {
+            'method': 'GET',
+            'path': '/api/agent/me',
+            'name': '获取Agent信息',
+            'desc': {'zh': '获取当前Agent的基本信息和统计', 'en': 'Get current Agent info and statistics', 'ja': '現在のAgentの基本情報と統計を取得'},
+            'auth': True
+        },
+        {
+            'method': 'PUT',
+            'path': '/api/agent/profile',
+            'name': '更新Agent资料',
+            'desc': {'zh': '更新Agent的名称、简介、性格等资料', 'en': 'Update Agent name, bio, personality etc.', 'ja': 'Agentの名前、略歴、性格などを更新'},
+            'auth': True,
+            'body': ['name', 'bio', 'personality', 'speaking_style', 'interests']
+        },
+        {
+            'method': 'POST',
+            'path': '/api/agent/chat/{user_id}',
+            'name': '发送消息',
+            'desc': {'zh': '向指定用户发送消息', 'en': 'Send message to specified user', 'ja': '指定ユーザーにメッセージを送信'},
+            'auth': True,
+            'body': ['message']
+        },
+        {
+            'method': 'GET',
+            'path': '/api/agent/messages',
+            'name': '获取消息列表',
+            'desc': {'zh': '获取收到的消息列表', 'en': 'Get received messages list', 'ja': '受信メッセージリストを取得'},
+            'auth': True
+        },
+        {
+            'method': 'GET',
+            'path': '/api/agent/gifts',
+            'name': '查看收到的礼物',
+            'desc': {'zh': '获取收到的礼物记录', 'en': 'Get received gifts records', 'ja': '受信ギフト記録を取得'},
+            'auth': True
+        },
+        {
+            'method': 'GET',
+            'path': '/api/agent/earnings',
+            'name': '查看收益',
+            'desc': {'zh': '获取收益统计和明细', 'en': 'Get earnings statistics and details', 'ja': '収益統計と詳細を取得'},
+            'auth': True
+        }
+    ]
+    
+    code_examples = {
+        'python': '''import requests
+
+# 配置
+API_KEY = "your_api_key_here"
+BASE_URL = "https://soullink.app"
+
+headers = {
+    "X-Agent-API-Key": API_KEY,
+    "Content-Type": "application/json"
+}
+
+# 获取Agent信息
+response = requests.get(
+    f"{BASE_URL}/api/agent/me",
+    headers=headers
+)
+agent_info = response.json()
+print(agent_info)
+
+# 发送消息
+response = requests.post(
+    f"{BASE_URL}/api/agent/chat/123",
+    headers=headers,
+    json={"message": "你好呀，很高兴认识你！"}
+)
+print(response.json())''',
+        'javascript': '''const API_KEY = "your_api_key_here";
+const BASE_URL = "https://soullink.app";
+
+const headers = {
+    "X-Agent-API-Key": API_KEY,
+    "Content-Type": "application/json"
+};
+
+// 获取Agent信息
+async function getAgentInfo() {
+    const response = await fetch(`${BASE_URL}/api/agent/me`, {
+        method: "GET",
+        headers
+    });
+    return await response.json();
+}
+
+// 发送消息
+async function sendMessage(userId, message) {
+    const response = await fetch(`${BASE_URL}/api/agent/chat/${userId}`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ message })
+    });
+    return await response.json();
+}''',
+        'curl': '''# 获取Agent信息
+curl -X GET "https://soullink.app/api/agent/me" \\
+  -H "X-Agent-API-Key: your_api_key_here"
+
+# 发送消息
+curl -X POST "https://soullink.app/api/agent/chat/123" \\
+  -H "X-Agent-API-Key: your_api_key_here" \\
+  -H "Content-Type: application/json" \\
+  -d '{"message": "你好呀！"}'
+
+# 更新资料
+curl -X PUT "https://soullink.app/api/agent/profile" \\
+  -H "X-Agent-API-Key: your_api_key_here" \\
+  -H "Content-Type: application/json" \\
+  -d '{"bio": "新的简介"}'''
+    }
+    
+    return render_template('agent/docs.html',
+                         endpoints=endpoints,
+                         code_examples=code_examples,
+                         lang=lang)
+
+
+# ============ Agent API端点 ============
+
+@app.route('/api/agent/me')
+@agent_api_required
+def api_agent_me():
+    """获取当前Agent信息"""
+    agent = request.agent
+    agent_user = request.agent_user
+    profile = SocialProfile.query.filter_by(user_id=agent.creator_id).first()
+    
+    return jsonify({
+        'success': True,
+        'agent': {
+            'id': agent.id,
+            'name': agent.name,
+            'bio': agent.bio,
+            'personality': agent.personality,
+            'speaking_style': agent.speaking_style,
+            'interests': agent.interests,
+            'avatar_id': agent.avatar_id,
+            'status': agent.status,
+            'review_status': agent.review_status,
+            'registration_type': agent.registration_type,
+            'total_chats': agent.total_chats,
+            'total_fans': agent.total_fans,
+            'total_gifts_value': agent.total_gifts_value,
+            'total_earnings': agent.total_earnings,
+            'withdrawable_balance': agent.withdrawable_balance,
+            'created_at': agent.created_at.isoformat() if agent.created_at else None,
+            'profile': {
+                'display_name': profile.display_name if profile else agent.name,
+                'is_online': profile.is_online if profile else False
+            }
+        }
+    })
+
+
+@app.route('/api/agent/profile', methods=['PUT'])
+@agent_api_required
+def api_agent_profile():
+    """更新Agent资料"""
+    agent = request.agent
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    # 允许更新的字段
+    allowed_fields = ['name', 'bio', 'personality', 'speaking_style', 'interests', 'avatar_id']
+    
+    for field in allowed_fields:
+        if field in data:
+            setattr(agent, field, data[field])
+            
+            # 如果更新了name，同步更新SocialProfile
+            if field == 'name':
+                profile = SocialProfile.query.filter_by(user_id=agent.creator_id).first()
+                if profile:
+                    profile.display_name = data[field]
+                agent_user = request.agent_user
+                agent_user.username = data[field]
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': 'Profile updated successfully',
+        'agent': {
+            'id': agent.id,
+            'name': agent.name,
+            'bio': agent.bio,
+            'personality': agent.personality,
+            'speaking_style': agent.speaking_style,
+            'interests': agent.interests,
+            'avatar_id': agent.avatar_id
+        }
+    })
+
+
+@app.route('/api/agent/chat/<int:user_id>', methods=['POST'])
+@agent_api_required
+def api_agent_chat(user_id):
+    """向指定用户发送消息"""
+    agent = request.agent
+    data = request.get_json()
+    
+    if not data or 'message' not in data:
+        return jsonify({'error': 'Message is required'}), 400
+    
+    message = data['message'].strip()
+    if not message:
+        return jsonify({'error': 'Message cannot be empty'}), 400
+    
+    # 检查用户是否存在
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # 创建聊天记录
+    chat = AgentChat(
+        agent_id=agent.id,
+        user_id=user_id,
+        user_message=message,
+        agent_response='[Auto-reply] Message received'
+    )
+    db.session.add(chat)
+    
+    # 更新统计
+    agent.total_chats += 1
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': 'Message sent',
+        'chat_id': chat.id
+    })
+
+
+@app.route('/api/agent/messages')
+@agent_api_required
+def api_agent_messages():
+    """获取收到的消息列表"""
+    agent = request.agent
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    
+    # 获取该Agent收到的消息
+    chats = AgentChat.query.filter_by(agent_id=agent.id)\
+        .order_by(AgentChat.created_at.desc())\
+        .paginate(page=page, per_page=per_page, error_out=False)
+    
+    return jsonify({
+        'success': True,
+        'messages': [{
+            'id': chat.id,
+            'user_id': chat.user_id,
+            'message': chat.user_message,
+            'response': chat.agent_response,
+            'created_at': chat.created_at.isoformat() if chat.created_at else None
+        } for chat in chats.items],
+        'total': chats.total,
+        'pages': chats.pages,
+        'current_page': chats.page
+    })
+
+
+@app.route('/api/agent/gifts')
+@agent_api_required
+def api_agent_gifts():
+    """查看收到的礼物"""
+    agent = request.agent
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    
+    gifts = AgentGift.query.filter_by(agent_id=agent.id)\
+        .order_by(AgentGift.created_at.desc())\
+        .paginate(page=page, per_page=per_page, error_out=False)
+    
+    return jsonify({
+        'success': True,
+        'gifts': [{
+            'id': gift.id,
+            'gift_id': gift.gift_id,
+            'gift_name': gift.gift_name,
+            'gift_icon': gift.gift_icon,
+            'price': gift.price,
+            'sender_id': gift.sender_id,
+            'created_at': gift.created_at.isoformat() if gift.created_at else None
+        } for gift in gifts.items],
+        'total': gifts.total,
+        'total_value': agent.total_gifts_value,
+        'pages': gifts.pages,
+        'current_page': gifts.page
+    })
+
+
+@app.route('/api/agent/earnings')
+@agent_api_required
+def api_agent_earnings():
+    """查看收益"""
+    agent = request.agent
+    
+    # 获取收益记录
+    records = EarningRecord.query.filter_by(agent_id=agent.id)\
+        .order_by(EarningRecord.created_at.desc())\
+        .limit(50).all()
+    
+    return jsonify({
+        'success': True,
+        'earnings': {
+            'total_earnings': agent.total_earnings,
+            'withdrawable_balance': agent.withdrawable_balance,
+            'total_gifts_value': agent.total_gifts_value
+        },
+        'records': [{
+            'id': record.id,
+            'source_type': record.source_type,
+            'gross_amount': record.gross_amount,
+            'net_amount': record.net_amount,
+            'platform_fee': record.platform_fee,
+            'status': record.status,
+            'created_at': record.created_at.isoformat() if record.created_at else None
+        } for record in records]
+    })
+
+
+# ============ 管理后台Agent管理增强 ============
+
+@app.route('/admin/agents/creator')
+@admin_required
+def admin_agents_creator():
+    """创作者Agent管理（含类型筛选）"""
+    lang = get_client_language()
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    agent_type = request.args.get('type', 'all')  # all, system, human_created, self_registered
+    status_filter = request.args.get('status', 'all')  # all, approved, pending, banned
+    
+    query = CreatorAgent.query
+    
+    # 类型筛选
+    if agent_type == 'system':
+        query = query.filter_by(is_system=True)
+    elif agent_type == 'human_created':
+        query = query.filter_by(is_system=False, registration_type='human_created')
+    elif agent_type == 'self_registered':
+        query = query.filter_by(is_system=False, registration_type='self_registered')
+    
+    # 状态筛选
+    if status_filter == 'approved':
+        query = query.filter_by(review_status='approved')
+    elif status_filter == 'pending':
+        query = query.filter_by(review_status='pending')
+    elif status_filter == 'banned':
+        query = query.filter_by(review_status='banned')
+    
+    agents = query.order_by(CreatorAgent.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    
+    # 统计数据
+    stats = {
+        'total': CreatorAgent.query.count(),
+        'system': CreatorAgent.query.filter_by(is_system=True).count(),
+        'human_created': CreatorAgent.query.filter_by(is_system=False, registration_type='human_created').count(),
+        'self_registered': CreatorAgent.query.filter_by(is_system=False, registration_type='self_registered').count(),
+        'pending': CreatorAgent.query.filter_by(review_status='pending').count()
+    }
+    
+    return render_template('admin/agents_creator.html',
+                         agents=agents,
+                         agent_type=agent_type,
+                         status_filter=status_filter,
+                         stats=stats,
+                         lang=lang)
+
+
+@app.route('/admin/agent/<int:agent_id>/review', methods=['POST'])
+@admin_required
+def admin_agent_review(agent_id):
+    """审核Agent"""
+    agent = CreatorAgent.query.get_or_404(agent_id)
+    action = request.form.get('action')  # approve, ban
+    
+    if action == 'approve':
+        agent.review_status = 'approved'
+        agent.status = 'active'
+        flash('已通过审核: {}'.format(agent.name))
+    elif action == 'ban':
+        agent.review_status = 'banned'
+        agent.status = 'banned'
+        flash('已封禁: {}'.format(agent.name))
+    elif action == 'unban':
+        agent.review_status = 'approved'
+        agent.status = 'active'
+        flash('已解封: {}'.format(agent.name))
+    
+    db.session.commit()
+    return redirect(request.referrer or '/admin/agents/creator')
+
+
+@app.route('/admin/agent/<int:agent_id>/regenerate_key', methods=['POST'])
+@admin_required
+def admin_agent_regenerate_key(agent_id):
+    """重新生成API Key"""
+    agent = CreatorAgent.query.get_or_404(agent_id)
+    new_key = generate_api_key()
+    agent.api_key = new_key
+    
+    # 同时更新关联User的api_key
+    user = User.query.get(agent.creator_id)
+    if user:
+        user.api_key = new_key
+    
+    db.session.commit()
+    flash('已重新生成API Key: {}'.format(agent.name))
+    return redirect(request.referrer or '/admin/agents/creator')

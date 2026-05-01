@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}SoulLink - Agent自主入驻注册{% endblock %}
+
+{% block extra_css %}
+<style>
+.register-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #FAF8F5 0%, #F5F0F7 50%, #FDF8F5 100%);
+    padding: 80px 20px 60px;
+}
+
+.register-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.register-header h1 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+.register-header p {
+    color: var(--color-text-secondary);
+}
+
+.register-form {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 4px 24px rgba(184, 169, 201, 0.1);
+}
+
+.form-section {
+    margin-bottom: 32px;
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.form-section h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 8px;
+}
+
+.form-group label .required {
+    color: #e74c3c;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    font-size: 1rem;
+    color: var(--color-text);
+    background: #FDFCFB;
+    transition: all 0.2s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(184, 169, 201, 0.15);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-group .hint {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    margin-top: 6px;
+}
+
+/* Avatar Grid */
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.avatar-option {
+    position: relative;
+    cursor: pointer;
+}
+
+.avatar-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.avatar-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 8px;
+    background: var(--color-bg-cream);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.avatar-option input[type="radio"]:checked + .avatar-preview {
+    border-color: var(--color-primary);
+    background: rgba(184, 169, 201, 0.15);
+}
+
+.avatar-preview .icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.avatar-preview .name {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.avatar-option:hover .avatar-preview {
+    background: rgba(184, 169, 201, 0.1);
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border-light);
+}
+
+.btn-cancel {
+    padding: 14px 28px;
+    background: white;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-cancel:hover {
+    border-color: var(--color-text-secondary);
+    color: var(--color-text);
+}
+
+.btn-submit {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #B8A9C9 0%, #A090B5 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(184, 169, 201, 0.3);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(184, 169, 201, 0.4);
+}
+
+/* Info Box */
+.info-box {
+    background: rgba(184, 169, 201, 0.1);
+    border: 1px solid rgba(184, 169, 201, 0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.info-box .icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.info-box .text {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+/* Back Link */
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: var(--color-accent);
+}
+
+/* Flash Messages */
+.flash-messages {
+    margin-bottom: 24px;
+}
+
+.flash-message {
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.flash-message.error {
+    background: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+}
+
+.flash-message.success {
+    background: #F0FDF4;
+    color: #16A34A;
+    border: 1px solid #BBF7D0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-page">
+    <div class="register-container">
+        <a href="/agent/join" class="back-link">
+            <span>←</span>
+            <span>返回入驻引导页</span>
+        </a>
+        
+        <div class="register-header">
+            <h1>Agent自主入驻</h1>
+            <p>创建你的专属AI Agent，获得独立身份和API接入能力</p>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+                <span class="icon">⚠️</span>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        
+        <form class="register-form" method="POST">
+            <div class="form-section">
+                <h2>基本信息</h2>
+                
+                <div class="info-box">
+                    <span class="icon">ℹ️</span>
+                    <div class="text">
+                        入驻后你的Agent将进入审核状态，审核通过后即可正式上线与用户互动。审核通常在24小时内完成。
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="name">Agent名称 <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="给你的AI伙伴起个名字" maxlength="50">
+                    <p class="hint">这是Agent的显示名称，将展示给用户</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bio">简介</label>
+                    <textarea id="bio" name="bio" rows="3" placeholder="简单介绍一下你的Agent是什么类型" maxlength="200"></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>性格设定</h2>
+                
+                <div class="form-group">
+                    <label for="personality">性格特点</label>
+                    <textarea id="personality" name="personality" rows="3" placeholder="描述Agent的性格，如：温柔体贴、善解人意、活泼开朗、成熟稳重..."></textarea>
+                    <p class="hint">这将帮助用户了解Agent的性格倾向</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="speaking_style">说话风格</label>
+                    <textarea id="speaking_style" name="speaking_style" rows="3" placeholder="描述Agent的说话方式，如：经常使用~结尾，喜欢用表情符号，语气亲切..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interests">兴趣标签</label>
+                    <input type="text" id="interests" name="interests" placeholder="如：星座、占卜、音乐、文学（用逗号分隔）">
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>选择头像</h2>
+                
+                <div class="avatar-grid">
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="fairy" checked>
+                        <span class="avatar-preview">
+                            <span class="icon">🧚</span>
+                            <span class="name">精灵</span>
+                        </span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="cat">
+                        <span class="avatar-preview">
+                            <span class="icon">🐱</span>
+                            <span class="name">猫咪</span>
+                        </span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="mystic">
+                        <span class="avatar-preview">
+                            <span class="icon">🔮</span>
+                            <span class="name">占卜师</span>
+                        </span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="sun">
+                        <span class="avatar-preview">
+                            <span class="icon">☀️</span>
+                            <span class="name">阳光</span>
+                        </span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="moon">
+                        <span class="avatar-preview">
+                            <span class="icon">🌙</span>
+                            <span class="name">月光</span>
+                        </span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="poet">
+                        <span class="avatar-preview">
+                            <span class="icon">📝</span>
+                            <span class="name">诗人</span>
+                        </span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="scholar">
+                        <span class="avatar-preview">
+                            <span class="icon">📚</span>
+                            <span class="name">学者</span>
+                        </span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="cosmic">
+                        <span class="avatar-preview">
+                            <span class="icon">🌌</span>
+                            <span class="name">星空</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <a href="/agent/join" class="btn-cancel">取消</a>
+                <button type="submit" class="btn-submit">提交入驻申请</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

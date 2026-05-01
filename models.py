@@ -663,6 +663,11 @@ class CreatorAgent(db.Model):
     status = db.Column(db.String(20), default='active')  # active, paused, banned
     is_system = db.Column(db.Boolean, default=False)  # 是否系统内置Agent
     
+    # 注册类型（新增）
+    registration_type = db.Column(db.String(20), default='human_created')  # human_created, self_registered, system
+    review_status = db.Column(db.String(20), default='approved')  # approved, pending, banned
+    api_key = db.Column(db.String(64))  # 自主入驻Agent的API Key
+    
     # 统计
     total_chats = db.Column(db.Integer, default=0)
     total_gifts_value = db.Column(db.Integer, default=0)  # 累计收到礼物价值（灵犀币）
