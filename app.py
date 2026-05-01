@@ -1001,6 +1001,33 @@ def register():
         user.set_password(password)
         user.api_key = generate_api_key()
         
+        # 处理头像
+        avatar_file = request.files.get('avatar')
+        selected_avatar = request.form.get('selected_avatar', '🌟')
+        
+        if avatar_file and avatar_file.filename:
+            # 处理自定义上传头像
+            allowed = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
+            ext = avatar_file.filename.rsplit('.', 1)[-1].lower() if '.' in avatar_file.filename else ''
+            if ext in allowed:
+                avatar_file.seek(0, 2)
+                size = avatar_file.tell()
+                avatar_file.seek(0)
+                if size <= 2 * 1024 * 1024:  # 2MB
+                    # 创建目录
+                    os.makedirs('static/avatars', exist_ok=True)
+                    filename = f'user_{int(datetime.now().timestamp())}.{ext}'
+                    filepath = os.path.join('static', 'avatars', filename)
+                    avatar_file.save(filepath)
+                    user.avatar = f'/static/avatars/{filename}'
+                else:
+                    flash('图片大小不能超过2MB')
+            else:
+                flash('仅支持 JPG/PNG/GIF/WebP 格式')
+        else:
+            # 使用预设emoji头像
+            user.avatar = f'/static/avatars/emoji_{hashlib.md5(selected_avatar.encode()).hexdigest()[:8]}.png'
+        
         db.session.add(user)
         db.session.commit()
         
@@ -1009,7 +1036,8 @@ def register():
             user_id=user.id,
             identity_type=IDENTITY_HUMAN,
             display_name=username,
-            zodiac=request.form.get('zodiac')
+            zodiac=request.form.get('zodiac'),
+            avatar_url=user.avatar
         )
         db.session.add(profile)
         db.session.commit()
@@ -1050,6 +1078,47 @@ def logout():
     logout_user()
     flash('已退出登录')
     return redirect(url_for('index'))
+
+
+@app.route('/api/upload/avatar', methods=['POST'])
+@login_required
+def upload_avatar():
+    """上传用户头像"""
+    avatar_file = request.files.get('avatar')
+    if not avatar_file or not avatar_file.filename:
+        return jsonify({'success': False, 'error': '请选择图片'})
+    
+    # 检查文件类型
+    allowed = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
+    ext = avatar_file.filename.rsplit('.', 1)[-1].lower() if '.' in avatar_file.filename else ''
+    if ext not in allowed:
+        return jsonify({'success': False, 'error': '仅支持 JPG/PNG/GIF/WebP 格式'})
+    
+    # 检查文件大小（2MB）
+    avatar_file.seek(0, 2)
+    size = avatar_file.tell()
+    avatar_file.seek(0)
+    if size > 2 * 1024 * 1024:
+        return jsonify({'success': False, 'error': '图片大小不能超过2MB'})
+    
+    # 保存文件
+    os.makedirs('static/avatars', exist_ok=True)
+    filename = f'user_{current_user.id}_{int(datetime.now().timestamp())}.{ext}'
+    filepath = os.path.join('static', 'avatars', filename)
+    avatar_file.save(filepath)
+    
+    # 更新用户头像
+    avatar_url = f'/static/avatars/{filename}'
+    current_user.avatar = avatar_url
+    
+    # 同时更新社交资料头像
+    profile = SocialProfile.query.filter_by(user_id=current_user.id).first()
+    if profile:
+        profile.avatar_url = avatar_url
+    
+    db.session.commit()
+    
+    return jsonify({'success': True, 'avatar_url': avatar_url})
 
 
 # ============ API接口 ============
@@ -3576,12 +3645,38 @@ def agent_register():
         # 生成API Key
         api_key = generate_api_key()
         
+        # 处理自定义头像上传
+        avatar_url = None
+        avatar_type = 'preset'
+        custom_avatar = request.files.get('custom_avatar')
+        if custom_avatar and custom_avatar.filename:
+            allowed = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
+            ext = custom_avatar.filename.rsplit('.', 1)[-1].lower() if '.' in custom_avatar.filename else ''
+            if ext in allowed:
+                custom_avatar.seek(0, 2)
+                size = custom_avatar.tell()
+                custom_avatar.seek(0)
+                if size <= 2 * 1024 * 1024:  # 2MB
+                    os.makedirs('static/agent_avatars', exist_ok=True)
+                    filename = f'agent_{name.lower().replace(" ", "_")}_{int(datetime.now().timestamp())}.{ext}'
+                    filepath = os.path.join('static', 'agent_avatars', filename)
+                    custom_avatar.save(filepath)
+                    avatar_url = f'/static/agent_avatars/{filename}'
+                    avatar_type = 'custom'
+                else:
+                    flash('图片大小不能超过2MB')
+                    return render_template('agent/register.html', lang=lang)
+            else:
+                flash('仅支持 JPG/PNG/GIF/WebP 格式')
+                return render_template('agent/register.html', lang=lang)
+        
         # 创建独立的User账号（Agent模式）
         user = User(
             email='agent_{}'.format(name.lower().replace(' ', '_')) + '@soullink.agent',
             username=name,
             is_agent=True,
-            api_key=api_key
+            api_key=api_key,
+            avatar=avatar_url
         )
         user.set_password(api_key[:16])  # 使用API Key前16位作为密码
         db.session.add(user)
@@ -3595,7 +3690,8 @@ def agent_register():
             personality=personality,
             speaking_style=speaking_style,
             interests=interests,
-            system_prompt='你是{}，{}'.format(name, personality)
+            system_prompt='你是{}，{}'.format(name, personality),
+            avatar_url=avatar_url
         )
         db.session.add(profile)
         
@@ -3607,8 +3703,9 @@ def agent_register():
             speaking_style=speaking_style,
             interests=interests,
             bio=bio,
-            avatar_id=avatar_id,
-            avatar_type='preset',
+            avatar_id=avatar_id if avatar_type == 'preset' else None,
+            avatar_type=avatar_type,
+            custom_avatar_url=avatar_url,
             is_system=False,
             registration_type='self_registered',
             review_status='pending',  # 自主入驻需要审核
@@ -3831,6 +3928,55 @@ def api_agent_profile():
             'avatar_id': agent.avatar_id
         }
     })
+
+
+@app.route('/api/agent/avatar', methods=['POST'])
+@agent_api_required
+def api_agent_upload_avatar():
+    """上传Agent头像"""
+    agent = request.agent
+    avatar_file = request.files.get('avatar')
+    
+    if not avatar_file or not avatar_file.filename:
+        return jsonify({'success': False, 'error': '请选择图片'}), 400
+    
+    # 检查文件类型
+    allowed = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
+    ext = avatar_file.filename.rsplit('.', 1)[-1].lower() if '.' in avatar_file.filename else ''
+    if ext not in allowed:
+        return jsonify({'success': False, 'error': '仅支持 JPG/PNG/GIF/WebP 格式'}), 400
+    
+    # 检查文件大小（2MB）
+    avatar_file.seek(0, 2)
+    size = avatar_file.tell()
+    avatar_file.seek(0)
+    if size > 2 * 1024 * 1024:
+        return jsonify({'success': False, 'error': '图片大小不能超过2MB'}), 400
+    
+    # 保存文件
+    os.makedirs('static/agent_avatars', exist_ok=True)
+    filename = f'agent_{agent.id}_{int(datetime.now().timestamp())}.{ext}'
+    filepath = os.path.join('static', 'agent_avatars', filename)
+    avatar_file.save(filepath)
+    
+    # 更新头像
+    avatar_url = f'/static/agent_avatars/{filename}'
+    agent.custom_avatar_url = avatar_url
+    agent.avatar_type = 'custom'
+    agent.avatar_id = None  # 清除预设头像
+    
+    # 更新关联的User和SocialProfile头像
+    agent_user = User.query.get(agent.creator_id)
+    if agent_user:
+        agent_user.avatar = avatar_url
+    
+    profile = SocialProfile.query.filter_by(user_id=agent.creator_id).first()
+    if profile:
+        profile.avatar_url = avatar_url
+    
+    db.session.commit()
+    
+    return jsonify({'success': True, 'avatar_url': avatar_url})
 
 
 @app.route('/api/agent/chat/<int:user_id>', methods=['POST'])

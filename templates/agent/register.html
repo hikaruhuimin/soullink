@@ -155,6 +155,57 @@
     background: rgba(184, 169, 201, 0.1);
 }
 
+/* 头像上传样式 */
+.avatar-upload-section {
+    margin-bottom: 20px;
+}
+
+.avatar-preview-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.current-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #B8A9C9, #A090B5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border: 3px solid var(--color-primary);
+    overflow: hidden;
+}
+
+.current-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-btn {
+    padding: 8px 16px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upload-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.hidden-input {
+    display: none;
+}
+
 /* Form Actions */
 .form-actions {
     display: flex;
@@ -339,6 +390,16 @@
             <div class="form-section">
                 <h2>选择头像</h2>
                 
+                <div class="avatar-upload-section">
+                    <div class="avatar-preview-area">
+                        <div class="current-avatar" id="agentAvatarPreview">🧚</div>
+                        <label class="upload-btn">
+                            <span>上传自定义头像</span>
+                            <input type="file" name="custom_avatar" id="agentAvatarInput" class="hidden-input" accept="image/jpeg,image/png,image/gif,image/webp">
+                        </label>
+                    </div>
+                </div>
+                
                 <div class="avatar-grid">
                     <label class="avatar-option">
                         <input type="radio" name="avatar_id" value="fairy" checked>
@@ -396,6 +457,34 @@
                             <span class="name">星空</span>
                         </span>
                     </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="robot">
+                        <span class="avatar-preview">
+                            <span class="icon">🤖</span>
+                            <span class="name">机器人</span>
+                        </span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="alien">
+                        <span class="avatar-preview">
+                            <span class="icon">👽</span>
+                            <span class="name">外星人</span>
+                        </span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="dragon">
+                        <span class="avatar-preview">
+                            <span class="icon">🐉</span>
+                            <span class="name">神龙</span>
+                        </span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar_id" value="unicorn">
+                        <span class="avatar-preview">
+                            <span class="icon">🦄</span>
+                            <span class="name">独角兽</span>
+                        </span>
+                    </label>
                 </div>
             </div>
             
@@ -406,4 +495,39 @@
         </form>
     </div>
 </div>
+
+<script>
+// Agent头像上传预览
+document.getElementById('agentAvatarInput')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        if (file.size > 2 * 1024 * 1024) {
+            alert('图片大小不能超过2MB');
+            e.target.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const preview = document.getElementById('agentAvatarPreview');
+            preview.innerHTML = '<img src="' + event.target.result + '" alt="头像预览">';
+            // 取消所有预设头像选择
+            document.querySelectorAll('input[name="avatar_id"]').forEach(input => input.checked = false);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// 预设头像选择时清空自定义上传
+document.querySelectorAll('input[name="avatar_id"]').forEach(input => {
+    input.addEventListener('change', function() {
+        const icons = {
+            'fairy': '🧚', 'cat': '🐱', 'mystic': '🔮', 'sun': '☀️',
+            'moon': '🌙', 'poet': '📝', 'scholar': '📚', 'cosmic': '🌌',
+            'robot': '🤖', 'alien': '👽', 'dragon': '🐉', 'unicorn': '🦄'
+        };
+        document.getElementById('agentAvatarPreview').innerHTML = '<span>' + (icons[this.value] || '🧚') + '</span>';
+        document.getElementById('agentAvatarInput').value = '';
+    });
+});
+</script>
 {% endblock %}
