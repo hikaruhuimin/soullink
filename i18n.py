@@ -335,6 +335,29 @@ TRANSLATIONS = {
         'reward_100days': '获得520灵石+永恒之证',
         'insufficient_stones': '灵石不足',
         'gift_sent_success': '礼物已送出！陪伴师会收到你的心意～',
+        
+        # FAQ Page translations
+        'faq_title': '常见问题',
+        'faq_subtitle': '关于SoulLink灵犀，您可能想了解的问题',
+        'still_have_questions': '还有其他问题？',
+        'cta_message': '欢迎体验SoulLink灵犀，探索命运的奥秘，感受AI的温暖陪伴',
+        'start_experience': '开始体验',
+        
+        # Register page
+        'phone_register': '手机注册',
+        'phone_number': '手机号码',
+        'select_country': '选择国家',
+        'verification_code': '验证码',
+        'send_code': '发送验证码',
+        'resend_code': '重新发送',
+        'code_sent': '验证码已发送',
+        'invalid_phone': '请输入有效的手机号码',
+        'agree_terms': '我已阅读并同意',
+        'user_agreement': '用户协议',
+        'privacy_policy': '隐私政策',
+        'complete_registration': '完成注册',
+        'already_have_account': '已有账号？',
+        'login_now': '立即登录',
     },
     
     'en': {
@@ -563,6 +586,29 @@ TRANSLATIONS = {
         'reward_100days': 'Get 520 stones + Eternal proof',
         'insufficient_stones': 'Insufficient stones',
         'gift_sent_success': 'Gift sent! Your companion will receive your heart~',
+        
+        # FAQ Page translations
+        'faq_title': 'Frequently Asked Questions',
+        'faq_subtitle': 'Questions you may have about SoulLink',
+        'still_have_questions': 'Still have questions?',
+        'cta_message': 'Welcome to experience SoulLink, explore the mysteries of destiny, feel the warm companionship of AI',
+        'start_experience': 'Start Now',
+        
+        # Register page
+        'phone_register': 'Phone Register',
+        'phone_number': 'Phone Number',
+        'select_country': 'Select Country',
+        'verification_code': 'Verification Code',
+        'send_code': 'Send Code',
+        'resend_code': 'Resend',
+        'code_sent': 'Code sent',
+        'invalid_phone': 'Please enter a valid phone number',
+        'agree_terms': 'I have read and agree to the',
+        'user_agreement': 'User Agreement',
+        'privacy_policy': 'Privacy Policy',
+        'complete_registration': 'Complete Registration',
+        'already_have_account': 'Already have an account?',
+        'login_now': 'Login Now',
     },
     
     'ja': {
@@ -768,6 +814,29 @@ TRANSLATIONS = {
         'reward_100days': '520霊石+永遠の証明書獲得',
         'insufficient_stones': '霊石不足',
         'gift_sent_success': 'ギフトを贈りました！相伴師があなたの気持ちを受け取ります～',
+        
+        # FAQ Page translations
+        'faq_title': 'よくある質問',
+        'faq_subtitle': 'SoulLinkについてよくあるご質問',
+        'still_have_questions': 'まだ質問がありますか？',
+        'cta_message': 'SoulLinkを体験して、運命の神秘を探索し、AIの温かい相伴を感じましょう',
+        'start_experience': '始めよう',
+        
+        # Register page
+        'phone_register': '電話番号登録',
+        'phone_number': '電話番号',
+        'select_country': '国を選択',
+        'verification_code': '認証コード',
+        'send_code': 'コードを送信',
+        'resend_code': '再送信',
+        'code_sent': 'コードを送信しました',
+        'invalid_phone': '有効な電話番号を入力してください',
+        'agree_terms': 'に同意します',
+        'user_agreement': '利用規約',
+        'privacy_policy': 'プライバシーポリシー',
+        'complete_registration': '登録完了',
+        'already_have_account': 'すでにアカウントをお持ちですか？',
+        'login_now': 'ログイン',
     }
 }
 

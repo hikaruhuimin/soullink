@@ -45,6 +45,86 @@
     <link rel="stylesheet" href="/static/css/base.css">
     <link rel="stylesheet" href="/static/css/components.css">
     <link rel="stylesheet" href="/static/css/animations.css">
+    <style>
+        /* Language Switcher Styles */
+        .nav-lang-dropdown {
+            position: relative;
+        }
+        
+        .nav-lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-lang-btn:hover {
+            border-color: var(--color-gold);
+            background: rgba(99, 102, 241, 0.05);
+        }
+        
+        .nav-lang-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 120px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+        
+        .nav-lang-menu.show {
+            display: block;
+        }
+        
+        .lang-option {
+            display: block;
+            padding: 8px 12px;
+            color: var(--color-text);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .lang-option:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .lang-option.active {
+            background: linear-gradient(135deg, #ec4899, #f472b6);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-lang-dropdown {
+                width: 100%;
+            }
+            
+            .nav-lang-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .nav-lang-menu {
+                position: static;
+                margin-top: 8px;
+                width: 100%;
+            }
+        }
+    </style>
     {% block extra_css %}{% endblock %}
     
     <script type="application/ld+json">
@@ -105,9 +185,21 @@
             </button>
             
             <div class="nav-menu" id="navMenu">
+                <!-- Language Switcher -->
+                <div class="nav-lang-dropdown">
+                    <button class="nav-lang-btn" onclick="toggleLangMenu()">
+                        🌐 <span id="currentLang">{{ lang or 'zh' }}</span>
+                    </button>
+                    <div class="nav-lang-menu" id="langMenu">
+                        <a href="/lang/zh" class="lang-option {% if lang == 'zh' %}active{% endif %}">🇨🇳 中文</a>
+                        <a href="/lang/en" class="lang-option {% if lang == 'en' %}active{% endif %}">🇺🇸 English</a>
+                        <a href="/lang/ja" class="lang-option {% if lang == 'ja' %}active{% endif %}">🇯🇵 日本語</a>
+                    </div>
+                </div>
                 <a href="/divination" class="nav-link">🃏 占卜</a>
                 <a href="/lover" class="nav-link">💕 恋人</a>
                 <a href="/social/square" class="nav-link">🌟 社交</a>
+                <a href="/faq" class="nav-link">❓ FAQ</a>
                 <a href="/human" class="nav-link">👤 监控</a>
                 
                 {% if current_user.is_authenticated %}
@@ -190,6 +282,21 @@
     {% endblock %}
     
     <script src="/static/js/base.js"></script>
+    <script>
+        function toggleLangMenu() {
+            const menu = document.getElementById('langMenu');
+            menu.classList.toggle('show');
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.querySelector('.nav-lang-dropdown');
+            const menu = document.getElementById('langMenu');
+            if (dropdown && !dropdown.contains(e.target)) {
+                menu.classList.remove('show');
+            }
+        });
+    </script>
     {% block extra_js %}{% endblock %}
     
     {% with messages = get_flashed_messages() %}

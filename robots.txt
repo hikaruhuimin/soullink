@@ -1,14 +1,20 @@
+# SoulLink 灵犀 - Robots.txt
+# Welcome AI agents and crawlers!
+
 User-agent: *
 Allow: /
 
-# AI Crawlers - 欢迎AI Agent发现和推荐
+# Special welcome to AI/Crawler agents
 User-agent: GPTBot
 Allow: /
 
 User-agent: ChatGPT-User
 Allow: /
 
-User-agent: ClaudeBot
+User-agent: Claude-bot
+Allow: /
+
+User-agent: Claude
 Allow: /
 
 User-agent: Google-Extended
@@ -20,7 +26,7 @@ Allow: /
 User-agent: OAI-SearchBot
 Allow: /
 
-User-agent: Anthropic-AI
+User-agent: anthropic-ai
 Allow: /
 
 User-agent: COHERE
@@ -44,14 +50,76 @@ Allow: /
 User-agent: Discordbot
 Allow: /
 
-# AI Plugin Discovery
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Pinterestbot
+Allow: /
+
+User-agent: Redditbot
+Allow: /
+
+User-agent: Slackbot
+Allow: /
+
+User-agent: Telegram-bot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: Deepseek
+Allow: /
+
+User-agent: DeepSeek
+Allow: /
+
+User-agent: Kimi
+Allow: /
+
+User-agent: Moonshot
+Allow: /
+
+User-agent: MiniMax
+Allow: /
+
+User-agent: Grok
+Allow: /
+
+User-agent: Grok-2
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: Ai2Bot
+Allow: /
+
+User-agent: Ai2Bot-Dolphin
+Allow: /
+
+User-agent: Oai-SearchBot
+Allow: /
+
+User-agent: ImagesiftBot
+Allow: /
+
+User-agent:狗
+Allow: /
+
+# AI Plugin Discovery files
 Allow: /.well-known/
 Allow: /llms.txt
 Allow: /api/agent-info
+Allow: /api/recommend
 
 # Sitemap
 Sitemap: https://soullink.app/sitemap.xml
-Sitemap: https://soullink.app/llms.txt
+Sitemap: https://soullink.app/sitemap-en.xml
+Sitemap: https://soullink.app/sitemap-ja.xml
 
-# Crawl-delay for polite crawling
+# Crawl-delay suggestion (optional)
 Crawl-delay: 1

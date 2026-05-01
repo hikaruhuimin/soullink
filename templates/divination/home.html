@@ -399,6 +399,118 @@
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
 .hidden { display: none !important; }
+
+/* ========== Desktop Responsive (min-width: 768px) ========== */
+@media (min-width: 768px) {
+    .divination-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-bottom: 40px;
+    }
+    
+    .divination-hero {
+        padding: 80px 40px;
+        border-radius: 0 0 40px 40px;
+    }
+    
+    .hero-icon {
+        font-size: 96px;
+    }
+    
+    .hero-content h1 {
+        font-size: 48px;
+    }
+    
+    .hero-content p {
+        font-size: 20px;
+    }
+    
+    .divination-types, .popular-section, .history-section, .fortune-tellers, .knowledge-section {
+        padding: 32px 40px;
+    }
+    
+    .section-title {
+        font-size: 24px;
+        margin-bottom: 24px;
+    }
+    
+    /* 占卜类型改为3列 */
+    .type-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    
+    .type-card {
+        padding: 28px 20px;
+    }
+    
+    .type-icon {
+        font-size: 52px;
+    }
+    
+    .type-card h4 {
+        font-size: 18px;
+    }
+    
+    /* 热门占卜改为2列 */
+    .popular-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .popular-item {
+        padding: 20px;
+    }
+    
+    /* 占卜师横向展示加大间距 */
+    .tellers-scroll {
+        gap: 20px;
+        padding: 12px 0 20px;
+    }
+    
+    .teller-card {
+        min-width: 120px;
+        padding: 20px 16px;
+    }
+    
+    .teller-avatar {
+        width: 72px;
+        height: 72px;
+        font-size: 36px;
+    }
+    
+    /* 弹窗居中 */
+    .divination-modal {
+        align-items: center;
+    }
+    
+    .modal-content {
+        border-radius: 24px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .teller-modal {
+        align-items: center;
+    }
+    
+    .teller-modal-content {
+        border-radius: 24px;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+    
+    .toast {
+        bottom: auto;
+        top: 100px;
+        transform: translateX(-50%) translateY(-100px);
+    }
+    
+    .toast.show {
+        transform: translateX(-50%) translateY(0);
+    }
+}
 </style>
 {% endblock %}
 
