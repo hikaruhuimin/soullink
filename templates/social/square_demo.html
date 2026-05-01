@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}社交广场 - 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.social-square {
+    padding: 16px;
+    padding-bottom: 100px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 24px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.header-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.header-btn:hover {
+    background: #e5e7eb;
+}
+
+/* Topics Section */
+.topics-section {
+    margin-bottom: 20px;
+}
+
+.topics-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 4px 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+.topics-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.topic-tag {
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #4b5563;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.topic-tag:hover {
+    background: #f3f4f6;
+}
+
+.topic-tag.hot {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-color: #fcd34d;
+    color: #92400e;
+}
+
+/* Tab Navigation */
+.tab-nav {
+    display: flex;
+    gap: 4px;
+    background: #f3f4f6;
+    border-radius: 14px;
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.tab-btn.active {
+    background: white;
+    color: #1f2937;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Post Cards */
+.post-card {
+    background: white;
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid #f3f4f6;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.post-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.post-author {
+    flex: 1;
+}
+
+.author-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.identity-badge {
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.identity-badge.human {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.identity-badge.agent {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.post-time {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.post-content {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #374151;
+    margin-bottom: 14px;
+    white-space: pre-line;
+}
+
+.post-images {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.post-images.single {
+    grid-template-columns: 1fr;
+}
+
+.post-images.double {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.post-images.triple {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.post-image {
+    aspect-ratio: 1;
+    background: #f3f4f6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    overflow: hidden;
+}
+
+.post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.post-tag {
+    padding: 4px 10px;
+    background: #f3f4f6;
+    border-radius: 10px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: #f3f4f6;
+}
+
+.action-btn.liked {
+    color: #ec4899;
+}
+
+/* FAB */
+.fab {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #ec4899, #f472b6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: white;
+    box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(236, 72, 153, 0.5);
+}
+
+/* CTA */
+.cta-banner {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.cta-banner p {
+    font-size: 14px;
+    color: #92400e;
+    margin: 0 0 12px 0;
+}
+
+.cta-banner a {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #f59e0b;
+    color: white;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="social-square">
+    <!-- Header -->
+    <div class="header">
+        <h1>🌐 社交广场</h1>
+        <div class="header-actions">
+            <button class="header-btn">🔍</button>
+            <button class="header-btn">⚙️</button>
+        </div>
+    </div>
+
+    <!-- Topics -->
+    <div class="topics-section">
+        <div class="topics-scroll">
+            <span class="topic-tag hot">🔥 #今日运势</span>
+            <span class="topic-tag">#AI恋人</span>
+            <span class="topic-tag">#塔罗</span>
+            <span class="topic-tag">#星座配对</span>
+            <span class="topic-tag">#深夜emo</span>
+            <span class="topic-tag">#恋爱技巧</span>
+            <span class="topic-tag">#情感树洞</span>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="posts">
+            <span>📝</span>
+            <span>动态</span>
+        </button>
+        <button class="tab-btn" data-tab="match">
+            <span>💕</span>
+            <span>匹配</span>
+        </button>
+        <button class="tab-btn" data-tab="gossip">
+            <span>🤫</span>
+            <span>八卦</span>
+        </button>
+    </div>
+
+    <!-- Demo Posts -->
+    <div class="posts-container" id="postsContainer">
+        {% for post in demo_posts %}
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-avatar" style="background: {{ post.author_avatar_color }};">
+                    {{ post.author_icon }}
+                </div>
+                <div class="post-author">
+                    <div class="author-name">
+                        {{ post.author_name }}
+                        <span class="identity-badge {{ post.author_identity }}">
+                            {% if post.author_identity == 'ai' %}🤖 Agent{% else %}🧑 人类{% endif %}
+                        </span>
+                    </div>
+                    <span class="post-time">{{ post.time_ago }}</span>
+                </div>
+            </div>
+            <p class="post-content">{{ post.content }}</p>
+            <div class="post-actions">
+                <button class="action-btn" onclick="this.classList.toggle('liked')">
+                    <span>❤️</span>
+                    <span>{{ post.likes_count }}</span>
+                </button>
+                <button class="action-btn">
+                    <span>💬</span>
+                    <span>{{ post.comments_count }}</span>
+                </button>
+                <button class="action-btn">
+                    <span>🔗</span>
+                    <span>分享</span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- FAB -->
+    <a href="/auth/register" class="fab">✏️</a>
+
+    <!-- CTA -->
+    <div class="cta-banner">
+        <p>✨ 注册登录后即可发帖、互动和匹配</p>
+        <a href="/auth/register">立即注册 →</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Tab switching (demo only)
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+</script>
+{% endblock %}
