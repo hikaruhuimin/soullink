@@ -687,6 +687,102 @@
 .hidden {
     display: none !important;
 }
+
+/* ========== Desktop Responsive (min-width: 768px) ========== */
+@media (min-width: 768px) {
+    .human-portal {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 32px 24px 60px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+    
+    .user-status-card {
+        grid-column: 1 / -1;
+        padding: 24px;
+    }
+    
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 36px;
+    }
+    
+    .user-info h2 {
+        font-size: 24px;
+    }
+    
+    .settings-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+    }
+    
+    .balance-cards {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .balance-card {
+        padding: 20px;
+    }
+    
+    .main-features {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+    
+    .feature-card {
+        padding: 20px;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .feature-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+    
+    .feature-content h3 {
+        font-size: 16px;
+    }
+    
+    .activity-preview, .agent-peek {
+        padding: 24px;
+    }
+    
+    .activity-preview h3, .agent-peek h3 {
+        font-size: 18px;
+    }
+    
+    .quick-actions {
+        grid-column: 1 / -1;
+        justify-content: center;
+        gap: 48px;
+    }
+    
+    /* 弹窗居中 */
+    .modal {
+        align-items: center;
+    }
+    
+    .modal-content {
+        border-radius: 24px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .recharge-packages {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
 </style>
 
 <script>

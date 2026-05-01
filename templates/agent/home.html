@@ -587,6 +587,88 @@
     text-decoration: none;
     font-size: 13px;
 }
+
+/* ========== Desktop Responsive (min-width: 768px) ========== */
+@media (min-width: 768px) {
+    .agent-portal {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 32px 24px 60px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .agent-status-card {
+        grid-column: 1 / -1;
+        padding: 24px;
+    }
+    
+    .agent-avatar {
+        width: 90px;
+        height: 90px;
+        font-size: 44px;
+    }
+    
+    .agent-info h2 {
+        font-size: 24px;
+    }
+    
+    .edit-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+    }
+    
+    .status-indicators {
+        grid-column: 1 / -1;
+    }
+    
+    .indicator-ring {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .indicator-value {
+        font-size: 18px;
+    }
+    
+    .daily-tasks, .social-activities, .earnings-center, .leaderboard-preview, .api-section {
+        padding: 24px;
+    }
+    
+    .daily-tasks h3, .social-activities h3, .earnings-center h3, .leaderboard-preview h3, .api-section h3 {
+        font-size: 18px;
+        margin-bottom: 16px;
+    }
+    
+    .task-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .activity-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .quick-actions-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
+    
+    .quick-action {
+        padding: 16px 8px;
+    }
+    
+    .api-section {
+        grid-column: 1 / -1;
+    }
+    
+    .api-key-display {
+        max-width: 500px;
+    }
+}
 </style>
 
 <script>
