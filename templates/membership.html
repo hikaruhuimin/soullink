@@ -145,6 +145,72 @@
     box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
 }
 
+/* 微信二维码样式 */
+.m-wechat-qr-display {
+    text-align: center;
+    margin: 16px 0;
+}
+
+.m-wechat-qr-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(7, 193, 96, 0.15);
+    border: 3px solid #f0f9f4;
+    margin-bottom: 12px;
+}
+
+.m-wechat-amount {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #07c160;
+    margin-bottom: 8px;
+}
+
+.m-wechat-reminder {
+    background: #f0f9f4;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 10px;
+}
+
+/* 支付宝占位样式 */
+.m-alipay-coming {
+    text-align: center;
+    padding: 24px;
+}
+
+.m-alipay-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #00a1e9 0%, #1677ff 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 2rem;
+}
+
+.m-alipay-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.m-alipay-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #00a1e9 0%, #1677ff 100%);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    margin-top: 12px;
+}
+
 /* 二维码占位 */
 .qr-area {
     text-align: center;
@@ -753,10 +819,10 @@ function showPayDetail(method) {
 function getWechatDetailHTML() {
     return `
         <button onclick="closePayModal()" style="position:absolute;top:16px;right:16px;background:#f5f5f5;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;">×</button>
-        <div style="text-align:center;margin-bottom:20px;">
-            <div style="font-size:2.8rem;margin-bottom:8px;">💚</div>
-            <div style="font-size:1.3rem;font-weight:bold;">微信支付</div>
-            <div style="color:#666;font-size:0.9rem;">心意即刻送达</div>
+        <div style="text-align:center;margin-bottom:16px;">
+            <div style="font-size:2.5rem;margin-bottom:8px;">💚</div>
+            <div style="font-size:1.2rem;font-weight:bold;">微信支付</div>
+            <div style="color:#666;font-size:0.85rem;">扫码支付，温暖相伴</div>
         </div>
         <div class="order-summary">
             <div class="order-summary-row">
@@ -768,30 +834,30 @@ function getWechatDetailHTML() {
                 <span class="value highlight">¥${currentMembershipPrice}</span>
             </div>
         </div>
-        <div class="qr-area">
-            <div class="qr-placeholder">
-                <div class="qr-grid">
-                    ${generateQRGrid()}
-                </div>
-                <div class="qr-logo">微</div>
-            </div>
-            <div class="qr-hint">请使用微信扫码支付</div>
+        <div class="m-wechat-qr-display">
+            <img src="/static/img/wechat_qr.jpg" alt="微信收款码" class="m-wechat-qr-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y1ZjVmNSIvPjxlbGxpcHNlIGN4PSIxMDAiIGN5PSIxMDAiIHJ4PSIxOCIgcng9IjE4IiByeT0iMTgiIGZpbGw9IiMwMGE0ZWIiLz48dGV4dCB4PSIxMDAiIHk9IjExMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7lm6TslLUnPC90ZXh0Pjwvc3ZnPg=='">
+            <div class="m-wechat-amount">¥${currentMembershipPrice}</div>
+            <div style="color:#666;font-size:0.85rem;">请使用微信扫描上方二维码</div>
+            <div class="m-wechat-reminder">💚 支付完成后点击下方按钮</div>
         </div>
         <div class="countdown-box">
-            <div class="countdown-label">剩余支付时间</div>
+            <div class="countdown-label">订单有效时间</div>
             <div class="countdown-time" id="detailCountdown">15:00</div>
         </div>
-        <button class="pay-confirm-btn" onclick="confirmMembershipSuccess()">我已完成支付</button>
+        <button class="pay-confirm-btn" onclick="confirmMembershipSuccess()">我已完成支付 ✓</button>
+        <p style="text-align:center;color:#999;font-size:0.75rem;margin-top:10px;">
+            如有疑问请联系客服
+        </p>
     `;
 }
 
 function getAlipayDetailHTML() {
     return `
         <button onclick="closePayModal()" style="position:absolute;top:16px;right:16px;background:#f5f5f5;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;">×</button>
-        <div style="text-align:center;margin-bottom:20px;">
-            <div style="font-size:2.8rem;margin-bottom:8px;">💙</div>
-            <div style="font-size:1.3rem;font-weight:bold;">支付宝</div>
-            <div style="color:#666;font-size:0.9rem;">便捷支付体验</div>
+        <div style="text-align:center;margin-bottom:16px;">
+            <div style="font-size:2.5rem;margin-bottom:8px;">💙</div>
+            <div style="font-size:1.2rem;font-weight:bold;">支付宝</div>
+            <div style="color:#666;font-size:0.85rem;">便捷支付体验</div>
         </div>
         <div class="order-summary">
             <div class="order-summary-row">
@@ -803,20 +869,32 @@ function getAlipayDetailHTML() {
                 <span class="value highlight">¥${currentMembershipPrice}</span>
             </div>
         </div>
-        <div class="qr-area">
-            <div class="qr-placeholder" style="background:linear-gradient(135deg, #f5f5f5 0%, #e3f2fd 100%);">
-                <div class="qr-grid">
-                    ${generateQRGrid()}
-                </div>
-                <div class="qr-logo" style="color:#1677ff;">支</div>
-            </div>
-            <div class="qr-hint">请使用支付宝扫码支付</div>
+        <div class="m-wechat-qr-display" style="--qr-color: #1677ff;">
+            <style>
+                .m-wechat-qr-display[style*="1677ff"] .m-wechat-qr-image {
+                    border-color: #e6f4ff;
+                    box-shadow: 0 4px 16px rgba(22, 119, 255, 0.15);
+                }
+                .m-wechat-qr-display[style*="1677ff"] .m-wechat-amount {
+                    color: #1677ff;
+                }
+                .m-wechat-qr-display[style*="1677ff"] .m-wechat-reminder::before {
+                    content: '💙 ';
+                }
+            </style>
+            <img src="/static/img/alipay_qr.png" alt="支付宝收款码" class="m-wechat-qr-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2U2ZjRmZiIvPjxlbGxpcHNlIGN4PSIxMDAiIGN5PSIxMDAiIHJ4PSIxOCIgcng9IjE4IiByeT0iMTgiIGZpbGw9IiMwMWE0ZWIiLz48dGV4dCB4PSIxMDAiIHk9IjExMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7lk6zskJzqijwvdGV4dD48L3N2Zz4='">
+            <div class="m-wechat-amount">¥${currentMembershipPrice}</div>
+            <div style="color:#666;font-size:0.85rem;">请使用支付宝扫描上方二维码</div>
+            <div class="m-wechat-reminder">支付完成后点击下方按钮</div>
         </div>
         <div class="countdown-box">
-            <div class="countdown-label">剩余支付时间</div>
+            <div class="countdown-label">订单有效时间</div>
             <div class="countdown-time" id="detailCountdown">15:00</div>
         </div>
-        <button class="pay-confirm-btn" onclick="confirmMembershipSuccess()">我已完成支付</button>
+        <button class="pay-confirm-btn" onclick="confirmMembershipSuccess()">我已完成支付 ✓</button>
+        <p style="text-align:center;color:#999;font-size:0.75rem;margin-top:10px;">
+            如有疑问请联系客服
+        </p>
     `;
 }
 
