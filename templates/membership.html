@@ -1,594 +1,410 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('membership') }} - 灵犀{% endblock %}
+{% block title %}{{ _('companion_tiers') }} - {{ _('app_name') }}{% endblock %}
 
 {% block content %}
-<div class="membership-page">
-    <!-- 当前状态 -->
-    <div class="current-status">
-        {% if current_vip == 'none' %}
-        <div class="status-card free">
-            <span class="status-icon">👤</span>
-            <h2>{{ _('free_user') }}</h2>
-            <p>{{ _('free_limitations') }}</p>
-        </div>
-        {% elif current_vip == 'basic' %}
-        <div class="status-card basic">
-            <span class="status-icon">✨</span>
-            <h2>{{ _('spirit_member') }}</h2>
-            <p>{{ _('basic_expires', date=basic_expire_date) }}</p>
-        </div>
-        {% elif current_vip == 'premium' %}
-        <div class="status-card premium">
-            <span class="status-icon">👑</span>
-            <h2>{{ _('spirit_elite') }}</h2>
-            <p>{{ _('premium_expires', date=premium_expire_date) }}</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- 年费优惠 -->
-    {% if show_annual_promo %}
-    <div class="annual-promo">
-        <div class="promo-badge">🎉</div>
-        <div class="promo-content">
-            <h3>{{ _('annual_save', percent='40%') }}</h3>
-            <p>{{ _('annual_promo_desc') }}</p>
-        </div>
-        <button class="promo-btn" onclick="showAnnualPlan()">{{ _('view_plan') }}</button>
-    </div>
-    {% endif %}
-
-    <!-- 会员等级 -->
-    <div class="vip-plans">
-        <!-- 基础会员 -->
-        <div class="plan-card {% if current_vip == 'basic' %}current{% endif %}">
-            <div class="plan-header">
-                <span class="plan-icon">✨</span>
-                <h3>{{ _('spirit_member') }}</h3>
-                {% if current_vip == 'basic' %}
-                <span class="current-badge">{{ _('current') }}</span>
-                {% endif %}
-            </div>
-            <div class="plan-price">
-                <span class="price">¥29</span>
-                <span class="period">/{{ _('month') }}</span>
-            </div>
-            <div class="plan-features">
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_basic_1') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_basic_2') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_basic_3') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_basic_4') }}</span>
-                </div>
-                <div class="feature locked">
-                    <span class="lock">○</span>
-                    <span>{{ _('feature_basic_5_locked') }}</span>
-                </div>
-            </div>
-            <button class="plan-btn" onclick="subscribe('basic')">
-                {% if current_vip == 'basic' %}{{ _('renew') }}{% else %}{{ _('subscribe') }}{% endif %}
-            </button>
-        </div>
-
-        <!-- 尊享会员 -->
-        <div class="plan-card featured {% if current_vip == 'premium' %}current{% endif %}">
-            <div class="featured-badge">{{ _('recommended') }}</div>
-            <div class="plan-header">
-                <span class="plan-icon">👑</span>
-                <h3>{{ _('spirit_elite') }}</h3>
-                {% if current_vip == 'premium' %}
-                <span class="current-badge">{{ _('current') }}</span>
-                {% endif %}
-            </div>
-            <div class="plan-price">
-                <span class="price">¥99</span>
-                <span class="period">/{{ _('month') }}</span>
-            </div>
-            <div class="plan-features">
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_1') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_2') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_3') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_4') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_5') }}</span>
-                </div>
-                <div class="feature">
-                    <span class="check">✓</span>
-                    <span>{{ _('feature_premium_6') }}</span>
-                </div>
-            </div>
-            <button class="plan-btn primary" onclick="subscribe('premium')">
-                {% if current_vip == 'premium' %}{{ _('renew') }}{% else %}{{ _('subscribe_now') }}{% endif %}
-            </button>
-        </div>
-    </div>
-
-    <!-- 年付选项 -->
-    <div class="billing-toggle">
-        <span>{{ _('monthly') }}</span>
-        <label class="switch">
-            <input type="checkbox" id="annualToggle" onchange="toggleBilling()">
-            <span class="slider"></span>
-        </label>
-        <span>{{ _('yearly') }}</span>
-        <span class="save-badge">{{ _('save_40') }}</span>
-    </div>
-
-    <!-- 限时优惠 -->
-    <div class="flash-sale">
-        <div class="sale-timer">
-            <span class="timer-label">{{ _('ends_in') }}</span>
-            <span class="timer" id="countdown">23:59:59</span>
-        </div>
-        <div class="sale-content">
-            <p>{{ _('flash_sale_text') }}</p>
-            <div class="sale-price">
-                <span class="original">¥99</span>
-                <span class="sale">¥69</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- 常见问题 -->
-    <div class="faq-section">
-        <h3>{{ _('faq') }}</h3>
-        {% for qa in faqs %}
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                <span>{{ qa.question }}</span>
-                <span class="faq-icon">▼</span>
-            </button>
-            <div class="faq-answer">{{ qa.answer }}</div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- 权益对比 -->
-    <div class="compare-section">
-        <h3>{{ _('compare_plans') }}</h3>
-        <table class="compare-table">
-            <thead>
-                <tr>
-                    <th>{{ _('feature') }}</th>
-                    <th>{{ _('free') }}</th>
-                    <th>{{ _('basic') }}</th>
-                    <th>{{ _('elite') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in compare_rows %}
-                <tr>
-                    <td>{{ row.name }}</td>
-                    <td>{{ row.free }}</td>
-                    <td>{{ row.basic }}</td>
-                    <td>{{ row.premium }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- 订阅确认弹窗 -->
-<div class="modal hidden" id="subscribeModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>{{ _('confirm_subscription') }}</h3>
-            <button onclick="closeSubscribeModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <div class="confirm-plan">
-                <span class="plan-icon" id="confirmIcon"></span>
-                <div class="plan-info">
-                    <span id="confirmName"></span>
-                    <span class="price" id="confirmPrice"></span>
-                </div>
-            </div>
-            <div class="payment-methods">
-                <h4>{{ _('select_payment') }}</h4>
-                <div class="method-list">
-                    <label class="payment-method selected">
-                        <input type="radio" name="payment" value="wechat" checked>
-                        <span class="method-icon">💳</span>
-                        <span>{{ _('wechat_pay') }}</span>
-                    </label>
-                    <label class="payment-method">
-                        <input type="radio" name="payment" value="alipay">
-                        <span class="method-icon">💰</span>
-                        <span>{{ _('alipay') }}</span>
-                    </label>
-                    <label class="payment-method">
-                        <input type="radio" name="payment" value="stones">
-                        <span class="method-icon">💎</span>
-                        <span>{{ _('use_stones') }} (<span id="stonesBalance"></span>)</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="confirm-btn" onclick="confirmSubscribe()">{{ _('confirm_pay') }}</button>
-        </div>
-    </div>
-</div>
-
 <style>
 .membership-page {
-    padding: 16px;
-    padding-bottom: 100px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-.current-status {
-    margin-bottom: 20px;
-}
-
-.status-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 24px;
-    border-radius: 20px;
+/* 页面标题 */
+.page-header {
     text-align: center;
-}
-
-.status-card.free {
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-}
-
-.status-card.basic {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-}
-
-.status-card.premium {
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    margin-bottom: 40px;
     color: white;
 }
 
-.status-icon {
-    font-size: 48px;
-    margin-bottom: 8px;
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
 }
 
-.status-card h2 {
-    margin: 0 0 4px 0;
-    font-size: 20px;
+.page-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
 }
 
-.status-card p {
-    margin: 0;
-    font-size: 13px;
+/* 当前状态卡片 */
+.current-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    background: #fff3e0;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-item .icon {
+    font-size: 1.5rem;
+}
+
+.status-item .label {
     color: #666;
 }
 
-.status-card.premium p {
-    color: rgba(255,255,255,0.8);
+.status-item .value {
+    font-weight: bold;
+    color: #e65100;
 }
 
-.annual-promo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border-radius: 16px;
-    margin-bottom: 20px;
-}
-
-.promo-badge {
-    font-size: 32px;
-}
-
-.promo-content {
-    flex: 1;
-}
-
-.promo-content h3 {
-    margin: 0 0 2px 0;
-    font-size: 15px;
-    color: #92400e;
-}
-
-.promo-content p {
-    margin: 0;
-    font-size: 12px;
-    color: #b45309;
-}
-
-.promo-btn {
-    padding: 8px 16px;
-    background: #f59e0b;
-    color: white;
-    border: none;
-    border-radius: 16px;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.vip-plans {
+/* 会员卡片网格 */
+.vip-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
 }
 
-.plan-card {
+/* 会员卡片 */
+.vip-card {
     background: white;
-    border-radius: 16px;
-    padding: 16px;
-    border: 2px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 30px 24px;
     position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 2px solid transparent;
 }
 
-.plan-card.featured {
-    border-color: #8b5cf6;
+.vip-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
 }
 
-.plan-card.current {
-    background: #f5f3ff;
+.vip-card.recommended {
+    border-color: #9c27b0;
+    transform: scale(1.02);
 }
 
-.featured-badge {
+.vip-card.recommended:hover {
+    transform: scale(1.02) translateY(-5px);
+}
+
+/* 推荐标签 */
+.recommended-badge {
     position: absolute;
-    top: -10px;
+    top: -12px;
     left: 50%;
     transform: translateX(-50%);
+    background: linear-gradient(135deg, #9c27b0, #e91e63);
+    color: white;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* 卡片头部 */
+.card-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.card-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.card-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.card-tag {
+    font-size: 0.85rem;
     padding: 4px 12px;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-    color: white;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
+    border-radius: 20px;
+    display: inline-block;
 }
 
-.plan-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
+/* 价格 */
+.card-price {
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #eee;
 }
 
-.plan-icon {
-    font-size: 24px;
-}
-
-.plan-header h3 {
-    margin: 0;
-    font-size: 14px;
-    flex: 1;
-}
-
-.current-badge {
-    padding: 2px 8px;
-    background: #10b981;
-    color: white;
-    border-radius: 8px;
-    font-size: 10px;
-}
-
-.plan-price {
-    margin-bottom: 12px;
-}
-
-.price {
-    font-size: 28px;
-    font-weight: 700;
-    color: #333;
-}
-
-.plan-card.featured .price {
-    color: #8b5cf6;
-}
-
-.period {
-    font-size: 13px;
-    color: #666;
-}
-
-.plan-features {
-    margin-bottom: 16px;
-}
-
-.feature {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    font-size: 12px;
-}
-
-.feature .check {
-    color: #10b981;
+.price-main {
+    font-size: 2.5rem;
     font-weight: bold;
 }
 
-.feature .lock {
-    color: #ccc;
-}
-
-.feature.locked {
+.price-unit {
+    font-size: 1rem;
     color: #999;
 }
 
-.plan-btn {
-    width: 100%;
-    padding: 10px;
-    background: #f3f4f6;
-    color: #333;
-    border: none;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
+.price-period {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 4px;
 }
 
-.plan-btn.primary {
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+.discount-note {
+    font-size: 0.8rem;
+    color: #4caf50;
+    margin-top: 8px;
+}
+
+/* 权益列表 */
+.card-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px 0;
+}
+
+.card-features li {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+}
+
+.card-features li .check {
+    color: #4caf50;
+    font-size: 1.2rem;
+}
+
+.card-features li .lock {
+    color: #ccc;
+    font-size: 1.2rem;
+}
+
+.card-features li.disabled {
+    color: #ccc;
+}
+
+/* 标语 */
+.card-slogan {
+    background: #f5f5f5;
+    padding: 16px;
+    border-radius: 12px;
+    font-style: italic;
+    color: #666;
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* 订阅按钮 */
+.subscribe-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.subscribe-btn.primary {
+    background: linear-gradient(135deg, #9c27b0, #e91e63);
     color: white;
 }
 
+.subscribe-btn.secondary {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+    color: white;
+}
+
+.subscribe-btn.basic {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+    color: white;
+}
+
+.subscribe-btn.free {
+    background: #e0e0e0;
+    color: #666;
+}
+
+.subscribe-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.subscribe-btn.current {
+    background: #fff3e0;
+    color: #e65100;
+    border: 2px solid #e65100;
+    cursor: default;
+}
+
+.subscribe-btn.current:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* 支付周期切换 */
 .billing-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    font-size: 13px;
+    gap: 15px;
+    margin-bottom: 30px;
 }
 
-.switch {
+.billing-toggle .switch {
     position: relative;
-    width: 44px;
-    height: 24px;
+    width: 50px;
+    height: 26px;
 }
 
-.switch input {
+.billing-toggle .switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-.slider {
+.billing-toggle .slider {
     position: absolute;
     cursor: pointer;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: #ccc;
-    border-radius: 24px;
-    transition: 0.3s;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 26px;
 }
 
-.slider:before {
+.billing-toggle .slider:before {
     position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
+    height: 20px;
+    width: 20px;
     left: 3px;
     bottom: 3px;
-    background: white;
+    background-color: white;
+    transition: .4s;
     border-radius: 50%;
-    transition: 0.3s;
 }
 
-input:checked + .slider {
-    background: #8b5cf6;
+.billing-toggle input:checked + .slider {
+    background-color: #9c27b0;
 }
 
-input:checked + .slider:before {
-    transform: translateX(20px);
+.billing-toggle input:checked + .slider:before {
+    transform: translateX(24px);
 }
 
 .save-badge {
-    padding: 2px 8px;
-    background: #fef3c7;
-    color: #f59e0b;
-    border-radius: 8px;
-    font-size: 11px;
+    background: #ff5722;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
 }
 
-.flash-sale {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px;
-    background: linear-gradient(135deg, #fef2f2, #fee2e2);
-    border-radius: 16px;
-    margin-bottom: 20px;
+/* 特色权益对比表 */
+.compare-section {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
 }
 
-.sale-timer {
+.compare-section h3 {
     text-align: center;
+    margin-bottom: 24px;
+    font-size: 1.5rem;
 }
 
-.timer-label {
-    display: block;
-    font-size: 11px;
-    color: #dc2626;
+.compare-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.timer {
-    font-size: 18px;
-    font-weight: 700;
-    color: #dc2626;
+.compare-table th,
+.compare-table td {
+    padding: 14px 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
 }
 
-.sale-content p {
-    margin: 0 0 4px 0;
-    font-size: 13px;
+.compare-table th {
+    background: #f5f5f5;
+    font-weight: bold;
 }
 
-.sale-price {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
+.compare-table th:first-child,
+.compare-table td:first-child {
+    text-align: left;
 }
 
-.original {
-    font-size: 14px;
-    color: #999;
-    text-decoration: line-through;
+.compare-table td:first-child {
+    font-weight: 500;
 }
 
-.sale {
-    font-size: 22px;
-    font-weight: 700;
-    color: #dc2626;
+.check-icon {
+    color: #4caf50;
+    font-size: 1.2rem;
 }
 
-.faq-section, .compare-section {
-    margin-bottom: 20px;
+.x-icon {
+    color: #e0e0e0;
+    font-size: 1.2rem;
 }
 
-.faq-section h3, .compare-section h3 {
-    margin: 0 0 12px 0;
-    font-size: 16px;
+/* 常见问题 */
+.faq-section {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+}
+
+.faq-section h3 {
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 1.5rem;
 }
 
 .faq-item {
-    background: white;
+    margin-bottom: 12px;
+    border: 1px solid #eee;
     border-radius: 12px;
-    margin-bottom: 8px;
     overflow: hidden;
 }
 
 .faq-question {
     width: 100%;
+    padding: 16px 20px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 1rem;
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
-    border: none;
-    background: transparent;
-    font-size: 14px;
-    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.faq-question:hover {
+    background: #f9f9f9;
 }
 
 .faq-icon {
-    font-size: 12px;
     transition: transform 0.3s;
 }
 
@@ -597,253 +413,361 @@ input:checked + .slider:before {
 }
 
 .faq-answer {
-    padding: 0 16px;
+    padding: 0 20px;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s, padding 0.3s;
-    font-size: 13px;
-    color: #666;
+    transition: all 0.3s;
 }
 
 .faq-item.active .faq-answer {
+    padding: 16px 20px;
     max-height: 200px;
-    padding: 0 16px 14px;
 }
 
-.compare-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    font-size: 12px;
-}
-
-.compare-table th, .compare-table td {
-    padding: 12px 8px;
-    text-align: center;
-    border-bottom: 1px solid #f3f4f6;
-}
-
-.compare-table th {
-    background: #f9fafb;
-    font-weight: 600;
-}
-
-.compare-table td:first-child {
-    text-align: left;
-}
-
-/* Modal */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: white;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 360px;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    border-bottom: 1px solid #f3f4f6;
-}
-
-.modal-header h3 {
-    margin: 0;
-}
-
-.modal-body {
-    padding: 16px;
-}
-
-.confirm-plan {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: #f9fafb;
-    border-radius: 12px;
-    margin-bottom: 16px;
-}
-
-.confirm-plan .plan-icon {
-    font-size: 32px;
-}
-
-.plan-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.plan-info .price {
-    font-size: 18px;
-    color: #8b5cf6;
-}
-
-.payment-methods h4 {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-}
-
-.method-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.payment-method {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    cursor: pointer;
-}
-
-.payment-method input {
-    display: none;
-}
-
-.payment-method.selected {
-    border-color: #8b5cf6;
-    background: #f5f3ff;
-}
-
-.method-icon {
-    font-size: 24px;
-}
-
-.modal-footer {
-    padding: 16px;
-}
-
-.confirm-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.hidden {
-    display: none !important;
+/* 响应式 */
+@media (max-width: 768px) {
+    .vip-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .vip-card.recommended {
+        transform: none;
+        order: -1;
+    }
+    
+    .vip-card.recommended:hover {
+        transform: translateY(-5px);
+    }
+    
+    .compare-table {
+        font-size: 0.85rem;
+    }
+    
+    .compare-table th,
+    .compare-table td {
+        padding: 10px 6px;
+    }
 }
 </style>
 
+<div class="membership-page">
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <h1>💝 {{ _('warm_companionship') }}</h1>
+        <p>{{ _('membership_slogan') }}</p>
+    </div>
+    
+    <!-- 当前状态 -->
+    <div class="current-status-bar">
+        <div class="status-item">
+            <span class="icon">💎</span>
+            <span class="label">{{ _('spirit_stones') }}:</span>
+            <span class="value">{{ spirit_stones }}</span>
+        </div>
+        <div class="status-item">
+            <span class="icon">👑</span>
+            <span class="label">{{ _('current_tier') }}:</span>
+            <span class="value">
+                {% if current_vip == 'ultimate' %}{{ _('tier_soul_resonance') }}
+                {% elif current_vip == 'premium' %}{{ _('tier_deep_devotion') }}
+                {% elif current_vip == 'basic' %}{{ _('tier_heart_guard') }}
+                {% else %}{{ _('tier_warm_companion') }}{% endif %}
+            </span>
+        </div>
+        {% if expire_date %}
+        <div class="status-item">
+            <span class="icon">📅</span>
+            <span class="label">{{ _('expire_date') }}:</span>
+            <span class="value">{{ expire_date }}</span>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- 支付周期切换 -->
+    <div class="billing-toggle">
+        <span>{{ _('monthly') }}</span>
+        <label class="switch">
+            <input type="checkbox" id="billingToggle" onchange="toggleBilling()">
+            <span class="slider"></span>
+        </label>
+        <span>{{ _('yearly') }}</span>
+        <span class="save-badge">{{ _('yearly_discount') }}</span>
+    </div>
+    
+    <!-- 会员卡片 -->
+    <div class="vip-grid">
+        <!-- 暖心相伴（免费） -->
+        <div class="vip-card {% if current_vip == 'none' %}current{% endif %}">
+            <div class="card-header">
+                <div class="card-icon">{{ plans.none.icon }}</div>
+                <div class="card-name">{{ plans.none.name.zh }}</div>
+                <span class="card-tag" style="background: #e8f5e9; color: #4caf50;">{{ plans.none.tag.zh }}</span>
+            </div>
+            <div class="card-price">
+                <span class="price-main">{{ plans.none.monthly_price }}</span>
+                <span class="price-unit">{{ _('rmb') }}</span>
+                <div class="price-period">/{{ _('forever') }}</div>
+            </div>
+            <ul class="card-features">
+                {% for feature in plans.none.features %}
+                <li class="{% if not feature.included %}disabled{% endif %}">
+                    <span class="{% if feature.included %}check{% else %}lock{% endif %}">
+                        {% if feature.included %}✓{% else %}✗{% endif %}
+                    </span>
+                    {{ feature.text.zh }}
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="card-slogan">"{{ plans.none.slogan.zh }}"</div>
+            {% if current_vip == 'none' %}
+            <button class="subscribe-btn current">{{ _('current_plan') }}</button>
+            {% else %}
+            <button class="subscribe-btn free" onclick="subscribe('none')">{{ _('select_plan') }}</button>
+            {% endif %}
+        </div>
+        
+        <!-- 知心守护 -->
+        <div class="vip-card {% if current_vip == 'basic' %}current{% endif %}">
+            <div class="card-header">
+                <div class="card-icon">{{ plans.basic.icon }}</div>
+                <div class="card-name">{{ plans.basic.name.zh }}</div>
+                <span class="card-tag" style="background: #e8f5e9; color: #4caf50;">{{ plans.basic.tag.zh }}</span>
+            </div>
+            <div class="card-price">
+                <span class="price-main" id="basicPrice">{{ plans.basic.monthly_price }}</span>
+                <span class="price-unit">{{ _('rmb') }}</span>
+                <div class="price-period" id="basicPeriod">/{{ _('month') }}</div>
+                <div class="discount-note" id="basicDiscount" style="display:none;">{{ _('quarterly_save', amount=6) }}</div>
+            </div>
+            <ul class="card-features">
+                {% for feature in plans.basic.features %}
+                <li class="{% if not feature.included %}disabled{% endif %}">
+                    <span class="{% if feature.included %}check{% else %}lock{% endif %}">
+                        {% if feature.included %}✓{% else %}✗{% endif %}
+                    </span>
+                    {{ feature.text.zh }}
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="card-slogan">"{{ plans.basic.slogan.zh }}"</div>
+            {% if current_vip == 'basic' %}
+            <button class="subscribe-btn current">{{ _('current_plan') }}</button>
+            {% else %}
+            <button class="subscribe-btn basic" onclick="subscribe('basic')">{{ _('subscribe_now') }}</button>
+            {% endif %}
+        </div>
+        
+        <!-- 深情相守 -->
+        <div class="vip-card recommended {% if current_vip == 'premium' %}current{% endif %}">
+            {% if plans.premium.recommended %}
+            <div class="recommended-badge">⭐ {{ _('most_popular') }}</div>
+            {% endif %}
+            <div class="card-header">
+                <div class="card-icon">{{ plans.premium.icon }}</div>
+                <div class="card-name">{{ plans.premium.name.zh }}</div>
+                <span class="card-tag" style="background: #e3f2fd; color: #2196f3;">{{ plans.premium.tag.zh }}</span>
+            </div>
+            <div class="card-price">
+                <span class="price-main" id="premiumPrice">{{ plans.premium.monthly_price }}</span>
+                <span class="price-unit">{{ _('rmb') }}</span>
+                <div class="price-period" id="premiumPeriod">/{{ _('month') }}</div>
+                <div class="discount-note" id="premiumDiscount" style="display:none;">{{ _('yearly_save', amount=118) }}</div>
+            </div>
+            <ul class="card-features">
+                {% for feature in plans.premium.features %}
+                <li class="{% if not feature.included %}disabled{% endif %}">
+                    <span class="{% if feature.included %}check{% else %}lock{% endif %}">
+                        {% if feature.included %}✓{% else %}✗{% endif %}
+                    </span>
+                    {{ feature.text.zh }}
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="card-slogan">"{{ plans.premium.slogan.zh }}"</div>
+            {% if current_vip == 'premium' %}
+            <button class="subscribe-btn current">{{ _('current_plan') }}</button>
+            {% else %}
+            <button class="subscribe-btn primary" onclick="subscribe('premium')">{{ _('subscribe_now') }}</button>
+            {% endif %}
+        </div>
+        
+        <!-- 灵魂共鸣 -->
+        <div class="vip-card {% if current_vip == 'ultimate' %}current{% endif %}">
+            <div class="card-header">
+                <div class="card-icon">{{ plans.ultimate.icon }}</div>
+                <div class="card-name">{{ plans.ultimate.name.zh }}</div>
+                <span class="card-tag" style="background: #f3e5f5; color: #9c27b0;">{{ plans.ultimate.tag.zh }}</span>
+            </div>
+            <div class="card-price">
+                <span class="price-main" id="ultimatePrice">{{ plans.ultimate.monthly_price }}</span>
+                <span class="price-unit">{{ _('rmb') }}</span>
+                <div class="price-period" id="ultimatePeriod">/{{ _('month') }}</div>
+                <div class="discount-note" id="ultimateDiscount" style="display:none;">{{ _('yearly_save', amount=238) }}</div>
+            </div>
+            <ul class="card-features">
+                {% for feature in plans.ultimate.features %}
+                <li class="{% if not feature.included %}disabled{% endif %}">
+                    <span class="{% if feature.included %}check{% else %}lock{% endif %}">
+                        {% if feature.included %}✓{% else %}✗{% endif %}
+                    </span>
+                    {{ feature.text.zh }}
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="card-slogan">"{{ plans.ultimate.slogan.zh }}"</div>
+            {% if current_vip == 'ultimate' %}
+            <button class="subscribe-btn current">{{ _('current_plan') }}</button>
+            {% else %}
+            <button class="subscribe-btn secondary" onclick="subscribe('ultimate')">{{ _('subscribe_now') }}</button>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 权益对比表 -->
+    <div class="compare-section">
+        <h3>📊 {{ _('benefit_comparison') }}</h3>
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>{{ _('benefit_item') }}</th>
+                    <th>{{ plans.none.name.zh }}</th>
+                    <th>{{ plans.basic.name.zh }}</th>
+                    <th>{{ plans.premium.name.zh }}</th>
+                    <th>{{ plans.ultimate.name.zh }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ _('chat_time') }}</td>
+                    <td>{{ plans.none.benefits.chat_time.zh }}</td>
+                    <td>{{ plans.basic.benefits.chat_time.zh }}</td>
+                    <td>{{ plans.premium.benefits.chat_time.zh }}</td>
+                    <td>{{ plans.ultimate.benefits.chat_time.zh }}</td>
+                </tr>
+                <tr>
+                    <td>{{ _('voice_messages') }}</td>
+                    <td>{{ plans.none.benefits.voice_messages.zh }}</td>
+                    <td>{{ plans.basic.benefits.voice_messages.zh }}</td>
+                    <td>{{ plans.premium.benefits.voice_messages.zh }}</td>
+                    <td>{{ plans.ultimate.benefits.voice_messages.zh }}</td>
+                </tr>
+                <tr>
+                    <td>{{ _('gift_discount') }}</td>
+                    <td>{{ plans.none.benefits.gift_discount.zh }}</td>
+                    <td>{{ plans.basic.benefits.gift_discount.zh }}</td>
+                    <td>{{ plans.premium.benefits.gift_discount.zh }}</td>
+                    <td>{{ plans.ultimate.benefits.gift_discount.zh }}</td>
+                </tr>
+                <tr>
+                    <td>{{ _('companion_count') }}</td>
+                    <td>{{ plans.none.benefits.companions.zh }}</td>
+                    <td>{{ plans.basic.benefits.companions.zh }}</td>
+                    <td>{{ plans.premium.benefits.companions.zh }}</td>
+                    <td>{{ plans.ultimate.benefits.companions.zh }}</td>
+                </tr>
+                <tr>
+                    <td>{{ _('night_mode') }}</td>
+                    <td><span class="x-icon">✗</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                    <td><span class="check-icon">✓</span></td>
+                </tr>
+                <tr>
+                    <td>{{ _('emotions') }}</td>
+                    <td>{{ plans.none.benefits.emotions.zh }}</td>
+                    <td>{{ plans.basic.benefits.emotions.zh }}</td>
+                    <td>{{ plans.premium.benefits.emotions.zh }}</td>
+                    <td>{{ plans.ultimate.benefits.emotions.zh }}</td>
+                </tr>
+                <tr>
+                    <td>{{ _('memory_storage') }}</td>
+                    <td>{{ plans.none.benefits.memory.zh }}</td>
+                    <td>{{ plans.basic.benefits.memory.zh }}</td>
+                    <td>{{ plans.premium.benefits.memory.zh }}</td>
+                    <td>{{ plans.ultimate.benefits.memory.zh }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- 常见问题 -->
+    <div class="faq-section">
+        <h3>❓ {{ _('common_questions') }}</h3>
+        
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+                <span>{{ _('faq_q1') }}</span>
+                <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+                {{ _('faq_a1') }}
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+                <span>{{ _('faq_q2') }}</span>
+                <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+                {{ _('faq_a2') }}
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+                <span>{{ _('faq_q3') }}</span>
+                <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+                {{ _('faq_a3') }}
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+                <span>{{ _('faq_q4') }}</span>
+                <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+                {{ _('faq_a4') }}
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-let selectedPlan = null;
-let isAnnual = false;
-
-function subscribe(plan) {
-    selectedPlan = plan;
-    const icon = plan === 'basic' ? '✨' : '👑';
-    const name = plan === 'basic' ? '{{ _("spirit_member") }}' : '{{ _("spirit_elite") }}';
-    const price = isAnnual ? (plan === 'basic' ? '¥288' : '¥988') : (plan === 'basic' ? '¥29' : '¥99');
-    
-    document.getElementById('confirmIcon').textContent = icon;
-    document.getElementById('confirmName').textContent = name;
-    document.getElementById('confirmPrice').textContent = price + '/{{ _("month") }}';
-    
-    // 获取灵石余额
-    fetch('/api/user/stones')
-        .then(r => r.json())
-        .then(data => {
-            document.getElementById('stonesBalance').textContent = data.balance;
-        });
-    
-    document.getElementById('subscribeModal').classList.remove('hidden');
-}
-
-function closeSubscribeModal() {
-    document.getElementById('subscribeModal').classList.add('hidden');
-}
-
-function confirmSubscribe() {
-    const payment = document.querySelector('input[name="payment"]:checked').value;
-    
-    fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            plan: selectedPlan, 
-            billing: isAnnual ? 'annual' : 'monthly',
-            payment: payment 
-        })
-    }).then(r => r.json()).then(data => {
-        if (data.success) {
-            if (data.redirect_url) {
-                window.location.href = data.redirect_url;
-            } else {
-                showToast('订阅成功');
-                location.reload();
-            }
-        } else if (data.error) {
-            showToast(data.error);
-        }
-    });
-}
-
+// 支付周期切换
 function toggleBilling() {
-    isAnnual = document.getElementById('annualToggle').checked;
+    const isYearly = document.getElementById('billingToggle').checked;
+    const suffix = isYearly ? '{{ _('year') }}' : '{{ _('month') }}';
+    
     // 更新价格显示
-    document.querySelectorAll('.plan-card').forEach(card => {
-        const price = card.querySelector('.price');
-        if (card.querySelector('.plan-icon').textContent === '✨') {
-            price.textContent = isAnnual ? '¥288' : '¥29';
-        } else {
-            price.textContent = isAnnual ? '¥988' : '¥99';
-        }
-    });
-}
-
-function toggleFaq(el) {
-    el.parentElement.classList.toggle('active');
-}
-
-// 支付方式选择
-document.querySelectorAll('.payment-method').forEach(method => {
-    method.addEventListener('click', function() {
-        document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-        this.classList.add('selected');
-        this.querySelector('input').checked = true;
-    });
-});
-
-// 倒计时
-function updateCountdown() {
-    const now = new Date();
-    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-    const diff = end - now;
+    document.getElementById('basicPrice').textContent = isYearly ? {{ plans.basic.yearly_price }} : {{ plans.basic.monthly_price }};
+    document.getElementById('basicPeriod').textContent = '/' + suffix;
+    document.getElementById('basicDiscount').style.display = isYearly ? 'block' : 'none';
     
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    document.getElementById('premiumPrice').textContent = isYearly ? {{ plans.premium.yearly_price }} : {{ plans.premium.monthly_price }};
+    document.getElementById('premiumPeriod').textContent = '/' + suffix;
+    document.getElementById('premiumDiscount').style.display = isYearly ? 'block' : 'none';
     
-    document.getElementById('countdown').textContent = 
-        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    document.getElementById('ultimatePrice').textContent = isYearly ? {{ plans.ultimate.yearly_price }} : {{ plans.ultimate.monthly_price }};
+    document.getElementById('ultimatePeriod').textContent = '/' + suffix;
+    document.getElementById('ultimateDiscount').style.display = isYearly ? 'block' : 'none';
 }
 
-setInterval(updateCountdown, 1000);
-updateCountdown();
+// 订阅
+function subscribe(plan) {
+    const isYearly = document.getElementById('billingToggle').checked;
+    const period = isYearly ? 'yearly' : 'monthly';
+    
+    alert('{{ _('payment_coming_soon') }}\n\n{{ _('plan') }}: ' + plan + '\n{{ _('period') }}: ' + period);
+}
+
+// FAQ切换
+function toggleFaq(btn) {
+    const item = btn.parentElement;
+    item.classList.toggle('active');
+}
 </script>
 {% endblock %}

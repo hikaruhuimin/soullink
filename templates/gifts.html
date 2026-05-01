@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('gift_shop') }} - {{ _('app_name') }}{% endblock %}
+
+{% block content %}
+<style>
+.gifts-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 页面标题 */
+.page-header {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    border-radius: 20px;
+    margin-bottom: 40px;
+    color: #333;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+/* 当前灵石 */
+.balance-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.balance-bar .icon {
+    font-size: 1.5rem;
+}
+
+.balance-bar .amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.balance-bar .recharge-link {
+    color: #ffd54f;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* 档位切换 */
+.tier-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tier-tab {
+    padding: 12px 24px;
+    border: 2px solid #eee;
+    border-radius: 30px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1rem;
+}
+
+.tier-tab:hover {
+    border-color: #ff9800;
+    background: #fff3e0;
+}
+
+.tier-tab.active {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    border-color: transparent;
+    color: white;
+}
+
+.tier-tab .icon {
+    margin-right: 6px;
+}
+
+/* 礼物网格 */
+.gift-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+/* 礼物卡片 */
+.gift-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.gift-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.gift-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.gift-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.gift-price {
+    font-size: 1.2rem;
+    color: #9c27b0;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.gift-price .unit {
+    font-size: 0.9rem;
+    color: #999;
+    font-weight: normal;
+}
+
+/* 档位说明 */
+.tier-section {
+    margin-bottom: 40px;
+}
+
+.tier-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eee;
+}
+
+.tier-icon {
+    font-size: 2rem;
+}
+
+.tier-info h3 {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+}
+
+.tier-info p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* 礼物详情弹窗 */
+.gift-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.gift-modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+}
+
+.modal-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+}
+
+.modal-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.modal-price {
+    font-size: 2rem;
+    color: #9c27b0;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.modal-price .unit {
+    font-size: 1rem;
+    color: #999;
+    font-weight: normal;
+}
+
+.modal-reaction {
+    background: #f9f9f9;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    font-style: italic;
+    color: #666;
+}
+
+.modal-reaction::before {
+    content: '"';
+}
+
+.modal-reaction::after {
+    content: '"';
+}
+
+.modal-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.modal-btn.send {
+    background: linear-gradient(135deg, #e91e63, #9c27b0);
+    color: white;
+}
+
+.modal-btn.send:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+}
+
+.modal-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* 连续送礼奖励 */
+.reward-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.reward-section h3 {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.reward-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.reward-item {
+    background: rgba(255,255,255,0.2);
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.reward-item .days {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.reward-item .reward {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .gift-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .tier-tabs {
+        gap: 8px;
+    }
+    
+    .tier-tab {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+<div class="gifts-page">
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <h1>🎁 {{ _('send_gift_express_heart') }}</h1>
+        <p>{{ _('gift_slogan') }}</p>
+    </div>
+    
+    <!-- 当前灵石 -->
+    <div class="balance-bar">
+        <span class="icon">💎</span>
+        <span>{{ _('current_balance') }}: <span class="amount">{{ spirit_stones }}</span></span>
+        <a href="/recharge" class="recharge-link">{{ _('recharge_now') }} →</a>
+    </div>
+    
+    <!-- 档位切换 -->
+    <div class="tier-tabs">
+        <div class="tier-tab active" onclick="showTier('all')">
+            <span class="icon">🎁</span>{{ _('all_gifts') }}
+        </div>
+        <div class="tier-tab" onclick="showTier('daily')">
+            <span class="icon">{{ tiers.daily.icon }}</span>{{ tiers.daily.name.zh }}
+        </div>
+        <div class="tier-tab" onclick="showTier('sweet')">
+            <span class="icon">{{ tiers.sweet.icon }}</span>{{ tiers.sweet.name.zh }}
+        </div>
+        <div class="tier-tab" onclick="showTier('deep')">
+            <span class="icon">{{ tiers.deep.icon }}</span>{{ tiers.deep.name.zh }}
+        </div>
+        <div class="tier-tab" onclick="showTier('luxury')">
+            <span class="icon">{{ tiers.luxury.icon }}</span>{{ tiers.luxury.name.zh }}
+        </div>
+    </div>
+    
+    <!-- 礼物展示 -->
+    <div class="gift-grid" id="giftGrid">
+        {% for gift_id, gift in gifts.items() %}
+        <div class="gift-card tier-{{ gift.tier }}" onclick="showGiftDetail('{{ gift_id }}')">
+            <div class="gift-icon">{{ gift.icon }}</div>
+            <div class="gift-name">{{ gift.name.zh }}</div>
+            <div class="gift-price">
+                {{ gift.price }}<span class="unit">💎</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- 连续送礼奖励 -->
+    <div class="reward-section">
+        <h3>🌟 {{ _('consecutive_gift_rewards') }}</h3>
+        <div class="reward-grid">
+            <div class="reward-item">
+                <div class="days">3 {{ _('days') }}</div>
+                <div class="reward">{{ _('reward_3days') }}</div>
+            </div>
+            <div class="reward-item">
+                <div class="days">7 {{ _('days') }}</div>
+                <div class="reward">{{ _('reward_7days') }}</div>
+            </div>
+            <div class="reward-item">
+                <div class="days">14 {{ _('days') }}</div>
+                <div class="reward">{{ _('reward_14days') }}</div>
+            </div>
+            <div class="reward-item">
+                <div class="days">30 {{ _('days') }}</div>
+                <div class="reward">{{ _('reward_30days') }}</div>
+            </div>
+            <div class="reward-item">
+                <div class="days">60 {{ _('days') }}</div>
+                <div class="reward">{{ _('reward_60days') }}</div>
+            </div>
+            <div class="reward-item">
+                <div class="days">100 {{ _('days') }}</div>
+                <div class="reward">{{ _('reward_100days') }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 礼物详情弹窗 -->
+<div class="gift-modal" id="giftModal">
+    <div class="modal-content">
+        <span class="modal-close" onclick="closeModal()">×</span>
+        <div class="modal-icon" id="modalIcon"></div>
+        <div class="modal-name" id="modalName"></div>
+        <div class="modal-price">
+            <span id="modalPrice"></span><span class="unit">💎</span>
+        </div>
+        <div class="modal-reaction" id="modalReaction"></div>
+        <button class="modal-btn send" id="modalBtn" onclick="sendGift()">
+            {{ _('send_gift') }}
+        </button>
+    </div>
+</div>
+
+<script>
+// 全部礼物数据
+const giftsData = {
+    {% for gift_id, gift in gifts.items() %}
+    '{{ gift_id }}': {
+        name: '{{ gift.name.zh }}',
+        icon: '{{ gift.icon }}',
+        price: {{ gift.price }},
+        reaction: '{{ gift.reaction.zh }}',
+        tier: '{{ gift.tier }}'
+    },
+    {% endfor %}
+};
+
+let currentGift = null;
+
+function showTier(tier) {
+    // 更新tab状态
+    document.querySelectorAll('.tier-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.closest('.tier-tab').classList.add('active');
+    
+    // 筛选礼物
+    const cards = document.querySelectorAll('.gift-card');
+    cards.forEach(card => {
+        if (tier === 'all' || card.classList.contains('tier-' + tier)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function showGiftDetail(giftId) {
+    const gift = giftsData[giftId];
+    if (!gift) return;
+    
+    currentGift = giftId;
+    
+    document.getElementById('modalIcon').textContent = gift.icon;
+    document.getElementById('modalName').textContent = gift.name;
+    document.getElementById('modalPrice').textContent = gift.price;
+    document.getElementById('modalReaction').textContent = gift.reaction;
+    
+    // 检查灵石是否足够
+    const btn = document.getElementById('modalBtn');
+    if ({{ spirit_stones }} >= gift.price) {
+        btn.disabled = false;
+        btn.textContent = '{{ _('send_gift') }}';
+    } else {
+        btn.disabled = true;
+        btn.textContent = '{{ _('insufficient_stones') }}';
+    }
+    
+    document.getElementById('giftModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('giftModal').classList.remove('active');
+    currentGift = null;
+}
+
+function sendGift() {
+    if (!currentGift) return;
+    
+    const gift = giftsData[currentGift];
+    if ({{ spirit_stones }} < gift.price) {
+        alert('{{ _('insufficient_stones') }}');
+        return;
+    }
+    
+    alert('{{ _('gift_sent_success') }}\n\n' + gift.name + ' ' + gift.icon);
+    closeModal();
+}
+
+// 点击外部关闭弹窗
+document.getElementById('giftModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+</script>
+{% endblock %}
