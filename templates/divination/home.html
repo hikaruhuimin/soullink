@@ -661,10 +661,10 @@ const zodiacSigns = [
 ];
 
 const tellerData = {
-    'mystic': { name: '神秘学家', icon: '🔮', specialty: '塔罗解读', description: '一位深谙塔罗奥秘的神秘学家，擅长通过塔罗牌解读命运的走向。', skills: '塔罗牌、牌阵解读、命运指引', style: '温柔细腻，解读深入' },
-    'love_mentor': { name: '情感导师', icon: '💕', specialty: '情感分析', description: '专注于情感领域的占卜师，无论是暗恋、恋爱还是婚姻问题，都能给你温暖的指引。', skills: '恋爱占卜、暗恋解析、复合指引', style: '温暖治愈，洞察人心' },
-    'astrologer': { name: '星象师', icon: '⭐', specialty: '星座星盘', description: '精通星座与星象的占卜师，通过星辰的语言为你解读人生的每一个重要时刻。', skills: '星座运势、星盘分析、流年运势', style: '浪漫诗意，宏观视角' },
-    'fortuneteller': { name: '命理师', icon: '📜', specialty: '八字命理', description: '精通中国传统命理的占卜师，结合八字五行为你分析命运的起伏与机遇。', skills: '八字命理、五行分析、运势预测', style: '稳重踏实，实事求是' }
+    'mystic': { name: '神秘学家', icon: '🔮', specialty: '塔罗解读', description: '一位深谙塔罗奥秘的神秘学家，擅长通过塔罗牌解读命运的走向。每一张牌都是命运的低语，让我为你倾听。', skills: '塔罗牌、牌阵解读、命运指引', style: '温柔细腻，解读深入' },
+    'empath': { name: '情感导师', icon: '💝', specialty: '情感分析', description: '专注于情感领域的占卜师，无论是暗恋、恋爱还是婚姻问题，都能给你温暖的指引。你的心，我懂。', skills: '恋爱占卜、暗恋解析、复合指引', style: '温暖治愈，洞察人心' },
+    'astro': { name: '星象师', icon: '⭐', specialty: '星座星盘', description: '精通星座与星象的占卜师，通过星辰的语言为你解读人生的每一个重要时刻。星辰为你闪耀。', skills: '星座运势、星盘分析、流年运势', style: '浪漫诗意，宏观视角' },
+    'oracle': { name: '命理师', icon: '📜', specialty: '八字命理', description: '精通中国传统命理的占卜师，结合八字五行为你分析命运的起伏与机遇。千年智慧，为你指路。', skills: '八字命理、五行分析、运势预测', style: '稳重踏实，实事求是' }
 };
 
 const popularTypeMap = {
@@ -853,9 +853,9 @@ function closeTellerModal() { document.getElementById('tellerModal').classList.r
 function startWithTeller() {
     closeTellerModal();
     if (selectedTellerId === 'mystic') selectType('tarot');
-    else if (selectedTellerId === 'love_mentor') selectType('love');
-    else if (selectedTellerId === 'astrologer') selectType('horoscope');
-    else if (selectedTellerId === 'fortuneteller') selectType('bazi');
+    else if (selectedTellerId === 'empath') selectType('love');
+    else if (selectedTellerId === 'astro') selectType('horoscope');
+    else if (selectedTellerId === 'oracle') selectType('bazi');
 }
 
 function beginDivination() {
