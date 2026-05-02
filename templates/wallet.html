@@ -288,14 +288,38 @@
     <!-- 余额卡片 -->
     <div class="balance-section">
         <div class="balance-label">💎 我的灵石余额</div>
+        {% if is_logged_in %}
         <div class="balance-amount">
-            {{ current_user.spirit_stones or 0 }}<span class="balance-suffix"> 灵石</span>
+            {{ balance }}<span class="balance-suffix"> 灵石</span>
         </div>
         <div class="balance-actions">
             <a href="/recharge" class="btn-recharge">⚡ 充值灵石</a>
             <a href="/shop" class="btn-shop">🛒 兑换商城</a>
         </div>
+        {% else %}
+        <div class="balance-amount">
+            ***<span class="balance-suffix"> 灵石</span>
+        </div>
+        <div class="balance-actions">
+            <a href="/recharge" class="btn-recharge">⚡ 充值灵石</a>
+            <a href="/shop" class="btn-shop">🛒 兑换商城</a>
+        </div>
+        {% endif %}
     </div>
+    
+    {% if not is_logged_in %}
+    <!-- 未登录提示 -->
+    <div class="login-prompt" style="background: white; border-radius: 16px; padding: 25px; margin-bottom: 20px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+        <div style="font-size: 2rem; margin-bottom: 10px;">🔐</div>
+        <div style="font-size: 1.1rem; font-weight: bold; color: #333; margin-bottom: 8px;">登录后可查看钱包详情</div>
+        <div style="color: #666; margin-bottom: 15px;">登录后您可以查看灵石余额、交易记录、充值和兑换商品</div>
+        <a href="/auth/login" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 35px; border-radius: 25px; text-decoration: none; font-weight: 600;">立即登录</a>
+        <div style="margin-top: 12px;">
+            <span style="color: #888;">还没有账号？</span>
+            <a href="/auth/register" style="color: #667eea; text-decoration: none;">立即注册</a>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- 统计 -->
     <div class="stats-grid">
@@ -308,7 +332,7 @@
             <div class="stat-label">累计支出</div>
         </div>
         <div class="stat-card">
-            <div class="stat-value">{{ current_user.spirit_stones or 0 }}</div>
+            <div class="stat-value">{{ balance }}</div>
             <div class="stat-label">当前余额</div>
         </div>
     </div>

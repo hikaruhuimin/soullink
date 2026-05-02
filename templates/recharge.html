@@ -888,9 +888,30 @@
     <!-- 当前余额 -->
     <div class="balance-card">
         <h2>{{ _('current_balance') }}</h2>
+        {% if current_user.is_authenticated %}
         <div class="balance-amount">{{ spirit_stones }}</div>
+        {% else %}
+        <div class="balance-amount">***</div>
+        {% endif %}
         <div class="balance-label">💎 {{ _('spirit_stones_unit') }}</div>
     </div>
+    
+    <!-- 未登录提示横幅 -->
+    {% if not current_user.is_authenticated %}
+    <div class="login-banner" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 16px; padding: 20px 25px; margin-bottom: 25px; color: white;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="font-size: 2.5rem;">🎉</div>
+            <div style="flex: 1;">
+                <div style="font-size: 1.15rem; font-weight: bold; margin-bottom: 5px;">新用户首充特惠</div>
+                <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 12px;">注册账号即可享受首充赠送，灵石可用于AI陪伴、占卜及商城兑换</div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="/auth/login" style="flex: 1; display: block; text-align: center; background: white; color: #f5576c; padding: 10px; border-radius: 20px; text-decoration: none; font-weight: 600;">登录</a>
+                    <a href="/auth/register" style="flex: 1; display: block; text-align: center; background: rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 20px; text-decoration: none; font-weight: 600;">注册</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     
     <!-- 选择充值套餐 -->
     <div class="package-grid">
@@ -1020,6 +1041,14 @@ const packages = {
 };
 
 function selectPackage(id) {
+    // 检查是否登录（通过检查是否有 current_user.id）
+    {% if not current_user.is_authenticated %}
+    if (confirm('登录后可进行充值，是否前往登录？')) {
+        window.location.href = '/auth/login';
+        return;
+    }
+    {% endif %}
+    
     document.querySelectorAll('.package-card').forEach(card => {
         card.classList.remove('selected');
     });

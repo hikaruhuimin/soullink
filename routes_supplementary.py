@@ -365,37 +365,45 @@ def register_lingstone_routes(app, db):
         """钱包页面"""
         lang = session.get('language', 'zh')
         
-        if not current_user.is_authenticated:
-            return redirect(url_for('login'))
+        is_logged_in = current_user.is_authenticated
+        transactions = []
+        total_income = 0
+        total_expense = 0
+        balance = 0
         
-        # 获取交易记录
-        transactions = LingStoneTransaction.query.filter_by(
-            user_id=current_user.id
-        ).order_by(LingStoneTransaction.created_at.desc()).limit(50).all()
-        
-        # 计算统计
-        total_income = db.session.query(
-            db.func.coalesce(db.func.sum(db.func.nullif(LingStoneTransaction.amount, 0)), 0)
-        ).filter(
-            LingStoneTransaction.user_id == current_user.id,
-            LingStoneTransaction.amount > 0
-        ).scalar() or 0
-        
-        total_expense = db.session.query(
-            db.func.coalesce(db.func.sum(db.func.abs(LingStoneTransaction.amount)), 0)
-        ).filter(
-            LingStoneTransaction.user_id == current_user.id,
-            LingStoneTransaction.amount < 0
-        ).scalar() or 0
-        
-        # 注册辅助函数到模板
-        app.jinja_env.globals['get_tx_icon'] = get_tx_icon
-        app.jinja_env.globals['get_tx_title'] = get_tx_title
+        if is_logged_in:
+            # 获取交易记录
+            transactions = LingStoneTransaction.query.filter_by(
+                user_id=current_user.id
+            ).order_by(LingStoneTransaction.created_at.desc()).limit(50).all()
+            
+            # 计算统计
+            total_income = db.session.query(
+                db.func.coalesce(db.func.sum(db.func.nullif(LingStoneTransaction.amount, 0)), 0)
+            ).filter(
+                LingStoneTransaction.user_id == current_user.id,
+                LingStoneTransaction.amount > 0
+            ).scalar() or 0
+            
+            total_expense = db.session.query(
+                db.func.coalesce(db.func.sum(db.func.abs(LingStoneTransaction.amount)), 0)
+            ).filter(
+                LingStoneTransaction.user_id == current_user.id,
+                LingStoneTransaction.amount < 0
+            ).scalar() or 0
+            
+            balance = current_user.spirit_stones or 0
+            
+            # 注册辅助函数到模板
+            app.jinja_env.globals['get_tx_icon'] = get_tx_icon
+            app.jinja_env.globals['get_tx_title'] = get_tx_title
         
         return render_template('wallet.html',
                              transactions=transactions,
                              total_income=total_income,
                              total_expense=total_expense,
+                             is_logged_in=is_logged_in,
+                             balance=balance,
                              lang=lang)
     
     # 商城页面
@@ -404,8 +412,8 @@ def register_lingstone_routes(app, db):
         """商城页面"""
         lang = session.get('language', 'zh')
         
-        if not current_user.is_authenticated:
-            return redirect(url_for('login'))
+        is_logged_in = current_user.is_authenticated
+        balance = current_user.spirit_stones if is_logged_in else 0
         
         # 使用models中的商品列表，添加提现选项
         shop_items_with_withdraw = SHOP_ITEMS + [{
@@ -420,6 +428,8 @@ def register_lingstone_routes(app, db):
         
         return render_template('shop.html',
                              shop_items=shop_items_with_withdraw,
+                             is_logged_in=is_logged_in,
+                             balance=balance,
                              lang=lang)
     
     # 充值API

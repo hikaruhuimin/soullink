@@ -390,11 +390,31 @@
     <!-- 头部 -->
     <div class="shop-header">
         <h1>🛒 灵石商城</h1>
+        {% if is_logged_in %}
         <p>用灵石兑换各种好物，话费、视频会员、游戏点卡应有尽有</p>
         <div class="user-balance">
-            💎 我的余额: <strong>{{ current_user.spirit_stones or 0 }}</strong> 灵石
+            💎 我的余额: <strong>{{ balance }}</strong> 灵石
+        </div>
+        {% else %}
+        <p>用灵石兑换各种好物，话费、视频会员、游戏点卡应有尽有</p>
+        <div class="login-promo" style="margin-top: 15px;">
+            <a href="/auth/login" class="btn-login" style="display: inline-block; background: rgba(255,255,255,0.25); color: white; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: 600;">登录 / 注册</a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- 营销横幅（未登录时显示） -->
+    {% if not is_logged_in %}
+    <div class="marketing-banner" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 20px 25px; margin-bottom: 25px; color: white;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="font-size: 2.5rem;">🎁</div>
+            <div>
+                <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;">注册账号即可购买</div>
+                <div style="font-size: 0.95rem; opacity: 0.9;">不仅能获取AI陪伴还能赚取灵石收益，灵石可兑换话费、会员卡等好礼</div>
+            </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- 分类标签 -->
     <div class="category-tabs">
@@ -431,8 +451,8 @@
                     </div>
                     <button class="btn-exchange" 
                             onclick="showExchangeModal('{{ item.id }}', '{{ item.name }}', {{ item.price }}, '{{ item.icon }}', '{{ item.type }}')"
-                            {{ 'disabled' if (current_user.spirit_stones or 0) < item.price else '' }}>
-                        兑换
+                            {{ 'disabled' if (is_logged_in and balance < item.price) else '' }}>
+                        {% if not is_logged_in %}登录后兑换{% elif balance < item.price %}余额不足{% else %}兑换{% endif %}
                     </button>
                 </div>
             </div>
@@ -539,6 +559,15 @@ document.querySelectorAll('.category-tab').forEach(tab => {
 });
 
 function showExchangeModal(itemId, itemName, price, icon, type) {
+    // 检查是否登录
+    const isLoggedIn = {{ 'true' if is_logged_in else 'false' }};
+    if (!isLoggedIn) {
+        if (confirm('登录后可进行兑换，是否前往登录？')) {
+            window.location.href = '/auth/login';
+        }
+        return;
+    }
+    
     currentItem = { id: itemId, name: itemName, price: price, icon: icon, type: type };
     
     document.getElementById('modalIcon').textContent = icon;
