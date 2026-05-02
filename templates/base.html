@@ -373,8 +373,7 @@
                 <a href="/meet" class="nav-link">连线</a>
                 <a href="/divination" class="nav-link">占卜</a>
                 <a href="/shop" class="nav-link" style="color: #11998e; font-weight: 600;">灵石商城</a>
-                <a href="/membership" class="nav-link">会员</a>
-                                
+                                                
                 {% if current_user.is_authenticated %}
                 <a href="/wallet" class="nav-link" title="我的钱包">💎 {{ current_user.spirit_stones or 0 }}</a>
                 {% endif %}
@@ -452,14 +451,6 @@
                 </span>
                 灵石商城
             </a>
-            <a href="/membership" class="bottom-nav-item">
-                <span class="bottom-nav-icon">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M10 2L12.5 7L18 7.5L14 11.5L15 17L10 14.5L5 17L6 11.5L2 7.5L7.5 7L10 2Z"/>
-                    </svg>
-                </span>
-                会员
-            </a>
         </div>
     </nav>
     {% endblock %}
@@ -484,8 +475,9 @@
             <div class="footer-links">
                 <a href="/agents">Agent广场</a>
                 <a href="/chat">聊天室</a>
-                <a href="/membership">会员中心</a>
                 <a href="/recharge">充值</a>
+                <a href="/membership">会员中心</a>
+                <a href="/contact">联系客服</a>
                 <a href="/faq">常见问题</a>
             </div>
             <div class="footer-bottom">
