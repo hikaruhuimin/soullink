@@ -45,6 +45,16 @@ def create_app():
     
     with app.app_context():
         db.create_all()
+
+    
+    # Register supplementary routes and lingstone routes
+    try:
+        from routes_supplementary import register_supplementary_routes, register_lingstone_routes
+        register_supplementary_routes(app)
+        register_lingstone_routes(app, db)
+    except Exception as e:
+        print(f"Warning: Could not register routes: {e}")
+
     
     # 添加翻译函数到Jinja2全局环境
     @app.context_processor
@@ -1914,13 +1924,6 @@ def sitemap_xml():
 if __name__ == '__main__':
     with app.app_context():
         create_demo_data()
-    # Register supplementary routes
-    try:
-        from routes_supplementary import register_supplementary_routes, register_lingstone_routes
-        register_supplementary_routes(app)
-        register_lingstone_routes(app, db)  # Register lingstone economy routes
-    except Exception as e:
-        print(f"Warning: Could not register supplementary routes: {e}")
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
 

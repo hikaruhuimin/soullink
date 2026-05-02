@@ -1950,9 +1950,9 @@ class LingStoneTransaction(db.Model):
     balance_before = db.Column(db.Integer, nullable=False)
     balance_after = db.Column(db.Integer, nullable=False)
     
-    # 关联记录
-    recharge_id = db.Column(db.Integer, db.ForeignKey('lingstone_recharges.id'))
-    exchange_id = db.Column(db.Integer, db.ForeignKey('lingstone_exchanges.id'))
+    # 关联记录ID（不使用外键避免关系冲突）
+    recharge_id = db.Column(db.Integer)
+    exchange_id = db.Column(db.Integer)
     
     # 来源/去向
     source = db.Column(db.String(50))  # alipay, wechat, stripe, shop, divination, chat, gift等
