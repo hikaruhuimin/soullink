@@ -1022,5 +1022,43 @@ function showLoginSuccess() {
     successContent.style.display = 'block';
     successContent.classList.add('active');
 }
+
+// Voice demo function
+function playVoiceDemo(agentId, btn) {
+    var originalHTML = btn.innerHTML;
+    btn.innerHTML = '<span>\u23f3</span><span>\u751f\u6210\u8bed\u97f3\u4e2d...</span>';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+    
+    fetch('/api/tts/demo/' + agentId)
+        .then(function(res) {
+            if (!res.ok) throw new Error('TTS failed');
+            return res.json();
+        })
+        .then(function(data) {
+            if (!data.audio_url) throw new Error('No audio URL');
+            var audio = new Audio(data.audio_url);
+            btn.innerHTML = '<span>\ud83d\udd0a</span><span>\u64ad\u653e\u4e2d...</span>';
+            btn.style.opacity = '1';
+            btn.classList.add('playing');
+            audio.play();
+            audio.onended = function() {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                btn.classList.remove('playing');
+            };
+            audio.onerror = function() {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                btn.classList.remove('playing');
+            };
+        })
+        .catch(function(err) {
+            console.error('Voice demo error:', err);
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        });
+}
 </script>
 {% endblock %}
