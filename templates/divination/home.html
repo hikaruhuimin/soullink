@@ -260,6 +260,19 @@ body::before {
     display: flex; align-items: center; justify-content: center; color: #C4D4E8;
 }
 
+
+.type-card-mystic-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(139, 92, 246, 0.3); border: none;
+    border-radius: 8px; padding: 4px 8px; font-size: 10px;
+    color: #C4B5FD; cursor: pointer; transition: all 0.2s;
+    opacity: 0; z-index: 2;
+}
+.type-card:hover .type-card-mystic-btn { opacity: 1; }
+.type-card-mystic-btn:hover {
+    background: rgba(139, 92, 246, 0.5); transform: scale(1.05);
+}
+
 @media (min-width: 768px) {
     .culture-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -619,6 +632,96 @@ body::before {
         transform: translateX(-50%) translateY(0);
     }
 }
+
+
+/* 神秘历史弹窗样式 */
+.mystical-history-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(2, 5, 21, 0.95); display: none; align-items: flex-end;
+    z-index: 1003; backdrop-filter: blur(10px);
+}
+.mystical-history-modal.active { display: flex; }
+
+.mystical-history-content {
+    background: linear-gradient(145deg, rgba(15, 12, 35, 0.98), rgba(8, 5, 25, 0.99));
+    border-radius: 24px 24px 0 0; width: 100%; max-height: 90vh; overflow-y: auto;
+    padding: 0; border: 1px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 0 -10px 40px rgba(139, 92, 246, 0.2);
+    animation: slideUp 0.4s ease;
+}
+
+.mystical-history-header-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+    position: sticky; top: 0; background: rgba(15, 12, 35, 0.98); z-index: 10;
+}
+
+.mystical-history-icon { font-size: 28px; }
+.mystical-history-title { font-size: 18px; font-weight: 700; color: #C4B5FD; flex: 1; }
+.mystical-history-close {
+    width: 32px; height: 32px; border: none; background: rgba(139, 92, 246, 0.2);
+    border-radius: 50%; font-size: 18px; cursor: pointer; color: #C4B5FD;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.mystical-history-body { padding: 20px; }
+
+.mystical-history-container {
+    font-family: 'Noto Serif SC', 'SimSun', serif;
+}
+
+.mystical-history-header {
+    text-align: center; margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.mystical-history-header .mystical-icon {
+    font-size: 48px; display: block; margin-bottom: 12px;
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5)); }
+    50% { filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.8)); }
+}
+
+.mystical-history-header h3 {
+    font-size: 22px; color: #E8D5C4; margin: 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.mystical-section {
+    background: rgba(30, 25, 60, 0.5);
+    border-radius: 16px; padding: 18px; margin-bottom: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    position: relative; overflow: hidden;
+}
+
+.mystical-section::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, #8b5cf6, #c4b5fd, #8b5cf6);
+}
+
+.mystical-subtitle {
+    font-size: 15px; color: #C4B5FD; margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+.mystical-text {
+    font-size: 14px; color: #C4D4E8; line-height: 1.9; margin: 0;
+    text-align: justify;
+}
+
+@media (min-width: 768px) {
+    .mystical-history-modal { align-items: center; }
+    .mystical-history-content {
+        border-radius: 24px; max-width: 600px; margin: 0 auto;
+    }
+    .mystical-section { padding: 24px; }
+}
+
 </style>
 {% endblock %}
 
@@ -647,6 +750,7 @@ body::before {
                 <h4>{{ type.name }}</h4>
                 <p>{{ type.description }}</p>
                 <span class="type-price">{% if type.cost > 0 %}{{ type.cost }}💎{% else %}免费{% endif %}</span>
+                <button class="type-card-mystic-btn" onclick="event.stopPropagation();event.preventDefault();showMysticalHistory('{{ type.id }}')">📜千年秘辛</button>
             </div>
             {% endfor %}
         </div>
@@ -895,6 +999,18 @@ body::before {
 <div class="toast" id="toast"></div>
 
 <!-- 占卜文化详情弹窗 -->
+<!-- 神秘历史详情弹窗 -->
+<div class="mystical-history-modal" id="mysticalHistoryModal">
+    <div class="mystical-history-content">
+        <div class="mystical-history-header-bar">
+            <span class="mystical-history-icon" id="mysticalHistoryIcon">📚</span>
+            <span class="mystical-history-title">千年秘辛</span>
+            <button class="mystical-history-close" onclick="closeMysticalHistory()">×</button>
+        </div>
+        <div class="mystical-history-body" id="mysticalHistoryBody"></div>
+    </div>
+</div>
+
 <div class="culture-modal" id="cultureModal">
     <div class="culture-modal-content">
         <div class="culture-modal-header">
@@ -1484,6 +1600,195 @@ const cultureData = [
     }
 ];
 
+// 每种占卜类型的神秘历史知识
+const mysticalHistoryData = {
+    'tarot': {
+        icon: '🃏',
+        title: '塔罗牌的千年秘辛',
+        sections: [
+            {
+                subtitle: '📜 起源之谜：埃及还是吉普赛？',
+                content: '关于塔罗牌的真正起源，至今仍是学界争论的焦点。传统观点认为，塔罗牌源自古埃及的"透特之书"（The Book of Thoth），由逃亡的埃及祭司在15世纪带入欧洲。然而，18世纪法国学者安托万·库尔·德·热贝林提出了另一种可能：塔罗牌可能源自更古老的神秘传统，与卡巴拉生命之树有着隐秘的联系。\n\n据说，在意大利文艺复兴时期，米兰公爵菲利普·玛丽亚·维斯康蒂是第一个将塔罗牌用于占卜的人。而现在我们熟知的78张塔罗牌结构，则要到18世纪末才完全定型。'
+            },
+            {
+                subtitle: '⚗️ 炼金术与塔罗的隐秘关联',
+                content: '塔罗牌与西方炼金术有着千丝万缕的联系。大阿卡纳的22张牌对应着灵魂觉醒的22个阶段，这与炼金术的"伟大工作"（Opus Magnum）惊人地吻合。\n\n金色黎明（Hermetic Order of the Golden Dawn）是19世纪末最具影响力的神秘主义组织，他们发展出了完整的塔罗理论体系，赋予每张牌以占星、数字和卡巴拉的多重含义。传说中，成员必须经过严格的仪式才能接触塔罗的秘密。'
+            },
+            {
+                subtitle: '👤 传奇占卜师：艾蒂安·罗宾逊',
+                content: '20世纪最著名的塔罗占卜师之一是艾蒂安·罗宾逊，他以精准的预测闻名于世。据说他能在牌阵中"看到"过去、现在和未来的交织画面。\n\n另一位传奇人物是帕梅拉·格林曼·史密斯，她将塔罗牌引入主流文化，著有《塔罗牌图解》一书，使塔罗从神秘主义的秘室走向了大众书店的货架。'
+            },
+            {
+                subtitle: '🔮 牌阵的奥秘：为何是78张？',
+                content: '塔罗牌的78张牌中，22张大阿卡纳代表灵魂的旅程，从"愚者"的纯真到"世界"的完成，象征着人生从无知的起点到智慧圆满的终点。56张小阿卡纳则分为四组：权杖（火）、圣杯（水）、宝剑（风）、星币（土），对应四种生命元素。\n\n据说，78这个数字本身就有神秘力量：7+8=15，而15世纪的塔罗牌最初只有15张用于游戏，后来才发展成完整的78张体系。'
+            }
+        ]
+    },
+    'horoscope': {
+        icon: '⭐',
+        title: '星象学的亘古奥秘',
+        sections: [
+            {
+                subtitle: '🏛️ 巴比伦：星象学的摇篮',
+                content: '人类最早的星象记录来自美索不达米亚平原上的巴比伦人。公元前2000年左右，巴比伦祭司开始系统观测天体运行，发现行星运行与人间大事之间存在神秘关联。\n\n据说，巴比伦国王尼布甲尼撒曾建造"空中花园"，但更重要的是，他们建立了黄道十二宫的雏形——将天空划分为12个区域，每个区域以一种星座命名。这一系统深刻影响了后来古希腊、罗马乃至整个西方的占星传统。'
+            },
+            {
+                subtitle: '📚 托勒密的《占星四书》',
+                content: '公元150年左右，天文学家托勒密完成了《占星四书》（Tetrabiblos），这部著作奠定了西方占星术的理论基础。托勒密认为，天上的星辰确实会影响地上的人类命运，尽管他也承认预测的准确性有限。\n\n有趣的是，托勒密同时也是地心说的集大成者，他的宇宙模型统治西方天文学长达1400年。直到哥白尼革命，人们才逐渐意识到地球并非宇宙的中心。'
+            },
+            {
+                subtitle: '🔭 开普勒：既是天文学家也是占星师',
+                content: '约翰内斯·开普勒发现了行星运动三大定律，被誉为"天空立法者"。然而，这位伟大的天文学家同时也是虔诚的占星师，他为神圣罗马帝国皇帝鲁道夫二世绘制星盘。\n\n开普勒曾说："占星学是女儿，天文学是母亲。如果女儿犯了错，母亲也不应过于苛责。"他相信行星的相位确实会对地球上的事件产生影响，尽管这种影响是通过某种微妙的方式传递的。'
+            },
+            {
+                subtitle: '🔄 行星逆行：古人的误解还是真相？',
+                content: '在古代占星术中，行星逆行被认为是最具影响力的天象之一。当火星逆行时，古代占星师会警告人们避免开始新事业或签订合同。\n\n现代天文学告诉我们，逆行不过是地球与行星相对位置变化造成的视觉现象。然而，许多占星师仍然认为，即使从物理上可以解释，逆行的"能量"仍然具有特殊意义。这或许是古人对宇宙统一性的直觉把握？'
+            }
+        ]
+    },
+    'bazi': {
+        icon: '📜',
+        title: '八字命理的千年传承',
+        sections: [
+            {
+                subtitle: '👤 李虚中：三命术的开创者',
+                content: '八字命理的源头可以追溯到唐代。相传有一位名叫李虚中的术士，他创立了"三命术"，以年柱、月柱、日柱三柱推算命运，开创了中国命理学的先河。\n\n据说李虚中能通过一个人的出生年月日推算其一生的吉凶祸福，准确程度令人惊叹。然而，他的方法还不完善，直到五代宋初的徐子平出现，八字命理才真正成熟。'
+            },
+            {
+                subtitle: '🔢 徐子平：四柱神数的创立',
+                content: '徐子平，五代宋初著名的命理学家，相传隐居于华山之巅，精通易学与星象之学。他在李虚中三命术的基础上，增加了时柱，形成了完整的"四柱八字"体系。\n\n据民间传说，徐子平的预测极为精准，曾为多位皇帝推算过国运。然而，他淡泊名利，只将毕生所学传授给了少数几个弟子，其中就包括后来编写《渊海子平》的徐升。'
+            },
+            {
+                subtitle: '📖 《渊海子平》：命理学的圣经',
+                content: '《渊海子平》是宋代徐升编撰的命理学著作，被誉为"八字命理学的圣经"。这部书系统总结了唐宋以来八字推命的理论和方法，奠定了四柱八字的基本框架。\n\n书中记载了大量推命口诀和实战案例，据说每一个口诀都是经过无数次验证才确定下来的。许多命理师将《渊海子平》奉为圭臬，研读终生而不倦。'
+            },
+            {
+                subtitle: '🗝️ 《滴天髓》：命理的巅峰之作',
+                content: '《滴天髓》是明代刘伯温所著，被誉为八字命理的最高典籍。相传刘伯温辅佐朱元璋建立明朝，功成名就后退隐山林，将毕生所学编撰成此书。\n\n《滴天髓》的理论精深玄妙，讲究"五行平衡流通"和"气势格局"。据说读懂此书的人少之又少，能运用自如者更是凤毛麟角。清代命理大师任铁樵曾为《滴天髓》作注，使这部奇书得以流传至今。'
+            }
+        ]
+    },
+    'dream': {
+        icon: '💭',
+        title: '解梦术的心灵密码',
+        sections: [
+            {
+                subtitle: '📜 周公解梦：中华梦文化之源',
+                content: '在中国文化中，周公旦被尊为梦学的鼻祖。相传周公是西周初年的政治家、谋略家，他辅佐年幼的成王，制礼作乐，天下大治。而他创立的"周公解梦"体系，则成为中国数千年梦占文化的源头。\n\n据说，周公解梦最初是周王室收藏的占梦之书，专门记录各种梦象与吉凶的对应关系。后来辗转流传，形成了今天我们熟知的《周公解梦》一书。然而，学者考证，现存版本是后人托名之作，真正的周公解梦可能早已失传。'
+            },
+            {
+                subtitle: '🛏️ 弗洛伊德：梦是欲望的伪装',
+                content: '1900年，西格蒙德·弗洛伊德出版了《梦的解析》，开创了现代精神分析学派。弗洛伊德认为，梦是潜意识欲望的伪装表达，通过分析梦境可以揭示被压抑的心理冲突。\n\n据说，弗洛伊德在研究梦之前，曾花费多年时间分析自己的梦。他声称，梦中出现的事物往往带有象征意义：尖锐物品代表男性，水代表女性，飞行象征追求自由......这些理论虽然争议不断，却深刻影响了20世纪的文化与艺术。'
+            },
+            {
+                subtitle: '🧠 荣格：梦是集体潜意识的语言',
+                content: '卡尔·荣格曾是弗洛伊德的得意门生，后来因观点分歧而分道扬镳。荣格提出了"集体无意识"的概念，认为人类的梦境中包含着跨越文化的原型意象。\n\n据荣格研究，世界上许多古老的文化都有相似的梦境象征：英雄、母亲、阴影、智慧老人......这些"原型"是人类世代相传的心理遗产。荣格还提出"共时性原理"：某些梦与现实事件之间存在神秘的对应关系，这超出了因果律的解释范畴。'
+            },
+            {
+                subtitle: '🌙 清明梦：梦中知梦的奥秘',
+                content: '清明梦（Lucid Dream）是指在梦中保持清醒意识的状态，梦中人可以意识到自己在做梦，甚至可以控制梦境的内容。这一现象在古代文献中就有记载。\n\n藏传佛教的"睡瑜伽"传统认为，通过训练可以在梦中修行，达到更高的精神境界。据说，著名探险家卡洛斯·卡斯塔尼达曾向巫师唐望学习清明梦技术，用于探索现实的本质。现代科学研究表明，清明梦时大脑的前额叶皮层活跃度显著提高。'
+            }
+        ]
+    },
+    'love': {
+        icon: '💕',
+        title: '爱情占卜的浪漫传说',
+        sections: [
+            {
+                subtitle: '💘 维纳斯：爱神之眼',
+                content: '古罗马神话中，维纳斯是爱与美的女神。据说，她能从星辰间俯视人间，看到每一颗坠入爱河的心。古代占星师认为，当金星运行到特定位置时，便是表白或求婚的最佳时机。\n\n据说，在古希腊德尔斐神庙，求爱者会向女祭司询问心上人是否也爱着自己。女祭司会通过观察火焰的形状和颜色给出预示，而那些模糊暧昧的预言，往往比任何明确的答案都更能触动人心。'
+            },
+            {
+                subtitle: '🌹 玫瑰花语的占卜起源',
+                content: '你知道吗？玫瑰花语的由来与占卜有关。中世纪的欧洲贵族相信，不同颜色的玫瑰蕴含不同的神秘力量。红色玫瑰代表热烈的爱，粉色玫瑰象征甜蜜的暗恋，白色玫瑰则寓意纯洁的思念。\n\n据说，每一朵玫瑰都有属于自己的守护精灵，她们会在夜深人静时，向心诚之人传递爱意。至今，仍有许多人在约会时手捧玫瑰，期待这份古老的魔法能为自己带来好运。'
+            },
+            {
+                subtitle: '🔮 塔罗中的爱情秘密',
+                content: '在塔罗牌中，有几张牌与爱情缘分最深。"恋人"牌象征着人生中的重大抉择，往往与感情关系有关；"月亮"牌则暗示情感的迷茫与不确定性；"太阳"牌预示着圆满与幸福。\n\n据说，在18世纪的欧洲，年轻女子会用塔罗牌占卜自己的真命天子。她们会虔诚地洗牌、切牌，然后翻开最上面的那张——那张牌的颜色和图案，据说能预示未来丈夫的某些特征。'
+            },
+            {
+                subtitle: '💍 月老红线：缘定三生的传说',
+                content: '在中国的传说中，月下老人是掌管人间姻缘的神仙。他有一本记录天下男女姻缘的册子，还有一根红线。只要这根红线系在两个人的脚踝上，他们便会相识、相爱、相守一生。\n\n据说，月老的红线具有神奇的魔力：即使两人相隔千里、地位悬殊、甚至是仇人，只要红线相连，命运就会让他们相遇。这或许解释了为何有些人初次相见，便有似曾相识的感觉。'
+            }
+        ]
+    },
+    'fortune': {
+        icon: '🔮',
+        title: '每日运势的神秘解读',
+        sections: [
+            {
+                subtitle: '🌟 星象与命运的古老联结',
+                content: '人类很早就发现，日月星辰的运行与地上万物的变化有着神秘的呼应。春天星空中，木星高悬，预示着万物生长、事业兴旺；秋冬时节，火星渐隐，暗示着收敛与内省。\n\n据说，古巴比伦的占星师会每天黎明时分登上神庙的尖顶，观察东方地平线上最先升起的是哪颗星，以此判断当日的吉凶。这种"日占"传统延续了数千年，直到今天仍有人相信星辰的指引。'
+            },
+            {
+                subtitle: '📅 黄道吉日：传统择日智慧',
+                content: '在中国传统文化中，选择良辰吉日是行事之前的重要准备。古人认为，天地之间存在着气的流动，某些日子气场和谐，适合婚嫁、开业、动土；某些日子则气场紊乱，需要避开。\n\n据说，皇帝祭天、选妃都要请钦天监推算吉日。民间百姓虽没有这样的条件，也会参照老黄历选择重要日子。这种"天人合一"的观念深刻影响了中华文明的各个方面。'
+            },
+            {
+                subtitle: '🔢 数字与命运的奇妙关联',
+                content: '数字占卜是人类最古老的占卜形式之一。毕达哥拉斯学派认为，"万物皆数"，数字是宇宙的本质。现代占星术中，幸运数字被认为与个人星盘有关：太阳星座代表第一个幸运数，月亮星座代表第二个。\n\n据说，每个人的生日数字都隐藏着命运的密码。将出生日期的各位数字相加，得到的数（再反复相加直到个位数）被称为"生命灵数"，据说能揭示一个人的性格特点与人生使命。'
+            },
+            {
+                subtitle: '🎨 颜色与运势的能量学',
+                content: '色彩占卜学认为，不同颜色蕴含不同的能量，可以影响人的运势。红色代表热情与行动力，适合需要突破的时刻；蓝色象征平静与沟通，适合需要理性思考的场合；紫色则与灵性成长相关。\n\n据说，在古埃及，神庙中的祭司会根据求卜者衣着的颜色来解读其命运。如果某人穿着黄色来占卜，祭司会认为他近期将有智慧的增长；如果是绿色，则预示着财运亨通。'
+            }
+        ]
+    },
+    'mbti': {
+        icon: '🧠',
+        title: 'MBTI背后的性格奥秘',
+        sections: [
+            {
+                subtitle: '🔬 荣格：性格类型的先驱',
+                content: 'MBTI的理论基础来自瑞士心理学家卡尔·荣格。1921年，荣格出版了《心理类型学》一书，首次系统阐述了人的心理类型理论。他提出，人格可以分为外向/内向、感觉/直觉、思考/情感等维度。\n\n据说，荣格本人性格内向，对人际交往感到困难。他研究人格类型，部分原因是为了理解自己与世界的关系。荣格认为，每个人都应该发展自己性格中的劣势功能，才能达到人格的完整。'
+            },
+            {
+                subtitle: '👩‍🔬 布里格斯母女：MBTI的诞生',
+                content: 'MBTI的正式诞生要归功于凯瑟琳·布里格斯和她的女儿伊莎贝尔·布里格斯·迈尔斯。20世纪40年代，母女二人基于荣格的理论，开发出了这套性格测试问卷。\n\n据说，伊莎贝尔在婚礼当天第一次接触荣格的著作，从此一发不可收拾。她和母亲花费数十年时间，收集了成千上万的问卷数据，不断完善问卷的题目和计分方式。MBTI于1962年正式公开发布，至今已帮助数亿人了解自己。'
+            },
+            {
+                subtitle: '🌐 16型人格：命运的十六种可能',
+                content: 'MBTI将人格分为16种类型，每个类型由四个字母组成：E/I（外向/内向）、S/N（感觉/直觉）、T/F（思考/情感）、J/P（判断/知觉）。这16种人格组合，据说揭示了人与人之间差异的密码。\n\n有趣的是，统计数据表明，INFJ是最稀有的人格类型，约占总人口的1-2%；而ESFJ则是最常见的类型之一。某些职业与特定人格类型存在显著关联：INTJ多出现在科学家和工程师中，ENFP则常成为艺术家和创业者。'
+            },
+            {
+                subtitle: '🤖 AI与性格分析的未来',
+                content: '传统MBTI需要受试者回答数十道选择题，而AI可以通过分析一个人的语言模式、社交媒体动态、甚至打字速度来推断其性格特征。\n\n据说，心理学家已经开始使用机器学习算法来提高性格预测的准确性。未来的AI占卜师或许能通过你与它的对话，瞬间"看透"你的性格特点，给你量身定制的人生建议。但问题是：性格是固定的吗？还是会随着时间和经历而改变？'
+            }
+        ]
+    }
+};
+
+// 显示神秘历史面板
+function showMysticalHistory(typeId) {
+    const data = mysticalHistoryData[typeId];
+    if (!data) {
+        // 如果没有对应数据，尝试使用默认数据
+        showToast('正在加载神秘知识...');
+        return;
+    }
+    
+    // 构建神秘历史内容
+    let content = '<div class="mystical-history-container">';
+    content += '<div class="mystical-history-header"><span class="mystical-icon">' + data.icon + '</span><h3>' + data.title + '</h3></div>';
+    
+    for (let section of data.sections) {
+        content += '<div class="mystical-section">';
+        content += '<h4 class="mystical-subtitle">' + section.subtitle + '</h4>';
+        content += '<p class="mystical-text">' + section.content.replace(/\n/g, '<br>') + '</p>';
+        content += '</div>';
+    }
+    
+    content += '</div>';
+    
+    document.getElementById('mysticalHistoryBody').innerHTML = content;
+    document.getElementById('mysticalHistoryModal').classList.add('active');
+}
+
+function closeMysticalHistory() {
+    document.getElementById('mysticalHistoryModal').classList.remove('active');
+}
+
+
 function showCultureModal(index) {
     const culture = cultureData[index];
     if (!culture) return;
@@ -1512,5 +1817,10 @@ document.addEventListener('DOMContentLoaded', function() {
         el.addEventListener('touchend', function(e) { setTimeout(() => { this.classList.remove('touched'); }, 150); }, { passive: true });
     });
 });
+
+document.getElementById('mysticalHistoryModal').addEventListener('click', function(e) { 
+    if (e.target === this) closeMysticalHistory(); 
+});
+
 </script>
 {% endblock %}

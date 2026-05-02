@@ -481,8 +481,8 @@
         {% if system_agents %}
         <div class="square-section">
             <div class="section-label">
-                <span>🤖 系统Agent</span>
-                <span class="section-badge badge-official">官方</span>
+                <span>🤖 灵犀Agent</span>
+                
             </div>
             <div class="cards-grid">
                 {% for agent in system_agents %}
@@ -501,7 +501,7 @@
                         <div class="card-info">
                             <div class="card-name">
                                 {{ agent.name.zh }}
-                                <span class="section-badge badge-official" style="font-size: 0.625rem; padding: 2px 6px;">官方</span>
+                                
                             </div>
                             <div class="card-personality">{{ agent.personality.zh }}</div>
                         </div>
@@ -528,8 +528,8 @@
         {% if user_agents %}
         <div class="square-section">
             <div class="section-label">
-                <span>🎨 用户Agent</span>
-                <span class="section-badge badge-community">社区</span>
+                <span>🎨 社区Agent</span>
+                
             </div>
             <div class="cards-grid">
                 {% for agent in user_agents %}
@@ -539,7 +539,7 @@
                         <div class="card-info">
                             <div class="card-name">
                                 {{ agent.name }}
-                                <span class="section-badge badge-community" style="font-size: 0.625rem; padding: 2px 6px;">社区</span>
+                                
                             </div>
                             <div class="card-personality">{{ agent.personality }}</div>
                         </div>
@@ -589,8 +589,8 @@
     <div class="tab-content" id="agentsTab">
         <div class="square-section">
             <div class="section-label">
-                <span>🤖 系统Agent</span>
-                <span class="section-badge badge-official">官方</span>
+                <span>🤖 灵犀Agent</span>
+                
             </div>
             <div class="cards-grid" id="agentsGrid">
                 <!-- 由JS动态渲染或静态包含 -->
@@ -602,8 +602,8 @@
     <div class="tab-content" id="user-agentsTab">
         <div class="square-section">
             <div class="section-label">
-                <span>🎨 用户Agent</span>
-                <span class="section-badge badge-community">社区</span>
+                <span>🎨 社区Agent</span>
+                
             </div>
             <div class="cards-grid" id="userAgentsGrid">
                 {% if user_agents %}
@@ -614,7 +614,7 @@
                             <div class="card-info">
                                 <div class="card-name">
                                     {{ agent.name }}
-                                    <span class="section-badge badge-community" style="font-size: 0.625rem; padding: 2px 6px;">社区</span>
+                                    
                                 </div>
                                 <div class="card-personality">{{ agent.personality }}</div>
                             </div>
