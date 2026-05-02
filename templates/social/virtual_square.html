@@ -570,6 +570,7 @@
     
     // 初始化 Three.js
     function initThreeJS() {
+        console.log('initThreeJS 开始...');
         const canvas = document.getElementById('threeCanvas');
         
         // 创建场景
@@ -1093,6 +1094,7 @@
     
     // 创建3D角色
     function createCharacter(user, isSelf = false) {
+        console.log('创建角色:', user.name, 'isSelf:', isSelf);
         const group = new THREE.Group();
         group.position.set(user.x || 0, 0, user.z || 0);
         group.userData = { ...user, isSelf };
@@ -1257,6 +1259,7 @@
         group.userData.animType = 'enter';
         
         scene.add(group);
+        console.log('角色已添加到场景, 角色总数:', scene.children.length);
         return group;
     }
     
@@ -1552,6 +1555,7 @@
     
     // 模拟在线用户
     function simulateOnlineUsers() {
+        console.log('开始模拟在线用户...');
         const mockUsers = [
             { id: 'agent_1', name: '星语', type: 'agent', x: -6, z: -4 },
             { id: 'agent_2', name: '月华', type: 'agent', x: 6, z: -4 },
@@ -1993,8 +1997,22 @@
         });
     }
     
-    // 初始化
-    init();
+    // 初始化 - 等待Three.js加载完成
+    function startApp() {
+        if (typeof THREE === 'undefined') {
+            console.log('等待Three.js加载...');
+            setTimeout(startApp, 200);
+            return;
+        }
+        console.log('Three.js已加载，初始化虚拟广场...');
+        init();
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startApp);
+    } else {
+        startApp();
+    }
     
     // 暴露函数给全局
     window.showCharacterPopup = showCharacterPopup;
