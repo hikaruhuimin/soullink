@@ -198,7 +198,7 @@ body::before {
 /* 内容区域毛玻璃效果增强 */
 .divination-hero {
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.6) 0%, rgba(22, 33, 62, 0.6) 50%, rgba(15, 52, 96, 0.6) 100%),
-                url("/static/images/universe_bg.jpg") center/cover no-repeat;
+                url("/static/images/milky_way.jpg") center/cover no-repeat;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     padding: 80px 20px;
@@ -208,25 +208,29 @@ body::before {
     border-radius: 0 0 40px 40px;
     margin-bottom: 20px;
     border: 1px solid rgba(139, 92, 246, 0.2);
-    min-height: 300px;
+    min-height: 350px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-size: 150% auto;
+    animation: galaxyDrift 60s ease-in-out infinite alternate;
 }
 
 .divination-hero {
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.5) 0%, rgba(22, 33, 62, 0.5) 50%, rgba(15, 52, 96, 0.5) 100%),
-                url("/static/images/universe_bg.jpg") center/cover no-repeat;
+                url("/static/images/milky_way.jpg") center/cover no-repeat;
     padding: 80px 20px;
     text-align: center;
     position: relative;
     overflow: hidden;
     border-radius: 0 0 40px 40px;
     margin-bottom: 20px;
-    min-height: 300px;
+    min-height: 350px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-size: 150% auto;
+    animation: galaxyDrift 60s ease-in-out infinite alternate;
 }
 
 .divination-hero::before {
@@ -265,6 +269,7 @@ body::before {
     position: absolute;
     top: 20px;
     left: 0; right: 0;
+    animation: galaxyRotate 60s ease-in-out infinite;
     display: flex;
     justify-content: space-around;
     pointer-events: none;
@@ -1019,6 +1024,20 @@ body::before {
     .mystical-section { padding: 24px; }
 }
 
+
+@keyframes galaxyDrift {
+    0% { background-position: 0% 30%; }
+    25% { background-position: 50% 20%; }
+    50% { background-position: 100% 40%; }
+    75% { background-position: 60% 60%; }
+    100% { background-position: 20% 30%; }
+}
+
+@keyframes galaxyRotate {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(1deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
 </style>
 {% endblock %}
 
