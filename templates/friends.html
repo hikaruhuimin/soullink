@@ -1,0 +1,529 @@
+{% extends "base.html" %}
+
+{% block title %}好友列表 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.friends-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-2xl) var(--space-xl);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+}
+
+.friends-tabs {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--color-border-light);
+    padding-bottom: var(--space-md);
+}
+
+.tab-btn {
+    padding: var(--space-sm) var(--space-lg);
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-fast);
+    position: relative;
+}
+
+.tab-btn:hover {
+    color: var(--color-text);
+    background: var(--color-bg-cream);
+}
+
+.tab-btn.active {
+    color: var(--color-accent);
+    background: rgba(184, 169, 201, 0.15);
+    font-weight: 500;
+}
+
+.tab-btn .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.75rem;
+    border-radius: var(--radius-full);
+    margin-left: var(--space-xs);
+}
+
+.friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.friend-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+}
+
+.friend-card:nth-child(1) { animation-delay: 0.1s; }
+.friend-card:nth-child(2) { animation-delay: 0.15s; }
+.friend-card:nth-child(3) { animation-delay: 0.2s; }
+.friend-card:nth-child(4) { animation-delay: 0.25s; }
+.friend-card:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.friend-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.friend-avatar {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.friend-avatar img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid #B8A9C9;
+    object-fit: cover;
+}
+
+.online-dot {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #4CAF50;
+    border: 2px solid white;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(76, 175, 80, 0); }
+}
+
+.friend-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-name {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 4px;
+}
+
+.friend-status {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+}
+
+.friend-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-bg-cream);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+    background: var(--color-accent);
+    color: white;
+}
+
+.btn-icon.chat:hover {
+    background: var(--color-primary);
+}
+
+.btn-icon.delete:hover {
+    background: #ef4444;
+}
+
+/* 好友请求样式 */
+.request-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+}
+
+.request-card:nth-child(1) { animation-delay: 0.1s; }
+.request-card:nth-child(2) { animation-delay: 0.15s; }
+
+.request-info {
+    flex: 1;
+}
+
+.request-name {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 4px;
+}
+
+.request-time {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+.request-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.btn-accept {
+    padding: 8px 20px;
+    border-radius: var(--radius-full);
+    border: none;
+    background: #4CAF50;
+    color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-accept:hover {
+    background: #43a047;
+}
+
+.btn-reject {
+    padding: 8px 20px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-reject:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: var(--space-3xl);
+    color: var(--color-text-muted);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-lg);
+    opacity: 0.5;
+}
+
+.empty-state-text {
+    font-size: 1rem;
+    margin-bottom: var(--space-lg);
+}
+
+.empty-state-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--color-accent);
+    color: white;
+    border-radius: var(--radius-full);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.empty-state-btn:hover {
+    background: var(--color-accent-light);
+    color: white;
+}
+
+/* Tab内容 */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@media (max-width: 640px) {
+    .friend-card {
+        padding: var(--space-md);
+    }
+    
+    .friend-avatar img {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .friend-actions {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="friends-page">
+    <div class="page-header">
+        <h1 class="page-title">💜 我的好友</h1>
+    </div>
+    
+    <div class="friends-tabs">
+        <button class="tab-btn active" data-tab="friends">
+            好友列表
+            <span id="friendsCount">{{ friends|length }}</span>
+        </button>
+        <button class="tab-btn" data-tab="requests">
+            好友请求
+            {% if pending_requests|length > 0 %}
+            <span class="badge">{{ pending_requests|length }}</span>
+            {% endif %}
+        </button>
+    </div>
+    
+    <!-- 好友列表 -->
+    <div class="tab-content active" id="friendsTab">
+        {% if friends %}
+        <div class="friends-list">
+            {% for friend in friends %}
+            <div class="friend-card" data-friend-id="{{ friend.id }}">
+                <div class="friend-avatar">
+                    <img src="{{ friend.avatar }}" alt="{{ friend.username }}">
+                    {% if friend.is_online %}
+                    <div class="online-dot"></div>
+                    {% endif %}
+                </div>
+                <div class="friend-info">
+                    <div class="friend-name">{{ friend.username }}</div>
+                    <div class="friend-status">
+                        {% if friend.is_online %}
+                        <span style="color: #4CAF50;">在线</span>
+                        {% else %}
+                        离线
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="friend-actions">
+                    <button class="btn-icon chat" onclick="startChat({{ friend.id }})" title="私聊">
+                        💬
+                    </button>
+                    <button class="btn-icon delete" onclick="removeFriend({{ friend.id }})" title="删除好友">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <p class="empty-state-text">还没有好友，去灵犀广场认识新朋友吧</p>
+            <a href="/agents" class="empty-state-btn">前往灵犀广场</a>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- 好友请求 -->
+    <div class="tab-content" id="requestsTab">
+        {% if pending_requests %}
+        <div class="friends-list">
+            {% for req in pending_requests %}
+            <div class="request-card" data-request-id="{{ req.id }}">
+                <div class="friend-avatar">
+                    <img src="{{ req.sender_avatar }}" alt="{{ req.sender_name }}">
+                </div>
+                <div class="request-info">
+                    <div class="request-name">{{ req.sender_name }}</div>
+                    <div class="request-time">{{ req.created_at }}</div>
+                </div>
+                <div class="request-actions">
+                    <button class="btn-accept" onclick="acceptRequest({{ req.id }})">接受</button>
+                    <button class="btn-reject" onclick="rejectRequest({{ req.id }})">拒绝</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p class="empty-state-text">暂无待处理的好友请求</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Tab切换
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tab = this.dataset.tab;
+        
+        // 切换按钮状态
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // 切换内容
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(tab + 'Tab').classList.add('active');
+    });
+});
+
+// 接受好友请求
+async function acceptRequest(requestId) {
+    try {
+        const response = await fetch('/api/friend/accept', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({request_id: requestId})
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('已添加好友');
+            // 移除请求卡片
+            const card = document.querySelector(`[data-request-id="${requestId}"]`);
+            if (card) {
+                card.style.opacity = '0';
+                setTimeout(() => card.remove(), 300);
+            }
+            // 刷新页面
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast(data.error || '操作失败');
+        }
+    } catch (err) {
+        showToast('网络错误');
+    }
+}
+
+// 拒绝好友请求
+async function rejectRequest(requestId) {
+    try {
+        const response = await fetch('/api/friend/reject', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({request_id: requestId})
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('已拒绝');
+            const card = document.querySelector(`[data-request-id="${requestId}"]`);
+            if (card) {
+                card.style.opacity = '0';
+                setTimeout(() => card.remove(), 300);
+            }
+        } else {
+            showToast(data.error || '操作失败');
+        }
+    } catch (err) {
+        showToast('网络错误');
+    }
+}
+
+// 开始私聊
+function startChat(friendId) {
+    window.location.href = `/chat/dm/human/${friendId}`;
+}
+
+// 删除好友
+async function removeFriend(friendId) {
+    if (!confirm('确定要删除这个好友吗？')) return;
+    
+    try {
+        const response = await fetch('/api/friend/remove', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({friend_id: friendId})
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('已删除好友');
+            const card = document.querySelector(`[data-friend-id="${friendId}"]`);
+            if (card) {
+                card.style.opacity = '0';
+                setTimeout(() => card.remove(), 300);
+            }
+        } else {
+            showToast(data.error || '操作失败');
+        }
+    } catch (err) {
+        showToast('网络错误');
+    }
+}
+
+// Toast提示
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 24px;
+        font-size: 0.875rem;
+        z-index: 10000;
+        animation: fadeIn 0.3s ease;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+</script>
+{% endblock %}

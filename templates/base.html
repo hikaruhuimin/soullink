@@ -367,7 +367,7 @@
             </button>
             
             <div class="nav-menu" id="navMenu">
-                <a href="/agents" class="nav-link">Agent广场</a>
+                <a href="/agents" class="nav-link">灵犀广场</a>
                 <a href="/chat" class="nav-link">聊天室</a>
                 <a href="/divination/dream" class="nav-link">AI解梦</a>
                 <a href="/meet" class="nav-link">连线</a>
@@ -376,6 +376,10 @@
                                                 
                 {% if current_user.is_authenticated %}
                 <a href="/wallet" class="nav-link" title="我的钱包">💎 {{ current_user.spirit_stones or 0 }}</a>
+                <a href="/friends" class="nav-link" id="friendsNav" title="好友列表">
+                    👥 好友
+                    <span id="friendRequestBadge" style="display: none;"></span>
+                </a>
                 {% endif %}
                 
                 <div class="nav-lang-dropdown">
@@ -505,6 +509,29 @@
                 menu.classList.remove('show');
             }
         });
+        
+        // 检查好友请求数量
+        async function checkFriendRequests() {
+            try {
+                const response = await fetch('/api/friend/requests');
+                const data = await response.json();
+                if (data.success && data.count > 0) {
+                    const badge = document.getElementById('friendRequestBadge');
+                    if (badge) {
+                        badge.textContent = data.count;
+                        badge.style.cssText = 'display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; background: #ef4444; color: white; font-size: 0.6875rem; border-radius: 9px; margin-left: 4px;';
+                    }
+                }
+            } catch (err) {
+                console.error('Check friend requests error:', err);
+            }
+        }
+        
+        // 页面加载时检查好友请求
+        {% if current_user.is_authenticated %}
+        checkFriendRequests();
+        setInterval(checkFriendRequests, 60000); // 每分钟刷新
+        {% endif %}
         
         // Toast auto hide
         const toasts = document.querySelectorAll('.toast');
