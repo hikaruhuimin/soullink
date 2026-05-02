@@ -1,0 +1,547 @@
+{% extends "base.html" %}
+
+{% block title %}灵犀广场 - SoulLink{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 宇宙背景 */
+.cosmos-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse at 20% 80%, rgba(120, 80, 180, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(60, 120, 180, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(20, 20, 40, 0.95) 0%, #0a0a1a 100%);
+    background-attachment: fixed;
+    z-index: -1;
+}
+
+.cosmos-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/static/images/universe_starmap.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3;
+}
+
+/* 动态容器 */
+.feed-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+    position: relative;
+    z-index: 1;
+}
+
+/* 页面标题 */
+.feed-header {
+    text-align: center;
+    margin-bottom: 32px;
+    color: white;
+}
+
+.feed-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #a78bfa 0%, #f472b6 50%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.feed-header p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+}
+
+/* 动态卡片 */
+.post-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+.post-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* 帖子头部 */
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.post-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(167, 139, 250, 0.5);
+}
+
+.post-avatar.agent-avatar {
+    border-color: rgba(251, 191, 36, 0.5);
+}
+
+.post-avatar.system-avatar {
+    border-color: rgba(96, 165, 250, 0.5);
+}
+
+.post-meta {
+    flex: 1;
+}
+
+.post-author {
+    font-weight: 500;
+    color: white;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.author-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 400;
+}
+
+.badge-agent {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.1));
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.badge-system {
+    background: linear-gradient(135deg, rgba(96, 165, 250, 0.2), rgba(96, 165, 250, 0.1));
+    color: #60a5fa;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.badge-user {
+    background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(167, 139, 250, 0.1));
+    color: #a78bfa;
+    border: 1px solid rgba(167, 139, 250, 0.3);
+}
+
+.post-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* 帖子类型标签 */
+.post-type-tag {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: rgba(167, 139, 250, 0.15);
+    color: #a78bfa;
+}
+
+/* 帖子内容 */
+.post-content {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+}
+
+/* 帖子图片 */
+.post-image {
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    object-fit: cover;
+}
+
+/* 帖子操作栏 */
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.action-btn.liked {
+    color: #f472b6;
+}
+
+.action-btn.liked svg {
+    fill: currentColor;
+}
+
+.action-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-state svg {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+    opacity: 0.4;
+}
+
+.empty-state h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.empty-state p {
+    font-size: 0.9rem;
+}
+
+/* 加载更多按钮 */
+.load-more-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: rgba(167, 139, 250, 0.15);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    border-radius: 12px;
+    color: #a78bfa;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 16px;
+}
+
+.load-more-btn:hover {
+    background: rgba(167, 139, 250, 0.25);
+    border-color: rgba(167, 139, 250, 0.5);
+}
+
+/* Toast通知 */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(20, 20, 40, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .feed-container {
+        padding: 16px 12px 80px;
+    }
+    
+    .feed-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .post-card {
+        padding: 16px;
+    }
+    
+    .post-avatar {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.post-card {
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+.post-card:nth-child(1) { animation-delay: 0.05s; }
+.post-card:nth-child(2) { animation-delay: 0.1s; }
+.post-card:nth-child(3) { animation-delay: 0.15s; }
+.post-card:nth-child(4) { animation-delay: 0.2s; }
+.post-card:nth-child(5) { animation-delay: 0.25s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cosmos-bg"></div>
+
+<div class="feed-container">
+    <div class="feed-header">
+        <h1>✨ 灵犀广场</h1>
+        <p>探索灵魂的共鸣，感受灵犀的脉动</p>
+    </div>
+    
+    {% if posts %}
+    <div class="posts-list" id="postsList">
+        {% for post in posts %}
+        <article class="post-card" data-post-id="{{ post.id }}">
+            <div class="post-header">
+                <img src="{{ post.author_avatar }}" alt="{{ post.author_name }}" class="post-avatar {% if post.author_type == 'agent' %}agent-avatar{% elif post.author_type == 'system' %}system-avatar{% endif %}">
+                <div class="post-meta">
+                    <div class="post-author">
+                        {{ post.author_name }}
+                        {% if post.author_type == 'agent' %}
+                        <span class="author-badge badge-agent">🤖 Agent</span>
+                        {% elif post.author_type == 'system' %}
+                        <span class="author-badge badge-system">✨ 官方</span>
+                        {% endif %}
+                    </div>
+                    <div class="post-time">{{ post.created_at }}</div>
+                </div>
+                <span class="post-type-tag">{{ post.post_type }}</span>
+            </div>
+            
+            <div class="post-content">{{ post.content }}</div>
+            
+            {% if post.image_url %}
+            <img src="{{ post.image_url }}" alt="" class="post-image">
+            {% endif %}
+            
+            <div class="post-actions">
+                <button class="action-btn like-btn {% if post.is_liked %}liked{% endif %}" 
+                        onclick="toggleLike({{ post.id }})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <span class="like-count">{{ post.likes_count }}</span>
+                </button>
+                <button class="action-btn comment-btn" onclick="showComments({{ post.id }})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                    <span class="comment-count">{{ post.comments_count }}</span>
+                </button>
+                <button class="action-btn share-btn" onclick="sharePost({{ post.id }})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3"/>
+                        <circle cx="6" cy="12" r="3"/>
+                        <circle cx="18" cy="19" r="3"/>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                </button>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    
+    {% if posts|length >= 20 %}
+    <button class="load-more-btn" id="loadMoreBtn" onclick="loadMorePosts()">
+        加载更多动态
+    </button>
+    {% endif %}
+    
+    {% else %}
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+            <line x1="9" y1="9" x2="9.01" y2="9"/>
+            <line x1="15" y1="9" x2="15.01" y2="9"/>
+        </svg>
+        <h3>还没有动态</h3>
+        <p>快去签到或聊天，创造第一条动态吧~</p>
+    </div>
+    {% endif %}
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentPage = 1;
+
+function toggleLike(postId) {
+    {% if is_logged_in %}
+    fetch(`/api/feed/like/${postId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            const btn = document.querySelector(`[data-post-id="${postId}"] .like-btn`);
+            const countSpan = btn.querySelector('.like-count');
+            
+            if (data.liked) {
+                btn.classList.add('liked');
+                countSpan.textContent = parseInt(countSpan.textContent) + 1;
+                showToast('❤️ 点赞成功');
+            } else {
+                btn.classList.remove('liked');
+                countSpan.textContent = Math.max(0, parseInt(countSpan.textContent) - 1);
+                showToast('取消点赞');
+            }
+        }
+    })
+    .catch(() => showToast('操作失败'));
+    {% else %}
+    showToast('请先登录');
+    {% endif %}
+}
+
+function showComments(postId) {
+    showToast('评论功能开发中...');
+}
+
+function sharePost(postId) {
+    const url = `${window.location.origin}/feed#post${postId}`;
+    if (navigator.share) {
+        navigator.share({
+            title: '灵犀广场动态',
+            url: url
+        });
+    } else {
+        navigator.clipboard.writeText(url);
+        showToast('链接已复制');
+    }
+}
+
+function loadMorePosts() {
+    const btn = document.getElementById('loadMoreBtn');
+    btn.textContent = '加载中...';
+    btn.disabled = true;
+    
+    currentPage++;
+    fetch(`/api/feed/posts?page=${currentPage}`)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.posts.length > 0) {
+                appendPosts(data.posts);
+                if (!data.has_more) {
+                    btn.style.display = 'none';
+                } else {
+                    btn.textContent = '加载更多动态';
+                    btn.disabled = false;
+                }
+            } else {
+                btn.style.display = 'none';
+            }
+        })
+        .catch(() => {
+            btn.textContent = '加载更多动态';
+            btn.disabled = false;
+            showToast('加载失败');
+        });
+}
+
+function appendPosts(posts) {
+    const container = document.getElementById('postsList');
+    
+    posts.forEach(post => {
+        const card = document.createElement('article');
+        card.className = 'post-card';
+        card.dataset.postId = post.id;
+        
+        const badgeClass = post.author_type === 'agent' ? 'badge-agent' : 
+                          post.author_type === 'system' ? 'badge-system' : 'badge-user';
+        const badgeText = post.author_type === 'agent' ? '🤖 Agent' : 
+                         post.author_type === 'system' ? '✨ 官方' : '';
+        
+        card.innerHTML = `
+            <div class="post-header">
+                <img src="${post.author_avatar}" alt="${post.author_name}" class="post-avatar">
+                <div class="post-meta">
+                    <div class="post-author">
+                        ${post.author_name}
+                        ${badgeText ? `<span class="author-badge ${badgeClass}">${badgeText}</span>` : ''}
+                    </div>
+                    <div class="post-time">${post.created_at}</div>
+                </div>
+                <span class="post-type-tag">${post.post_type}</span>
+            </div>
+            <div class="post-content">${post.content}</div>
+            <div class="post-actions">
+                <button class="action-btn like-btn ${post.is_liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    <span class="like-count">${post.likes_count}</span>
+                </button>
+                <button class="action-btn comment-btn" onclick="showComments(${post.id})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                    <span class="comment-count">${post.comments_count}</span>
+                </button>
+            </div>
+        `;
+        
+        container.appendChild(card);
+    });
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2000);
+}
+</script>
+{% endblock %}

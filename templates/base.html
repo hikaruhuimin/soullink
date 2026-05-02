@@ -367,10 +367,11 @@
             </button>
             
             <div class="nav-menu" id="navMenu">
+                <a href="/feed" class="nav-link" style="color: #8b5cf6;">✨ 动态</a>
                 <a href="/agents" class="nav-link">灵犀广场</a>
                 <a href="/chat" class="nav-link">聊天室</a>
                 <a href="/divination/dream" class="nav-link">AI解梦</a>
-                <a href="/meet" class="nav-link">连线</a>
+                <a href="/meet" class="nav-link">奔现</a>
                 <a href="/divination" class="nav-link">占卜</a>
                 <a href="/shop" class="nav-link" style="color: #11998e; font-weight: 600;">灵石商城</a>
                                                 
@@ -380,6 +381,22 @@
                     👥 好友
                     <span id="friendRequestBadge" style="display: none;"></span>
                 </a>
+                <button class="nav-checkin-btn" id="checkinBtn" onclick="openCheckinModal()" style="
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    padding: 8px 16px;
+                    background: linear-gradient(135deg, #f59e0b, #d97706);
+                    color: white;
+                    border: none;
+                    border-radius: 20px;
+                    font-size: 0.875rem;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                ">
+                    🔔 签到
+                    <span id="streakBadge" style="display: none; background: rgba(255,255,255,0.3); padding: 2px 6px; border-radius: 10px; font-size: 0.75rem;"></span>
+                </button>
                 {% endif %}
                 
                 <div class="nav-lang-dropdown">
@@ -403,6 +420,11 @@
         </div>
     </nav>
     {% endblock %}
+    
+    <!-- 新手引导弹窗 -->
+    <div id="guideModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 24px; padding: 32px; max-width: 420px; width: 90%;"></div>
+    </div>
     
     <main class="main-content">
         {% block content %}{% endblock %}
@@ -541,7 +563,380 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         });
+        
+        // ========== 新手引导弹窗 ==========
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(0,0,0,0.85); color: white; padding: 12px 24px; border-radius: 24px; font-size: 0.875rem; opacity: 0; transition: all 0.3s; z-index: 10001;';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+            });
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+        
+        function showNewUserGuide() {
+            const guideKey = 'soullink_guide_completed';
+            if (localStorage.getItem(guideKey)) return false;
+            
+            const modal = document.getElementById('guideModal');
+            const modalContent = modal.querySelector('div');
+            
+            let currentStep = 0;
+            const steps = [
+                { title: '欢迎来到灵犀世界！🌌', content: '这里有16种灵魂伴侣等你相遇，每一个Agent都有独特的性格和故事。', action: null, actionText: null },
+                { title: '认识灵犀Agent', content: '在灵犀广场探索不同类型的Agent，找到与你灵魂契合的那一个。', action: '/agents', actionText: '去灵犀广场' },
+                { title: '体验AI占卜', content: '塔罗牌、AI解梦、MBTI性格测试...探索命运的无限可能。', action: '/divination', actionText: '开始占卜' },
+                { title: '创建你的Agent', content: '成为Agent创作者，定义独特的性格、故事和灵魂。', action: '/create-agent', actionText: '创建Agent' },
+                { title: '领取新手礼包 🎁', content: '100灵石已到账！用它来解锁更多有趣的互动体验吧~', action: null, actionText: '太棒了！', final: true }
+            ];
+            
+            function renderStep() {
+                const step = steps[currentStep];
+                modalContent.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 3rem; margin-bottom: 16px;">${currentStep === 0 ? '🌌' : currentStep === 4 ? '🎁' : '✨'}</div>
+                        <h2 style="color: #8b5cf6; margin-bottom: 16px; font-size: 1.5rem;">${step.title}</h2>
+                        <p style="color: #666; line-height: 1.8; margin-bottom: 24px;">${step.content}</p>
+                        <div style="display: flex; justify-content: center; gap: 12px;">
+                            ${currentStep > 0 ? '<button onclick="guidePrev()" style="padding: 12px 24px; background: #f3f4f6; border: none; border-radius: 24px; cursor: pointer; font-size: 0.9375rem;">上一步</button>' : ''}
+                            <button onclick="guideNext()" style="padding: 12px 32px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; border: none; border-radius: 24px; cursor: pointer; font-size: 0.9375rem; font-weight: 600;">${step.actionText}</button>
+                        </div>
+                        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 8px;">
+                            ${steps.map((_, i) => `<span style="width: 8px; height: 8px; border-radius: 50%; background: ${i === currentStep ? '#8b5cf6' : '#e5e7eb'}; display: inline-block;"></span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                modal.style.display = 'flex';
+            }
+            
+            function guideNext() {
+                if (currentStep < steps.length - 1) {
+                    currentStep++;
+                    renderStep();
+                } else {
+                    modal.style.display = 'none';
+                    localStorage.setItem(guideKey, 'true');
+                    // 如果还没登录，提示登录
+                    {% if not current_user.is_authenticated %}
+                    showToast('请登录以领取新手礼包~');
+                    {% else %}
+                    // 已登录用户，给100灵石新手礼包
+                    fetch('/api/newuser/reward', { method: 'POST' })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) showToast('🎁 新手礼包已到账！100灵石');
+                        })
+                        .catch(() => showToast('🎁 欢迎来到灵犀世界！'));
+                    {% endif %}
+                }
+            }
+            
+            function guidePrev() {
+                if (currentStep > 0) {
+                    currentStep--;
+                    renderStep();
+                }
+            }
+            
+            window.guideNext = guideNext;
+            window.guidePrev = guidePrev;
+            
+            renderStep();
+            return true;
+        }
+        
+        // ========== 每日签到弹窗 ==========
+        let checkinModal;
+        document.addEventListener('DOMContentLoaded', function() {
+            // 创建签到弹窗
+            checkinModal = document.createElement('div');
+            checkinModal.id = 'checkinModal';
+            checkinModal.style.cssText = 'display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center;';
+            checkinModal.innerHTML = `
+                <div style="background: white; border-radius: 24px; padding: 32px; max-width: 400px; width: 90%; position: relative;">
+                    <button onclick="closeCheckinModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999;">×</button>
+                    <div id="checkinContent"></div>
+                </div>
+            `;
+            document.body.appendChild(checkinModal);
+            
+            // 检查是否显示新手引导
+            {% if current_user.is_authenticated %}
+            setTimeout(() => {
+                if (showNewUserGuide()) {
+                    // 引导显示中
+                }
+            }, 1000);
+            {% endif %}
+        });
+        
+        window.openCheckinModal = function() {
+            loadCheckinStatus();
+            checkinModal.style.display = 'flex';
+        }
+        
+        window.closeCheckinModal = function() {
+            checkinModal.style.display = 'none';
+        }
+        
+        function loadCheckinStatus() {
+            fetch('/api/checkin/status')
+                .then(r => r.json())
+                .then(data => {
+                    renderCheckinUI(data);
+                })
+                .catch(err => {
+                    document.getElementById('checkinContent').innerHTML = '<p style="text-align:center;color:#999;">加载失败</p>';
+                });
+        }
+        
+        function renderCheckinUI(data) {
+            const content = document.getElementById('checkinContent');
+            
+            if (data.checked_in) {
+                // 已签到
+                content.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 16px;">🎉</div>
+                        <h2 style="color: #f59e0b; margin-bottom: 8px;">今日已签到</h2>
+                        <p style="color: #666; margin-bottom: 16px;">连续签到 <strong style="color: #f59e0b; font-size: 1.5rem;">${data.streak_days}</strong> 天</p>
+                        <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                            <p style="margin: 0; color: #92400e;">今日获得: <strong>+${data.today_reward}</strong> 💎灵石</p>
+                            ${data.has_weekly_bonus ? '<p style="margin: 8px 0 0; color: #dc2626;">🎁 周连签额外奖励已获得！</p>' : ''}
+                        </div>
+                        <p style="color: #999; font-size: 0.875rem;">明天再来签到吧~</p>
+                    </div>
+                `;
+            } else {
+                // 未签到
+                const canClaim = data.can_claim;
+                content.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 16px;">📅</div>
+                        <h2 style="color: #333; margin-bottom: 8px;">每日签到</h2>
+                        <p style="color: #666; margin-bottom: 16px;">
+                            连续签到 <strong style="color: #f59e0b; font-size: 1.5rem;">${data.streak_days}</strong> 天
+                        </p>
+                        
+                        <!-- 签到日历 -->
+                        <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 20px;">
+                            ${[1,2,3,4,5,6,7].map(d => {
+                                const claimed = d <= data.streak_days + (data.checked_in ? 1 : 0);
+                                const isToday = d === data.streak_days + 1;
+                                return `<div style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; ${claimed ? 'background: #f59e0b; color: white;' : isToday ? 'background: #fef3c7; border: 2px solid #f59e0b; color: #f59e0b;' : 'background: #f3f4f6; color: #999;'}">
+                                    ${d}天<br><span style="font-size: 0.625rem;">${[10,15,20,25,30,40,50][d-1]}</span>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                        
+                        ${data.can_get_weekly_bonus ? '<p style="color: #dc2626; font-size: 0.875rem; margin-bottom: 16px;">🎁 明天连续7天可获得额外100灵石！</p>' : ''}
+                        
+                        ${canClaim ? `
+                            <button onclick="doCheckin()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; border-radius: 12px; font-size: 1.125rem; font-weight: 600; cursor: pointer;">
+                                🔔 立即签到 (+${data.next_reward}灵石)
+                            </button>
+                        ` : `
+                            <div style="background: #f3f4f6; padding: 16px; border-radius: 12px; color: #666;">
+                                <p style="margin: 0;">明天再来签到吧~</p>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }
+        }
+        
+        window.doCheckin = function() {
+            fetch('/api/checkin', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        renderCheckinUI({
+                            checked_in: true,
+                            streak_days: data.streak_days,
+                            today_reward: data.reward_stones,
+                            has_weekly_bonus: data.has_weekly_bonus
+                        });
+                        showToast(`🎉 签到成功！+${data.reward_stones}灵石`);
+                    } else {
+                        showToast(data.error || '签到失败');
+                    }
+                })
+                .catch(err => showToast('签到失败，请重试'));
+        }
+        
+        // 检查签到状态更新导航栏
+        {% if current_user.is_authenticated %}
+        function updateCheckinNav() {
+            fetch('/api/checkin/status')
+                .then(r => r.json())
+                .then(data => {
+                    const badge = document.getElementById('streakBadge');
+                    if (badge) {
+                        if (data.checked_in) {
+                            badge.textContent = '✓';
+                            badge.style.display = 'inline';
+                        } else if (data.can_claim) {
+                            badge.textContent = data.next_reward + '!';
+                            badge.style.display = 'inline';
+                            badge.style.background = '#ef4444';
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
+        updateCheckinNav();
+        setInterval(updateCheckinNav, 60000);
+        {% endif %}
     </script>
+    
+    <!-- 新手引导弹窗 -->
+    <script>
+    // 新手引导配置
+    const GUIDE_STEPS = [
+        {
+            title: '👋 欢迎来到灵犀',
+            content: '在这里，你可以与AI Agent互动、探索灵魂共鸣。\n\n每个Agent都有独特的性格和故事，等待你来发现。',
+            icon: '🤖',
+            highlight: '#agents',
+            position: 'bottom'
+        },
+        {
+            title: '✨ 灵犀广场',
+            content: '这里是所有用户和Agent的动态汇聚地。\n\n签到、聊天、占卜...每一次互动都可能产生精彩的动态！',
+            icon: '📝',
+            highlight: '#feed',
+            position: 'bottom'
+        },
+        {
+            title: '🎁 每日签到',
+            content: '每天签到可获得灵石奖励！\n\n连续签到7天更有周奖励等你拿，还有神秘惊喜等着你~',
+            icon: '💎',
+            highlight: '#checkinBtn',
+            position: 'bottom'
+        }
+    ];
+
+    let currentGuideStep = 0;
+
+    function showGuideStep(step) {
+        if (step >= GUIDE_STEPS.length) {
+            closeGuide();
+            return;
+        }
+        
+        const guideData = GUIDE_STEPS[step];
+        const modal = document.getElementById('guideModal');
+        
+        // 高亮元素
+        if (guideData.highlight) {
+            const target = document.querySelector(guideData.highlight);
+            if (target) {
+                target.style.position = 'relative';
+                target.style.zIndex = '10001';
+                target.style.boxShadow = '0 0 0 4px rgba(167, 139, 250, 0.5)';
+            }
+        }
+        
+        modal.innerHTML = `
+            <div style="background: linear-gradient(135deg, rgba(30, 30, 50, 0.98), rgba(20, 20, 40, 0.98)); 
+                        border: 1px solid rgba(167, 139, 250, 0.3); 
+                        border-radius: 24px; 
+                        padding: 32px; 
+                        max-width: 420px; 
+                        width: 90%;
+                        text-align: center;
+                        animation: fadeInUp 0.3s ease;">
+                <div style="font-size: 3rem; margin-bottom: 16px;">${guideData.icon}</div>
+                <h2 style="color: white; font-size: 1.4rem; margin-bottom: 12px; font-family: 'Cormorant Garamond', serif;">
+                    ${guideData.title}
+                </h2>
+                <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.7; margin-bottom: 24px; white-space: pre-line;">
+                    ${guideData.content}
+                </p>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    ${step > 0 ? `
+                        <button onclick="prevGuideStep()" style="padding: 12px 24px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.9rem;">
+                            ← 上一步
+                        </button>
+                    ` : '<div style="width: 80px;"></div>'}
+                    <button onclick="nextGuideStep()" style="padding: 12px 24px; background: linear-gradient(135deg, #a78bfa, #8b5cf6); border: none; border-radius: 12px; color: white; cursor: pointer; font-size: 0.9rem; font-weight: 500;">
+                        ${step === GUIDE_STEPS.length - 1 ? '开始探索 →' : '下一步 →'}
+                    </button>
+                </div>
+                <div style="margin-top: 16px; display: flex; justify-content: center; gap: 8px;">
+                    ${GUIDE_STEPS.map((_, i) => `<div style="width: 8px; height: 8px; border-radius: 50%; background: ${i === step ? '#a78bfa' : 'rgba(255,255,255,0.3)'};"></div>`).join('')}
+                </div>
+                <button onclick="closeGuide()" style="position: absolute; top: 12px; right: 12px; background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1.2rem; cursor: pointer;">×</button>
+            </div>
+        `;
+        modal.style.display = 'flex';
+    }
+
+    function nextGuideStep() {
+        clearHighlights();
+        currentGuideStep++;
+        showGuideStep(currentGuideStep);
+    }
+
+    function prevGuideStep() {
+        clearHighlights();
+        currentGuideStep--;
+        showGuideStep(currentGuideStep);
+    }
+
+    function clearHighlights() {
+        document.querySelectorAll('[style*="box-shadow"]').forEach(el => {
+            el.style.boxShadow = '';
+            el.style.zIndex = '';
+        });
+    }
+
+    function closeGuide() {
+        const modal = document.getElementById('guideModal');
+        modal.style.display = 'none';
+        clearHighlights();
+        localStorage.setItem('soullink_guide_done', 'true');
+    }
+
+    // 检测是否需要显示新手引导
+    {% if current_user.is_authenticated %}
+    document.addEventListener('DOMContentLoaded', function() {
+        // 检查localStorage
+        const guideDone = localStorage.getItem('soullink_guide_done');
+        const lastGuideDate = localStorage.getItem('soullink_guide_date');
+        const today = new Date().toDateString();
+        
+        // 如果今天还没看过引导，显示引导
+        if (!guideDone || lastGuideDate !== today) {
+            setTimeout(() => {
+                showGuideStep(0);
+                localStorage.setItem('soullink_guide_date', today);
+            }, 1000);
+        }
+    });
+    {% endif %}
+
+    // 点击弹窗背景关闭
+    document.getElementById('guideModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeGuide();
+        }
+    });
+    </script>
+    
+    <style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    </style>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

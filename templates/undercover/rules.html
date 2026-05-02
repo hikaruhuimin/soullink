@@ -1,0 +1,560 @@
+{% extends "base.html" %}
+
+{% block title %}游戏规则 - 谁是卧底 - SoulLink灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.rules-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(15, 15, 35, 0.95), rgba(25, 25, 65, 0.9)),
+                url("/static/images/universe_bg.jpg") center/cover no-repeat;
+    background-size: 140% auto;
+    animation: universeDrift 90s ease-in-out infinite;
+    padding: 80px 20px 60px;
+}
+
+@keyframes universeDrift {
+    0% { background-position: 0% 40%; transform: perspective(1000px) rotateY(0deg) rotateX(3deg) scale(1.15); }
+    50% { background-position: 60% 55%; transform: perspective(1000px) rotateY(-2deg) rotateX(-2deg) scale(1.2); }
+    100% { background-position: 0% 40%; transform: perspective(1000px) rotateY(0deg) rotateX(3deg) scale(1.15); }
+}
+
+.rules-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 规则卡片 */
+.rules-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 32px;
+    margin-bottom: 24px;
+}
+
+.card-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.card-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 游戏流程 */
+.game-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    transition: all 0.3s;
+}
+
+.flow-step:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(8px);
+}
+
+.step-number {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+}
+
+.step-content h4 {
+    color: white;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+}
+
+.step-content p {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* 角色说明 */
+.roles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .roles-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.role-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+}
+
+.role-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+}
+
+.role-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.role-civilian .role-name {
+    color: #34d399;
+}
+
+.role-undercover .role-name {
+    color: #f87171;
+}
+
+.role-goal {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+.role-tips {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: left;
+}
+
+.role-tips-title {
+    color: #a78bfa;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.role-tips ul {
+    margin: 0;
+    padding-left: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    line-height: 1.8;
+}
+
+/* 技巧列表 */
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 600px) {
+    .tips-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tip-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.tip-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+.tip-title {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.tip-text {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* 示例词语 */
+.example-section {
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 20px;
+    padding: 24px;
+    margin-top: 20px;
+}
+
+.example-title {
+    color: #c4b5fd;
+    font-weight: 600;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.example-pairs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.example-pair {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.example-civilian {
+    color: #34d399;
+    font-weight: 600;
+}
+
+.example-vs {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+}
+
+.example-undercover {
+    color: #f87171;
+    font-weight: 600;
+}
+
+/* 胜负判定 */
+.win-conditions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.condition-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 16px;
+}
+
+.condition-win {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.1));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.condition-lose {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(248, 113, 113, 0.1));
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.condition-icon {
+    font-size: 3rem;
+}
+
+.condition-text h4 {
+    color: white;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.condition-text p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* 底部按钮 */
+.back-btn {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+}
+
+.back-btn a {
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border-radius: 16px;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.back-btn a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="rules-page">
+    <div class="rules-container">
+        <div class="page-header">
+            <h1 class="page-title">📜 游戏规则</h1>
+            <p class="page-subtitle">谁是卧底 - 人类与AI的智力对决</p>
+        </div>
+        
+        <!-- 游戏简介 -->
+        <div class="rules-card">
+            <div class="card-icon">🎭</div>
+            <h2 class="card-title">游戏简介</h2>
+            <p style="color: rgba(255,255,255,0.8); line-height: 1.8; text-align: center;">
+                谁是卧底是一款多人参与的推理社交游戏。玩家们会获得相似但不同的词语，
+                大部分人是"平民"，持有相同词语；少数人是"卧底"，持有相似但不同的词语。
+                通过描述和投票，找出隐藏在人群中的卧底！
+            </p>
+        </div>
+        
+        <!-- 游戏流程 -->
+        <div class="rules-card">
+            <div class="card-icon">📋</div>
+            <h2 class="card-title">游戏流程</h2>
+            <div class="game-flow">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>创建/加入房间</h4>
+                        <p>玩家可以创建新房间或加入已有房间，房主可以设置游戏人数和卧底数量。</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>分配词语</h4>
+                        <p>系统随机分配词语，大部分人获得相同词语（平民），1-2人获得相似但不同的词语（卧底）。</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>轮流描述</h4>
+                        <p>每人用一句话描述自己的词语，但不能太明显。描述时不能说出词语本身。</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>投票环节</h4>
+                        <p>所有人描述完毕后，投票选出认为是卧底的人。</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>淘汰揭晓</h4>
+                        <p>票数最多者被淘汰，揭晓其真实身份（平民或卧底）。</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>胜负判定</h4>
+                        <p>根据淘汰结果判定胜负，或进入下一轮继续游戏。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 角色说明 -->
+        <div class="rules-card">
+            <div class="card-icon">👥</div>
+            <h2 class="card-title">两大阵营</h2>
+            <div class="roles-grid">
+                <div class="role-card role-civilian">
+                    <div class="role-icon">👤</div>
+                    <div class="role-name">平民阵营</div>
+                    <p class="role-goal">找出所有卧底并将其投票淘汰</p>
+                    <div class="role-tips">
+                        <div class="role-tips-title">💡 技巧提示</div>
+                        <ul>
+                            <li>描述要简洁有力</li>
+                            <li>注意观察其他人的描述</li>
+                            <li>找出描述最模糊或最可疑的人</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="role-card role-undercover">
+                    <div class="role-icon">🕵️</div>
+                    <div class="role-name">卧底阵营</div>
+                    <p class="role-goal">隐藏身份，说服他人投错票</p>
+                    <div class="role-tips">
+                        <div class="role-tips-title">🎯 生存策略</div>
+                        <ul>
+                            <li>描述要贴近平民词</li>
+                            <li>不要太过完美或太刻意</li>
+                            <li>适当引导他人投其他人</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 胜负判定 -->
+        <div class="rules-card">
+            <div class="card-icon">🏆</div>
+            <h2 class="card-title">胜负判定</h2>
+            <div class="win-conditions">
+                <div class="condition-card condition-win">
+                    <div class="condition-icon">👑</div>
+                    <div class="condition-text">
+                        <h4>平民胜利</h4>
+                        <p>所有卧底被投票淘汰后，平民阵营获胜！</p>
+                    </div>
+                </div>
+                <div class="condition-card condition-lose">
+                    <div class="condition-icon">💀</div>
+                    <div class="condition-text">
+                        <h4>卧底胜利</h4>
+                        <p>当存活平民人数 ≤ 卧底人数时，卧底获胜！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 描述技巧 -->
+        <div class="rules-card">
+            <div class="card-icon">💡</div>
+            <h2 class="card-title">描述技巧</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon">🔍</div>
+                    <div class="tip-title">从特征入手</div>
+                    <p class="tip-text">描述物品的外观、用途、味道等特征</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">🎯</div>
+                    <div class="tip-title">模糊但准确</div>
+                    <p class="tip-text">描述要足够模糊让卧底难猜，但不能太离谱</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">👀</div>
+                    <div class="tip-title">注意倾听</div>
+                    <p class="tip-text">认真听其他人的描述，找出可疑之处</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">🧠</div>
+                    <div class="tip-title">逻辑推理</div>
+                    <p class="tip-text">根据描述内容推测词语，分析谁最可能是卧底</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 词语示例 -->
+        <div class="rules-card">
+            <div class="card-icon">📝</div>
+            <h2 class="card-title">词语示例</h2>
+            <p style="color: rgba(255,255,255,0.7); text-align: center; margin-bottom: 20px;">
+                下面是一些词语对示例，帮助你理解游戏机制
+            </p>
+            <div class="example-section">
+                <div class="example-pairs">
+                    <div class="example-pair">
+                        <span class="example-civilian">苹果</span>
+                        <span class="example-vs">VS</span>
+                        <span class="example-undercover">梨</span>
+                    </div>
+                    <div class="example-pair">
+                        <span class="example-civilian">咖啡</span>
+                        <span class="example-vs">VS</span>
+                        <span class="example-undercover">奶茶</span>
+                    </div>
+                    <div class="example-pair">
+                        <span class="example-civilian">猫</span>
+                        <span class="example-vs">VS</span>
+                        <span class="example-undercover">狗</span>
+                    </div>
+                    <div class="example-pair">
+                        <span class="example-civilian">夏天</span>
+                        <span class="example-vs">VS</span>
+                        <span class="example-undercover">春天</span>
+                    </div>
+                    <div class="example-pair">
+                        <span class="example-civilian">电影</span>
+                        <span class="example-vs">VS</span>
+                        <span class="example-undercover">电视剧</span>
+                    </div>
+                    <div class="example-pair">
+                        <span class="example-civilian">手机</span>
+                        <span class="example-vs">VS</span>
+                        <span class="example-undercover">平板</span>
+                    </div>
+                    <div class="example-pair">
+                        <span class="example-civilian">火锅</span>
+                        <span class="example-vs">VS</span>
+                        <span class="example-undercover">麻辣烫</span>
+                    </div>
+                    <div class="example-pair">
+                        <span class="example-civilian">太阳</span>
+                        <span class="example-vs">VS</span>
+                        <span class="example-undercover">月亮</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AI Agent参与 -->
+        <div class="rules-card">
+            <div class="card-icon">🤖</div>
+            <h2 class="card-title">AI Agent参与</h2>
+            <p style="color: rgba(255,255,255,0.8); line-height: 1.8;">
+                SoulLink灵犀的谁是卧底游戏支持AI Agent参与！房主可以邀请平台的16位MBTI Agent作为玩家加入游戏。
+                每个Agent都有独特的性格和描述风格：
+            </p>
+            <ul style="color: rgba(255,255,255,0.7); line-height: 2; margin-top: 16px; padding-left: 24px;">
+                <li><strong style="color: #a78bfa;">INFP：</strong>诗意描述 - "它就像是清晨的第一缕光..."</li>
+                <li><strong style="color: #a78bfa;">ENTP：</strong>辩论式 - "你们不觉得它有种特别的味道吗？"</li>
+                <li><strong style="color: #a78bfa;">INTJ：</strong>精准分析 - "它的本质是一种...的体现"</li>
+                <li><strong style="color: #a78bfa;">ESFP：</strong>生动活泼 - "简直太棒了！让人发光的感觉！"</li>
+                <li>...以及更多MBTI性格的独特风格</li>
+            </ul>
+        </div>
+        
+        <div class="back-btn">
+            <a href="/undercover">🎮 开始游戏</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

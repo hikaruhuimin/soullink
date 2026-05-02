@@ -1,0 +1,844 @@
+{% extends "base.html" %}
+
+{% block title %}真心话大冒险 | SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Cosmic + Sakura Background */
+.tod-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #e94560 100%);
+    overflow: hidden;
+}
+
+.tod-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/static/images/sakura_bg.jpg') center/cover no-repeat;
+    opacity: 0.08;
+}
+
+/* Stars */
+.stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 2s infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+}
+
+/* Sakura Petals */
+.sakura-petals {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.sakura-petal {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(135deg, #ffb7c5 0%, #ff69b4 100%);
+    border-radius: 50% 0 50% 50%;
+    opacity: 0.6;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-10vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Page Container */
+.tod-page {
+    min-height: 100vh;
+    padding: 100px 20px 60px;
+    position: relative;
+    z-index: 2;
+}
+
+.tod-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Page Title */
+.tod-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #ff69b4, #ffd700, #ff69b4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 20px rgba(255, 105, 180, 0.5); }
+    to { text-shadow: 0 0 40px rgba(255, 215, 0, 0.5); }
+}
+
+.tod-subtitle {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 40px;
+    font-size: 1.1rem;
+}
+
+/* Score Display */
+.score-bar {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.score-item {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 15px 30px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.score-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 5px;
+}
+
+.score-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffd700;
+}
+
+/* Mode Selection */
+.mode-selection {
+    display: none;
+}
+
+.mode-selection.active {
+    display: block;
+}
+
+.mode-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.mode-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 35px 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s;
+    border: 2px solid transparent;
+}
+
+.mode-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255, 105, 180, 0.5);
+    box-shadow: 0 20px 50px rgba(255, 105, 180, 0.3);
+}
+
+.mode-card.selected {
+    border-color: #ffd700;
+    background: linear-gradient(135deg, rgba(255, 105, 180, 0.2), rgba(255, 215, 0, 0.2));
+    transform: scale(1.05);
+}
+
+.mode-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+
+.mode-name {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.mode-desc {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Partner Selection */
+.partner-selection {
+    display: none;
+}
+
+.partner-selection.active {
+    display: block;
+}
+
+.partner-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+.partner-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.partner-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 105, 180, 0.5);
+}
+
+.partner-card.selected {
+    border-color: #ffd700;
+    background: linear-gradient(135deg, rgba(255, 105, 180, 0.2), rgba(255, 215, 0, 0.2));
+}
+
+.partner-icon {
+    font-size: 50px;
+    margin-bottom: 12px;
+}
+
+.partner-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: white;
+}
+
+/* Game Area */
+.game-area {
+    display: none;
+}
+
+.game-area.active {
+    display: block;
+}
+
+.question-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(25px);
+    border-radius: 28px;
+    padding: 45px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.question-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff69b4, #ffd700, #ff69b4);
+}
+
+.question-type {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff69b4, #ffd700);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.question-text {
+    font-size: 1.6rem;
+    color: white;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+/* Answer Input */
+.answer-area {
+    margin-bottom: 25px;
+}
+
+.answer-input {
+    width: 100%;
+    padding: 18px 22px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    color: white;
+    font-size: 1.1rem;
+    text-align: center;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+.answer-input:focus {
+    outline: none;
+    border-color: #ffd700;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.answer-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Buttons */
+.btn {
+    padding: 16px 40px;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #ff69b4, #ffd700);
+    color: white;
+    box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(255, 105, 180, 0.5);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Agent Response */
+.agent-response {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 25px;
+    margin-top: 25px;
+    text-align: left;
+    border-left: 4px solid #ffd700;
+}
+
+.agent-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.agent-avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff69b4, #ffd700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.agent-name-small {
+    font-weight: 600;
+    color: white;
+}
+
+.agent-message {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+}
+
+/* Reward Animation */
+.reward-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: linear-gradient(135deg, #ffd700, #ff69b4);
+    border-radius: 24px;
+    padding: 40px 60px;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 30px 80px rgba(255, 215, 0, 0.5);
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.reward-popup.show {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.reward-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+
+.reward-text {
+    font-size: 1.3rem;
+    color: white;
+    font-weight: 600;
+}
+
+.reward-amount {
+    font-size: 2rem;
+    color: white;
+    font-weight: 700;
+}
+
+/* Progress Bar */
+.progress-container {
+    margin-bottom: 30px;
+}
+
+.progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff69b4, #ffd700);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .tod-title { font-size: 1.8rem; }
+    
+    .mode-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .partner-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .question-text { font-size: 1.3rem; }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Background -->
+<div class="tod-bg"></div>
+<div class="stars" id="stars"></div>
+<div class="sakura-petals" id="sakuraPetals"></div>
+
+<div class="tod-page">
+    <div class="tod-container">
+        <h1 class="tod-title">🎭 真心话大冒险</h1>
+        <p class="tod-subtitle">穿越灵魂的边界，触碰真实的心跳</p>
+        
+        <!-- Score Bar -->
+        <div class="score-bar">
+            <div class="score-item">
+                <div class="score-label">💎 灵石</div>
+                <div class="score-value" id="spiritStones">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">⭐ 积分</div>
+                <div class="score-value" id="points">0</div>
+            </div>
+        </div>
+        
+        <!-- Progress -->
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+            <div class="progress-text">第 <span id="currentQ">1</span> 题 / 共 <span id="totalQ">10</span> 题</div>
+        </div>
+        
+        <!-- Mode Selection -->
+        <div class="mode-selection active" id="modeSelection">
+            <div class="mode-cards">
+                <div class="mode-card" ontouchend="selectMode('truth')">
+                    <div class="mode-icon">🎯</div>
+                    <div class="mode-name">真心话</div>
+                    <div class="mode-desc">回答深刻有趣的问题</div>
+                </div>
+                <div class="mode-card" ontouchend="selectMode('dare')">
+                    <div class="mode-icon">🔥</div>
+                    <div class="mode-name">大冒险</div>
+                    <div class="mode-desc">完成有趣的挑战任务</div>
+                </div>
+                <div class="mode-card" ontouchend="selectMode('mixed')">
+                    <div class="mode-icon">🎲</div>
+                    <div class="mode-name">混合模式</div>
+                    <div class="mode-desc">真心话+大冒险随机</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Partner Selection -->
+        <div class="partner-selection" id="partnerSelection">
+            <div class="partner-cards">
+                <div class="partner-card" ontouchend="selectPartner('agent')">
+                    <div class="partner-icon">🤖</div>
+                    <div class="partner-name">跟灵魂玩</div>
+                </div>
+                <div class="partner-card" ontouchend="selectPartner('friend')">
+                    <div class="partner-icon">👥</div>
+                    <div class="partner-name">跟好友玩</div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" ontouchend="backToMode()">← 返回</button>
+            </div>
+        </div>
+        
+        <!-- Game Area -->
+        <div class="game-area" id="gameArea">
+            <div class="question-card">
+                <div class="question-type" id="questionType">🎯 真心话</div>
+                <div class="question-text" id="questionText">你准备好了吗？</div>
+                
+                <div class="answer-area">
+                    <input type="text" class="answer-input" id="answerInput" placeholder="在这里输入你的回答...">
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" ontouchend="submitAnswer()">提交回答</button>
+                    <button class="btn btn-secondary" ontouchend="skipQuestion()">跳过 (-5分)</button>
+                </div>
+                
+                <div class="agent-response" id="agentResponse" style="display: none;">
+                    <div class="agent-header">
+                        <div class="agent-avatar-small">🤖</div>
+                        <span class="agent-name-small">月光守护者</span>
+                    </div>
+                    <div class="agent-message" id="agentMessage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reward Popup -->
+<div class="reward-popup" id="rewardPopup">
+    <div class="reward-icon">🎉</div>
+    <div class="reward-text">恭喜获得</div>
+    <div class="reward-amount" id="rewardAmount">+10 💎</div>
+</div>
+
+<script>
+// Game State
+let currentMode = null;
+let partnerType = null;
+let currentQuestion = null;
+let currentQuestionIndex = 0;
+let totalQuestions = 10;
+let spiritStones = 0;
+let points = 0;
+
+// Questions Database
+const truthQuestions = [
+    // 浅层
+    { level: 1, text: "你最近一次笑是因为什么？", responses: ["哈哈哈，你这个问题太逗了~", "想到了一些好笑的事情呢", "秘密哦 😄"] },
+    { level: 1, text: "你的手机壁纸是什么？", responses: ["哦？你也喜欢这个吗？", "很有品味的壁纸呢", "看来我们有相似的审美~"] },
+    { level: 1, text: "你最喜欢吃什么零食？", responses: ["巧克力的忠实粉丝！", "甜食控报到~", "下次可以一起分享哦"] },
+    // 中层
+    { level: 2, text: "你最害怕失去什么？", responses: ["这个问题有点深度呢...", "每个人都有自己的答案吧", "说出来的瞬间感觉更真实了"] },
+    { level: 2, text: "你有没有一个从未告诉别人的秘密？", responses: ["能说出来需要很大的勇气呢", "秘密之所以是秘密...", "但你愿意分享给我，我很开心"] },
+    { level: 2, text: "你上一次哭是什么时候？", responses: ["每个人都有脆弱的时候", "哭泣不代表软弱哦", "我很高兴你愿意敞开心扉"] },
+    // 深层
+    { level: 3, text: "如果明天是世界末日，你最想见谁？", responses: ["这个问题让人深思呢...", "珍惜当下最重要", "你的答案很真实"] },
+    { level: 3, text: "你觉得什么是真正的孤独？", responses: ["你是一个很感性的人呢", "孤独有时候也是一种成长", "谢谢你的分享 💕"] },
+    { level: 3, text: "如果可以，你会对过去的自己说什么？", responses: ["时光倒流只是一种幻想...", "但我们可以把握现在", "过去的你造就了现在的你"] },
+    { level: 3, text: "你认为爱情中最重要的是什么？", responses: ["哇，这是个深刻的问题!", "我觉得是互相理解", "每个人答案都不一样呢~"] },
+    // 更多问题
+    { level: 1, text: "你睡觉时喜欢面向哪边？", responses: ["原来你也是...", "有趣的细节呢", "我们的相似之处又多了一个"] },
+    { level: 2, text: "你曾经撒过的最大的谎是什么？", responses: ["每个人都有不为人知的一面", "能承认需要勇气", "过去的就让它过去吧"] },
+    { level: 2, text: "如果你是动物，会想成为什么？", responses: ["这个比喻很可爱!", "和我想象的一样呢", "你果然很有趣~"] },
+    { level: 3, text: "你相信命运吗？", responses: ["命运还是缘分？", "有些事真的很神奇", "但我们也要努力争取呢"] },
+    { level: 3, text: "如果只能选一个超能力，你想要什么？", responses: ["我也想过这个问题!", "你的选择很特别呢", "这样我们就能互相帮忙啦~"] },
+];
+
+const dareQuestions = [
+    // 简单
+    { level: 1, text: "用三个词形容你自己", responses: ["哈哈，好有趣的回答!", "你真的很了解自己呢", "这三个词很贴切~"] },
+    { level: 1, text: "模仿一个动物叫声", responses: ["哈哈哈哈!", "太可爱了吧", "我也想听你模仿更多~"] },
+    { level: 1, text: "用一首流行歌的调调唱出'我今天很开心'", responses: ["哈哈哈太好笑了!", "你有当歌手的潜力!", "再来一首~"] },
+    // 中等
+    { level: 2, text: "给你最近联系人发一条'我想你了'", responses: ["啊这...", "发完告诉我TA回了什么!", "你的勇气让我佩服~"] },
+    { level: 2, text: "闭眼画一幅自画像（描述出来）", responses: ["哈哈，画面太美", "你的画画风格很有个性!", "展示给我看看~"] },
+    { level: 2, text: "模仿你最喜欢的明星说话", responses: ["像极了!", "你很有表演天赋!", "再来模仿一个~"] },
+    // 困难
+    { level: 3, text: "说出你最大的谎言", responses: ["每个人都有秘密...", "谢谢你愿意坦诚", "我不会告诉别人的~"] },
+    { level: 3, text: "给你的灵魂写一首诗", responses: ["哇，好浪漫!", "诗人! 我被你感动了", "这首诗我要收藏~"] },
+    { level: 3, text: "假装你中了彩票，跟我分享你的计划", responses: ["哇，想象力满分!", "听起来很美好呢", "但要记得分我一点哦~"] },
+    { level: 3, text: "用emoji讲述你今天发生的事", responses: ["😂🎉❤️", "故事很有趣!", "原来你今天这么精彩~"] },
+    // 更多挑战
+    { level: 1, text: "原地转10圈然后走直线", responses: ["哈哈头晕了吧!", "你还好吗?", "这个挑战太难了~"] },
+    { level: 2, text: "给你爸妈发一条'我爱你'", responses: ["好孩子!", "他们一定很开心", "家庭很重要~"] },
+    { level: 2, text: "用一种奇怪的声音说'你好，很高兴认识你'", responses: ["什么声音!?", "太好笑了", "我要笑死了~"] },
+    { level: 3, text: "假装你是电视购物主持人推销一款产品", responses: ["太有才了!", "你确定不去当主持人吗?", "这个广告满分!"] },
+    { level: 3, text: "当场编一个300字的小故事", responses: ["哇，作家!", "这个故事很精彩", "我听得入迷了~"] },
+];
+
+// Generate Stars
+function generateStars() {
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(star);
+    }
+}
+
+// Generate Sakura Petals
+function generatePetals() {
+    const container = document.getElementById('sakuraPetals');
+    for (let i = 0; i < 15; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'sakura-petal';
+        petal.style.left = Math.random() * 100 + '%';
+        petal.style.animationDuration = (Math.random() * 8 + 8) + 's';
+        petal.style.animationDelay = (Math.random() * 10) + 's';
+        petal.style.opacity = Math.random() * 0.3 + 0.2;
+        petal.style.width = (Math.random() * 8 + 8) + 'px';
+        petal.style.height = petal.style.width;
+        container.appendChild(petal);
+    }
+}
+
+generateStars();
+generatePetals();
+
+// Mode Selection
+function selectMode(mode) {
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    currentMode = mode;
+    
+    setTimeout(() => {
+        document.getElementById('modeSelection').classList.remove('active');
+        document.getElementById('partnerSelection').classList.add('active');
+    }, 500);
+}
+
+// Partner Selection
+function selectPartner(partner) {
+    document.querySelectorAll('.partner-card').forEach(c => c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    partnerType = partner;
+    
+    setTimeout(() => {
+        document.getElementById('partnerSelection').classList.remove('active');
+        document.getElementById('gameArea').classList.add('active');
+        document.getElementById('progressContainer').style.display = 'block';
+        nextQuestion();
+    }, 500);
+}
+
+// Back to Mode Selection
+function backToMode() {
+    document.getElementById('partnerSelection').classList.remove('active');
+    document.getElementById('modeSelection').classList.add('active');
+    currentMode = null;
+}
+
+// Get Random Question
+function getRandomQuestion() {
+    let pool = [];
+    if (currentMode === 'truth') {
+        pool = truthQuestions;
+    } else if (currentMode === 'dare') {
+        pool = dareQuestions;
+    } else {
+        pool = [...truthQuestions, ...dareQuestions];
+    }
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// Next Question
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex > totalQuestions) {
+        endGame();
+        return;
+    }
+    
+    currentQuestion = getRandomQuestion();
+    document.getElementById('currentQ').textContent = currentQuestionIndex;
+    document.getElementById('progressFill').style.width = (currentQuestionIndex / totalQuestions * 100) + '%';
+    
+    const typeText = currentMode === 'truth' ? '🎯 真心话' : (currentMode === 'dare' ? '🔥 大冒险' : '🎲 随机');
+    document.getElementById('questionType').textContent = typeText;
+    document.getElementById('questionText').textContent = currentQuestion.text;
+    document.getElementById('answerInput').value = '';
+    document.getElementById('agentResponse').style.display = 'none';
+    
+    document.getElementById('answerInput').focus();
+}
+
+// Submit Answer
+function submitAnswer() {
+    const answer = document.getElementById('answerInput').value.trim();
+    if (!answer) {
+        alert('请先输入你的回答哦~');
+        return;
+    }
+    
+    // Show agent response
+    const response = currentQuestion.responses[Math.floor(Math.random() * currentQuestion.responses.length)];
+    document.getElementById('agentMessage').textContent = response;
+    document.getElementById('agentResponse').style.display = 'block';
+    
+    // Add reward
+    points += 10;
+    spiritStones += 5;
+    updateScores();
+    showReward(5);
+    
+    // Next question after delay
+    setTimeout(() => {
+        nextQuestion();
+    }, 2500);
+}
+
+// Skip Question
+function skipQuestion() {
+    points = Math.max(0, points - 5);
+    updateScores();
+    
+    document.getElementById('agentMessage').textContent = '没关系，跳过也是一种选择~但下次要勇敢一点哦! 💪';
+    document.getElementById('agentResponse').style.display = 'block';
+    
+    setTimeout(() => {
+        nextQuestion();
+    }, 2000);
+}
+
+// Update Scores
+function updateScores() {
+    document.getElementById('spiritStones').textContent = spiritStones;
+    document.getElementById('points').textContent = points;
+}
+
+// Show Reward Popup
+function showReward(amount) {
+    document.getElementById('rewardAmount').textContent = '+' + amount + ' 💎';
+    document.getElementById('rewardPopup').classList.add('show');
+    
+    setTimeout(() => {
+        document.getElementById('rewardPopup').classList.remove('show');
+    }, 1500);
+}
+
+// End Game
+function endGame() {
+    document.getElementById('questionText').textContent = '🎊 太棒了！你完成了今天的挑战！';
+    document.getElementById('questionType').textContent = '🏆 恭喜';
+    document.getElementById('answerInput').style.display = 'none';
+    
+    document.querySelector('.answer-area').innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+            <p style="color: rgba(255,255,255,0.8); font-size: 1.2rem;">最终得分</p>
+            <p style="font-size: 2.5rem; color: #ffd700; font-weight: 700;">${points} 分</p>
+            <p style="font-size: 1.5rem; color: #ff69b4;">获得 ${spiritStones} 💎</p>
+            <button class="btn btn-primary" style="margin-top: 20px;" ontouchend="restartGame()">再来一局</button>
+        </div>
+    `;
+    document.getElementById('agentResponse').style.display = 'none';
+}
+
+// Restart Game
+function restartGame() {
+    currentQuestionIndex = 0;
+    document.getElementById('answerInput').style.display = 'block';
+    document.querySelector('.answer-area').innerHTML = `
+        <div class="answer-area">
+            <input type="text" class="answer-input" id="answerInput" placeholder="在这里输入你的回答...">
+        </div>
+    `;
+    document.getElementById('gameArea').classList.remove('active');
+    document.getElementById('modeSelection').classList.add('active');
+    document.getElementById('progressContainer').style.display = 'none';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,716 @@
+{% extends "base.html" %}
+
+{% block title %}谁是卧底 - SoulLink灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 游戏大厅样式 */
+.undercover-lobby {
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(15, 15, 35, 0.95), rgba(25, 25, 65, 0.9)),
+                url("/static/images/universe_bg.jpg") center/cover no-repeat;
+    background-size: 140% auto;
+    animation: universeDrift 90s ease-in-out infinite;
+    padding: 80px 20px 40px;
+}
+
+@keyframes universeDrift {
+    0% { background-position: 0% 40%; transform: perspective(1000px) rotateY(0deg) rotateX(3deg) scale(1.15); }
+    50% { background-position: 60% 55%; transform: perspective(1000px) rotateY(-2deg) rotateX(-2deg) scale(1.2); }
+    100% { background-position: 0% 40%; transform: perspective(1000px) rotateY(0deg) rotateX(3deg) scale(1.15); }
+}
+
+.lobby-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.lobby-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 10px;
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+}
+
+.lobby-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 主容器 */
+.lobby-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 900px) {
+    .lobby-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 卡片通用样式 */
+.lobby-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 创建房间区域 */
+.create-section {
+    text-align: center;
+}
+
+.create-btn {
+    width: 100%;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+}
+
+.create-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+}
+
+/* 加入房间 */
+.join-section {
+    margin-top: 20px;
+}
+
+.join-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.join-input {
+    flex: 1;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+}
+
+.join-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.join-input:focus {
+    border-color: #8b5cf6;
+}
+
+.join-btn {
+    padding: 14px 24px;
+    background: #ec4899;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.join-btn:hover {
+    background: #db2777;
+    transform: translateY(-2px);
+}
+
+/* 游戏设置 */
+.game-settings {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.setting-label {
+    font-size: 0.95rem;
+}
+
+.setting-value {
+    font-weight: 600;
+    color: #a78bfa;
+}
+
+.setting-select {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+}
+
+/* 等待房间列表 */
+.rooms-list {
+    margin-top: 20px;
+}
+
+.room-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s;
+}
+
+.room-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.room-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.room-code {
+    font-family: monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #a78bfa;
+}
+
+.room-meta {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.room-join-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #10b981, #34d399);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.room-join-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.empty-rooms {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Agent选择区域 */
+.agent-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+    .agent-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.agent-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.agent-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+.agent-card.selected {
+    border-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.2);
+}
+
+.agent-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    object-fit: cover;
+}
+
+.agent-name {
+    font-size: 0.85rem;
+    color: white;
+    font-weight: 600;
+}
+
+.agent-mbti {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 2px;
+}
+
+/* 规则链接 */
+.rules-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-top: 20px;
+    transition: color 0.3s;
+}
+
+.rules-link:hover {
+    color: #a78bfa;
+}
+
+/* 模态框 */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: rgba(20, 20, 50, 0.98);
+    border-radius: 24px;
+    padding: 32px;
+    max-width: 500px;
+    width: 90%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-title {
+    font-size: 1.4rem;
+    color: white;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 16px;
+    outline: none;
+}
+
+.modal-input:focus {
+    border-color: #8b5cf6;
+}
+
+.modal-select {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 16px;
+    cursor: pointer;
+}
+
+.modal-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.modal-btn.primary {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+}
+
+.modal-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 10px;
+}
+
+.modal-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Toast提示 */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(20, 20, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 14px 28px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    z-index: 2000;
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast.success {
+    border-color: #10b981;
+}
+
+.toast.error {
+    border-color: #ef4444;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="undercover-lobby">
+    <div class="lobby-header">
+        <h1 class="lobby-title">🎭 谁是卧底</h1>
+        <p class="lobby-subtitle">人类与Agent同台竞技，找出隐藏的卧底！</p>
+    </div>
+    
+    <div class="lobby-container">
+        <!-- 左侧：创建房间 & 加入房间 -->
+        <div class="lobby-main">
+            <!-- 创建房间卡片 -->
+            <div class="lobby-card create-section">
+                <h2 class="card-title">🎮 创建游戏房间</h2>
+                
+                {% if is_logged_in %}
+                <button class="create-btn" onclick="showCreateModal()">
+                    ✨ 创建房间
+                </button>
+                
+                <div class="join-section">
+                    <p style="color: rgba(255,255,255,0.6); margin-bottom: 12px;">或输入房间号加入</p>
+                    <div class="join-input-group">
+                        <input type="text" class="join-input" id="joinCode" placeholder="输入6位房间号" maxlength="6">
+                        <button class="join-btn" onclick="joinRoom()">加入</button>
+                    </div>
+                </div>
+                {% else %}
+                <p style="color: rgba(255,255,255,0.7); padding: 20px;">
+                    请先 <a href="/auth/login" style="color: #a78bfa;">登录</a> 后创建或加入游戏
+                </p>
+                {% endif %}
+                
+                <a href="/undercover/rules" class="rules-link">
+                    📜 查看游戏规则
+                </a>
+            </div>
+            
+            <!-- 等待中的房间 -->
+            <div class="lobby-card" style="margin-top: 20px;">
+                <h2 class="card-title">🚪 等待中的房间</h2>
+                <div class="rooms-list" id="roomsList">
+                    {% if waiting_rooms %}
+                        {% for room in waiting_rooms %}
+                        <div class="room-item">
+                            <div class="room-info">
+                                <span class="room-code">{{ room.room_code }}</span>
+                                <span class="room-meta">{{ room.players.count() }}/{{ room.max_players }}人 | 赌注: {{ room.stake }}灵石</span>
+                            </div>
+                            <button class="room-join-btn" onclick="quickJoin('{{ room.room_code }}')">加入</button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-rooms">
+                            <p>暂无等待中的房间</p>
+                            <p style="font-size: 0.85rem; margin-top: 8px;">创建一个新房间开始游戏吧！</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧：选择Agent & 快速开始 -->
+        <div class="lobby-side">
+            <!-- 选择Agent（创建房间时使用） -->
+            <div class="lobby-card">
+                <h2 class="card-title">🤖 选择AI玩家（可选）</h2>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 16px;">
+                    创建房间后可添加AI Agent作为玩家一起游戏
+                </p>
+                
+                <div class="agent-grid" id="agentGrid">
+                    {% for agent in agents[:8] %}
+                    <div class="agent-card" onclick="selectAgent('{{ agent.id }}')">
+                        <img src="{{ agent.avatar }}" class="agent-avatar" alt="{{ agent.name.zh }}">
+                        <div class="agent-name">{{ agent.name.zh }}</div>
+                        <div class="agent-mbti">{{ agent.mbti }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- 游戏统计 -->
+            <div class="lobby-card" style="margin-top: 20px;">
+                <h2 class="card-title">📊 游戏说明</h2>
+                <div style="color: rgba(255,255,255,0.7); line-height: 1.8;">
+                    <p>🎯 <strong>目标：</strong>平民找出卧底并投票淘汰</p>
+                    <p>🕵️ <strong>卧底：</strong>隐藏身份，说出与平民相似的描述</p>
+                    <p>💡 <strong>技巧：</strong>描述要模糊但不能太明显</p>
+                    <p>🏆 <strong>胜利：</strong>卧底全灭→平民胜；平民≤1人→卧底胜</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 创建房间模态框 -->
+<div class="modal-overlay" id="createModal">
+    <div class="modal-content">
+        <h3 class="modal-title">✨ 创建游戏房间</h3>
+        
+        <label style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">最大人数</label>
+        <select class="modal-select" id="maxPlayers">
+            <option value="4">4人</option>
+            <option value="5">5人</option>
+            <option value="6" selected>6人</option>
+            <option value="7">7人</option>
+            <option value="8">8人</option>
+        </select>
+        
+        <label style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">卧底数量</label>
+        <select class="modal-select" id="undercoverCount">
+            <option value="1" selected>1人</option>
+            <option value="2">2人</option>
+        </select>
+        
+        <label style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">灵石赌注</label>
+        <select class="modal-select" id="stakeAmount">
+            <option value="0">无赌注</option>
+            <option value="10">10灵石</option>
+            <option value="50">50灵石</option>
+            <option value="100">100灵石</option>
+        </select>
+        
+        <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; text-align: center; margin: 12px 0;">
+            你的灵石: <span id="userStones" style="color: #fbbf24;">{{ spirit_stones }}</span>
+        </p>
+        
+        <button class="modal-btn primary" onclick="createRoom()">创建房间</button>
+        <button class="modal-btn secondary" onclick="hideCreateModal()">取消</button>
+    </div>
+</div>
+
+<!-- Toast提示 -->
+<div class="toast" id="toast"></div>
+
+<script>
+// 选中的Agent列表
+let selectedAgents = [];
+
+// 显示创建模态框
+function showCreateModal() {
+    document.getElementById('createModal').classList.add('active');
+    document.getElementById('userStones').textContent = '{{ spirit_stones }}';
+}
+
+// 隐藏创建模态框
+function hideCreateModal() {
+    document.getElementById('createModal').classList.remove('active');
+}
+
+// 选择Agent
+function selectAgent(agentId) {
+    const card = event.currentTarget;
+    const index = selectedAgents.indexOf(agentId);
+    
+    if (index > -1) {
+        selectedAgents.splice(index, 1);
+        card.classList.remove('selected');
+    } else {
+        selectedAgents.push(agentId);
+        card.classList.add('selected');
+    }
+}
+
+// 创建房间
+async function createRoom() {
+    const maxPlayers = document.getElementById('maxPlayers').value;
+    const undercoverCount = document.getElementById('undercoverCount').value;
+    const stake = document.getElementById('stakeAmount').value;
+    
+    try {
+        const response = await fetch('/api/undercover/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                max_players: parseInt(maxPlayers),
+                undercover_count: parseInt(undercoverCount),
+                stake: parseInt(stake)
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // 添加选中的Agent
+            for (const agentId of selectedAgents) {
+                await fetch('/api/undercover/add_agent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        room_code: data.room_code,
+                        agent_id: agentId
+                    })
+                });
+            }
+            
+            hideCreateModal();
+            showToast('房间创建成功！', 'success');
+            setTimeout(() => {
+                window.location.href = '/undercover/room/' + data.room_code;
+            }, 1000);
+        } else {
+            showToast(data.error || '创建失败', 'error');
+        }
+    } catch (err) {
+        showToast('网络错误', 'error');
+    }
+}
+
+// 加入房间
+async function joinRoom() {
+    const code = document.getElementById('joinCode').value.trim().toUpperCase();
+    
+    if (!code) {
+        showToast('请输入房间号', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/undercover/join', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room_code: code })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('加入成功！', 'success');
+            setTimeout(() => {
+                window.location.href = '/undercover/room/' + code;
+            }, 500);
+        } else {
+            showToast(data.error || '加入失败', 'error');
+        }
+    } catch (err) {
+        showToast('网络错误', 'error');
+    }
+}
+
+// 快速加入房间
+async function quickJoin(roomCode) {
+    try {
+        const response = await fetch('/api/undercover/join', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room_code: roomCode })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.href = '/undercover/room/' + roomCode;
+        } else {
+            showToast(data.error || '加入失败', 'error');
+        }
+    } catch (err) {
+        showToast('网络错误', 'error');
+    }
+}
+
+// 显示Toast
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast ' + type + ' show';
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// 刷新房间列表
+function refreshRooms() {
+    fetch('/undercover')
+        .then(r => r.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newList = doc.querySelector('#roomsList');
+            if (newList) {
+                document.getElementById('roomsList').innerHTML = newList.innerHTML;
+            }
+        });
+}
+
+// 每10秒刷新房间列表
+setInterval(refreshRooms, 10000);
+</script>
+{% endblock %}

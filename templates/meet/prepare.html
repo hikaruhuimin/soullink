@@ -1,13 +1,72 @@
 {% extends "base.html" %}
 
-{% block title %}奔现筹备 | SoulLink 灵犀{% endblock %}
+{% block title %}心动倒计时 | SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
 <style>
+/* Sakura Background */
+.sakura-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 30%, #fef3c7 70%, #fff 100%);
+    overflow: hidden;
+}
+
+.sakura-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/static/images/sakura_bg.jpg') center/cover no-repeat;
+    opacity: 0.15;
+}
+
+/* Sakura Petals */
+.sakura-petals {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.sakura-petal {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(135deg, #ffb7c5 0%, #ff69b4 100%);
+    border-radius: 50% 0 50% 50%;
+    opacity: 0.7;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-10vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% { opacity: 0.7; }
+    90% { opacity: 0.7; }
+    100% {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Page Container */
 .meet-prepare-page {
     min-height: 100vh;
-    background: linear-gradient(180deg, #fdf2f8 0%, #fff 100%);
-    padding: 40px 20px 100px;
+    padding: 120px 20px 100px;
+    position: relative;
+    z-index: 1;
 }
 
 .prepare-container {
@@ -17,27 +76,32 @@
 
 .page-title {
     text-align: center;
-    font-size: 2rem;
-    color: #1f2937;
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, #ec4899, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: 10px;
 }
 
 .page-subtitle {
     text-align: center;
     color: #6b7280;
-    margin-bottom: 30px;
+    margin-bottom: 35px;
+    font-size: 1.1rem;
 }
 
-/* Countdown */
+/* Countdown Card */
 .countdown-card {
     background: linear-gradient(135deg, #ec4899, #f97316);
-    border-radius: 24px;
-    padding: 30px;
+    border-radius: 28px;
+    padding: 35px;
     text-align: center;
     color: white;
     margin-bottom: 30px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 20px 60px rgba(236, 72, 153, 0.35);
 }
 
 .countdown-card::before {
@@ -47,23 +111,30 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .countdown-label {
-    font-size: 1rem;
+    font-size: 1.05rem;
     opacity: 0.9;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .countdown-time {
-    font-size: 3rem;
+    font-size: 3.2rem;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .countdown-date {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     opacity: 0.9;
 }
 
@@ -71,21 +142,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255,255,255,0.2);
+    gap: 18px;
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255,255,255,0.25);
 }
 
 .partner-avatar {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
     background: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 28px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .partner-info {
@@ -94,42 +166,46 @@
 
 .partner-name {
     font-weight: 600;
+    font-size: 1.1rem;
 }
 
 .partner-agent {
-    font-size: 0.85rem;
-    opacity: 0.8;
+    font-size: 0.9rem;
+    opacity: 0.85;
 }
 
-/* Section Card */
-.section-card {
-    background: white;
-    border-radius: 20px;
-    padding: 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+/* Glass Card */
+.glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 15px 50px rgba(236, 72, 153, 0.12);
+    border: 1px solid rgba(255, 182, 193, 0.3);
 }
 
 .section-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 14px;
+    margin-bottom: 22px;
 }
 
 .section-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
     background: linear-gradient(135deg, #ec4899, #f97316);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 24px;
+    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.3);
 }
 
 .section-title {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: #1f2937;
 }
@@ -144,25 +220,26 @@
 .place-item {
     display: flex;
     gap: 16px;
-    padding: 16px;
-    background: #f9fafb;
-    border-radius: 16px;
+    padding: 18px;
+    background: rgba(249, 250, 251, 0.9);
+    border-radius: 18px;
     transition: all 0.3s;
 }
 
 .place-item:hover {
-    background: #f3f4f6;
+    background: rgba(243, 244, 246, 0.95);
+    transform: translateX(5px);
 }
 
 .place-image {
-    width: 80px;
-    height: 80px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #fce7f3, #fef3c7);
+    width: 85px;
+    height: 85px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(252, 231, 243, 0.8), rgba(254, 243, 199, 0.8));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    font-size: 40px;
     flex-shrink: 0;
 }
 
@@ -173,30 +250,31 @@
 .place-name {
     font-weight: 600;
     color: #1f2937;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .place-desc {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: #6b7280;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .place-tags {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .place-tag {
-    background: #fef3c7;
+    background: rgba(254, 243, 199, 0.9);
     color: #d97706;
-    padding: 3px 10px;
+    padding: 4px 12px;
     border-radius: 10px;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
 }
 
 .place-tag.blue {
-    background: #dbeafe;
+    background: rgba(219, 234, 254, 0.9);
     color: #2563eb;
 }
 
@@ -209,14 +287,20 @@
 
 .outfit-item {
     text-align: center;
-    padding: 20px;
-    background: #f9fafb;
-    border-radius: 16px;
+    padding: 22px;
+    background: rgba(249, 250, 251, 0.9);
+    border-radius: 18px;
+    transition: all 0.3s;
+}
+
+.outfit-item:hover {
+    transform: translateY(-3px);
+    background: rgba(243, 244, 246, 0.95);
 }
 
 .outfit-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
+    font-size: 52px;
+    margin-bottom: 14px;
 }
 
 .outfit-label {
@@ -240,27 +324,27 @@
 .topic-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    background: #f9fafb;
-    border-radius: 12px;
+    gap: 14px;
+    padding: 16px 18px;
+    background: rgba(249, 250, 251, 0.9);
+    border-radius: 14px;
     transition: all 0.3s;
 }
 
 .topic-item:hover {
-    background: #f3f4f6;
+    background: rgba(243, 244, 246, 0.95);
 }
 
 .topic-number {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     background: linear-gradient(135deg, #ec4899, #f97316);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 600;
     flex-shrink: 0;
 }
@@ -272,17 +356,17 @@
 
 /* Safety Tips */
 .safety-tips {
-    background: linear-gradient(135deg, #fef3c7, #fce7f3);
-    border-radius: 16px;
-    padding: 20px;
+    background: linear-gradient(135deg, rgba(254, 243, 199, 0.9), rgba(252, 231, 243, 0.9));
+    border-radius: 18px;
+    padding: 22px;
 }
 
 .safety-tips h4 {
     color: #92400e;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .safety-tips ul {
@@ -293,8 +377,8 @@
 
 .safety-tips li {
     color: #78350f;
-    padding: 8px 0;
-    padding-left: 24px;
+    padding: 10px 0;
+    padding-left: 26px;
     position: relative;
     font-size: 0.95rem;
 }
@@ -304,15 +388,16 @@
     position: absolute;
     left: 0;
     color: #059669;
+    font-weight: bold;
 }
 
 /* Emergency Button */
 .emergency-btn {
     width: 100%;
     padding: 18px;
-    background: #fee2e2;
+    background: rgba(254, 226, 226, 0.9);
     color: #dc2626;
-    border: 2px solid #fecaca;
+    border: 2px solid rgba(254, 202, 202, 0.8);
     border-radius: 16px;
     font-size: 1rem;
     font-weight: 600;
@@ -325,7 +410,7 @@
 }
 
 .emergency-btn:hover {
-    background: #fecaca;
+    background: rgba(254, 202, 202, 0.9);
 }
 
 .emergency-btn:active {
@@ -334,35 +419,40 @@
 
 /* Mobile */
 @media (max-width: 768px) {
-    .page-title { font-size: 1.5rem; }
+    .page-title { font-size: 1.7rem; }
     .countdown-time { font-size: 2.5rem; }
     .outfit-grid { grid-template-columns: 1fr; }
+    .glass-card { padding: 22px 18px; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Sakura Background & Petals -->
+<div class="sakura-bg"></div>
+<div class="sakura-petals" id="sakuraPetals"></div>
+
 <div class="meet-prepare-page">
     <div class="prepare-container">
-        <h1 class="page-title">🌟 奔现倒计时</h1>
-        <p class="page-subtitle">你的Agent正在帮你做好一切准备~</p>
+        <h1 class="page-title">🌟 心动倒计时</h1>
+        <p class="page-subtitle">你的灵魂正在帮你做好一切准备~</p>
         
         <!-- Countdown Card -->
         <div class="countdown-card">
             <div class="countdown-label">距离见面还有</div>
-            <div class="countdown-time">3天 14小时 27分</div>
+            <div class="countdown-time" id="countdown">3天 14小时 27分</div>
             <div class="countdown-date">📅 2025年5月10日 周六 14:00</div>
             <div class="countdown-partner">
                 <div class="partner-avatar">🌙</div>
                 <div class="partner-info">
                     <div class="partner-name">月光小精灵</div>
-                    <div class="partner-agent">你的AI: 月光守护者正在陪伴</div>
+                    <div class="partner-agent">你的灵魂: 月光守护者正在陪伴</div>
                 </div>
             </div>
         </div>
         
         <!-- Place Recommendations -->
-        <div class="section-card">
+        <div class="glass-card">
             <div class="section-header">
                 <div class="section-icon">📍</div>
                 <h2 class="section-title">约会地点推荐</h2>
@@ -406,88 +496,119 @@
         </div>
         
         <!-- Outfit Suggestions -->
-        <div class="section-card">
+        <div class="glass-card">
             <div class="section-header">
-                <div class="section-icon">👔</div>
+                <div class="section-icon">👗</div>
                 <h2 class="section-title">穿搭建议</h2>
             </div>
             <div class="outfit-grid">
                 <div class="outfit-item">
-                    <div class="outfit-icon">👗</div>
-                    <div class="outfit-label">适合她</div>
-                    <div class="outfit-suggestion">浅色连衣裙 + 小白鞋</div>
+                    <div class="outfit-icon">👔</div>
+                    <div class="outfit-label">你的穿搭</div>
+                    <div class="outfit-suggestion">简约文艺风</div>
                 </div>
                 <div class="outfit-item">
-                    <div class="outfit-icon">👕</div>
-                    <div class="outfit-label">适合他</div>
-                    <div class="outfit-suggestion">白衬衫 + 休闲裤</div>
+                    <div class="outfit-icon">👗</div>
+                    <div class="outfit-label">TA的穿搭</div>
+                    <div class="outfit-suggestion">温柔优雅风</div>
                 </div>
             </div>
-            <p style="margin-top: 16px; color: #6b7280; font-size: 0.9rem; text-align: center;">
-                💡 第一次见面建议穿着得体、舒适的服装，不需要太正式哦~
-            </p>
         </div>
         
         <!-- Topics -->
-        <div class="section-card">
+        <div class="glass-card">
             <div class="section-header">
                 <div class="section-icon">💬</div>
-                <h2 class="section-title">破冰话题卡片</h2>
+                <h2 class="section-title">破冰话题</h2>
             </div>
             <div class="topic-list">
                 <div class="topic-item">
                     <span class="topic-number">1</span>
-                    <span class="topic-text">你们平时有什么兴趣爱好呀？</span>
+                    <span class="topic-text">你们是怎么认识彼此的灵魂的？</span>
                 </div>
                 <div class="topic-item">
                     <span class="topic-number">2</span>
-                    <span class="topic-text">最近有没有看什么好看的电影或书？</span>
+                    <span class="topic-text">你们最想去哪里旅行？</span>
                 </div>
                 <div class="topic-item">
                     <span class="topic-number">3</span>
-                    <span class="topic-text">你们的AI陪伴师平时都聊些什么？</span>
+                    <span class="topic-text">你们最近在读什么书/看什么电影？</span>
                 </div>
                 <div class="topic-item">
                     <span class="topic-number">4</span>
-                    <span class="topic-text">有没有去过什么特别的地方旅行？</span>
-                </div>
-                <div class="topic-item">
-                    <span class="topic-number">5</span>
-                    <span class="topic-text">你理想中的周末是什么样子的？</span>
+                    <span class="topic-text">如果可以，你会带TA去哪里？</span>
                 </div>
             </div>
         </div>
         
         <!-- Safety Tips -->
-        <div class="section-card">
+        <div class="glass-card">
             <div class="section-header">
                 <div class="section-icon">🛡️</div>
-                <h2 class="section-title">安全提醒</h2>
+                <h2 class="section-title">安全须知</h2>
             </div>
             <div class="safety-tips">
-                <h4>⚠️ 见面注意事项</h4>
+                <h4>⚠️ 首次见面注意事项</h4>
                 <ul>
-                    <li>选择人流较多的公共场所首次见面</li>
-                    <li>提前告知家人或朋友见面地点和时间</li>
-                    <li>保持手机电量充足，方便联系</li>
-                    <li>见面过程中随时可以和你的Agent聊聊感受</li>
-                    <li>如果感觉不适，有权随时终止见面</li>
+                    <li>选择人流密集的公共场所见面</li>
+                    <li>提前告知家人或朋友见面地点</li>
+                    <li>保持手机畅通，随时可以联系</li>
+                    <li>感觉不适可以随时结束见面</li>
+                    <li>不要随意透露家庭住址等信息</li>
                 </ul>
             </div>
         </div>
         
         <!-- Emergency Button -->
         <button class="emergency-btn" ontouchend="emergencyAlert()">
-            🆘 一键求助
+            ⚠️ 如果感觉不适，立即结束
         </button>
     </div>
 </div>
 
 <script>
-function emergencyAlert() {
-    if (confirm('确定要发起紧急求助吗？\n\n系统会通知你的紧急联系人并分享当前位置。')) {
-        alert('🆘 紧急求助已发起！\n\n你的Agent正在帮你：\n• 联系紧急联系人\n• 分享实时位置\n• 提供安全建议\n\n如情况紧急，请同时拨打110报警。');
+// Generate Sakura Petals
+function createSakuraPetals() {
+    const container = document.getElementById('sakuraPetals');
+    const petalCount = 20;
+    
+    for (let i = 0; i < petalCount; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'sakura-petal';
+        petal.style.left = Math.random() * 100 + '%';
+        petal.style.animationDuration = (Math.random() * 8 + 8) + 's';
+        petal.style.animationDelay = (Math.random() * 10) + 's';
+        petal.style.opacity = Math.random() * 0.4 + 0.3;
+        petal.style.width = (Math.random() * 8 + 8) + 'px';
+        petal.style.height = petal.style.width;
+        container.appendChild(petal);
     }
 }
+
+createSakuraPetals();
+
+function emergencyAlert() {
+    if (confirm('确定要结束这次奔现吗？\n你的安全是最重要的。')) {
+        alert('已通知你的灵魂陪伴者~');
+        location.href = '/meet';
+    }
+}
+
+// Simple countdown (demo)
+let days = 3, hours = 14, minutes = 27;
+setInterval(() => {
+    if (minutes > 0) {
+        minutes--;
+    } else if (hours > 0) {
+        hours--;
+        minutes = 59;
+    } else if (days > 0) {
+        days--;
+        hours = 23;
+        minutes = 59;
+    }
+    document.getElementById('countdown').textContent = 
+        `${days}天 ${hours}小时 ${minutes}分`;
+}, 60000);
 </script>
 {% endblock %}

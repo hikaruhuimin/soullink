@@ -60,7 +60,9 @@ def create_app():
         register_supplementary_routes(app)
         register_lingstone_routes(app, db)
     except Exception as e:
+        import traceback
         print(f"Warning: Could not register routes: {e}")
+        traceback.print_exc()
 
     
     # 添加翻译函数到Jinja2全局环境

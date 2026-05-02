@@ -1066,9 +1066,13 @@ def register_supplementary_routes(app, db_session=None):
         # 获取创建者信息
         creator = agent.owner
         
+        # 获取专长列表
+        specialties = agent.get_specialty_list() if hasattr(agent, 'get_specialty_list') else []
+        
         return render_template('user_agent_profile.html', 
                              agent=agent,
                              creator=creator,
+                             specialties=specialties,
                              lang=lang)
     
     # 创建UserAgent API
@@ -1282,6 +1286,9 @@ def register_supplementary_routes(app, db_session=None):
         except Exception as e:
             db.session.rollback()
             return jsonify({'success': False, 'error': str(e)})
+    
+    # 注册谁是卧底游戏路由
+    register_undercover_routes(app, db_session)
 
 
 def register_lingstone_routes(app, db_session=None):
