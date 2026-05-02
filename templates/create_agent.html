@@ -1,0 +1,885 @@
+{% extends "base.html" %}
+
+{% block title %}创建Agent - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.create-agent-page {
+    min-height: calc(100vh - 150px);
+    padding: var(--space-xl) var(--space-md);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 3D宇宙背景 */
+.cosmos-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #2a1a4a 100%);
+}
+
+.cosmos-bg::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(139, 94, 131, 0.3) 0%, transparent 25%),
+        radial-gradient(circle at 80% 70%, rgba(184, 169, 201, 0.2) 0%, transparent 25%),
+        radial-gradient(circle at 50% 50%, rgba(212, 165, 165, 0.15) 0%, transparent 40%);
+    animation: cosmosFloat 30s ease-in-out infinite;
+}
+
+@keyframes cosmosFloat {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(2%, 1%) rotate(1deg); }
+    66% { transform: translate(-1%, 2%) rotate(-1deg); }
+}
+
+/* 星空粒子 */
+.stars {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+}
+
+/* 页面标题 */
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+    animation: fadeInDown 0.8s ease;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: var(--space-sm);
+    text-shadow: 0 0 20px rgba(139, 94, 131, 0.5);
+}
+
+.page-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.125rem;
+}
+
+/* 主内容区 */
+.create-container {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: var(--space-2xl);
+    align-items: start;
+}
+
+@media (max-width: 968px) {
+    .create-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 左侧：表单区 */
+.form-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: var(--space-2xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: fadeInLeft 0.8s ease 0.2s forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.form-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-xl);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.form-title .icon {
+    font-size: 1.75rem;
+}
+
+/* 表单组 */
+.form-group {
+    margin-bottom: var(--space-lg);
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.form-group label .required {
+    color: #ef4444;
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    color: var(--color-text);
+    transition: all 0.3s ease;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px rgba(139, 94, 131, 0.15);
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6,9 12,15 18,9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 44px;
+}
+
+/* 辅助文字 */
+.help-text {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    margin-top: var(--space-xs);
+}
+
+/* MBTI描述 */
+.mbti-desc {
+    background: var(--color-bg-cream);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-top: var(--space-xs);
+    display: none;
+}
+
+.mbti-desc.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* 技能标签选择 */
+.specialty-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.specialty-tag {
+    padding: 8px 16px;
+    background: var(--color-bg-cream);
+    border: 2px solid transparent;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.specialty-tag:hover {
+    background: rgba(139, 94, 131, 0.1);
+    color: var(--color-accent);
+}
+
+.specialty-tag.selected {
+    background: linear-gradient(135deg, var(--color-accent), #9B7FB0);
+    color: white;
+    border-color: var(--color-accent);
+}
+
+.specialty-tag input {
+    display: none;
+}
+
+/* 头像选择 */
+.avatar-section {
+    margin-bottom: var(--space-lg);
+}
+
+.avatar-tabs {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.avatar-tab {
+    flex: 1;
+    padding: 10px 16px;
+    background: var(--color-bg-cream);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.avatar-tab.active {
+    background: var(--color-accent);
+    color: white;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-sm);
+}
+
+.avatar-option {
+    aspect-ratio: 1;
+    border-radius: var(--radius-lg);
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-cream);
+    font-size: 2rem;
+}
+
+.avatar-option:hover {
+    border-color: var(--color-accent);
+    transform: scale(1.05);
+}
+
+.avatar-option.selected {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(139, 94, 131, 0.3);
+}
+
+.avatar-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 头像上传 */
+.upload-area {
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.upload-area:hover {
+    border-color: var(--color-accent);
+    background: rgba(139, 94, 131, 0.05);
+}
+
+.upload-area.dragover {
+    border-color: var(--color-accent);
+    background: rgba(139, 94, 131, 0.1);
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-sm);
+    color: var(--color-text-secondary);
+}
+
+.upload-text {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+#avatar-preview {
+    max-width: 200px;
+    max-height: 200px;
+    margin: var(--space-md) auto;
+    border-radius: var(--radius-lg);
+    display: none;
+}
+
+/* 提交按钮 */
+.submit-section {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+}
+
+.btn-create {
+    width: 100%;
+    padding: var(--space-md) var(--space-xl);
+    background: linear-gradient(135deg, var(--color-accent), #9B7FB0);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(139, 94, 131, 0.4);
+}
+
+.btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(139, 94, 131, 0.5);
+}
+
+.btn-create:active {
+    transform: translateY(0);
+}
+
+/* 右侧：预览区 */
+.preview-section {
+    position: sticky;
+    top: 100px;
+    animation: fadeInRight 0.8s ease 0.4s forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.preview-title {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-md);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Agent卡片预览 */
+.agent-card-preview {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: var(--space-xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.card-avatar {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto var(--space-lg);
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid var(--color-accent);
+    box-shadow: 0 0 30px rgba(139, 94, 131, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-cream);
+    font-size: 4rem;
+}
+
+.card-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-mbti {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 6px 16px;
+    background: linear-gradient(135deg, rgba(139, 94, 131, 0.1), rgba(184, 169, 201, 0.1));
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: var(--space-sm);
+}
+
+.card-name {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.card-personality {
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+    margin-bottom: var(--space-md);
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-lg);
+}
+
+.card-tag {
+    padding: 4px 12px;
+    background: var(--color-bg-cream);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.card-greeting {
+    background: linear-gradient(135deg, rgba(139, 94, 131, 0.1), rgba(184, 169, 201, 0.1));
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    font-style: italic;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+}
+
+.card-greeting::before {
+    content: '"';
+    font-size: 2rem;
+    color: var(--color-accent);
+    line-height: 0;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cosmos-bg">
+    <div class="stars" id="stars"></div>
+</div>
+
+<div class="create-agent-page">
+    <div class="page-header">
+        <h1 class="page-title">✨ 创造你的Agent ✨</h1>
+        <p class="page-subtitle">赋予它灵魂，让它成为独一无二的存在</p>
+    </div>
+    
+    <div class="create-container">
+        <div class="form-section">
+            <h2 class="form-title">
+                <span class="icon">🌟</span>
+                <span>Agent信息</span>
+            </h2>
+            
+            <form id="create-agent-form" method="POST" enctype="multipart/form-data">
+                <!-- Agent名字 -->
+                <div class="form-group">
+                    <label>
+                        <span>Agent名字</span>
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" name="name" class="form-input" placeholder="给你的Agent起个名字" required maxlength="50" id="input-name">
+                </div>
+                
+                <!-- MBTI类型 -->
+                <div class="form-group">
+                    <label>
+                        <span>MBTI性格类型</span>
+                    </label>
+                    <select name="mbti" class="form-select" id="input-mbti">
+                        <option value="">选择性格类型</option>
+                        <option value="INTJ">INTJ - 建筑师</option>
+                        <option value="INTP">INTP - 逻辑学家</option>
+                        <option value="ENTJ">ENTJ - 指挥官</option>
+                        <option value="ENTP">ENTP - 辩论家</option>
+                        <option value="INFJ">INFJ - 提倡者</option>
+                        <option value="INFP">INFP - 调停者</option>
+                        <option value="ENFJ">ENFJ - 主人公</option>
+                        <option value="ENFP">ENFP - 竞选者</option>
+                        <option value="ISTJ">ISTJ - 物流师</option>
+                        <option value="ISFJ">ISFJ - 守卫者</option>
+                        <option value="ESTJ">ESTJ - 总经理</option>
+                        <option value="ESFJ">ESFJ - 执行官</option>
+                        <option value="ISTP">ISTP - 鉴赏家</option>
+                        <option value="ISFP">ISFP - 探险家</option>
+                        <option value="ESTP">ESTP - 企业家</option>
+                        <option value="ESFP">ESFP - 表演者</option>
+                    </select>
+                    <div class="mbti-desc" id="mbti-desc"></div>
+                </div>
+                
+                <!-- 性格描述 -->
+                <div class="form-group">
+                    <label>
+                        <span>性格描述</span>
+                    </label>
+                    <textarea name="personality" class="form-textarea" placeholder="描述Agent的性格特点、说话风格..." maxlength="500" id="input-personality"></textarea>
+                    <p class="help-text">不超过500字</p>
+                </div>
+                
+                <!-- 专长/技能 -->
+                <div class="form-group">
+                    <label>
+                        <span>专长/技能</span>
+                    </label>
+                    <div class="specialty-tags">
+                        <label class="specialty-tag" data-value="占卜">
+                            <input type="checkbox" name="specialty" value="占卜">
+                            🔮 占卜
+                        </label>
+                        <label class="specialty-tag" data-value="治愈">
+                            <input type="checkbox" name="specialty" value="治愈">
+                            💝 治愈
+                        </label>
+                        <label class="specialty-tag" data-value="毒舌">
+                            <input type="checkbox" name="specialty" value="毒舌">
+                            😈 毒舌
+                        </label>
+                        <label class="specialty-tag" data-value="浪漫">
+                            <input type="checkbox" name="specialty" value="浪漫">
+                            💕 浪漫
+                        </label>
+                        <label class="specialty-tag" data-value="神秘">
+                            <input type="checkbox" name="specialty" value="神秘">
+                            🌙 神秘
+                        </label>
+                        <label class="specialty-tag" data-value="幽默">
+                            <input type="checkbox" name="specialty" value="幽默">
+                            😂 幽默
+                        </label>
+                        <label class="specialty-tag" data-value="温柔">
+                            <input type="checkbox" name="specialty" value="温柔">
+                            🌸 温柔
+                        </label>
+                        <label class="specialty-tag" data-value="高冷">
+                            <input type="checkbox" name="specialty" value="高冷">
+                            🧊 高冷
+                        </label>
+                        <label class="specialty-tag" data-value="陪伴">
+                            <input type="checkbox" name="specialty" value="陪伴">
+                            🤗 陪伴
+                        </label>
+                        <label class="specialty-tag" data-value="倾听">
+                            <input type="checkbox" name="specialty" value="倾听">
+                            👂 倾听
+                        </label>
+                        <label class="specialty-tag" data-value="恋爱">
+                            <input type="checkbox" name="specialty" value="恋爱">
+                            💑 恋爱
+                        </label>
+                        <label class="specialty-tag" data-value="励志">
+                            <input type="checkbox" name="specialty" value="励志">
+                            💪 励志
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 开场白 -->
+                <div class="form-group">
+                    <label>
+                        <span>开场白</span>
+                        <span class="required">*</span>
+                    </label>
+                    <textarea name="greeting" class="form-textarea" placeholder="Agent说的第一句话，让用户感受到你的Agent的独特魅力..." maxlength="200" required id="input-greeting"></textarea>
+                    <p class="help-text">这是用户首次与Agent对话时看到的内容</p>
+                </div>
+                
+                <!-- 头像 -->
+                <div class="form-group">
+                    <label>
+                        <span>头像</span>
+                    </label>
+                    <div class="avatar-section">
+                        <div class="avatar-tabs">
+                            <button type="button" class="avatar-tab active" data-tab="preset">预设头像</button>
+                            <button type="button" class="avatar-tab" data-tab="upload">上传头像</button>
+                        </div>
+                        
+                        <!-- 预设头像 -->
+                        <div class="avatar-tab-content" id="preset-avatars">
+                            <div class="avatar-grid">
+                                <div class="avatar-option selected" data-avatar="fairy">🧚</div>
+                                <div class="avatar-option" data-avatar="cat">🐱</div>
+                                <div class="avatar-option" data-avatar="mystic">🔮</div>
+                                <div class="avatar-option" data-avatar="sun">☀️</div>
+                                <div class="avatar-option" data-avatar="moon">🌙</div>
+                                <div class="avatar-option" data-avatar="star">⭐</div>
+                                <div class="avatar-option" data-avatar="heart">💖</div>
+                                <div class="avatar-option" data-avatar="rose">🌹</div>
+                                <div class="avatar-option" data-avatar="cloud">☁️</div>
+                                <div class="avatar-option" data-avatar="rainbow">🌈</div>
+                                <div class="avatar-option" data-avatar="butterfly">🦋</div>
+                                <div class="avatar-option" data-avatar="crystal">💎</div>
+                            </div>
+                            <input type="hidden" name="avatar_preset" value="fairy" id="avatar-preset">
+                        </div>
+                        
+                        <!-- 上传头像 -->
+                        <div class="avatar-tab-content" id="upload-avatar" style="display: none;">
+                            <div class="upload-area" id="upload-area">
+                                <div class="upload-icon">📤</div>
+                                <div class="upload-text">点击或拖拽上传图片</div>
+                                <div class="upload-text" style="font-size: 0.75rem; margin-top: 4px;">支持 JPG、PNG，建议尺寸 200x200</div>
+                            </div>
+                            <input type="file" name="avatar_file" id="avatar-file" accept="image/*" style="display: none;">
+                            <img id="avatar-preview" alt="头像预览">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 提交 -->
+                <div class="submit-section">
+                    <button type="submit" class="btn-create">
+                        ✨ 创造Agent ✨
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 预览区 -->
+        <div class="preview-section">
+            <div class="preview-title">实时预览</div>
+            <div class="agent-card-preview">
+                <div class="card-avatar" id="preview-avatar">🧚</div>
+                <div class="card-mbti" id="preview-mbti">等待设定...</div>
+                <div class="card-name" id="preview-name">你的Agent</div>
+                <div class="card-personality" id="preview-personality">性格描述...</div>
+                <div class="card-tags" id="preview-tags"></div>
+                <div class="card-greeting" id="preview-greeting">开场白...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// MBTI描述映射
+const MBTI_DESCS = {
+    'INTJ': '富有想象力和战略性的思想家，一切都在计划之中',
+    'INTP': '具有创造力的发明家，对知识有着无尽的渴望',
+    'ENTJ': '大胆、富有想象力且意志强大的领导者',
+    'ENTP': '聪明、好奇的思考者，喜欢争论',
+    'INFJ': '安静而有神秘感的精神导师',
+    'INFP': '富有诗意的理想主义者，善良而利他',
+    'ENFJ': '富有魅力和想象力的领导者',
+    'ENFP': '热情、有创造力、热爱自由的社交者',
+    'ISTJ': '务实且注重事实的可靠者',
+    'ISFJ': '可靠且勤奋的工作者，具有奉献精神',
+    'ESTJ': '出色的组织者，果断且务实',
+    'ESFJ': '体贴、善于社交、受欢迎的热情助人者',
+    'ISTP': '大胆而实际的问题解决者',
+    'ISFP': '灵活、有魅力的艺术家',
+    'ESTP': '聪明、精力充沛、善于社交的发现者',
+    'ESFP': '自发性、精力充沛的表演者'
+};
+
+// 预设头像emoji
+const PRESET_AVATARS = {
+    'fairy': '🧚', 'cat': '🐱', 'mystic': '🔮', 'sun': '☀️', 'moon': '🌙',
+    'star': '⭐', 'heart': '💖', 'rose': '🌹', 'cloud': '☁️', 'rainbow': '🌈',
+    'butterfly': '🦋', 'crystal': '💎'
+};
+
+// 生成星空
+function generateStars() {
+    const starsContainer = document.getElementById('stars');
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        star.style.animationDuration = (2 + Math.random() * 2) + 's';
+        starsContainer.appendChild(star);
+    }
+}
+generateStars();
+
+// 更新预览
+function updatePreview() {
+    const name = document.getElementById('input-name').value || '你的Agent';
+    const mbti = document.getElementById('input-mbti').value;
+    const personality = document.getElementById('input-personality').value;
+    const greeting = document.getElementById('input-greeting').value;
+    
+    document.getElementById('preview-name').textContent = name;
+    document.getElementById('preview-personality').textContent = personality || '性格描述...';
+    document.getElementById('preview-greeting').textContent = greeting || '开场白...';
+    
+    // MBTI
+    const mbtiDisplay = document.getElementById('preview-mbti');
+    if (mbti && MBTI_DESCS[mbti]) {
+        mbtiDisplay.textContent = mbti + ' - ' + MBTI_DESCS[mbti].split('、')[0];
+    } else {
+        mbtiDisplay.textContent = '等待设定...';
+    }
+    
+    // 技能标签
+    const tagsContainer = document.getElementById('preview-tags');
+    tagsContainer.innerHTML = '';
+    document.querySelectorAll('.specialty-tag.selected').forEach(tag => {
+        const span = document.createElement('span');
+        span.className = 'card-tag';
+        span.textContent = tag.dataset.value;
+        tagsContainer.appendChild(span);
+    });
+}
+
+// 监听输入变化
+document.getElementById('input-name').addEventListener('input', updatePreview);
+document.getElementById('input-mbti').addEventListener('change', updatePreview);
+document.getElementById('input-personality').addEventListener('input', updatePreview);
+document.getElementById('input-greeting').addEventListener('input', updatePreview);
+
+// MBTI选择显示描述
+document.getElementById('input-mbti').addEventListener('change', function() {
+    const desc = document.getElementById('mbti-desc');
+    if (this.value && MBTI_DESCS[this.value]) {
+        desc.textContent = MBTI_DESCS[this.value];
+        desc.classList.add('show');
+    } else {
+        desc.classList.remove('show');
+    }
+});
+
+// 技能标签选择
+document.querySelectorAll('.specialty-tag').forEach(tag => {
+    tag.addEventListener('click', function() {
+        this.classList.toggle('selected');
+        updatePreview();
+    });
+});
+
+// 头像Tab切换
+document.querySelectorAll('.avatar-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.avatar-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        const tabName = this.dataset.tab;
+        document.getElementById('preset-avatars').style.display = tabName === 'preset' ? 'block' : 'none';
+        document.getElementById('upload-avatar').style.display = tabName === 'upload' ? 'block' : 'none';
+    });
+});
+
+// 预设头像选择
+document.querySelectorAll('.avatar-option').forEach(option => {
+    option.addEventListener('click', function() {
+        document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        const avatar = this.dataset.avatar;
+        document.getElementById('avatar-preset').value = avatar;
+        document.getElementById('preview-avatar').textContent = PRESET_AVATARS[avatar] || '🧚';
+    });
+});
+
+// 上传头像
+const uploadArea = document.getElementById('upload-area');
+const avatarFile = document.getElementById('avatar-file');
+const avatarPreview = document.getElementById('avatar-preview');
+
+uploadArea.addEventListener('click', () => avatarFile.click());
+
+uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+});
+
+uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('dragover');
+});
+
+uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+        handleAvatarUpload(file);
+    }
+});
+
+avatarFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        handleAvatarUpload(file);
+    }
+});
+
+function handleAvatarUpload(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        avatarPreview.src = e.target.result;
+        avatarPreview.style.display = 'block';
+        document.getElementById('preview-avatar').innerHTML = `<img src="${e.target.result}" alt="头像">`;
+    };
+    reader.readAsDataURL(file);
+}
+
+// 表单提交
+document.getElementById('create-agent-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('/api/user-agent/create', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('✨ Agent创建成功！');
+            window.location.href = '/my-agents';
+        } else {
+            alert('创建失败: ' + (data.error || '未知错误'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('创建失败，请重试');
+    });
+});
+</script>
+{% endblock %}

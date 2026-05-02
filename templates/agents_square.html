@@ -524,28 +524,41 @@
         {% if user_agents %}
         <div class="square-section">
             <div class="section-label">
-                <span>🤖 Agent</span>
-                
+                <span>🎨 用户Agent</span>
+                <span class="section-badge badge-community">用户创建</span>
             </div>
             <div class="cards-grid">
                 {% for agent in user_agents %}
                 <div class="square-card agent-card" data-agent-id="{{ agent.id }}" data-agent-type="user">
                     <div class="card-header">
-                        <img src="{{ agent.avatar }}" alt="{{ agent.name }}" class="card-avatar">
+                        <div class="card-avatar-wrapper">
+                            <div class="card-avatar" style="display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--color-bg-cream);">
+                                {% if agent.avatar and (agent.avatar.startswith('data:') or agent.avatar.startswith('http')) %}
+                                <img src="{{ agent.avatar }}" alt="{{ agent.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
+                                <span>{{ agent.avatar or '🤖' }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
                         <div class="card-info">
                             <div class="card-name">
                                 {{ agent.name }}
-                                
+                                <span style="font-size: 0.75rem; color: #8B5E83; font-weight: normal;">👤 {{ agent.owner_name }}</span>
                             </div>
-                            <div class="card-personality">{{ agent.personality }}</div>
+                            <div class="card-personality">{{ agent.personality or '等待探索...' }}</div>
                         </div>
                     </div>
-                    <p class="card-desc">{{ agent.description }}</p>
+                    <p class="card-desc">{{ agent.greeting or '快来和我聊天吧~' }}</p>
                     <div class="card-tags">
-                        <span class="tag tag-mbti">{{ agent.mbti }}</span>
+                        {% if agent.mbti %}<span class="tag tag-mbti">{{ agent.mbti }}</span>{% endif %}
+                        {% if agent.specialty %}
+                            {% for tag in agent.specialty[:3] %}
+                            <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                     <div class="card-actions">
-                        <a href="/agent/{{ agent.id }}" class="btn btn-primary">开始聊天</a>
+                        <a href="/agent/user/{{ agent.id }}" class="btn btn-primary">开始聊天</a>
                     </div>
                 </div>
                 {% endfor %}

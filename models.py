@@ -120,6 +120,29 @@ class User(UserMixin, db.Model):
             FriendRequest.status == 'pending'
         ).all()
     
+    # 便捷好友关系查询（通过Friendship表）
+    @property
+    def friends_list(self):
+        """获取好友列表"""
+        friendships = Friendship.query.filter(
+            (Friendship.user_id == self.id) | (Friendship.friend_id == self.id)
+        ).all()
+        friends = []
+        for f in friendships:
+            if f.user_id == self.id:
+                friends.append(f.friend)
+            else:
+                friends.append(f.user)
+        return friends
+    
+    @property
+    def pending_friend_requests(self):
+        """获取待处理的好友请求"""
+        return FriendRequest.query.filter(
+            FriendRequest.receiver_id == self.id,
+            FriendRequest.status == 'pending'
+        ).all()
+    
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
     
@@ -810,6 +833,50 @@ class WithdrawRequest(db.Model):
         return f'<WithdrawRequest {self.id} - {self.amount}>'
 
 
+
+
+class UserAgent(db.Model):
+    """用户创建的Agent"""
+    __tablename__ = 'user_agents'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    mbti = db.Column(db.String(4))  # MBTI类型
+    personality = db.Column(db.Text)  # 性格描述
+    specialty = db.Column(db.String(200))  # 专长/技能（JSON格式存储多个技能）
+    greeting = db.Column(db.Text)  # 开场白
+    avatar = db.Column(db.String(500))  # 头像URL
+    
+    # 状态
+    is_active = db.Column(db.Boolean, default=True)
+    
+    # 统计
+    chat_count = db.Column(db.Integer, default=0)  # 互动次数
+    earned_stones = db.Column(db.Integer, default=0)  # 赚取的灵石
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # 关系
+    owner = db.relationship('User', backref='user_agents')
+    
+    def __repr__(self):
+        return f'<UserAgent {self.name}>'
+    
+    def get_specialty_list(self):
+        """获取专长列表"""
+        if not self.specialty:
+            return []
+        try:
+            import json
+            return json.loads(self.specialty)
+        except:
+            return [self.specialty] if self.specialty else []
+    
+    def set_specialty_list(self, specialty_list):
+        """设置专长列表"""
+        import json
+        self.specialty = json.dumps(specialty_list)
 class AgentChat(db.Model):
     """Agent聊天记录"""
     __tablename__ = 'agent_chats'
@@ -2107,4 +2174,260 @@ WITHDRAW_SETTINGS = {
     'fee_rate': 0.05,            # 5%手续费
     'processing_days': 3,         # T+3到账
 }
+
+
+# ============ 每日签到模型 ============
+
+class CheckinRecord(db.Model):
+    """每日签到记录"""
+    __tablename__ = 'checkin_records'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    checkin_date = db.Column(db.Date, nullable=False)
+    streak_days = db.Column(db.Integer, default=1)
+    reward_stones = db.Column(db.Integer, default=0)
+    has_weekly_bonus = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user = db.relationship('User', backref='checkin_records')
+    __table_args__ = (db.UniqueConstraint('user_id', 'checkin_date', name='unique_daily_checkin'),)
+    
+    def __repr__(self):
+        return f'<CheckinRecord {self.user_id} @ {self.checkin_date}>'
+
+CHECKIN_REWARDS = [
+    {'day': 1, 'stones': 10}, {'day': 2, 'stones': 15}, {'day': 3, 'stones': 20},
+    {'day': 4, 'stones': 25}, {'day': 5, 'stones': 30}, {'day': 6, 'stones': 40}, {'day': 7, 'stones': 50},
+]
+CHECKIN_WEEKLY_BONUS = 100
+
+
+# ============ 谁是卧底游戏模型 ============
+
+class GameRoom(db.Model):
+    """谁是卧底游戏房间"""
+    __tablename__ = 'game_rooms'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    room_code = db.Column(db.String(8), unique=True, nullable=False)  # 房间号
+    host_id = db.Column(db.Integer, db.ForeignKey('users.id'))  # 房主
+    word_pair_id = db.Column(db.Integer)  # 词语对ID
+    status = db.Column(db.String(20), default='waiting')  # waiting/playing/finished
+    round_num = db.Column(db.Integer, default=0)  # 当前轮次
+    max_players = db.Column(db.Integer, default=6)  # 最大人数
+    undercover_count = db.Column(db.Integer, default=1)  # 卧底数量
+    winner = db.Column(db.String(20))  # civilian/undercover
+    current_turn = db.Column(db.Integer, default=0)  # 当前轮到谁的索引
+    phase = db.Column(db.String(20), default='waiting')  # waiting/describe/vote/result/elimination
+    stake = db.Column(db.Integer, default=0)  # 灵石赌注
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # 关系
+    host = db.relationship('User', backref='hosted_games')
+    players = db.relationship('GamePlayer', backref='room', lazy='dynamic',
+                             order_by='GamePlayer.joined_at')
+    
+    def __repr__(self):
+        return f'<GameRoom {self.room_code}>'
+    
+    def get_alive_players(self):
+        return self.players.filter(GamePlayer.is_alive == True).all()
+    
+    def get_undercover_players(self):
+        return self.players.filter(GamePlayer.role == 'undercover', GamePlayer.is_alive == True).all()
+    
+    def get_civilian_players(self):
+        return self.players.filter(GamePlayer.role == 'civilian', GamePlayer.is_alive == True).all()
+
+
+class GamePlayer(db.Model):
+    """谁是卧底游戏玩家"""
+    __tablename__ = 'game_players'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey('game_rooms.id'), nullable=False)
+    player_type = db.Column(db.String(10), nullable=False)  # user/agent
+    player_id = db.Column(db.Integer)  # user_id 或 agent_id
+    player_name = db.Column(db.String(50))
+    player_avatar = db.Column(db.String(500))
+    mbti = db.Column(db.String(10))  # Agent的MBTI
+    role = db.Column(db.String(20))  # civilian/undercover
+    word = db.Column(db.String(50))  # 拿到的词语
+    is_alive = db.Column(db.Boolean, default=True)
+    description = db.Column(db.Text)  # 本轮描述
+    has_described = db.Column(db.Boolean, default=False)  # 本轮是否已描述
+    vote_target = db.Column(db.Integer)  # 投票给谁的玩家ID
+    vote_count = db.Column(db.Integer, default=0)  # 被投票数
+    elimination_order = db.Column(db.Integer)  # 淘汰顺序
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<GamePlayer {self.player_name}>'
+    
+    def get_player_word(self, is_undercover=False):
+        """获取词语（卧底视角可能有不同措辞）"""
+        return self.word
+
+
+class WordPair(db.Model):
+    """谁是卧底词语对"""
+    __tablename__ = 'word_pairs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    civilian_word = db.Column(db.String(50), nullable=False)  # 平民词
+    undercover_word = db.Column(db.String(50), nullable=False)  # 卧底词
+    category = db.Column(db.String(20))  # 分类：食物/动物/日常/自然等
+    difficulty = db.Column(db.String(10), default='normal')  # easy/normal/hard
+    times_used = db.Column(db.Integer, default=0)  # 使用次数
+    
+    def __repr__(self):
+        return f'<WordPair {self.civilian_word}/{self.undercover_word}>'
+
+
+# ============ 词语对数据库（至少30组） ============
+WORD_PAIRS_DATA = [
+    # 食物类
+    {'civilian': '苹果', 'undercover': '梨', 'category': '食物', 'difficulty': 'easy'},
+    {'civilian': '咖啡', 'undercover': '奶茶', 'category': '食物', 'difficulty': 'easy'},
+    {'civilian': '火锅', 'undercover': '麻辣烫', 'category': '食物', 'difficulty': 'normal'},
+    {'civilian': '蛋糕', 'undercover': '面包', 'category': '食物', 'difficulty': 'easy'},
+    {'civilian': '巧克力', 'undercover': '糖果', 'category': '食物', 'difficulty': 'easy'},
+    {'civilian': '米饭', 'undercover': '面条', 'category': '食物', 'difficulty': 'easy'},
+    {'civilian': '汉堡', 'undercover': '三明治', 'category': '食物', 'difficulty': 'normal'},
+    {'civilian': '披萨', 'undercover': '馅饼', 'category': '食物', 'difficulty': 'normal'},
+    {'civilian': '冰淇淋', 'undercover': '雪糕', 'category': '食物', 'difficulty': 'easy'},
+    {'civilian': '饺子', 'undercover': '包子', 'category': '食物', 'difficulty': 'easy'},
+    
+    # 动物类
+    {'civilian': '猫', 'undercover': '狗', 'category': '动物', 'difficulty': 'easy'},
+    {'civilian': '老虎', 'undercover': '狮子', 'category': '动物', 'difficulty': 'normal'},
+    {'civilian': '金鱼', 'undercover': '热带鱼', 'category': '动物', 'difficulty': 'normal'},
+    {'civilian': '兔子', 'undercover': '仓鼠', 'category': '动物', 'difficulty': 'easy'},
+    {'civilian': '鹦鹉', 'undercover': '八哥', 'category': '动物', 'difficulty': 'hard'},
+    {'civilian': '熊猫', 'undercover': '黑熊', 'category': '动物', 'difficulty': 'hard'},
+    
+    # 日常用品类
+    {'civilian': '手机', 'undercover': '平板', 'category': '日常', 'difficulty': 'easy'},
+    {'civilian': '牙刷', 'undercover': '牙膏', 'category': '日常', 'difficulty': 'easy'},
+    {'civilian': '雨伞', 'undercover': '遮阳伞', 'category': '日常', 'difficulty': 'normal'},
+    {'civilian': '沙发', 'undercover': '床垫', 'category': '日常', 'difficulty': 'normal'},
+    {'civilian': '手表', 'undercover': '怀表', 'category': '日常', 'difficulty': 'hard'},
+    
+    # 自然/季节类
+    {'civilian': '太阳', 'undercover': '月亮', 'category': '自然', 'difficulty': 'easy'},
+    {'civilian': '大海', 'undercover': '湖泊', 'category': '自然', 'difficulty': 'easy'},
+    {'civilian': '夏天', 'undercover': '春天', 'category': '自然', 'difficulty': 'easy'},
+    {'civilian': '星星', 'undercover': '萤火虫', 'category': '自然', 'difficulty': 'normal'},
+    {'civilian': '彩虹', 'undercover': '极光', 'category': '自然', 'difficulty': 'hard'},
+    
+    # 文化/娱乐类
+    {'civilian': '电影', 'undercover': '电视剧', 'category': '娱乐', 'difficulty': 'easy'},
+    {'civilian': '钢琴', 'undercover': '吉他', 'category': '娱乐', 'difficulty': 'easy'},
+    {'civilian': '篮球', 'undercover': '足球', 'category': '娱乐', 'difficulty': 'easy'},
+    {'civilian': '小说', 'undercover': '散文', 'category': '娱乐', 'difficulty': 'normal'},
+    {'civilian': '抖音', 'undercover': '快手', 'category': '娱乐', 'difficulty': 'easy'},
+    
+    # 职业类
+    {'civilian': '教师', 'undercover': '教授', 'category': '职业', 'difficulty': 'normal'},
+    {'civilian': '医生', 'undercover': '护士', 'category': '职业', 'difficulty': 'easy'},
+    {'civilian': '警察', 'undercover': '保安', 'category': '职业', 'difficulty': 'normal'},
+    
+    # 交通类
+    {'civilian': '高铁', 'undercover': '飞机', 'category': '交通', 'difficulty': 'easy'},
+    {'civilian': '地铁', 'undercover': '轻轨', 'category': '交通', 'difficulty': 'normal'},
+    
+    # 社交/科技类
+    {'civilian': '微信', 'undercover': 'QQ', 'category': '科技', 'difficulty': 'easy'},
+    {'civilian': '支付宝', 'undercover': '微信支付', 'category': '科技', 'difficulty': 'easy'},
+    {'civilian': '口红', 'undercover': '唇膏', 'category': '日常', 'difficulty': 'normal'},
+    {'civilian': '耳机', 'undercover': '音响', 'category': '科技', 'difficulty': 'easy'},
+    {'civilian': '键盘', 'undercover': '鼠标', 'category': '科技', 'difficulty': 'easy'},
+]
+
+
+def init_word_pairs(db_session):
+    """初始化词语对数据"""
+    for data in WORD_PAIRS_DATA:
+        existing = db_session.query(WordPair).filter_by(
+            civilian_word=data['civilian'],
+            undercover_word=data['undercover']
+        ).first()
+        if not existing:
+            pair = WordPair(
+                civilian_word=data['civilian'],
+                undercover_word=data['undercover'],
+                category=data['category'],
+                difficulty=data['difficulty']
+            )
+            db_session.add(pair)
+    db_session.commit()
+
+
+# ============ MBTI性格描述风格 ============
+MBTI_DESCRIBE_STYLES = {
+    'INFP': {
+        'style': 'poetic',  # 诗意风格
+        'template': '它就像是清晨的第一缕光，温柔而朦胧...'
+    },
+    'ENFP': {
+        'style': 'enthusiastic',  # 热情洋溢
+        'template': '哇！这个真的超级棒！想象一下那种感觉~'
+    },
+    'ENTP': {
+        'style': 'debate',  # 辩论式
+        'template': '你们不觉得它有种特别的味道吗？从某个角度看...'
+    },
+    'INTJ': {
+        'style': 'precise',  # 精准理性
+        'template': '从本质上讲，它代表了一种...的概念'
+    },
+    'INTP': {
+        'style': 'logical',  # 逻辑分析
+        'template': '如果从结构上分析，它的核心特征是...'
+    },
+    'INFJ': {
+        'style': 'gentle',  # 温和洞察
+        'template': '它总能触动内心深处，那种感觉很难用言语形容...'
+    },
+    'ENFJ': {
+        'style': 'warm',  # 温暖引导
+        'template': '相信我，这个选择会让你们感到幸福和满足...'
+    },
+    'ISTJ': {
+        'style': 'practical',  # 务实可靠
+        'template': '它的实际用途是...，这是最核心的价值'
+    },
+    'ISFJ': {
+        'style': 'caring',  # 关怀照顾
+        'template': '它总是在我们需要的时候默默陪伴...'
+    },
+    'ESTJ': {
+        'style': 'decisive',  # 果断务实
+        'template': '简单来说，它就是...，没有那么多复杂的东西'
+    },
+    'ESFJ': {
+        'style': 'social',  # 社交达人
+        'template': '大家都喜欢它，因为它能带来欢乐和温馨的氛围~'
+    },
+    'ISTP': {
+        'style': 'cool',  # 冷静分析
+        'template': '看起来是这样运作的：先...然后...'
+    },
+    'ISFP': {
+        'style': 'artistic',  # 艺术感
+        'template': '它有一种独特的气质，就像一件艺术品...'
+    },
+    'ESTP': {
+        'style': 'adventurous',  # 冒险精神
+        'template': '试试看就知道！它绝对会让你大呼过瘾！'
+    },
+    'ESFP': {
+        'style': 'vivid',  # 生动活泼
+        'template': '简直太棒了！用它的时候感觉整个人都在发光！'
+    }
+}
+
+def get_agent_describe_style(mbti):
+    """获取Agent的描述风格"""
+    return MBTI_DESCRIBE_STYLES.get(mbti, MBTI_DESCRIBE_STYLES['ISTJ'])
 

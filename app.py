@@ -45,6 +45,13 @@ def create_app():
     
     with app.app_context():
         db.create_all()
+        
+        # 初始化谁是卧底词语对
+        try:
+            from models import init_word_pairs
+            init_word_pairs(db.session)
+        except Exception as e:
+            print(f"Warning: Could not init word pairs: {e}")
 
     
     # Register supplementary routes and lingstone routes
@@ -1064,6 +1071,7 @@ def register():
         user = User(email=email, username=username)
         user.set_password(password)
         user.api_key = generate_api_key()
+        user.spirit_stones = 100  # 注册赠送100灵石
         
         # 处理头像
         avatar_file = request.files.get('avatar')

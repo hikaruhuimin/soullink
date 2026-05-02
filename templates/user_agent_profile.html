@@ -1,0 +1,726 @@
+{% extends "base.html" %}
+
+{% block title %}{{ agent.name }} - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Agent Profile Page */
+.agent-profile-page {
+    min-height: calc(100vh - 150px);
+    padding: var(--space-xl) var(--space-md);
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* 背景氛围 */
+.profile-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(139, 94, 131, 0.15) 0%, rgba(184, 169, 201, 0.1) 50%, rgba(212, 165, 165, 0.1) 100%);
+}
+
+.profile-bg::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 20%, rgba(139, 94, 131, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(184, 169, 201, 0.15) 0%, transparent 50%);
+    animation: bgFloat 20s ease-in-out infinite;
+}
+
+@keyframes bgFloat {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(2%, 1%) rotate(1deg); }
+    66% { transform: translate(-1%, 2%) rotate(-1deg); }
+}
+
+/* 主内容区 */
+.profile-container {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: var(--space-2xl);
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 左侧：动态肖像 */
+.profile-portrait-section {
+    text-align: center;
+}
+
+.portrait-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: var(--space-lg);
+}
+
+.agent-portrait {
+    width: 280px;
+    height: 280px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 6rem;
+    border: 4px solid var(--color-accent);
+    box-shadow: 0 0 40px rgba(139, 94, 131, 0.3);
+    overflow: hidden;
+}
+
+.agent-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 统计信息 */
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+    margin-top: var(--space-lg);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-accent);
+}
+
+.stat-label {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+}
+
+/* 右侧：Agent信息 */
+.profile-info-section {
+    animation: fadeInRight 0.8s ease forwards;
+}
+
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.agent-identity {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.agent-mbti-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 6px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: var(--space-md);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.agent-name-display {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+    text-shadow: 0 2px 10px rgba(255,255,255,0.5);
+}
+
+.agent-personality-display {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+}
+
+/* 信息卡片 */
+.info-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.info-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.info-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.info-card-icon {
+    font-size: 1.5rem;
+}
+
+.info-card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-card-content {
+    color: var(--color-text);
+    line-height: 1.7;
+}
+
+.info-card-content p {
+    margin: 0;
+}
+
+/* 标签区 */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.profile-tag {
+    padding: 6px 14px;
+    background: var(--color-bg-cream);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+/* 座右铭 */
+.motto-card {
+    background: linear-gradient(135deg, rgba(139, 94, 131, 0.1), rgba(184, 169, 201, 0.15));
+    border-left: 4px solid var(--color-accent);
+}
+
+.motto-card .info-card-content {
+    font-style: italic;
+    font-size: 1.0625rem;
+    color: var(--color-accent);
+}
+
+/* 创建者信息 */
+.creator-info {
+    background: var(--color-bg-cream);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.creator-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    overflow: hidden;
+}
+
+.creator-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.creator-details {
+    flex: 1;
+}
+
+.creator-label {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.creator-name {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+/* 动作按钮 */
+.profile-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+}
+
+.btn-chat {
+    flex: 1;
+    max-width: 280px;
+    padding: var(--space-md) var(--space-xl);
+    background: linear-gradient(135deg, var(--color-accent), #9B7FB0);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139, 94, 131, 0.3);
+}
+
+.btn-chat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(139, 94, 131, 0.4);
+}
+
+.btn-chat:active {
+    transform: translateY(0);
+}
+
+/* 返回链接 */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: var(--space-lg);
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: var(--color-accent);
+}
+
+/* 聊天区域 */
+.chat-section {
+    margin-top: var(--space-2xl);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.chat-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.chat-messages {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: var(--space-md);
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+}
+
+.chat-message {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.chat-message.user {
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-bg-cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.message-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.chat-message.user .message-bubble {
+    background: linear-gradient(135deg, var(--color-accent), #9B7FB0);
+    color: white;
+}
+
+.message-text {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+}
+
+.chat-message.user .message-time {
+    color: rgba(255,255,255,0.7);
+}
+
+.chat-input-area {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.chat-input {
+    flex: 1;
+    padding: 0.875rem 1rem;
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    color: var(--color-text);
+    resize: none;
+}
+
+.chat-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+.chat-send-btn {
+    padding: 0.875rem var(--space-xl);
+    background: linear-gradient(135deg, var(--color-accent), #9B7FB0);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chat-send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 94, 131, 0.3);
+}
+
+/* 登录提示 */
+.login-prompt {
+    text-align: center;
+    padding: var(--space-2xl);
+    color: var(--color-text-secondary);
+}
+
+.login-prompt a {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-prompt a:hover {
+    text-decoration: underline;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-bg"></div>
+
+<div class="agent-profile-page">
+    <a href="/agents" class="back-link">
+        <span>←</span>
+        <span>返回Agent广场</span>
+    </a>
+    
+    <div class="profile-container">
+        <!-- 左侧：动态肖像 -->
+        <div class="profile-portrait-section">
+            <div class="portrait-container">
+                <div class="agent-portrait animated">
+                    {% if agent.avatar and agent.avatar.startswith('data:') %}
+                    <img src="{{ agent.avatar }}" alt="{{ agent.name }}">
+                    {% elif agent.avatar and agent.avatar.startswith('http') %}
+                    <img src="{{ agent.avatar }}" alt="{{ agent.name }}">
+                    {% else %}
+                    <span>{{ agent.avatar or '🤖' }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 统计信息 -->
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value">{{ agent.chat_count or 0 }}</div>
+                    <div class="stat-label">互动次数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ agent.earned_stones or 0 }}</div>
+                    <div class="stat-label">赚取灵石</div>
+                </div>
+            </div>
+            
+            <!-- 创建者信息 -->
+            {% if creator %}
+            <div class="creator-info" style="margin-top: var(--space-lg);">
+                <div class="creator-avatar">
+                    {% if creator.avatar and creator.avatar.startswith('http') %}
+                    <img src="{{ creator.avatar }}" alt="{{ creator.username }}">
+                    {% else %}
+                    <span>👤</span>
+                    {% endif %}
+                </div>
+                <div class="creator-details">
+                    <div class="creator-label">创造者</div>
+                    <div class="creator-name">{{ creator.username }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- 右侧：Agent信息 -->
+        <div class="profile-info-section">
+            <div class="agent-identity">
+                {% if agent.mbti %}
+                <div class="agent-mbti-badge">
+                    <span>{{ agent.mbti }}</span>
+                </div>
+                {% endif %}
+                <h1 class="agent-name-display">{{ agent.name }}</h1>
+                {% if agent.personality %}
+                <p class="agent-personality-display">{{ agent.personality }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="info-cards">
+                <!-- 专长/技能 -->
+                {% if specialties %}
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <span class="info-card-icon">✨</span>
+                        <span class="info-card-title">专长/技能</span>
+                    </div>
+                    <div class="info-card-content">
+                        <div class="tags-container">
+                            {% for specialty in specialties %}
+                            <span class="profile-tag">{{ specialty }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- 性格描述 -->
+                {% if agent.personality %}
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <span class="info-card-icon">💫</span>
+                        <span class="info-card-title">性格特点</span>
+                    </div>
+                    <div class="info-card-content">
+                        <p>{{ agent.personality }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- 开场白 -->
+                {% if agent.greeting %}
+                <div class="info-card motto-card">
+                    <div class="info-card-header">
+                        <span class="info-card-icon">💬</span>
+                        <span class="info-card-title">开场白</span>
+                    </div>
+                    <div class="info-card-content">
+                        <p>"{{ agent.greeting }}"</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- 开始聊天按钮 -->
+            <div class="profile-actions">
+                <button class="btn-chat" id="startChatBtn" data-agent-id="{{ agent.id }}">
+                    <span>💬</span>
+                    <span>开始聊天</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 聊天区域 -->
+    <div class="chat-section" id="chatSection" style="display: none;">
+        <h3 class="chat-title">
+            <span>💬</span>
+            <span>与{{ agent.name }}对话</span>
+        </h3>
+        
+        {% if current_user.is_authenticated %}
+        <div class="chat-messages" id="chatMessages">
+            <!-- 欢迎消息 -->
+            <div class="chat-message">
+                <div class="message-avatar">
+                    {% if agent.avatar and (agent.avatar.startswith('data:') or agent.avatar.startswith('http')) %}
+                    <img src="{{ agent.avatar }}" alt="">
+                    {% else %}
+                    <span>{{ agent.avatar or '🤖' }}</span>
+                    {% endif %}
+                </div>
+                <div class="message-bubble">
+                    <div class="message-text">{{ agent.greeting or '你好！很高兴认识你~' }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-area">
+            <textarea class="chat-input" id="chatInput" placeholder="输入消息..." rows="1"></textarea>
+            <button class="chat-send-btn" id="sendBtn">发送</button>
+        </div>
+        {% else %}
+        <div class="login-prompt">
+            <p>登录后即可与{{ agent.name }}聊天</p>
+            <p><a href="/login">登录</a> 或 <a href="/register">注册</a></p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 获取专长列表
+const specialties = {{ specialties|tojson }};
+
+// 显示/隐藏聊天区域
+document.getElementById('startChatBtn').addEventListener('click', function() {
+    const chatSection = document.getElementById('chatSection');
+    if (chatSection.style.display === 'none') {
+        chatSection.style.display = 'block';
+        this.textContent = '💬 收起聊天';
+        document.getElementById('chatInput').focus();
+    } else {
+        chatSection.style.display = 'none';
+        this.innerHTML = '<span>💬</span><span>开始聊天</span>';
+    }
+});
+
+// 发送消息
+const chatInput = document.getElementById('chatInput');
+const chatMessages = document.getElementById('chatMessages');
+const sendBtn = document.getElementById('sendBtn');
+const agentId = {{ agent.id }};
+
+// 自动调整输入框高度
+chatInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+});
+
+// 发送消息函数
+function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+    
+    // 添加用户消息
+    const userHtml = `
+        <div class="chat-message user">
+            <div class="message-bubble">
+                <div class="message-text">${escapeHtml(message)}</div>
+            </div>
+        </div>
+    `;
+    chatMessages.insertAdjacentHTML('beforeend', userHtml);
+    
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    // 发送请求
+    fetch(`/api/user-agent/${agentId}/chat`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // 添加Agent回复
+            const agentHtml = `
+                <div class="chat-message">
+                    <div class="message-avatar">
+                        {% if agent.avatar and (agent.avatar.startswith('data:') or agent.avatar.startswith('http')) %}
+                        <img src="{{ agent.avatar }}" alt="">
+                        {% else %}
+                        <span>{{ agent.avatar or '🤖' }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-text">${escapeHtml(data.message)}</div>
+                    </div>
+                </div>
+            `;
+            chatMessages.insertAdjacentHTML('beforeend', agentHtml);
+        } else {
+            alert('发送失败: ' + (data.error || '未知错误'));
+        }
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    })
+    .catch(err => {
+        console.error(err);
+        alert('发送失败，请重试');
+    });
+}
+
+// 转义HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// 发送按钮点击
+sendBtn.addEventListener('click', sendMessage);
+
+// 回车发送（Shift+回车换行）
+chatInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+</script>
+{% endblock %}
