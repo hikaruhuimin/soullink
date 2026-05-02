@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ agent.name.zh }} - SoulLink 灵犀{% endblock %}
+{% block title %}{{ current_agent.name.zh }} - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -539,11 +539,11 @@
                 <div class="agent-portrait animated" 
                      id="mainPortrait"
                      data-agent-portrait 
-                     data-agent-id="{{ agent.id }}" 
-                     data-avatar="{{ agent.avatar }}"
-                     data-mood="{{ agent.mood if agent.mood else 'happy' }}">
+                     data-agent-id="{{ current_agent.id }}" 
+                     data-avatar="{{ current_agent.avatar }}"
+                     data-mood="{{ current_agent.mood if current_agent.mood else 'happy' }}">
                     <div class="portrait-frame">
-                        <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="portrait-img">
+                        <img src="{{ current_agent.avatar }}" alt="{{ current_agent.name.zh }}" class="portrait-img">
                         <div class="portrait-overlay"></div>
                         <div class="portrait-particles"></div>
                         <div class="portrait-glow"></div>
@@ -553,8 +553,8 @@
             
             <!-- 情绪状态指示 -->
             <div class="mood-indicator">
-                <span class="mood-icon">{{ mood_icons.get(agent.mood, '😊') }}</span>
-                <span class="mood-text">{{ agent.mood_zh if agent.mood_zh else '心情愉悦' }}</span>
+                <span class="mood-icon">{{ mood_icons.get(current_agent.mood, '😊') }}</span>
+                <span class="mood-text">{{ current_agent.mood_zh if current_agent.mood_zh else '心情愉悦' }}</span>
             </div>
         </div>
         
@@ -562,12 +562,12 @@
         <div class="profile-info-section">
             <div class="agent-identity">
                 <div class="agent-mbti-badge">
-                    <span>{{ agent.mbti }}</span>
+                    <span>{{ current_agent.mbti }}</span>
                     <span>|</span>
-                    <span>{{ agent.personality.zh }}</span>
+                    <span>{{ current_agent.personality.zh }}</span>
                 </div>
-                <h1 class="agent-name-display">{{ agent.name.zh }}</h1>
-                <p class="agent-personality-display">{{ agent.description.zh }}</p>
+                <h1 class="agent-name-display">{{ current_agent.name.zh }}</h1>
+                <p class="agent-personality-display">{{ current_agent.description.zh }}</p>
             </div>
             
             <div class="info-cards">
@@ -579,7 +579,7 @@
                     </div>
                     <div class="info-card-content">
                         <div class="tags-container">
-                            {% for tag in agent.tags %}
+                            {% for tag in current_agent.tags %}
                             <span class="profile-tag">{{ tag }}</span>
                             {% endfor %}
                         </div>
@@ -593,7 +593,7 @@
                         <span class="info-card-title">性格特点</span>
                     </div>
                     <div class="info-card-content">
-                        <p>{{ agent.personality.zh if agent.personality else '温柔陪伴' }}</p>
+                        <p>{{ current_agent.personality.zh if current_agent.personality else '温柔陪伴' }}</p>
                     </div>
                 </div>
                 
@@ -604,14 +604,14 @@
                         <span class="info-card-title">经典台词</span>
                     </div>
                     <div class="info-card-content">
-                        <p>"{{ agent.demo_text.zh if agent.demo_text else '很高兴遇见你' }}"</p>
+                        <p>"{{ current_agent.demo_text.zh if current_agent.demo_text else '很高兴遇见你' }}"</p>
                     </div>
                 </div>
             </div>
             
             <!-- 开始聊天按钮 -->
             <div class="profile-actions">
-                <button class="btn-chat" id="startChatBtn" data-agent-id="{{ agent.id }}">
+                <button class="btn-chat" id="startChatBtn" data-agent-id="{{ current_agent.id }}">
                     <span>💬</span>
                     <span>开始聊天</span>
                 </button>
@@ -628,7 +628,7 @@
         <div class="login-modal-header">
             <div class="login-modal-icon">💕</div>
             <h2 class="login-modal-title">欢迎来到灵犀</h2>
-            <p class="login-modal-subtitle" id="loginModalSubtitle">登录后即可与{{ agent.name.zh }}畅聊</p>
+            <p class="login-modal-subtitle" id="loginModalSubtitle">登录后即可与{{ current_agent.name.zh }}畅聊</p>
         </div>
         
         <div class="login-modal-body">
@@ -690,7 +690,7 @@
                 <div class="login-success">
                     <div class="login-success-icon">🎉</div>
                     <p class="login-success-text">登录成功！正在跳转...</p>
-                    <p class="login-redirect">即将带你进入与{{ agent.name.zh }}的对话</p>
+                    <p class="login-redirect">即将带你进入与{{ current_agent.name.zh }}的对话</p>
                 </div>
             </div>
         </div>
@@ -746,13 +746,13 @@ const moodZhMap = {
 
 // 当前Agent信息
 const currentAgent = {
-    id: '{{ agent.id }}',
-    name: '{{ agent.name.zh }}'
+    id: '{{ current_agent.id }}',
+    name: '{{ current_agent.name.zh }}'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
     // 设置MBTI背景
-    const mbti = '{{ agent.mbti }}';
+    const mbti = '{{ current_agent.mbti }}';
     const bgConfig = mbtiBgConfig[mbti] || mbtiBgConfig['INFP'];
     const profileBg = document.getElementById('profileBg');
     profileBg.style.setProperty('--bg-primary', bgConfig.primary);
@@ -762,7 +762,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainPortrait = document.getElementById('mainPortrait');
     if (mainPortrait) {
         AgentPortrait.init(mainPortrait, currentAgent.id, {
-            mood: '{{ agent.mood if agent.mood else "happy" }}',
+            mood: '{{ current_agent.mood if current_agent.mood else "happy" }}',
             size: 'large',
             showStatus: true,
             statusOnline: true,

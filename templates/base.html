@@ -38,9 +38,10 @@
             left: 0;
             right: 0;
             z-index: var(--z-sticky);
-            background: rgba(253, 252, 250, 0.92);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--color-border-light);
+            background: linear-gradient(135deg, rgba(30, 15, 60, 0.95), rgba(10, 20, 50, 0.95));
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 2px 20px rgba(139, 92, 246, 0.15);
         }
         
         .nav-container {
@@ -50,7 +51,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 72px;
+            height: 56px;
         }
         
         .nav-logo {
@@ -65,7 +66,7 @@
         }
         
         .nav-logo:hover {
-            color: var(--color-accent);
+            color: #c4b5fd;
         }
         
         .nav-menu {
@@ -160,14 +161,14 @@
         
         .lang-option.active {
             background: rgba(184, 169, 201, 0.12);
-            color: var(--color-accent);
+            color: #c4b5fd;
         }
         
         .nav-btn {
             display: inline-flex;
             align-items: center;
             padding: 10px 20px;
-            background: var(--color-accent);
+            background: #8B5CF6;
             color: white;
             font-size: 0.9375rem;
             font-weight: 500;
@@ -248,7 +249,7 @@
         }
         
         .footer-links a:hover {
-            color: var(--color-accent);
+            color: #c4b5fd;
         }
         
         .footer-bottom {
@@ -294,7 +295,7 @@
         
         .bottom-nav-item:hover,
         .bottom-nav-item.active {
-            color: var(--color-accent);
+            color: #c4b5fd;
         }
         
         .bottom-nav-icon {
@@ -372,7 +373,7 @@
                 <a href="/divination/dream" class="nav-link">AI解梦</a>
                 <a href="/meet" class="nav-link">连线</a>
                 <a href="/divination" class="nav-link">占卜</a>
-                <a href="/shop" class="nav-link" style="color: #11998e; font-weight: 600;">灵石商城</a>
+                <a href="/shop" class="nav-link" style="color: #7cffc4; font-weight: 600; text-shadow: 0 0 8px rgba(124, 255, 196, 0.4);">灵石商城</a>
                                                 
                 {% if current_user.is_authenticated %}
                 <a href="/wallet" class="nav-link" title="我的钱包">💎 {{ current_user.spirit_stones or 0 }}</a>
