@@ -3,7 +3,7 @@
 from flask import request, jsonify, session, render_template, redirect, url_for
 from flask_login import current_user, login_required
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from models import db
 import random
 import uuid
@@ -1416,6 +1416,25 @@ def register_checkin_routes(app, db_session=None):
     """注册每日签到路由"""
     if db_session is None:
         db_session = db
+
+    @app.route('/checkin')
+    def checkin_page():
+        """签到页面"""
+        from flask_login import current_user
+        streak_days = 0
+        today_checked = False
+        if current_user.is_authenticated:
+            today = datetime.utcnow().date()
+            record = CheckinRecord.query.filter_by(user_id=current_user.id, checkin_date=today).first()
+            if record:
+                today_checked = True
+                streak_days = record.streak_days
+            else:
+                yesterday = today - timedelta(days=1)
+                yesterday_record = CheckinRecord.query.filter_by(user_id=current_user.id, checkin_date=yesterday).first()
+                if yesterday_record:
+                    streak_days = yesterday_record.streak_days
+        return render_template('checkin.html', streak_days=streak_days, today_checked=today_checked)
 
     # 签到状态API
     @app.route('/api/checkin/status')
