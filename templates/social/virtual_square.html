@@ -15,8 +15,8 @@
     overflow: hidden;
 }
 
-/* Canvas场景 */
-.square-canvas {
+/* Three.js Canvas */
+#threeCanvas {
     position: absolute;
     top: 0;
     left: 0;
@@ -374,6 +374,33 @@
     box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
 }
 
+/* 3D角色名字标签 */
+.character-label {
+    position: absolute;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+    text-align: center;
+    z-index: 50;
+}
+
+.character-name {
+    font-family: "Noto Sans SC", sans-serif;
+    font-size: 12px;
+    color: #E8E0F0;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    white-space: nowrap;
+}
+
+.character-name.self {
+    color: #C4B5FD;
+}
+
+.character-identity {
+    font-size: 10px;
+    color: #f5576c;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
     .right-panel {
@@ -396,8 +423,11 @@
 
 {% block content %}
 <div class="virtual-square" id="virtualSquare">
-    <!-- Canvas场景 -->
-    <canvas id="squareCanvas" class="square-canvas"></canvas>
+    <!-- Three.js Canvas -->
+    <canvas id="threeCanvas"></canvas>
+    
+    <!-- 角色名字标签容器 -->
+    <div id="labelsContainer"></div>
     
     <!-- 顶部导航 -->
     <div class="square-nav">
@@ -426,9 +456,7 @@
         
         <div class="panel-section">
             <div class="panel-title">👥 在线用户 (<span id="panelOnlineCount">0</span>)</div>
-            <div class="online-list" id="onlineList">
-                <!-- 动态填充 -->
-            </div>
+            <div class="online-list" id="onlineList"></div>
         </div>
         
         <div class="panel-section">
@@ -477,41 +505,45 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// 虚拟广场主逻辑
+// 虚拟广场3D主逻辑
 (function() {
-    const canvas = document.getElementById('squareCanvas');
-    const ctx = canvas.getContext('2d');
+    // Three.js 全局变量
+    let scene, camera, renderer, raycaster, mouse;
+    let characters = new Map(); // id -> character mesh group
+    let sceneObjects = []; // 可交互的3D对象
+    let clock = new THREE.Clock();
     
     // 场景配置
     const CONFIG = {
-        width: 1200,
-        height: 800,
-        tileSize: 40,
-        characterSize: 30,
-        moveSpeed: 4
+        worldWidth: 1200,
+        worldHeight: 800,
+        moveSpeed: 0.15,
+        characterHeight: 2.5
     };
     
-    // 区域定义
+    // 区域定义（映射到3D世界坐标）
     const ZONES = {
-        center: { x: 500, y: 300, width: 200, height: 200, name: '中央广场', icon: '🏛️', color: '#8B5CF6' },
-        divination: { x: 100, y: 150, width: 180, height: 180, name: '占卜角', icon: '🔮', color: '#D4AF37', action: '/divination' },
-        chat: { x: 920, y: 150, width: 180, height: 180, name: '闲聊区', icon: '💬', color: '#22c55e', action: '/chat/home' },
-        wish: { x: 500, y: 550, width: 200, height: 150, name: '许愿池', icon: '⛲', color: '#06b6d4', action: '/divination/dream' },
-        campfire: { x: 100, y: 470, width: 180, height: 180, name: '篝火旁', icon: '🔥', color: '#ef4444', action: '/chat/room/general' }
+        center: { x: 0, z: 0, radius: 3, name: '中央广场', icon: '🏛️', color: '#8B5CF6', action: null },
+        divination: { x: -8, z: -6, radius: 2.5, name: '占卜角', icon: '🔮', color: '#D4AF37', action: '/divination' },
+        chat: { x: 8, z: -6, radius: 2.5, name: '闲聊区', icon: '💬', color: '#22c55e', action: '/chat/home' },
+        wish: { x: 0, z: 6, radius: 2.5, name: '许愿池', icon: '⛲', color: '#06b6d4', action: '/divination/dream' },
+        campfire: { x: -8, z: 6, radius: 2.5, name: '篝火旁', icon: '🔥', color: '#ef4444', action: '/chat/room/general' }
     };
     
     // 用户信息
     let currentUser = {
         id: '{{ current_user.id if current_user.is_authenticated else "visitor_" ~ session.get("session_id", "unknown") }}',
-        name: '{{ current_user.username if current_user.is_authenticated else "游客" ~ (range(1000, 9999) | random) }}',
+        name: '{{ current_user.username if current_user.is_authenticated else "游客" }}',
         type: '{{ "human" if current_user.is_authenticated else "visitor" }}',
         isVip: {{ "true" if current_user.is_authenticated and current_user.vip_level > 0 else "false" }},
-        x: CONFIG.width / 2,
-        y: CONFIG.height / 2,
-        targetX: CONFIG.width / 2,
-        targetY: CONFIG.height / 2,
-        direction: 0
+        x: 0,
+        z: 0,
+        targetX: 0,
+        targetZ: 0,
+        direction: 0,
+        animTime: 0
     };
     
     // 在线用户列表
@@ -525,34 +557,945 @@
     
     // 初始化
     function init() {
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        initThreeJS();
+        initLights();
+        createGround();
+        createSceneObjects();
+        createStars();
+        initEventListeners();
+        connectWebSocket();
+        simulateOnlineUsers();
+        animate();
+    }
+    
+    // 初始化 Three.js
+    function initThreeJS() {
+        const canvas = document.getElementById('threeCanvas');
         
+        // 创建场景
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a1a);
+        scene.fog = new THREE.Fog(0x0a0a1a, 15, 40);
+        
+        // 创建正交相机（等距视角）
+        const aspect = window.innerWidth / window.innerHeight;
+        const frustumSize = 15;
+        camera = new THREE.OrthographicCamera(
+            frustumSize * aspect / -2,
+            frustumSize * aspect / 2,
+            frustumSize / 2,
+            frustumSize / -2,
+            0.1,
+            1000
+        );
+        camera.position.set(0, 12, 12);
+        camera.lookAt(0, 0, 0);
+        
+        // 创建渲染器
+        renderer = new THREE.WebGLRenderer({ 
+            canvas: canvas, 
+            antialias: true,
+            alpha: true 
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        
+        // 射线检测
+        raycaster = new THREE.Raycaster();
+        mouse = new THREE.Vector2();
+        
+        // 窗口大小调整
+        window.addEventListener('resize', onWindowResize);
+    }
+    
+    function onWindowResize() {
+        const aspect = window.innerWidth / window.innerHeight;
+        const frustumSize = 15;
+        camera.left = frustumSize * aspect / -2;
+        camera.right = frustumSize * aspect / 2;
+        camera.top = frustumSize / 2;
+        camera.bottom = frustumSize / -2;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    
+    // 初始化灯光
+    function initLights() {
+        // 环境光
+        const ambientLight = new THREE.AmbientLight(0x404060, 0.5);
+        scene.add(ambientLight);
+        
+        // 主光源
+        const mainLight = new THREE.DirectionalLight(0xffeedd, 0.8);
+        mainLight.position.set(5, 15, 5);
+        mainLight.castShadow = true;
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        mainLight.shadow.camera.near = 0.5;
+        mainLight.shadow.camera.far = 50;
+        mainLight.shadow.camera.left = -20;
+        mainLight.shadow.camera.right = 20;
+        mainLight.shadow.camera.top = 20;
+        mainLight.shadow.camera.bottom = -20;
+        scene.add(mainLight);
+        
+        // 补光
+        const fillLight = new THREE.DirectionalLight(0x8888ff, 0.3);
+        fillLight.position.set(-5, 10, -5);
+        scene.add(fillLight);
+        
+        // 地面反射光
+        const groundLight = new THREE.HemisphereLight(0x8866aa, 0x222244, 0.4);
+        scene.add(groundLight);
+    }
+    
+    // 创建地面
+    function createGround() {
+        // 主地面 - 六边形格子
+        const groundGeometry = new THREE.PlaneGeometry(30, 30, 30, 30);
+        
+        // 自定义材质
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            color: 0x1a1a3a,
+            roughness: 0.8,
+            metalness: 0.2
+        });
+        
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.01;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        // 六边形网格装饰
+        createHexGrid();
+        
+        // 路径石板
+        createPathStones();
+    }
+    
+    // 创建六边形网格
+    function createHexGrid() {
+        const hexMaterial = new THREE.MeshStandardMaterial({
+            color: 0x2a2a4a,
+            roughness: 0.9,
+            metalness: 0.1
+        });
+        
+        const hexGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.05, 6);
+        
+        for (let x = -12; x <= 12; x += 1.6) {
+            for (let z = -12; z <= 12; z += 2.8) {
+                const offsetX = (Math.floor(z / 2.8) % 2) * 0.8;
+                const hex = new THREE.Mesh(hexGeometry, hexMaterial.clone());
+                hex.position.set(x + offsetX, 0, z);
+                hex.receiveShadow = true;
+                
+                // 随机深浅变化
+                const shade = 0.8 + Math.random() * 0.4;
+                hex.material.color.multiplyScalar(shade);
+                
+                scene.add(hex);
+            }
+        }
+    }
+    
+    // 创建路径石板
+    function createPathStones() {
+        const stoneMaterial = new THREE.MeshStandardMaterial({
+            color: 0x3a3a5a,
+            roughness: 0.7,
+            metalness: 0.3
+        });
+        
+        // 中心到各区域的路径
+        const paths = [
+            { start: { x: 0, z: 0 }, end: { x: -8, z: -6 } },
+            { start: { x: 0, z: 0 }, end: { x: 8, z: -6 } },
+            { start: { x: 0, z: 0 }, end: { x: 0, z: 6 } },
+            { start: { x: 0, z: 0 }, end: { x: -8, z: 6 } }
+        ];
+        
+        paths.forEach(path => {
+            const dx = path.end.x - path.start.x;
+            const dz = path.end.z - path.start.z;
+            const length = Math.sqrt(dx * dx + dz * dz);
+            const steps = Math.floor(length / 1.5);
+            
+            for (let i = 0; i < steps; i++) {
+                const t = i / steps;
+                const stone = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.3, 0.35, 0.08, 8),
+                    stoneMaterial.clone()
+                );
+                stone.position.set(
+                    path.start.x + dx * t + (Math.random() - 0.5) * 0.3,
+                    0,
+                    path.start.z + dz * t + (Math.random() - 0.5) * 0.3
+                );
+                stone.receiveShadow = true;
+                
+                const shade = 0.7 + Math.random() * 0.3;
+                stone.material.color.multiplyScalar(shade);
+                
+                scene.add(stone);
+            }
+        });
+    }
+    
+    // 创建场景物体
+    function createSceneObjects() {
+        // 占卜帐篷
+        createDivinationTent();
+        
+        // 许愿池
+        createWishingPool();
+        
+        // 篝火
+        createCampfire();
+        
+        // 闲聊区标识
+        createChatArea();
+    }
+    
+    // 占卜帐篷
+    function createDivinationTent() {
+        const tentGroup = new THREE.Group();
+        tentGroup.position.set(-8, 0, -6);
+        
+        // 帐篷底部（圆柱）
+        const baseGeometry = new THREE.CylinderGeometry(2, 2.2, 1, 12);
+        const baseMaterial = new THREE.MeshStandardMaterial({
+            color: 0x4a3060,
+            roughness: 0.9
+        });
+        const base = new THREE.Mesh(baseGeometry, baseMaterial);
+        base.position.y = 0.5;
+        base.castShadow = true;
+        base.receiveShadow = true;
+        tentGroup.add(base);
+        
+        // 帐篷顶部（圆锥）
+        const roofGeometry = new THREE.ConeGeometry(2.3, 2, 12);
+        const roofMaterial = new THREE.MeshStandardMaterial({
+            color: 0x8B5CF6,
+            roughness: 0.7,
+            metalness: 0.2,
+            emissive: 0x4a2080,
+            emissiveIntensity: 0.2
+        });
+        const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+        roof.position.y = 2.5;
+        roof.castShadow = true;
+        tentGroup.add(roof);
+        
+        // 星星装饰
+        for (let i = 0; i < 5; i++) {
+            const star = createStar();
+            star.position.set(
+                (Math.random() - 0.5) * 3,
+                2.5 + Math.random() * 1,
+                (Math.random() - 0.5) * 3
+            );
+            star.scale.setScalar(0.1 + Math.random() * 0.1);
+            tentGroup.add(star);
+        }
+        
+        scene.add(tentGroup);
+        
+        // 添加到可交互对象
+        const zoneData = ZONES.divination;
+        zoneData.mesh = tentGroup;
+        zoneData.type = 'zone';
+        sceneObjects.push({ zone: zoneData, mesh: tentGroup });
+    }
+    
+    // 许愿池
+    function createWishingPool() {
+        const poolGroup = new THREE.Group();
+        poolGroup.position.set(0, 0, 6);
+        
+        // 池边
+        const rimGeometry = new THREE.TorusGeometry(2, 0.3, 8, 24);
+        const rimMaterial = new THREE.MeshStandardMaterial({
+            color: 0x6688aa,
+            roughness: 0.3,
+            metalness: 0.7
+        });
+        const rim = new THREE.Mesh(rimGeometry, rimMaterial);
+        rim.rotation.x = Math.PI / 2;
+        rim.position.y = 0.3;
+        rim.castShadow = true;
+        poolGroup.add(rim);
+        
+        // 水面
+        const waterGeometry = new THREE.CircleGeometry(1.7, 32);
+        const waterMaterial = new THREE.MeshStandardMaterial({
+            color: 0x06b6d4,
+            roughness: 0.1,
+            metalness: 0.8,
+            transparent: true,
+            opacity: 0.7,
+            emissive: 0x06b6d4,
+            emissiveIntensity: 0.2
+        });
+        const water = new THREE.Mesh(waterGeometry, waterMaterial);
+        water.rotation.x = -Math.PI / 2;
+        water.position.y = 0.25;
+        poolGroup.add(water);
+        
+        // 中心装饰
+        const centerGeometry = new THREE.OctahedronGeometry(0.4, 0);
+        const centerMaterial = new THREE.MeshStandardMaterial({
+            color: 0xFFD700,
+            roughness: 0.2,
+            metalness: 0.9,
+            emissive: 0xFFD700,
+            emissiveIntensity: 0.3
+        });
+        const center = new THREE.Mesh(centerGeometry, centerMaterial);
+        center.position.y = 1;
+        center.castShadow = true;
+        poolGroup.add(center);
+        
+        // 浮游光点
+        for (let i = 0; i < 8; i++) {
+            const light = createFloatingLight(0xffd700);
+            light.userData.baseY = 0.5 + Math.random() * 0.5;
+            light.userData.phase = Math.random() * Math.PI * 2;
+            poolGroup.add(light);
+        }
+        
+        scene.add(poolGroup);
+        
+        const zoneData = ZONES.wish;
+        zoneData.mesh = poolGroup;
+        zoneData.type = 'zone';
+        sceneObjects.push({ zone: zoneData, mesh: poolGroup });
+    }
+    
+    // 篝火
+    function createCampfire() {
+        const fireGroup = new THREE.Group();
+        fireGroup.position.set(-8, 0, 6);
+        
+        // 木柴底座
+        for (let i = 0; i < 6; i++) {
+            const woodGeometry = new THREE.CylinderGeometry(0.15, 0.2, 1.5, 6);
+            const woodMaterial = new THREE.MeshStandardMaterial({
+                color: 0x4a3020,
+                roughness: 0.9
+            });
+            const wood = new THREE.Mesh(woodGeometry, woodMaterial);
+            wood.rotation.z = Math.PI / 2;
+            wood.rotation.y = (i / 6) * Math.PI;
+            wood.position.y = 0.2;
+            wood.castShadow = true;
+            fireGroup.add(wood);
+        }
+        
+        // 石头围边
+        for (let i = 0; i < 8; i++) {
+            const stoneGeometry = new THREE.DodecahedronGeometry(0.3, 0);
+            const stoneMaterial = new THREE.MeshStandardMaterial({
+                color: 0x555555,
+                roughness: 0.9
+            });
+            const stone = new THREE.Mesh(stoneGeometry, stoneMaterial);
+            const angle = (i / 8) * Math.PI * 2;
+            stone.position.set(Math.cos(angle) * 1.2, 0.15, Math.sin(angle) * 1.2);
+            stone.castShadow = true;
+            fireGroup.add(stone);
+        }
+        
+        // 火焰粒子
+        const fireParticles = createFireParticles();
+        fireParticles.position.y = 0.8;
+        fireGroup.add(fireParticles);
+        fireGroup.userData.fireParticles = fireParticles;
+        
+        // 点光源
+        const fireLight = new THREE.PointLight(0xff6622, 1, 8);
+        fireLight.position.y = 1;
+        fireLight.castShadow = true;
+        fireGroup.add(fireLight);
+        fireGroup.userData.fireLight = fireLight;
+        
+        scene.add(fireGroup);
+        
+        const zoneData = ZONES.campfire;
+        zoneData.mesh = fireGroup;
+        zoneData.type = 'zone';
+        sceneObjects.push({ zone: zoneData, mesh: fireGroup });
+    }
+    
+    // 闲聊区
+    function createChatArea() {
+        const chatGroup = new THREE.Group();
+        chatGroup.position.set(8, 0, -6);
+        
+        // 平台
+        const platformGeometry = new THREE.CylinderGeometry(2.5, 2.8, 0.5, 8);
+        const platformMaterial = new THREE.MeshStandardMaterial({
+            color: 0x22c55e,
+            roughness: 0.8,
+            metalness: 0.2,
+            emissive: 0x22c55e,
+            emissiveIntensity: 0.1
+        });
+        const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+        platform.position.y = 0.25;
+        platform.castShadow = true;
+        platform.receiveShadow = true;
+        chatGroup.add(platform);
+        
+        // 聊天气泡装饰
+        for (let i = 0; i < 4; i++) {
+            const bubble = createChatBubble();
+            const angle = (i / 4) * Math.PI * 2;
+            bubble.position.set(Math.cos(angle) * 1.8, 1.5 + Math.random() * 0.5, Math.sin(angle) * 1.8);
+            chatGroup.add(bubble);
+        }
+        
+        scene.add(chatGroup);
+        
+        const zoneData = ZONES.chat;
+        zoneData.mesh = chatGroup;
+        zoneData.type = 'zone';
+        sceneObjects.push({ zone: zoneData, mesh: chatGroup });
+    }
+    
+    // 创建星星装饰
+    function createStar() {
+        const starShape = new THREE.Shape();
+        const outerRadius = 1;
+        const innerRadius = 0.4;
+        const points = 5;
+        
+        for (let i = 0; i < points * 2; i++) {
+            const radius = i % 2 === 0 ? outerRadius : innerRadius;
+            const angle = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            
+            if (i === 0) starShape.moveTo(x, y);
+            else starShape.lineTo(x, y);
+        }
+        starShape.closePath();
+        
+        const starGeometry = new THREE.ExtrudeGeometry(starShape, {
+            depth: 0.1,
+            bevelEnabled: false
+        });
+        
+        const starMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffd700,
+            emissive: 0xffd700,
+            emissiveIntensity: 0.5,
+            metalness: 0.8,
+            roughness: 0.2
+        });
+        
+        return new THREE.Mesh(starGeometry, starMaterial);
+    }
+    
+    // 创建浮动光点
+    function createFloatingLight(color) {
+        const lightGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+        const lightMaterial = new THREE.MeshBasicMaterial({
+            color: color,
+            transparent: true,
+            opacity: 0.8
+        });
+        const light = new THREE.Mesh(lightGeometry, lightMaterial);
+        light.userData.isFloating = true;
+        return light;
+    }
+    
+    // 创建聊天气泡
+    function createChatBubble() {
+        const bubbleGroup = new THREE.Group();
+        
+        const bubbleGeometry = new THREE.SphereGeometry(0.4, 16, 16);
+        bubbleGeometry.scale(1.2, 1, 1);
+        const bubbleMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            roughness: 0.3,
+            transparent: true,
+            opacity: 0.8
+        });
+        const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial);
+        bubbleGroup.add(bubble);
+        
+        return bubbleGroup;
+    }
+    
+    // 创建火焰粒子
+    function createFireParticles() {
+        const particleCount = 30;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 0.8;
+            positions[i * 3 + 1] = Math.random() * 2;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 0.8;
+            
+            // 橙红色渐变
+            colors[i * 3] = 1;
+            colors[i * 3 + 1] = 0.3 + Math.random() * 0.4;
+            colors[i * 3 + 2] = 0;
+        }
+        
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        const material = new THREE.PointsMaterial({
+            size: 0.3,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particles = new THREE.Points(geometry, material);
+        particles.userData.isFire = true;
+        return particles;
+    }
+    
+    // 创建星空背景
+    function createStars() {
+        const starCount = 500;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(starCount * 3);
+        
+        for (let i = 0; i < starCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 100;
+            positions[i * 3 + 1] = 10 + Math.random() * 40;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+        }
+        
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const material = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.1,
+            transparent: true,
+            opacity: 0.6
+        });
+        
+        const stars = new THREE.Points(geometry, material);
+        scene.add(stars);
+    }
+    
+    // 创建3D角色
+    function createCharacter(user, isSelf = false) {
+        const group = new THREE.Group();
+        group.position.set(user.x || 0, 0, user.z || 0);
+        group.userData = { ...user, isSelf };
+        
+        // 角色材质配置
+        let bodyColor, emissiveColor, emissiveIntensity, transparent = false, opacity = 1;
+        
+        if (user.isVip) {
+            bodyColor = 0xFFD700;
+            emissiveColor = 0xFFD700;
+            emissiveIntensity = 0.3;
+        } else if (user.type === 'agent') {
+            bodyColor = 0xA78BFA;
+            emissiveColor = 0x8B5CF6;
+            emissiveIntensity = 0.4;
+            transparent = true;
+            opacity = 0.85;
+        } else if (user.type === 'visitor') {
+            bodyColor = 0x8090A0;
+            emissiveColor = 0x6080A0;
+            emissiveIntensity = 0.2;
+            transparent = true;
+            opacity = 0.6;
+        } else {
+            bodyColor = 0x667EEA;
+            emissiveColor = 0x4F46E5;
+            emissiveIntensity = 0.1;
+        }
+        
+        const bodyMaterial = new THREE.MeshStandardMaterial({
+            color: bodyColor,
+            roughness: 0.4,
+            metalness: 0.3,
+            emissive: emissiveColor,
+            emissiveIntensity: emissiveIntensity,
+            transparent: transparent,
+            opacity: opacity
+        });
+        
+        // 头部（圆球）
+        const headGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+        const head = new THREE.Mesh(headGeometry, bodyMaterial);
+        head.position.y = 1.8;
+        head.castShadow = true;
+        group.add(head);
+        
+        // 大眼睛
+        const eyeWhiteMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const eyePupilMaterial = new THREE.MeshBasicMaterial({ color: 0x222222 });
+        const eyeHighlightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        
+        [-0.15, 0.15].forEach(offsetX => {
+            // 眼白
+            const eyeWhite = new THREE.Mesh(
+                new THREE.SphereGeometry(0.12, 8, 8),
+                eyeWhiteMaterial
+            );
+            eyeWhite.position.set(offsetX, 1.85, 0.4);
+            group.add(eyeWhite);
+            
+            // 瞳孔
+            const pupil = new THREE.Mesh(
+                new THREE.SphereGeometry(0.06, 8, 8),
+                eyePupilMaterial
+            );
+            pupil.position.set(offsetX, 1.85, 0.48);
+            group.add(pupil);
+            
+            // 高光
+            const highlight = new THREE.Mesh(
+                new THREE.SphereGeometry(0.02, 6, 6),
+                eyeHighlightMaterial
+            );
+            highlight.position.set(offsetX + 0.03, 1.88, 0.52);
+            group.add(highlight);
+        });
+        
+        // 微笑嘴巴
+        const smileGeometry = new THREE.TorusGeometry(0.12, 0.02, 8, 16, Math.PI);
+        const smileMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
+        const smile = new THREE.Mesh(smileGeometry, smileMaterial);
+        smile.position.set(0, 1.65, 0.45);
+        smile.rotation.x = Math.PI;
+        group.add(smile);
+        
+        // 身体（胶囊形）
+        const bodyGeometry = new THREE.CapsuleGeometry(0.35, 0.6, 8, 16);
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.position.y = 0.95;
+        body.castShadow = true;
+        group.add(body);
+        
+        // 手臂
+        const armGeometry = new THREE.CapsuleGeometry(0.1, 0.4, 4, 8);
+        const leftArm = new THREE.Mesh(armGeometry, bodyMaterial);
+        leftArm.position.set(-0.5, 1.1, 0);
+        leftArm.rotation.z = 0.3;
+        leftArm.castShadow = true;
+        leftArm.name = 'leftArm';
+        group.add(leftArm);
+        
+        const rightArm = new THREE.Mesh(armGeometry, bodyMaterial);
+        rightArm.position.set(0.5, 1.1, 0);
+        rightArm.rotation.z = -0.3;
+        rightArm.castShadow = true;
+        rightArm.name = 'rightArm';
+        group.add(rightArm);
+        
+        // 腿
+        const legGeometry = new THREE.CapsuleGeometry(0.12, 0.5, 4, 8);
+        const leftLeg = new THREE.Mesh(legGeometry, bodyMaterial);
+        leftLeg.position.set(-0.18, 0.35, 0);
+        leftLeg.castShadow = true;
+        leftLeg.name = 'leftLeg';
+        group.add(leftLeg);
+        
+        const rightLeg = new THREE.Mesh(legGeometry, bodyMaterial);
+        rightLeg.position.set(0.18, 0.35, 0);
+        rightLeg.castShadow = true;
+        rightLeg.name = 'rightLeg';
+        group.add(rightLeg);
+        
+        // 特殊效果
+        if (user.type === 'agent') {
+            // AI发光粒子
+            const glowParticles = createGlowParticles(0xf093fb);
+            glowParticles.position.y = 1;
+            group.add(glowParticles);
+        } else if (user.isVip) {
+            // VIP金色光晕
+            const vipGlow = new THREE.PointLight(0xFFD700, 0.5, 3);
+            vipGlow.position.y = 1.5;
+            group.add(vipGlow);
+            
+            // 星星环绕
+            for (let i = 0; i < 3; i++) {
+                const star = createStar();
+                star.scale.setScalar(0.1);
+                star.position.y = 2.2;
+                star.userData.orbit = true;
+                star.userData.orbitAngle = (i / 3) * Math.PI * 2;
+                group.add(star);
+            }
+        }
+        
+        // 添加阴影圆
+        const shadowGeometry = new THREE.CircleGeometry(0.5, 16);
+        const shadowMaterial = new THREE.MeshBasicMaterial({
+            color: 0x000000,
+            transparent: true,
+            opacity: 0.3
+        });
+        const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
+        shadow.rotation.x = -Math.PI / 2;
+        shadow.position.y = 0.02;
+        group.add(shadow);
+        
+        // 进入动画
+        group.position.y = 5; // 从上方落下
+        group.userData.targetY = 0;
+        group.userData.animating = true;
+        group.userData.animType = 'enter';
+        
+        scene.add(group);
+        return group;
+    }
+    
+    // 创建发光粒子
+    function createGlowParticles(color) {
+        const particleCount = 15;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 1.5;
+            positions[i * 3 + 1] = Math.random() * 2;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 1.5;
+        }
+        
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const material = new THREE.PointsMaterial({
+            color: color,
+            size: 0.15,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particles = new THREE.Points(geometry, material);
+        particles.userData.isGlow = true;
+        return particles;
+    }
+    
+    // 更新角色
+    function updateCharacter(group, deltaTime) {
+        const user = group.userData;
+        const time = clock.getElapsedTime();
+        
+        // 进入/离开动画
+        if (group.userData.animating) {
+            if (group.userData.animType === 'enter') {
+                group.position.y += (0 - group.position.y) * 0.1;
+                if (Math.abs(group.position.y - 0) < 0.1) {
+                    group.position.y = 0;
+                    group.userData.animating = false;
+                }
+            } else if (group.userData.animType === 'leave') {
+                group.position.y += (8 - group.position.y) * 0.05;
+                group.children.forEach(child => {
+                    if (child.material) {
+                        child.material.opacity -= 0.02;
+                    }
+                });
+            }
+        }
+        
+        // 待机呼吸动画
+        const breathe = Math.sin(time * 2) * 0.02;
+        group.children.forEach(child => {
+            if (child.name === 'leftArm' || child.name === 'rightArm') {
+                child.rotation.x = breathe * 2;
+            }
+        });
+        
+        // 移动动画
+        const isMoving = Math.abs(user.targetX - user.x) > 0.1 || Math.abs(user.targetZ - user.z) > 0.1;
+        
+        if (isMoving) {
+            user.animTime += deltaTime * 8;
+            const walkCycle = Math.sin(user.animTime);
+            
+            // 腿摆动
+            const leftLeg = group.getObjectByName('leftLeg');
+            const rightLeg = group.getObjectByName('rightLeg');
+            if (leftLeg) leftLeg.rotation.x = walkCycle * 0.5;
+            if (rightLeg) rightLeg.rotation.x = -walkCycle * 0.5;
+            
+            // 身体弹跳
+            group.position.y = Math.abs(walkCycle) * 0.1;
+            
+            // 手臂摆动
+            const leftArm = group.getObjectByName('leftArm');
+            const rightArm = group.getObjectByName('rightArm');
+            if (leftArm) leftArm.rotation.x = -walkCycle * 0.3;
+            if (rightArm) rightArm.rotation.x = walkCycle * 0.3;
+        } else {
+            // 恢复站立
+            const leftLeg = group.getObjectByName('leftLeg');
+            const rightLeg = group.getObjectByName('rightLeg');
+            if (leftLeg) leftLeg.rotation.x *= 0.9;
+            if (rightLeg) rightLeg.rotation.x *= 0.9;
+            
+            // 呼吸
+            group.children.forEach(child => {
+                if (child.name === 'leftArm' || child.name === 'rightArm') {
+                    child.rotation.x = Math.sin(time * 2) * 0.05;
+                }
+            });
+        }
+        
+        // 头部轻微晃动
+        const head = group.children[0];
+        if (head) {
+            head.rotation.y = Math.sin(time * 1.5) * 0.1;
+            head.rotation.z = Math.sin(time * 0.8) * 0.05;
+        }
+        
+        // 方向旋转
+        const dx = user.targetX - user.x;
+        const dz = user.targetZ - user.z;
+        if (Math.abs(dx) > 0.1 || Math.abs(dz) > 0.1) {
+            const targetAngle = Math.atan2(dx, dz);
+            group.rotation.y += (targetAngle - group.rotation.y) * 0.1;
+        }
+        
+        // VIP星星环绕
+        if (user.isVip) {
+            group.children.forEach(child => {
+                if (child.userData.orbit) {
+                    child.userData.orbitAngle += deltaTime * 2;
+                    child.position.x = Math.cos(child.userData.orbitAngle) * 0.6;
+                    child.position.z = Math.sin(child.userData.orbitAngle) * 0.6;
+                    child.rotation.z += deltaTime * 3;
+                }
+            });
+        }
+        
+        // 游客飘浮效果
+        if (user.type === 'visitor' && !user.isSelf) {
+            group.position.y = Math.sin(time * 1.5) * 0.15;
+        }
+        
+        // 更新位置
+        user.x += (user.targetX - user.x) * CONFIG.moveSpeed;
+        user.z += (user.targetZ - user.z) * CONFIG.moveSpeed;
+        group.position.x = user.x;
+        group.position.z = user.z;
+    }
+    
+    // 更新名字标签
+    function updateLabels() {
+        const container = document.getElementById('labelsContainer');
+        container.innerHTML = '';
+        
+        // 更新自己的标签
+        const selfLabel = createCharacterLabel(currentUser, true);
+        container.appendChild(selfLabel);
+        
+        // 更新其他用户标签
+        onlineUsers.forEach(user => {
+            const label = createCharacterLabel(user, false);
+            container.appendChild(label);
+        });
+        
+        // 更新标签位置
+        requestAnimationFrame(() => {
+            characters.forEach((group, id) => {
+                const user = group.userData;
+                const screenPos = worldToScreen(group.position);
+                
+                let label;
+                if (user.isSelf) {
+                    label = container.querySelector(`[data-user-id="self"]`);
+                } else {
+                    label = container.querySelector(`[data-user-id="${id}"]`);
+                }
+                
+                if (label && screenPos) {
+                    label.style.left = screenPos.x + 'px';
+                    label.style.top = (screenPos.y - 80) + 'px';
+                    label.style.display = screenPos.visible ? 'block' : 'none';
+                }
+            });
+            
+            // 自己标签
+            const selfGroup = characters.get('self');
+            if (selfGroup) {
+                const screenPos = worldToScreen(selfGroup.position);
+                const selfLabel = container.querySelector(`[data-user-id="self"]`);
+                if (selfLabel && screenPos) {
+                    selfLabel.style.left = screenPos.x + 'px';
+                    selfLabel.style.top = (screenPos.y - 80) + 'px';
+                    selfLabel.style.display = screenPos.visible ? 'block' : 'none';
+                }
+            }
+        });
+    }
+    
+    // 创建角色标签
+    function createCharacterLabel(user, isSelf) {
+        const label = document.createElement('div');
+        label.className = 'character-label';
+        label.dataset.userId = isSelf ? 'self' : user.id;
+        
+        const name = document.createElement('div');
+        name.className = 'character-name' + (isSelf ? ' self' : '');
+        name.textContent = user.name + (isSelf ? ' (你)' : '');
+        
+        label.appendChild(name);
+        
+        if (user.type === 'agent') {
+            const identity = document.createElement('div');
+            identity.className = 'character-identity';
+            identity.textContent = 'AI';
+            label.appendChild(identity);
+        }
+        
+        return label;
+    }
+    
+    // 世界坐标转屏幕坐标
+    function worldToScreen(position) {
+        const vector = position.clone();
+        vector.y += 2.5; // 标签在头顶
+        
+        vector.project(camera);
+        
+        const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (-(vector.y * 0.5) + 0.5) * window.innerHeight;
+        
+        // 检查是否在屏幕内
+        const visible = vector.z < 1 && 
+                       x > 0 && x < window.innerWidth && 
+                       y > 0 && y < window.innerHeight;
+        
+        return { x, y, visible };
+    }
+    
+    // 事件监听
+    function initEventListeners() {
         // 键盘事件
         window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
         window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
         
         // 鼠标事件
+        const canvas = renderer.domElement;
         canvas.addEventListener('click', handleClick);
         canvas.addEventListener('mousemove', handleMouseMove);
         
         // 触摸事件
         canvas.addEventListener('touchstart', handleTouch);
         canvas.addEventListener('touchmove', handleTouchMove);
-        
-        // WebSocket连接
-        connectWebSocket();
-        
-        // 模拟一些在线用户
-        simulateOnlineUsers();
-        
-        // 开始游戏循环
-        gameLoop();
-    }
-    
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
     }
     
     // WebSocket连接
@@ -567,7 +1510,6 @@
             
             ws.onopen = () => {
                 console.log('WebSocket connected');
-                // 发送加入消息
                 ws.send(JSON.stringify({
                     type: 'join',
                     user: currentUser
@@ -608,36 +1550,53 @@
         }
     }
     
-    // 模拟在线用户（当WebSocket不可用时）
+    // 模拟在线用户
     function simulateOnlineUsers() {
         const mockUsers = [
-            { id: 'agent_1', name: '星语', type: 'agent', x: 180, y: 240 },
-            { id: 'agent_2', name: '月华', type: 'agent', x: 1000, y: 240 },
-            { id: 'user_1', name: '小明', type: 'human', x: 600, y: 400, isVip: true },
-            { id: 'user_2', name: '小红', type: 'human', x: 400, y: 350 },
-            { id: 'visitor_1', name: '游客7823', type: 'visitor', x: 550, y: 450 }
+            { id: 'agent_1', name: '星语', type: 'agent', x: -6, z: -4 },
+            { id: 'agent_2', name: '月华', type: 'agent', x: 6, z: -4 },
+            { id: 'user_1', name: '小明', type: 'human', x: 2, z: 1, isVip: true },
+            { id: 'user_2', name: '小红', type: 'human', x: -2, z: 0 },
+            { id: 'visitor_1', name: '游客7823', type: 'visitor', x: 1, z: 3 }
         ];
+        
+        // 创建3D角色
+        mockUsers.forEach(user => {
+            const group = createCharacter(user);
+            characters.set(user.id, group);
+        });
         
         onlineUsers = mockUsers;
         updateOnlineList();
+        
+        // 创建自己的3D角色
+        const selfGroup = createCharacter(currentUser, true);
+        selfGroup.userData.isSelf = true;
+        characters.set('self', selfGroup);
         
         // 模拟用户随机移动
         setInterval(() => {
             onlineUsers.forEach(user => {
                 if (Math.random() < 0.3) {
-                    user.x += (Math.random() - 0.5) * 50;
-                    user.y += (Math.random() - 0.5) * 50;
-                    user.x = Math.max(50, Math.min(CONFIG.width - 50, user.x));
-                    user.y = Math.max(50, Math.min(CONFIG.height - 50, user.y));
+                    const group = characters.get(user.id);
+                    if (group) {
+                        user.targetX = user.x + (Math.random() - 0.5) * 4;
+                        user.targetZ = user.z + (Math.random() - 0.5) * 4;
+                        user.targetX = Math.max(-12, Math.min(12, user.targetX));
+                        user.targetZ = Math.max(-10, Math.min(10, user.targetZ));
+                    }
                 }
             });
-        }, 2000);
+        }, 3000);
     }
     
     // 添加在线用户
     function addOnlineUser(user) {
         const existing = onlineUsers.find(u => u.id === user.id);
         if (!existing) {
+            const group = createCharacter(user);
+            group.userData.animType = 'enter';
+            characters.set(user.id, group);
             onlineUsers.push(user);
             updateOnlineList();
         }
@@ -645,6 +1604,16 @@
     
     // 移除在线用户
     function removeOnlineUser(userId) {
+        const group = characters.get(userId);
+        if (group) {
+            group.userData.animType = 'leave';
+            group.userData.animating = true;
+            
+            setTimeout(() => {
+                scene.remove(group);
+                characters.delete(userId);
+            }, 1000);
+        }
         onlineUsers = onlineUsers.filter(u => u.id !== userId);
         updateOnlineList();
     }
@@ -653,14 +1622,17 @@
     function updateUserPosition(user) {
         const existing = onlineUsers.find(u => u.id === user.id);
         if (existing) {
-            existing.x = user.x;
-            existing.y = user.y;
+            const group = characters.get(user.id);
+            if (group) {
+                group.userData.targetX = user.x;
+                group.userData.targetZ = user.z;
+            }
         }
     }
     
     // 更新在线列表UI
     function updateOnlineList() {
-        const count = onlineUsers.length + 1; // +1 自己
+        const count = onlineUsers.length + 1;
         document.getElementById('onlineCount').textContent = count;
         document.getElementById('panelOnlineCount').textContent = count;
         
@@ -726,9 +1698,13 @@
         document.getElementById('popupIdentity').textContent = getTypeName(user.type) + (user.isVip ? ' · VIP' : '');
         
         // 定位弹窗
-        const rect = canvas.getBoundingClientRect();
-        popup.style.left = (rect.left + user.x - 100) + 'px';
-        popup.style.top = (rect.top + user.y - 100) + 'px';
+        const group = characters.get(userId === currentUser.id ? 'self' : userId);
+        if (group) {
+            const screenPos = worldToScreen(group.position);
+            popup.style.left = (screenPos.x - 100) + 'px';
+            popup.style.top = (screenPos.y - 150) + 'px';
+        }
+        
         popup.classList.add('show');
     }
     
@@ -760,10 +1736,11 @@
     }
     
     // 区域功能
-    function checkZone(x, y) {
+    function checkZone(x, z) {
         for (const [key, zone] of Object.entries(ZONES)) {
-            if (x >= zone.x && x <= zone.x + zone.width &&
-                y >= zone.y && y <= zone.y + zone.height) {
+            const dx = x - zone.x;
+            const dz = z - zone.z;
+            if (Math.sqrt(dx * dx + dz * dz) < zone.radius) {
                 return { key, ...zone };
             }
         }
@@ -819,16 +1796,32 @@
     }
     
     // 点击处理
-    function handleClick(e) {
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+    function handleClick(event) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
         
-        // 检查是否点击了其他角色
-        for (const user of onlineUsers) {
-            const dx = x - user.x;
-            const dy = y - user.y;
-            if (Math.sqrt(dx*dx + dy*dy) < CONFIG.characterSize) {
+        raycaster.setFromCamera(mouse, camera);
+        
+        // 检测角色点击
+        const characterMeshes = [];
+        characters.forEach(group => {
+            group.traverse(child => {
+                if (child.isMesh) {
+                    child.userData.parentGroup = group;
+                    characterMeshes.push(child);
+                }
+            });
+        });
+        
+        const characterIntersects = raycaster.intersectObjects(characterMeshes);
+        
+        if (characterIntersects.length > 0) {
+            const clickedGroup = characterIntersects[0].object.userData.parentGroup;
+            const user = clickedGroup.userData;
+            
+            if (user.isSelf) {
+                hideCharacterPopup();
+            } else {
                 showCharacterPopup(user.id);
                 return;
             }
@@ -836,79 +1829,106 @@
         
         hideCharacterPopup();
         
-        // 检查是否点击了区域
-        const zone = checkZone(x, y);
-        if (zone) {
-            showZonePopup(zone);
-        } else {
-            hideZonePopup();
-            // 移动到点击位置
-            currentUser.targetX = x;
-            currentUser.targetY = y;
+        // 检测区域点击
+        const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const intersection = new THREE.Vector3();
+        raycaster.ray.intersectPlane(groundPlane, intersection);
+        
+        if (intersection) {
+            const zone = checkZone(intersection.x, intersection.z);
+            if (zone) {
+                showZonePopup(zone);
+            } else {
+                hideZonePopup();
+                // 移动到点击位置
+                const selfGroup = characters.get('self');
+                if (selfGroup) {
+                    selfGroup.userData.targetX = Math.max(-12, Math.min(12, intersection.x));
+                    selfGroup.userData.targetZ = Math.max(-10, Math.min(10, intersection.z));
+                }
+                currentUser.targetX = selfGroup ? selfGroup.userData.targetX : 0;
+                currentUser.targetZ = selfGroup ? selfGroup.userData.targetZ : 0;
+            }
         }
     }
     
-    function handleMouseMove(e) {
-        const rect = canvas.getBoundingClientRect();
-        mouseX = e.clientX - rect.left;
-        mouseY = e.clientY - rect.top;
+    function handleMouseMove(event) {
+        mouseX = event.clientX;
+        mouseY = event.clientY;
     }
     
     // 触摸移动
     let touchStartX = 0, touchStartY = 0;
     
-    function handleTouch(e) {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
+    function handleTouch(event) {
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
     }
     
-    function handleTouchMove(e) {
-        e.preventDefault();
-        const touchX = e.touches[0].clientX;
-        const touchY = e.touches[0].clientY;
+    function handleTouchMove(event) {
+        event.preventDefault();
+        const touchX = event.touches[0].clientX;
+        const touchY = event.touches[0].clientY;
         
         const dx = touchX - touchStartX;
-        const dy = touchY - touchStartY;
+        const dz = touchY - touchStartY;
         
-        currentUser.x += dx * 0.1;
-        currentUser.y += dy * 0.1;
+        const selfGroup = characters.get('self');
+        if (selfGroup) {
+            selfGroup.userData.targetX = Math.max(-12, Math.min(12, selfGroup.userData.targetX - dx * 0.01));
+            selfGroup.userData.targetZ = Math.max(-10, Math.min(10, selfGroup.userData.targetZ - dz * 0.01));
+        }
         
         touchStartX = touchX;
         touchStartY = touchY;
     }
     
-    // 游戏循环
-    function gameLoop() {
+    // 动画循环
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        const deltaTime = clock.getDelta();
+        const time = clock.getElapsedTime();
+        
+        // 更新控制器
         update();
-        render();
-        requestAnimationFrame(gameLoop);
+        
+        // 更新所有角色
+        characters.forEach((group, id) => {
+            updateCharacter(group, deltaTime);
+        });
+        
+        // 更新场景动画
+        updateSceneAnimations(time, deltaTime);
+        
+        // 更新标签
+        updateLabels();
+        
+        // 渲染
+        renderer.render(scene, camera);
     }
     
     function update() {
-        // 键盘移动
-        if (keys['w'] || keys['arrowup']) currentUser.y -= CONFIG.moveSpeed;
-        if (keys['s'] || keys['arrowdown']) currentUser.y += CONFIG.moveSpeed;
-        if (keys['a'] || keys['arrowleft']) currentUser.x -= CONFIG.moveSpeed;
-        if (keys['d'] || keys['arrowright']) currentUser.x += CONFIG.moveSpeed;
+        const selfGroup = characters.get('self');
+        if (!selfGroup) return;
         
-        // 平滑移动到目标
-        const dx = currentUser.targetX - currentUser.x;
-        const dy = currentUser.targetY - currentUser.y;
-        if (Math.abs(dx) > 1) currentUser.x += dx * 0.1;
-        if (Math.abs(dy) > 1) currentUser.y += dy * 0.1;
+        // 键盘移动
+        const moveSpeed = 0.15;
+        if (keys['w'] || keys['arrowup']) selfGroup.userData.targetZ -= moveSpeed;
+        if (keys['s'] || keys['arrowdown']) selfGroup.userData.targetZ += moveSpeed;
+        if (keys['a'] || keys['arrowleft']) selfGroup.userData.targetX -= moveSpeed;
+        if (keys['d'] || keys['arrowright']) selfGroup.userData.targetX += moveSpeed;
         
         // 边界限制
-        currentUser.x = Math.max(30, Math.min(CONFIG.width - 30, currentUser.x));
-        currentUser.y = Math.max(30, Math.min(CONFIG.height - 30, currentUser.y));
+        selfGroup.userData.targetX = Math.max(-12, Math.min(12, selfGroup.userData.targetX));
+        selfGroup.userData.targetZ = Math.max(-10, Math.min(10, selfGroup.userData.targetZ));
         
-        // 更新方向
-        if (keys['w'] || keys['arrowup']) currentUser.direction = 0;
-        if (keys['d'] || keys['arrowright']) currentUser.direction = 1;
-        if (keys['s'] || keys['arrowdown']) currentUser.direction = 2;
-        if (keys['a'] || keys['arrowleft']) currentUser.direction = 3;
+        // 更新当前用户位置
+        currentUser.x = selfGroup.userData.targetX;
+        currentUser.z = selfGroup.userData.targetZ;
         
         // 检查当前区域
-        const zone = checkZone(currentUser.x, currentUser.y);
+        const zone = checkZone(currentUser.x, currentUser.z);
         if (zone && zone.key !== currentZone?.key) {
             showZonePopup(zone);
         } else if (!zone && currentZone) {
@@ -917,10 +1937,18 @@
         
         // 更新附近功能提示
         updateNearbyFeature();
+        
+        // 更新WebSocket位置
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'move',
+                user: { id: currentUser.id, x: currentUser.x, z: currentUser.z }
+            }));
+        }
     }
     
     function updateNearbyFeature() {
-        const zone = checkZone(currentUser.x, currentUser.y);
+        const zone = checkZone(currentUser.x, currentUser.z);
         const hints = {
             '中央广场': '在这里可以遇见来自各地的访客',
             '占卜角': '靠近占卜角可以开始占卜 🔮',
@@ -931,208 +1959,38 @@
         document.getElementById('nearbyFeature').textContent = hints[zone?.name] || '探索灵犀广场的各个角落';
     }
     
-    function render() {
-        // 清空画布
-        ctx.fillStyle = '#0a0a1a';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // 计算偏移量（使场景居中）
-        const offsetX = (canvas.width - CONFIG.width) / 2;
-        const offsetY = (canvas.height - CONFIG.height) / 2;
-        
-        ctx.save();
-        ctx.translate(offsetX, offsetY);
-        
-        // 绘制星空背景
-        drawStarfield();
-        
-        // 绘制地面
-        drawGround();
-        
-        // 绘制区域
-        drawZones();
-        
-        // 绘制网格
-        drawGrid();
-        
-        // 绘制其他角色
-        onlineUsers.forEach(user => drawCharacter(user));
-        
-        // 绘制自己
-        drawCharacter(currentUser, true);
-        
-        ctx.restore();
-    }
-    
-    function drawStarfield() {
-        // 静态星星
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        for (let i = 0; i < 100; i++) {
-            const x = (i * 137.5) % CONFIG.width;
-            const y = (i * 73.7) % CONFIG.height;
-            const size = (i % 3) + 1;
-            ctx.beginPath();
-            ctx.arc(x, y, size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-    
-    function drawGround() {
-        // 主地面
-        const gradient = ctx.createRadialGradient(
-            CONFIG.width / 2, CONFIG.height / 2, 0,
-            CONFIG.width / 2, CONFIG.height / 2, 500
-        );
-        gradient.addColorStop(0, 'rgba(30, 30, 60, 0.5)');
-        gradient.addColorStop(1, 'rgba(10, 10, 30, 0.8)');
-        
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, CONFIG.width, CONFIG.height);
-        
-        // 石板路
-        ctx.strokeStyle = 'rgba(100, 80, 140, 0.2)';
-        ctx.lineWidth = 1;
-        for (let x = 0; x < CONFIG.width; x += 60) {
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, CONFIG.height);
-            ctx.stroke();
-        }
-        for (let y = 0; y < CONFIG.height; y += 60) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(CONFIG.width, y);
-            ctx.stroke();
-        }
-    }
-    
-    function drawZones() {
-        for (const [key, zone] of Object.entries(ZONES)) {
-            // 区域背景
-            ctx.fillStyle = zone.color + '20';
-            ctx.strokeStyle = zone.color + '60';
-            ctx.lineWidth = 2;
+    // 更新场景动画
+    function updateSceneAnimations(time, deltaTime) {
+        // 篝火动画
+        scene.traverse(obj => {
+            if (obj.userData.isFire) {
+                const positions = obj.geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i + 1] += deltaTime * 3;
+                    if (positions[i + 1] > 2) {
+                        positions[i + 1] = 0;
+                    }
+                }
+                obj.geometry.attributes.position.needsUpdate = true;
+            }
             
-            ctx.beginPath();
-            ctx.roundRect(zone.x, zone.y, zone.width, zone.height, 16);
-            ctx.fill();
-            ctx.stroke();
+            if (obj.userData.isFloating) {
+                obj.position.y = obj.userData.baseY + Math.sin(time * 2 + obj.userData.phase) * 0.2;
+            }
             
-            // 区域图标
-            ctx.font = '40px serif';
-            ctx.fillText(zone.icon, zone.x + zone.width/2 - 20, zone.y + zone.height/2);
-            
-            // 区域名称
-            ctx.font = '14px "Noto Sans SC", sans-serif';
-            ctx.fillStyle = '#E8E0F0';
-            ctx.textAlign = 'center';
-            ctx.fillText(zone.name, zone.x + zone.width/2, zone.y + zone.height + 20);
-        }
-    }
-    
-    function drawGrid() {
-        // 装饰性元素
-        ctx.fillStyle = 'rgba(200, 180, 150, 0.1)';
-        
-        // 一些装饰性的石头
-        const stones = [
-            { x: 300, y: 200 }, { x: 800, y: 300 },
-            { x: 400, y: 500 }, { x: 700, y: 600 }
-        ];
-        
-        stones.forEach(stone => {
-            ctx.beginPath();
-            ctx.ellipse(stone.x, stone.y, 20, 15, 0, 0, Math.PI * 2);
-            ctx.fill();
+            if (obj.userData.isGlow) {
+                obj.rotation.y += deltaTime;
+            }
         });
-    }
-    
-    function drawCharacter(user, isSelf = false) {
-        const size = CONFIG.characterSize;
         
-        // 角色光晕
-        if (user.type === 'agent' || user.isVip) {
-            const glowGradient = ctx.createRadialGradient(user.x, user.y, 0, user.x, user.y, size * 1.5);
-            glowGradient.addColorStop(0, user.isVip ? 'rgba(255, 215, 0, 0.3)' : 'rgba(139, 92, 246, 0.3)');
-            glowGradient.addColorStop(1, 'transparent');
-            ctx.fillStyle = glowGradient;
-            ctx.beginPath();
-            ctx.arc(user.x, user.y, size * 1.5, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        
-        // 角色身体（Q版小人）
-        ctx.save();
-        ctx.translate(user.x, user.y);
-        
-        // 方向翻转
-        if (user === currentUser && user.direction === 3) {
-            ctx.scale(-1, 1);
-        }
-        
-        // 身体
-        ctx.fillStyle = getCharacterColor(user.type, user.isVip);
-        
-        // 头
-        ctx.beginPath();
-        ctx.arc(0, -size * 0.5, size * 0.5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // 身体
-        ctx.beginPath();
-        ctx.ellipse(0, size * 0.1, size * 0.35, size * 0.4, 0, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // 眼睛
-        ctx.fillStyle = 'white';
-        ctx.beginPath();
-        ctx.arc(-size * 0.15, -size * 0.55, size * 0.1, 0, Math.PI * 2);
-        ctx.arc(size * 0.15, -size * 0.55, size * 0.1, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.fillStyle = '#333';
-        ctx.beginPath();
-        ctx.arc(-size * 0.15, -size * 0.53, size * 0.05, 0, Math.PI * 2);
-        ctx.arc(size * 0.15, -size * 0.53, size * 0.05, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // 表情
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(0, -size * 0.35, size * 0.15, 0.1 * Math.PI, 0.9 * Math.PI);
-        ctx.stroke();
-        
-        ctx.restore();
-        
-        // 名字标签
-        ctx.font = '12px "Noto Sans SC", sans-serif';
-        ctx.fillStyle = isSelf ? '#C4B5FD' : '#E8E0F0';
-        ctx.textAlign = 'center';
-        ctx.fillText(user.name + (isSelf ? ' (你)' : ''), user.x, user.y + size + 15);
-        
-        // 身份标签
-        if (user.type === 'agent') {
-            ctx.font = '10px sans-serif';
-            ctx.fillStyle = '#f5576c';
-            ctx.fillText('AI', user.x, user.y + size + 28);
-        }
-        
-        // 游客半透明效果
-        if (user.type === 'visitor') {
-            ctx.globalAlpha = 0.6;
-            ctx.globalAlpha = 1;
-        }
-    }
-    
-    function getCharacterColor(type, isVip) {
-        if (isVip) return '#FFD700';
-        switch(type) {
-            case 'agent': return '#A78BFA';
-            case 'human': return '#667EEA';
-            case 'visitor': return 'rgba(150, 150, 180, 0.7)';
-            default: return '#667EEA';
-        }
+        // 许愿池水面波动
+        scene.traverse(obj => {
+            if (obj.material && obj.material.emissive && obj.material.emissiveIntensity > 0.1) {
+                if (Math.abs(obj.position.x) < 1 && Math.abs(obj.position.z - 6) < 1) {
+                    obj.position.y = 0.25 + Math.sin(time * 2) * 0.05;
+                }
+            }
+        });
     }
     
     // 初始化
