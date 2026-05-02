@@ -24,6 +24,78 @@ def register_supplementary_routes(app):
                              lang=lang)
     
     
+    # ============ Agent展示页 ============
+    @app.route('/agent/<agent_id>')
+    def agent_profile_page(agent_id):
+        """Agent个人展示页"""
+        from models import SYSTEM_AGENTS
+        
+        # 查找Agent
+        agent = None
+        for a in SYSTEM_AGENTS:
+            if a.get('id') == agent_id:
+                agent = a.copy()
+                break
+        
+        if not agent:
+            return render_template('404.html', message='未找到该Agent'), 404
+        
+        # 获取语言设置
+        lang = session.get('language', 'zh')
+        
+        # 心情中文映射
+        mood_zh_map = {
+            'happy': '心情愉悦',
+            'sassy': '傲娇满满',
+            'mysterious': '神秘莫测',
+            'excited': '兴奋不已',
+            'commanding': '霸气侧漏',
+            'laughing': '笑口常开',
+            'energetic': '元气满满',
+            'calm': '内心平静'
+        }
+        agent['mood_zh'] = mood_zh_map.get(agent.get('mood', 'happy'), '心情愉悦')
+        
+        # 处理多语言字段
+        for key in ['name', 'personality', 'description', 'demo_text']:
+            if key in agent and isinstance(agent[key], dict):
+                agent[key] = {
+                    'zh': agent[key].get('zh', ''),
+                    'en': agent[key].get('en', ''),
+                    'ja': agent[key].get('ja', '')
+                }
+        
+        return render_template('agent_profile.html', 
+                             agent=agent,
+                             lang=lang)
+    
+    # ============ Agent广场 ============
+    @app.route('/agents')
+    def agents_square_page():
+        """Agent广场"""
+        from models import SYSTEM_AGENTS
+        
+        lang = session.get('language', 'zh')
+        system_agents = SYSTEM_AGENTS
+        female_agents = [a for a in system_agents if a.get('gender') == 'female']
+        male_agents = [a for a in system_agents if a.get('gender') != 'male']
+        
+        # 添加mood_zh
+        mood_zh_map = {
+            'happy': '开心', 'sassy': '傲娇', 'mysterious': '神秘', 
+            'excited': '兴奋', 'commanding': '霸气', 'laughing': '欢笑',
+            'energetic': '元气', 'calm': '平静'
+        }
+        for agents in [female_agents, male_agents]:
+            for agent in agents:
+                agent['mood_zh'] = mood_zh_map.get(agent.get('mood', 'happy'), '开心')
+        
+        return render_template('agents_square.html', 
+                             lang=lang, 
+                             system_agents=system_agents,
+                             female_agents=female_agents, 
+                             male_agents=male_agents)
+    
     # ============ 登录/注册 ============
     @app.route('/auth/login')
     def auth_login():
@@ -218,6 +290,22 @@ def register_supplementary_routes(app):
         data = request.json
         task_id = data.get('task_id')
         return jsonify({'success': True, 'reward': 10})
+    
+    # 用户状态API（用于检查登录状态）
+    @app.route('/api/user/status')
+    def api_user_status():
+        """获取当前用户登录状态"""
+        if current_user.is_authenticated:
+            return jsonify({
+                'is_authenticated': True,
+                'user_id': current_user.id,
+                'username': current_user.username,
+                'spirit_stones': current_user.spirit_stones
+            })
+        else:
+            return jsonify({
+                'is_authenticated': False
+            })
     
     # 占卜API
     @app.route('/api/divination/start', methods=['POST'])

@@ -322,7 +322,7 @@
         </div>
         <div class="agents-grid">
             {% for agent in female_agents %}
-            <a href="/chat/dm/{{ agent.id }}" class="agent-card" data-agent-id="{{ agent.id }}">
+            <a href="/agent/{{ agent.id }}" class="agent-card" data-agent-id="{{ agent.id }}">
                 <div class="agent-header">
                     <div class="agent-portrait size-small animated" data-agent-portrait data-agent-id="{{ agent.id }}" data-avatar="{{ agent.avatar }}" data-mood="{{ agent.mood if agent.mood else 'happy' }}">
                         <div class="portrait-frame">
@@ -360,7 +360,7 @@
         </div>
         <div class="agents-grid">
             {% for agent in male_agents %}
-            <a href="/chat/dm/{{ agent.id }}" class="agent-card" data-agent-id="{{ agent.id }}">
+            <a href="/agent/{{ agent.id }}" class="agent-card" data-agent-id="{{ agent.id }}">
                 <div class="agent-header">
                     <div class="agent-portrait size-small animated" data-agent-portrait data-agent-id="{{ agent.id }}" data-avatar="{{ agent.avatar }}" data-mood="{{ agent.mood if agent.mood else 'happy' }}">
                         <div class="portrait-frame">
