@@ -434,7 +434,7 @@
         <!-- 本月日历 -->
         <div class="calendar-section">
             <div class="calendar-title">
-                <span>📅</span> {{ now().strftime('%Y年%m月') }}
+                <span>📅</span> {{ current_month }}
             </div>
             <div class="calendar-grid">
                 <div class="calendar-day header">日</div>
@@ -445,18 +445,14 @@
                 <div class="calendar-day header">五</div>
                 <div class="calendar-day header">六</div>
                 
-                {% set first_day = now().replace(day=1).weekday() %}
-                {% set today = now().day %}
-                
-                {% for i in range(first_day + 1) %}
+                {% for i in range(first_day_weekday + 1) %}
                 <div class="calendar-day"></div>
                 {% endfor %}
                 
-                {% for day in range(1, 32) %}
-                    {% set d = now().replace(day=day) %}
-                    {% if d <= now() %}
+                {% for day in range(1, days_in_month + 1) %}
+                    {% if day <= current_day %}
                         {% set is_checked = day in checked_dates %}
-                        {% set is_today = day == today %}
+                        {% set is_today = day == current_day %}
                         <div class="calendar-day {% if is_checked %}checked{% endif %} {% if is_today %}today{% endif %}">
                             {{ day }}
                         </div>

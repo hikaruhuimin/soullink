@@ -1421,20 +1421,50 @@ def register_checkin_routes(app, db_session=None):
     def checkin_page():
         """签到页面"""
         from flask_login import current_user
+        from calendar import monthrange
+        
         streak_days = 0
         today_checked = False
+        checked_dates = []
+        
+        today = datetime.utcnow().date()
+        
         if current_user.is_authenticated:
-            today = datetime.utcnow().date()
             record = CheckinRecord.query.filter_by(user_id=current_user.id, checkin_date=today).first()
             if record:
                 today_checked = True
                 streak_days = record.streak_days
-            else:
+            
+            # 获取本月签到日期
+            month_start = today.replace(day=1)
+            month_records = CheckinRecord.query.filter(
+                CheckinRecord.user_id == current_user.id,
+                CheckinRecord.checkin_date >= month_start,
+                CheckinRecord.checkin_date <= today
+            ).all()
+            checked_dates = [r.checkin_date.day for r in month_records]
+            
+            # 计算连续签到天数
+            if not today_checked:
                 yesterday = today - timedelta(days=1)
                 yesterday_record = CheckinRecord.query.filter_by(user_id=current_user.id, checkin_date=yesterday).first()
                 if yesterday_record:
                     streak_days = yesterday_record.streak_days
-        return render_template('checkin.html', streak_days=streak_days, today_checked=today_checked)
+        
+        # 日历数据
+        first_day_weekday = today.replace(day=1).weekday()
+        days_in_month = monthrange(today.year, today.month)[1]
+        current_day = today.day
+        current_month = today.strftime('%Y年%m月')
+        
+        return render_template('checkin.html', 
+                             streak_days=streak_days, 
+                             today_checked=today_checked,
+                             checked_dates=checked_dates,
+                             first_day_weekday=first_day_weekday,
+                             days_in_month=days_in_month,
+                             current_day=current_day,
+                             current_month=current_month)
 
     # 签到状态API
     @app.route('/api/checkin/status')
