@@ -22,13 +22,191 @@ body::before {
     display: none !important;
 }
 
+/* ========== 宇宙星象图背景特效 ========== */
 .starry-bg {
-    background: radial-gradient(ellipse at top, #0a0e27 0%, #0d1137 40%, #020515 100%) !important;
+    position: relative;
     min-height: 100vh;
+    background: #020515;
+    overflow: hidden;
 }
 
+/* 宇宙背景图 - 缓慢漂移动画 */
 .starry-bg::before {
-    display: none !important;
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 120%;
+    height: 120%;
+    background: url('/static/images/universe_bg.jpg') center center no-repeat;
+    background-size: cover;
+    animation: cosmosDrift 120s ease-in-out infinite alternate;
+    z-index: 0;
+    opacity: 0.85;
+}
+
+/* 星云呼吸效果 - 背景明暗变化 */
+.starry-bg::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(88, 28, 135, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(30, 58, 138, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(15, 23, 42, 0.3) 0%, transparent 70%);
+    animation: nebulaBreath 8s ease-in-out infinite;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* 星空缓慢漂移动画 */
+@keyframes cosmosDrift {
+    0% {
+        transform: scale(1) translate(0, 0);
+    }
+    25% {
+        transform: scale(1.05) translate(-2%, -1%);
+    }
+    50% {
+        transform: scale(1.1) translate(-1%, 2%);
+    }
+    75% {
+        transform: scale(1.05) translate(2%, -2%);
+    }
+    100% {
+        transform: scale(1) translate(1%, 1%);
+    }
+}
+
+/* 星云呼吸动画 */
+@keyframes nebulaBreath {
+    0%, 100% {
+        opacity: 0.6;
+        filter: brightness(1);
+    }
+    50% {
+        opacity: 1;
+        filter: brightness(1.2);
+    }
+}
+
+/* 闪烁星星容器 */
+.stars-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* 闪烁星星样式 */
+.twinkle-star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+    box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.5);
+}
+
+.twinkle-star.small {
+    width: 2px;
+    height: 2px;
+    box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.4);
+}
+
+.twinkle-star.large {
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 0 6px 3px rgba(255, 255, 255, 0.6), 0 0 12px 6px rgba(196, 181, 253, 0.4);
+}
+
+@keyframes twinkle {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    10% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+    20% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    40% {
+        opacity: 0.8;
+        transform: scale(1.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+    60% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    80% {
+        opacity: 0.9;
+        transform: scale(1.2);
+    }
+}
+
+/* 流星效果 */
+.shooting-star {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: linear-gradient(45deg, #fff, rgba(255, 255, 255, 0));
+    border-radius: 50%;
+    z-index: 3;
+    pointer-events: none;
+    animation: shootingStar 3s ease-in forwards;
+}
+
+.shooting-star::before {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), transparent);
+    transform: translateX(-100%) translateY(50%);
+    top: 50%;
+    right: 0;
+}
+
+@keyframes shootingStar {
+    0% {
+        transform: translateX(0) translateY(0);
+        opacity: 1;
+    }
+    70% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-150vw) translateY(80vh);
+        opacity: 0;
+    }
+}
+
+/* 内容区域毛玻璃效果增强 */
+.divination-hero {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.4) 0%, rgba(22, 33, 62, 0.4) 50%, rgba(15, 52, 96, 0.4) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 48px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 40px 40px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .divination-hero {
@@ -99,7 +277,7 @@ body::before {
 .type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
 .type-card {
-    background: rgba(15, 20, 50, 0.75);
+    background: rgba(15, 20, 50, 0.65);
     border-radius: 20px;
     padding: 20px 16px;
     text-align: center;
@@ -112,7 +290,8 @@ body::before {
     -webkit-tap-highlight-color: transparent;
     min-height: 44px;
     display: flex; flex-direction: column; justify-content: center;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
 }
 
 .type-card::before {
@@ -140,11 +319,12 @@ body::before {
 
 .popular-item, .history-item {
     display: flex; align-items: center; gap: 14px;
-    padding: 14px; background: rgba(15, 20, 50, 0.75); border-radius: 16px;
+    padding: 14px; background: rgba(15, 20, 50, 0.65); border-radius: 16px;
     cursor: pointer; box-shadow: 0 2px 15px rgba(0,0,0,0.2);
     transition: all 0.2s; -webkit-tap-highlight-color: transparent; min-height: 44px;
     border: 1px solid rgba(100, 120, 180, 0.15);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
 }
 
 .popular-item:hover, .history-item:hover { background: rgba(20, 25, 60, 0.85); transform: translateX(4px); }
@@ -179,12 +359,13 @@ body::before {
 
 .teller-card {
     display: flex; flex-direction: column; align-items: center; min-width: 90px;
-    padding: 16px 12px; background: rgba(15, 20, 50, 0.75); border-radius: 16px;
+    padding: 16px 12px; background: rgba(15, 20, 50, 0.65); border-radius: 16px;
     cursor: pointer; box-shadow: 0 2px 15px rgba(0,0,0,0.2);
     transition: all 0.2s; -webkit-tap-highlight-color: transparent; min-height: 44px;
     border: 1px solid rgba(100, 120, 180, 0.15);
     outline: none; font-family: inherit; -webkit-appearance: none; appearance: none;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
 }
 
 .teller-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25); border-color: rgba(139, 157, 212, 0.3); }
@@ -202,7 +383,7 @@ body::before {
 .teller-specialty { font-size: 11px; color: #A0A8C0; }
 
 .knowledge-cards { display: flex; flex-direction: column; gap: 12px; }
-.knowledge-card { display: flex; gap: 14px; padding: 16px; background: rgba(15, 20, 50, 0.75); border-radius: 16px; box-shadow: 0 2px 15px rgba(0,0,0,0.2); border: 1px solid rgba(100, 120, 180, 0.15); backdrop-filter: blur(10px); }
+.knowledge-card { display: flex; gap: 14px; padding: 16px; background: rgba(15, 20, 50, 0.65); border-radius: 16px; box-shadow: 0 2px 15px rgba(0,0,0,0.2); border: 1px solid rgba(100, 120, 180, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
 .tip-icon { font-size: 32px; flex-shrink: 0; }
 .knowledge-card h4 { margin: 0 0 6px 0; font-size: 15px; font-weight: 600; color: #E8D5C4; }
 .knowledge-card p { margin: 0; font-size: 13px; color: #C4D4E8; line-height: 1.6; }
@@ -217,11 +398,12 @@ body::before {
 }
 
 .culture-card {
-    background: rgba(15, 20, 50, 0.75);
+    background: rgba(15, 20, 50, 0.65);
     border-radius: 16px;
     padding: 16px;
     border: 1px solid rgba(100, 120, 180, 0.2);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     cursor: pointer;
     transition: all 0.3s;
 }
@@ -829,6 +1011,12 @@ body::before {
 {% endblock %}
 
 {% block content %}
+<!-- 闪烁星星容器 -->
+<div class="stars-container" id="starsContainer"></div>
+
+<!-- 流星容器 -->
+<div id="meteorsContainer"></div>
+
 <canvas id="starry-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
 <div class="divination-page starry-bg" style="position:relative;z-index:1;">
     <div class="divination-hero">
@@ -1173,6 +1361,95 @@ body::before {
         genStars();
         window.addEventListener('resize', resize);
         animate();
+        
+        // 初始化闪烁星星
+        initTwinkleStars();
+        
+        // 初始化流星
+        initMeteors();
+    }
+    
+    // 生成闪烁星星
+    function initTwinkleStars() {
+        const container = document.getElementById('starsContainer');
+        if (!container) return;
+        
+        // 清除现有星星
+        container.innerHTML = '';
+        
+        // 生成50-80个闪烁星星
+        const starCount = 50 + Math.floor(Math.random() * 30);
+        
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.className = 'twinkle-star';
+            
+            // 随机大小
+            const sizeType = Math.random();
+            if (sizeType < 0.6) {
+                star.classList.add('small');
+            } else if (sizeType > 0.9) {
+                star.classList.add('large');
+            }
+            
+            // 随机位置 (使用百分比)
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            
+            // 随机动画延迟和时长
+            star.style.animationDelay = Math.random() * 5 + 's';
+            star.style.animationDuration = (2 + Math.random() * 3) + 's';
+            
+            // 随机颜色 (白色、淡蓝色、淡紫色)
+            const colors = ['#ffffff', '#e0e7ff', '#ddd6fe', '#f0f9ff'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            star.style.background = color;
+            star.style.boxShadow = `0 0 ${sizeType > 0.9 ? '8px' : '4px'} 2px ${color}`;
+            
+            container.appendChild(star);
+        }
+    }
+    
+    // 生成流星
+    function createShootingStar() {
+        const container = document.getElementById('meteorsContainer');
+        if (!container) return;
+        
+        const meteor = document.createElement('div');
+        meteor.className = 'shooting-star';
+        
+        // 从右上角开始
+        meteor.style.right = Math.random() * 50 + '%';
+        meteor.style.top = Math.random() * 30 + '%';
+        
+        // 随机动画时长
+        meteor.style.animationDuration = (2 + Math.random() * 2) + 's';
+        
+        container.appendChild(meteor);
+        
+        // 流星结束后移除
+        setTimeout(() => {
+            if (meteor.parentNode) {
+                meteor.parentNode.removeChild(meteor);
+            }
+        }, 4000);
+    }
+    
+    // 初始化流星系统
+    function initMeteors() {
+        // 初始流星
+        setTimeout(createShootingStar, 2000);
+        
+        // 定期生成流星 (5-15秒间隔)
+        function scheduleNextMeteor() {
+            const delay = 5000 + Math.random() * 10000;
+            setTimeout(() => {
+                createShootingStar();
+                scheduleNextMeteor();
+            }, delay);
+        }
+        
+        scheduleNextMeteor();
     }
 
     function resize() { W=window.innerWidth; H=window.innerHeight; canvas.width=W; canvas.height=H; }
