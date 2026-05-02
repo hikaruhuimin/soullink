@@ -6,3 +6,4 @@ requests==2.31.0
 python-dotenv==1.0.0
 blinker==1.7.0
 gunicorn==21.2.0
+openai==1.12.0
