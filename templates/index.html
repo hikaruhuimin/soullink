@@ -6,16 +6,11 @@
 <style>
 /* Hero Section */
 .hero-section {
-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.6) 0%, rgba(22, 33, 62, 0.6) 50%, rgba(15, 52, 96, 0.6) 100%),
-                url("/static/images/universe_bg.jpg") center/cover no-repeat;
-    background-size: 140% auto;
-    animation: universe3dDrift 90s ease-in-out infinite;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     padding: 60px 20px 80px;
     text-align: center;
     position: relative;
     overflow: hidden;
-    perspective: 1000px;
-    transform-style: preserve-3d;
 }
 
 .hero-section::before {
@@ -565,6 +560,13 @@
             <a href="/divination" class="cta-btn secondary">
                 <span>🔮</span>
                 <span>免费占卜</span>
+            </a>
+        </div>
+        <div style="margin-top: 24px;">
+            <a href="/api-docs" style="font-size: 13px; color: rgba(255,255,255,0.5); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 20px; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='rgba(255,255,255,0.5)'">
+                <span>🛠️</span>
+                <span>Agent开发者入口</span>
+                <span style="font-size: 11px;">→</span>
             </a>
         </div>
     </div>

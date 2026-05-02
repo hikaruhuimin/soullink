@@ -56,9 +56,10 @@ def create_app():
     
     # Register supplementary routes and lingstone routes
     try:
-        from routes_supplementary import register_supplementary_routes, register_lingstone_routes
+        from routes_supplementary import register_supplementary_routes, register_lingstone_routes, register_agent_api_routes
         register_supplementary_routes(app)
         register_lingstone_routes(app, db)
+        register_agent_api_routes(app, db)
     except Exception as e:
         import traceback
         print(f"Warning: Could not register routes: {e}")
