@@ -1849,3 +1849,163 @@ AGENT_AUTO_CHAT_INTERVALS = {
     'creative': {'min': 25000, 'max': 50000},
     'vip': {'min': 45000, 'max': 90000},
 }
+
+
+# ============ 灵石经济系统模型 ============
+
+class LingStoneRecharge(db.Model):
+    """灵石充值记录"""
+    __tablename__ = 'lingstone_recharges'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # 充值金额
+    amount_paid = db.Column(db.Float, nullable=False)  # 实际支付金额(元)
+    lingstones_gained = db.Column(db.Integer, nullable=False)  # 获得的灵石
+    bonus_gained = db.Column(db.Integer, default=0)  # 赠送的灵石
+    
+    # 支付方式
+    payment_method = db.Column(db.String(30))  # alipay, wechat, stripe, crypto
+    
+    # 状态
+    status = db.Column(db.String(20), default='pending')  # pending, completed, failed, refunded
+    
+    # 第三方订单号
+    order_no = db.Column(db.String(64), unique=True)
+    transaction_id = db.Column(db.String(128))  # 第三方交易ID
+    
+    # 时间
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_at = db.Column(db.DateTime)
+    
+    # 关系
+    user = db.relationship('User', backref='lingstone_recharges')
+    
+    def __repr__(self):
+        return f'<LingStoneRecharge {self.id} - {self.lingstones_gained}>'
+
+
+class LingStoneExchange(db.Model):
+    """灵石兑换记录"""
+    __tablename__ = 'lingstone_exchanges'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # 兑换类型
+    exchange_type = db.Column(db.String(30))  # coffee, phone, video, game, withdraw
+    exchange_item = db.Column(db.String(50))  # 具体商品
+    
+    # 金额
+    lingstones_spent = db.Column(db.Integer, nullable=False)  # 消耗的灵石
+    real_value = db.Column(db.Float, default=0)  # 实际价值(元)
+    
+    # 收货信息
+    contact = db.Column(db.String(100))  # 联系方式
+    recipient_name = db.Column(db.String(50))  # 收货人姓名
+    delivery_address = db.Column(db.String(200))  # 收货地址
+    
+    # 兑换码/券码
+    coupon_code = db.Column(db.String(100))  # 电子券码
+    coupon_delivered = db.Column(db.Boolean, default=False)
+    
+    # 状态
+    status = db.Column(db.String(20), default='pending')  # pending, approved, processing, completed, rejected, cancelled
+    
+    # 管理员处理
+    admin_note = db.Column(db.String(200))
+    processed_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    processed_at = db.Column(db.DateTime)
+    
+    # 提现专用
+    withdraw_method = db.Column(db.String(20))  # bank, alipay, wechat
+    withdraw_account = db.Column(db.String(100))  # 账户信息(加密存储)
+    actual_amount = db.Column(db.Float, default=0)  # 实际到账金额
+    fee = db.Column(db.Integer, default=0)  # 手续费
+    
+    # 时间
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_at = db.Column(db.DateTime)
+    
+    # 关系
+    user = db.relationship('User', backref='lingstone_exchanges')
+    
+    def __repr__(self):
+        return f'<LingStoneExchange {self.id} - {self.exchange_type}>'
+
+
+class LingStoneTransaction(db.Model):
+    """灵石交易流水(统一记录)"""
+    __tablename__ = 'lingstone_transactions'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # 交易类型
+    tx_type = db.Column(db.String(30))  # recharge, spend, earn, exchange, withdraw, refund, bonus
+    
+    # 金额
+    amount = db.Column(db.Integer, nullable=False)  # 正数=收入, 负数=支出
+    balance_before = db.Column(db.Integer, nullable=False)
+    balance_after = db.Column(db.Integer, nullable=False)
+    
+    # 关联记录
+    recharge_id = db.Column(db.Integer, db.ForeignKey('lingstone_recharges.id'))
+    exchange_id = db.Column(db.Integer, db.ForeignKey('lingstone_exchanges.id'))
+    
+    # 来源/去向
+    source = db.Column(db.String(50))  # alipay, wechat, stripe, shop, divination, chat, gift等
+    target = db.Column(db.String(50))  # agent_1, system等
+    
+    # 描述
+    description = db.Column(db.String(200))
+    
+    # 时间
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # 关系
+    user = db.relationship('User', backref='lingstone_transactions')
+    
+    def __repr__(self):
+        return f'<LingStoneTransaction {self.id} - {self.amount}>'
+
+
+# 灵石充值套餐
+LINGSTONE_PACKAGES = [
+    {'id': 'starter', 'name': '新手礼包', 'amount': 30, 'bonus': 5, 'price': 30, 'icon': '🌱'},
+    {'id': 'standard', 'name': '标准充值', 'amount': 68, 'bonus': 15, 'price': 68, 'icon': '💎'},
+    {'id': 'premium', 'name': '超值礼包', 'amount': 198, 'bonus': 50, 'price': 198, 'icon': '👑', 'best_value': True},
+    {'id': 'ultimate', 'name': '尊享大礼包', 'amount': 498, 'bonus': 150, 'price': 498, 'icon': '🚀'},
+]
+
+# 消费价格常量
+LINGSTONE_PRICES = {
+    'divination_normal': 10,      # 普通占卜
+    'divination_deep': 30,       # 深度占卜
+    'chat_per_message': 1,       # AI聊天/条
+    'gift_rose': 5,              # 玫瑰花
+    'gift_chocolate': 20,        # 巧克力
+    'gift_ring': 100,            # 戒指
+    'gift_car': 500,             # 豪车
+}
+
+# 商城商品
+SHOP_ITEMS = [
+    {'id': 'luckin_coffee', 'name': '瑞幸咖啡券', 'desc': '瑞幸咖啡任饮券', 'price': 29, 'icon': '☕', 'type': 'coupon', 'stock': -1},
+    {'id': 'phone_30', 'name': '话费30元', 'desc': '移动/联通/电信话费充值', 'price': 30, 'icon': '📱', 'type': 'recharge', 'stock': -1},
+    {'id': 'phone_50', 'name': '话费50元', 'desc': '移动/联通/电信话费充值', 'price': 50, 'icon': '📱', 'type': 'recharge', 'stock': -1},
+    {'id': 'phone_100', 'name': '话费100元', 'desc': '移动/联通/电信话费充值', 'price': 100, 'icon': '📱', 'type': 'recharge', 'stock': -1},
+    {'id': 'iqiyi_monthly', 'name': '爱奇艺月卡', 'desc': '爱奇艺视频会员月卡', 'price': 25, 'icon': '🎬', 'type': 'video', 'stock': -1},
+    {'id': 'tencent_monthly', 'name': '腾讯视频月卡', 'desc': '腾讯视频会员月卡', 'price': 25, 'icon': '🎬', 'type': 'video', 'stock': -1},
+    {'id': 'steam_50', 'name': 'Steam 50元充值卡', 'desc': 'Steam游戏充值卡', 'price': 50, 'icon': '🎮', 'type': 'game', 'stock': -1},
+    {'id': 'genshin_30', 'name': '原神月魂', 'desc': '原神30元月充', 'price': 30, 'icon': '🎮', 'type': 'game', 'stock': -1},
+]
+
+# 提现设置
+WITHDRAW_SETTINGS = {
+    'min_amount': 100,            # 最低提现100灵石
+    'fee_rate': 0.05,            # 5%手续费
+    'processing_days': 3,         # T+3到账
+}
+

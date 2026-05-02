@@ -372,6 +372,13 @@
                 <a href="/divination/dream" class="nav-link">AI解梦</a>
                 <a href="/meet" class="nav-link">连线</a>
                 <a href="/divination" class="nav-link">占卜</a>
+                <a href="/shop" class="nav-link">商城</a>
+                <a href="/membership" class="nav-link">会员</a>
+                <a href="/contact" class="nav-link" style="color: var(--color-primary);">客服</a>
+                
+                {% if current_user.is_authenticated %}
+                <a href="/wallet" class="nav-link" title="我的钱包">💎 {{ current_user.spirit_stones or 0 }}</a>
+                {% endif %}
                 
                 <div class="nav-lang-dropdown">
                     <button class="nav-lang-btn" onclick="toggleLangMenu()">
@@ -427,6 +434,25 @@
                 </span>
                 聊天
             </a>
+            <a href="/wallet" class="bottom-nav-item">
+                <span class="bottom-nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="10" cy="10" r="8"/>
+                        <path d="M10 6v8M7 9h6"/>
+                    </svg>
+                </span>
+                钱包
+            </a>
+            <a href="/shop" class="bottom-nav-item">
+                <span class="bottom-nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 3h2l2.5 9h8l2-6H6"/>
+                        <circle cx="9" cy="17" r="1.5"/>
+                        <circle cx="15" cy="17" r="1.5"/>
+                    </svg>
+                </span>
+                商城
+            </a>
             <a href="/membership" class="bottom-nav-item">
                 <span class="bottom-nav-icon">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -434,6 +460,15 @@
                     </svg>
                 </span>
                 会员
+            </a>
+            <a href="/contact" class="bottom-nav-item">
+                <span class="bottom-nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 5C3 3.9 3.9 3 5 3H15C16.1 3 17 3.9 17 5V15C17 16.1 16.1 17 15 17H5C3.9 17 3 16.1 3 15V5Z"/>
+                        <path d="M3 7L10 11L17 7"/>
+                    </svg>
+                </span>
+                客服
             </a>
         </div>
     </nav>

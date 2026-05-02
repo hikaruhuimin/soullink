@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('contact_support') }} - {{ _('app_name') }}{% endblock %}
+
+{% block content %}
+<style>
+.contact-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Header */
+.contact-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.contact-header h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 16px;
+}
+
+.contact-header p {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+}
+
+/* Cards Container */
+.contact-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 50px;
+}
+
+.contact-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    border: 1px solid var(--color-border-light);
+}
+
+.contact-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.contact-card-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.contact-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+.contact-card p {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+/* Form Container */
+.contact-form-container {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--color-border-light);
+}
+
+.contact-form-container h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    color: var(--color-text);
+    background: var(--color-bg);
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(184, 169, 201, 0.2);
+}
+
+.form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(184, 169, 201, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Success Message */
+.success-message {
+    display: none;
+    text-align: center;
+    padding: 40px;
+}
+
+.success-message.show {
+    display: block;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: white;
+}
+
+.success-message h3 {
+    font-size: 1.5rem;
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+.success-message p {
+    color: var(--color-text-secondary);
+}
+
+/* FAQ Section */
+.faq-section {
+    margin-top: 50px;
+}
+
+.faq-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.faq-item {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 16px;
+    border: 1px solid var(--color-border-light);
+}
+
+.faq-item h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.faq-item h4::before {
+    content: "Q";
+    width: 24px;
+    height: 24px;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.faq-item p {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    padding-left: 34px;
+}
+
+/* Email Display */
+.email-display {
+    text-align: center;
+    padding: 20px;
+    background: rgba(184, 169, 201, 0.1);
+    border-radius: var(--radius-lg);
+    margin-top: 30px;
+}
+
+.email-display a {
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-decoration: none;
+}
+
+.email-display a:hover {
+    text-decoration: underline;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #333;
+    color: white;
+    padding: 14px 28px;
+    border-radius: var(--radius-full);
+    font-size: 0.95rem;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast.success {
+    background: #4CAF50;
+}
+
+.toast.error {
+    background: #f44336;
+}
+</style>
+
+<div class="contact-page">
+    <!-- Header -->
+    <div class="contact-header">
+        <h1>联系客服</h1>
+        <p>遇到问题了吗？我们随时为您提供帮助</p>
+    </div>
+
+    <!-- Contact Cards -->
+    <div class="contact-cards">
+        <div class="contact-card">
+            <div class="contact-card-icon">💎</div>
+            <h3>充值问题</h3>
+            <p>灵石充值未到账、支付失败、订单查询等问题</p>
+        </div>
+        <div class="contact-card">
+            <div class="contact-card-icon">👤</div>
+            <h3>账号问题</h3>
+            <p>登录异常、无法注册、信息修改等账号相关问题</p>
+        </div>
+        <div class="contact-card">
+            <div class="contact-card-icon">💡</div>
+            <h3>功能建议</h3>
+            <p>对新功能的建议或对现有功能的改进意见</p>
+        </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="contact-form-container">
+        <h2>提交工单</h2>
+        
+        <form id="contactForm" method="POST" action="/contact">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nickname">昵称</label>
+                    <input type="text" id="nickname" name="nickname" required 
+                           placeholder="请输入您的昵称"
+                           value="{{ current_user.username if current_user.is_authenticated else '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input type="email" id="email" name="email" required 
+                           placeholder="请输入您的邮箱"
+                           value="{{ current_user.email if current_user.is_authenticated else '' }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="category">问题类型</label>
+                <select id="category" name="category" required>
+                    <option value="">请选择问题类型</option>
+                    <option value="recharge">充值问题</option>
+                    <option value="account">账号问题</option>
+                    <option value="feature">功能建议</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="message">问题描述</label>
+                <textarea id="message" name="message" required 
+                          placeholder="请详细描述您遇到的问题，我们会尽快处理..."></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn">提交工单</button>
+        </form>
+
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✓</div>
+            <h3>提交成功！</h3>
+            <p>感谢您的反馈，我们会在24小时内处理您的问题并回复您。</p>
+        </div>
+    </div>
+
+    <!-- Email Display -->
+    <div class="email-display">
+        <p>您也可以直接发送邮件至：<a href="mailto:hikaru@qq.com">hikaru@qq.com</a></p>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section">
+        <h2>常见问题</h2>
+        
+        <div class="faq-item">
+            <h4>灵石充值未到账怎么办？</h4>
+            <p>请先检查支付记录确认是否已扣款，通常延迟到账时间为5-30分钟。如超过30分钟未到账，请提供订单截图联系我们处理。</p>
+        </div>
+        
+        <div class="faq-item">
+            <h4>如何成为会员？</h4>
+            <p>您可以在充值页面或会员页面选择适合您的会员套餐，支付成功后即可享受对应权益。</p>
+        </div>
+        
+        <div class="faq-item">
+            <h4>会员权益可以叠加吗？</h4>
+            <p>会员权益不可以叠加，但您可以升级到更高级别的会员享受更多权益。</p>
+        </div>
+        
+        <div class="faq-item">
+            <h4>如何联系客服？</h4>
+            <p>您可以通过本页面的表单提交工单，或直接发送邮件至 hikaru@qq.com，我们会在24小时内回复您。</p>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    var form = this;
+    var toast = document.getElementById('toast');
+    var successMessage = document.getElementById('successMessage');
+    
+    // Show loading state
+    var btn = form.querySelector('.submit-btn');
+    btn.textContent = '提交中...';
+    btn.disabled = true;
+    
+    // Submit form
+    fetch('/contact', {
+        method: 'POST',
+        body: new FormData(form)
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            form.style.display = 'none';
+            successMessage.classList.add('show');
+        } else {
+            showToast(data.message || '提交失败，请重试', 'error');
+            btn.textContent = '提交工单';
+            btn.disabled = false;
+        }
+    })
+    .catch(function() {
+        showToast('提交失败，请重试', 'error');
+        btn.textContent = '提交工单';
+        btn.disabled = false;
+    });
+});
+
+function showToast(message, type) {
+    var toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast ' + type;
+    toast.classList.add('show');
+    
+    setTimeout(function() {
+        toast.classList.remove('show');
+    }, 3000);
+}
+</script>
+{% endblock %}

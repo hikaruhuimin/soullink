@@ -1,0 +1,630 @@
+{% extends "base.html" %}
+
+{% block title %}灵石商城 - 灵犀{% endblock %}
+
+{% block content %}
+<style>
+.shop-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 页面头部 */
+.shop-header {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border-radius: 24px;
+    padding: 40px 30px;
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.shop-header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.shop-header p {
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.user-balance {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.2);
+    padding: 10px 20px;
+    border-radius: 30px;
+    margin-top: 15px;
+    font-size: 1.1rem;
+}
+
+/* 分类标签 */
+.category-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.category-tab {
+    padding: 10px 20px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 25px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.category-tab:hover {
+    border-color: #11998e;
+    color: #11998e;
+}
+
+.category-tab.active {
+    background: #11998e;
+    color: white;
+    border-color: #11998e;
+}
+
+/* 商品网格 */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* 商品卡片 */
+.product-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.product-image {
+    height: 120px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+}
+
+.product-info {
+    padding: 20px;
+}
+
+.product-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.product-desc {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.product-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.product-price {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.price-icon {
+    font-size: 1.2rem;
+}
+
+.price-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #9c27b0;
+}
+
+.price-unit {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.btn-exchange {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-exchange:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+}
+
+.btn-exchange:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 提现卡片 */
+.withdraw-card {
+    background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+    color: white;
+}
+
+.withdraw-card .product-image {
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+}
+
+.withdraw-card .price-value {
+    color: white;
+}
+
+.withdraw-card .btn-exchange {
+    background: white;
+    color: #fc4a1a;
+}
+
+/* 热门标签 */
+.hot-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff5722;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.product-card {
+    position: relative;
+}
+
+/* 提示信息 */
+.tips-section {
+    background: #fff8e1;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.tips-section h3 {
+    color: #f57c00;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.tips-section ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.tips-section li {
+    margin-bottom: 5px;
+}
+
+/* 兑换弹窗 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 450px;
+    width: 90%;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-icon {
+    font-size: 2.5rem;
+}
+
+.modal-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-price {
+    color: #9c27b0;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #11998e;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.modal-footer button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel {
+    background: #f5f5f5;
+    border: none;
+    color: #666;
+}
+
+.btn-confirm {
+    background: #11998e;
+    border: none;
+    color: white;
+}
+
+.btn-confirm:hover {
+    background: #0d8a7f;
+}
+
+/* 提现说明 */
+.withdraw-info {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.withdraw-info p {
+    margin: 5px 0;
+}
+
+/* 成功提示 */
+.success-modal .modal-content {
+    text-align: center;
+}
+
+.success-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+.success-message {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.success-hint {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+@media (max-width: 768px) {
+    .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .product-info { padding: 12px; }
+    .product-name { font-size: 1rem; }
+    .price-value { font-size: 1.1rem; }
+    .btn-exchange { padding: 8px 15px; font-size: 0.85rem; }
+}
+</style>
+
+<div class="shop-page">
+    <!-- 头部 -->
+    <div class="shop-header">
+        <h1>🛒 灵石商城</h1>
+        <p>用灵石兑换各种好物，话费、视频会员、游戏点卡应有尽有</p>
+        <div class="user-balance">
+            💎 我的余额: <strong>{{ current_user.spirit_stones or 0 }}</strong> 灵石
+        </div>
+    </div>
+
+    <!-- 分类标签 -->
+    <div class="category-tabs">
+        <div class="category-tab active" data-category="all">全部</div>
+        <div class="category-tab" data-category="coupon">☕ 餐饮券</div>
+        <div class="category-tab" data-category="recharge">📱 话费充值</div>
+        <div class="category-tab" data-category="video">🎬 视频会员</div>
+        <div class="category-tab" data-category="game">🎮 游戏点卡</div>
+        <div class="category-tab" data-category="withdraw">💸 灵石提现</div>
+    </div>
+
+    <!-- 商品列表 -->
+    <div class="products-grid" id="productsGrid">
+        {% for item in shop_items %}
+        <div class="product-card" data-category="{{ item.type }}">
+            {% if item.type == 'coupon' %}
+            <div class="product-image">{{ item.icon }}</div>
+            {% elif item.type == 'recharge' %}
+            <div class="product-image">{{ item.icon }}</div>
+            {% elif item.type == 'video' %}
+            <div class="product-image">{{ item.icon }}</div>
+            {% elif item.type == 'game' %}
+            <div class="product-image">{{ item.icon }}</div>
+            {% elif item.type == 'withdraw' %}
+            <div class="product-image">{{ item.icon }}</div>
+            {% endif %}
+            <div class="product-info">
+                <div class="product-name">{{ item.name }}</div>
+                <div class="product-desc">{{ item.desc }}</div>
+                <div class="product-footer">
+                    <div class="product-price">
+                        <span class="price-icon">💎</span>
+                        <span class="price-value">{{ item.price }}</span>
+                        <span class="price-unit">灵石</span>
+                    </div>
+                    <button class="btn-exchange" 
+                            onclick="showExchangeModal('{{ item.id }}', '{{ item.name }}', {{ item.price }}, '{{ item.icon }}', '{{ item.type }}')"
+                            {{ 'disabled' if (current_user.spirit_stones or 0) < item.price else '' }}>
+                        兑换
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 提示信息 -->
+    <div class="tips-section">
+        <h3>📌 兑换说明</h3>
+        <ul>
+            <li>电子券码将在兑换后24小时内通过站内消息发送，请注意查收</li>
+            <li>话费充值需要提供手机号码，充值成功后会有短信通知</li>
+            <li>提现申请提交后，T+3个工作日内到账（节假日顺延）</li>
+            <li>提现手续费5%，最低提现100灵石</li>
+            <li>如有疑问，请联系客服</li>
+        </ul>
+    </div>
+</div>
+
+<!-- 兑换确认弹窗 -->
+<div class="modal" id="exchangeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-icon" id="modalIcon">☕</span>
+            <div>
+                <div class="modal-title" id="modalTitle">确认兑换</div>
+                <div class="modal-price">需要 <span id="modalPrice">29</span> 灵石</div>
+            </div>
+        </div>
+        
+        <form id="exchangeForm">
+            <div class="form-group" id="contactGroup">
+                <label>联系方式（手机号/邮箱）</label>
+                <input type="text" id="contactInfo" placeholder="请输入您的手机号或邮箱" required>
+            </div>
+            
+            <div class="form-group" id="nameGroup" style="display:none;">
+                <label>收货人姓名</label>
+                <input type="text" id="recipientName" placeholder="请输入收货人姓名">
+            </div>
+            
+            <div class="form-group" id="addressGroup" style="display:none;">
+                <label>收货地址</label>
+                <input type="text" id="deliveryAddress" placeholder="请输入详细地址">
+            </div>
+            
+            <div class="withdraw-info" id="withdrawInfo" style="display:none;">
+                <p>⚠️ 提现说明：</p>
+                <p>• 手续费：5%</p>
+                <p>• 最低提现：100灵石</p>
+                <p>• 到账时间：T+3个工作日</p>
+                <p>• 实际到账：<span id="actualAmount">0</span> 元</p>
+            </div>
+            
+            <div class="form-group" id="accountGroup" style="display:none;">
+                <label>提现账户</label>
+                <select id="withdrawMethod">
+                    <option value="alipay">支付宝</option>
+                    <option value="wechat">微信支付</option>
+                    <option value="bank">银行卡</option>
+                </select>
+                <input type="text" id="accountNumber" placeholder="请输入账户信息" style="margin-top:10px;">
+            </div>
+        </form>
+        
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal()">取消</button>
+            <button class="btn-confirm" onclick="submitExchange()">确认兑换</button>
+        </div>
+    </div>
+</div>
+
+<!-- 成功弹窗 -->
+<div class="modal success-modal" id="successModal">
+    <div class="modal-content">
+        <div class="success-icon">✅</div>
+        <div class="success-message">兑换申请已提交！</div>
+        <div class="success-hint">请耐心等待处理，券码将发送至您的站内消息</div>
+        <div class="modal-footer" style="margin-top:20px;">
+            <button class="btn-confirm" onclick="closeSuccessModal()" style="flex:1;">知道了</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentItem = null;
+
+// 分类切换
+document.querySelectorAll('.category-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        const category = this.dataset.category;
+        document.querySelectorAll('.product-card').forEach(card => {
+            if (category === 'all' || card.dataset.category === category) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+});
+
+function showExchangeModal(itemId, itemName, price, icon, type) {
+    currentItem = { id: itemId, name: itemName, price: price, icon: icon, type: type };
+    
+    document.getElementById('modalIcon').textContent = icon;
+    document.getElementById('modalTitle').textContent = itemName;
+    document.getElementById('modalPrice').textContent = price;
+    
+    // 根据类型显示/隐藏表单
+    const withdrawInfo = document.getElementById('withdrawInfo');
+    const accountGroup = document.getElementById('accountGroup');
+    const contactGroup = document.getElementById('contactGroup');
+    
+    if (type === 'withdraw') {
+        withdrawInfo.style.display = 'block';
+        accountGroup.style.display = 'block';
+        contactGroup.style.display = 'none';
+        
+        // 计算实际到账
+        const fee = Math.ceil(price * 0.05);
+        document.getElementById('actualAmount').textContent = (price - fee).toFixed(2);
+    } else {
+        withdrawInfo.style.display = 'none';
+        accountGroup.style.display = 'none';
+        contactGroup.style.display = 'block';
+    }
+    
+    document.getElementById('exchangeModal').classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('exchangeModal').classList.remove('show');
+}
+
+function closeSuccessModal() {
+    document.getElementById('successModal').classList.remove('show');
+    location.reload();
+}
+
+function submitExchange() {
+    if (!currentItem) return;
+    
+    const formData = {
+        item_id: currentItem.id,
+        item_type: currentItem.type,
+        price: currentItem.price,
+        contact: document.getElementById('contactInfo')?.value || '',
+        recipient_name: document.getElementById('recipientName')?.value || '',
+        address: document.getElementById('deliveryAddress')?.value || '',
+        withdraw_method: document.getElementById('withdrawMethod')?.value || '',
+        account_number: document.getElementById('accountNumber')?.value || ''
+    };
+    
+    // 验证
+    if (currentItem.type !== 'withdraw' && !formData.contact) {
+        alert('请填写联系方式');
+        return;
+    }
+    
+    // 发送到服务器
+    fetch('/api/shop/exchange', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            closeModal();
+            document.getElementById('successModal').classList.add('show');
+        } else {
+            alert(data.error || '兑换失败，请重试');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('网络错误，请重试');
+    });
+}
+
+// 点击外部关闭弹窗
+document.getElementById('exchangeModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+document.getElementById('successModal').addEventListener('click', function(e) {
+    if (e.target === this) closeSuccessModal();
+});
+</script>
+{% endblock %}

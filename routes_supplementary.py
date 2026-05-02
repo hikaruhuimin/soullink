@@ -335,3 +335,424 @@ def register_jinja_globals(app):
         from i18n import get_translation
         lang = session.get('language', 'zh')
         return get_translation(key, lang, **kwargs)
+
+
+
+# ============ 灵石经济系统路由 ============
+
+def register_lingstone_routes(app, db):
+    """注册灵石经济系统路由"""
+    
+    from models import (
+        LingStoneRecharge, LingStoneExchange, LingStoneTransaction,
+        LINGSTONE_PACKAGES, LINGSTONE_PRICES, SHOP_ITEMS, WITHDRAW_SETTINGS
+    )
+    from flask_login import current_user
+    from datetime import datetime
+    import random
+    import string
+    
+    def generate_order_no():
+        """生成订单号"""
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        return f"LS{timestamp}{random_str}"
+    
+    def get_tx_icon(tx_type, source):
+        """获取交易图标"""
+        icon_map = {
+            'recharge': '💰',
+            'spend': '💸',
+            'earn': '🎁',
+            'exchange': '🎯',
+            'withdraw': '🏧',
+            'refund': '↩️',
+            'bonus': '🎉',
+        }
+        return icon_map.get(tx_type, '💎')
+    
+    def get_tx_title(tx_type, source):
+        """获取交易标题"""
+        title_map = {
+            'recharge': '灵石充值',
+            'spend_divination': '占卜消费',
+            'spend_chat': '聊天消费',
+            'spend_gift': '赠送礼物',
+            'spend_membership': '会员订阅',
+            'earn_gift': '收到礼物',
+            'earn_external': '外部收入',
+            'exchange_shop': '商城兑换',
+            'withdraw': '提现申请',
+            'refund': '退款',
+            'bonus': '活动奖励',
+        }
+        return title_map.get(source, '灵石变动')
+    
+    # 钱包页面
+    @app.route('/wallet')
+    def wallet_page():
+        """钱包页面"""
+        lang = session.get('language', 'zh')
+        
+        if not current_user.is_authenticated:
+            return redirect(url_for('login'))
+        
+        # 获取交易记录
+        transactions = LingStoneTransaction.query.filter_by(
+            user_id=current_user.id
+        ).order_by(LingStoneTransaction.created_at.desc()).limit(50).all()
+        
+        # 计算统计
+        total_income = db.session.query(
+            db.func.coalesce(db.func.sum(db.func.nullif(LingStoneTransaction.amount, 0)), 0)
+        ).filter(
+            LingStoneTransaction.user_id == current_user.id,
+            LingStoneTransaction.amount > 0
+        ).scalar() or 0
+        
+        total_expense = db.session.query(
+            db.func.coalesce(db.func.sum(db.func.abs(LingStoneTransaction.amount)), 0)
+        ).filter(
+            LingStoneTransaction.user_id == current_user.id,
+            LingStoneTransaction.amount < 0
+        ).scalar() or 0
+        
+        # 注册辅助函数到模板
+        app.jinja_env.globals['get_tx_icon'] = get_tx_icon
+        app.jinja_env.globals['get_tx_title'] = get_tx_title
+        
+        return render_template('wallet.html',
+                             transactions=transactions,
+                             total_income=total_income,
+                             total_expense=total_expense,
+                             lang=lang)
+    
+    # 商城页面
+    @app.route('/shop')
+    def shop_page():
+        """商城页面"""
+        lang = session.get('language', 'zh')
+        
+        if not current_user.is_authenticated:
+            return redirect(url_for('login'))
+        
+        # 添加提现选项到商品列表
+        shop_items_with_withdraw = SHOP_ITEMS + [{
+            'id': 'withdraw',
+            'name': '灵石提现',
+            'desc': '灵石可提现至支付宝/微信/银行卡',
+            'price': 100,
+            'icon': '💸',
+            'type': 'withdraw',
+            'stock': -1
+        }]
+        
+        return render_template('shop.html',
+                             shop_items=shop_items_with_withdraw,
+                             lang=lang)
+    
+    # 充值API
+    @app.route('/api/recharge/create', methods=['POST'])
+    def api_create_recharge():
+        """创建充值订单"""
+        if not current_user.is_authenticated:
+            return jsonify({'success': False, 'error': '请先登录'})
+        
+        data = request.json
+        package_id = data.get('package_id')
+        payment_method = data.get('payment_method', 'alipay')
+        
+        # 查找套餐
+        package = next((p for p in LINGSTONE_PACKAGES if p['id'] == package_id), None)
+        if not package:
+            return jsonify({'success': False, 'error': '无效的套餐'})
+        
+        # 创建充值记录
+        order_no = generate_order_no()
+        recharge = LingStoneRecharge(
+            user_id=current_user.id,
+            amount_paid=package['price'],
+            lingstones_gained=package['amount'],
+            bonus_gained=package['bonus'],
+            payment_method=payment_method,
+            order_no=order_no,
+            status='pending'
+        )
+        db.session.add(recharge)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'order_no': order_no,
+            'amount': package['price'],
+            'payment_method': payment_method,
+            'message': '订单创建成功'
+        })
+    
+    # 充值回调（模拟）
+    @app.route('/api/recharge/callback/<order_no>', methods=['POST'])
+    def api_recharge_callback(order_no):
+        """充值回调"""
+        recharge = LingStoneRecharge.query.filter_by(order_no=order_no).first()
+        if not recharge:
+            return jsonify({'success': False, 'error': '订单不存在'})
+        
+        # 更新状态
+        recharge.status = 'completed'
+        recharge.completed_at = datetime.utcnow()
+        
+        # 添加灵石
+        total_stones = recharge.lingstones_gained + recharge.bonus_gained
+        current_user.spirit_stones = (current_user.spirit_stones or 0) + total_stones
+        
+        # 创建交易记录
+        tx = LingStoneTransaction(
+            user_id=current_user.id,
+            tx_type='recharge',
+            amount=total_stones,
+            balance_before=current_user.spirit_stones - total_stones,
+            balance_after=current_user.spirit_stones,
+            source=f'{recharge.payment_method}_pay',
+            recharge_id=recharge.id,
+            description=f'充值获得 {total_stones} 灵石'
+        )
+        db.session.add(tx)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': '充值成功'})
+    
+    # 充值确认（模拟支付成功）
+    @app.route('/api/recharge/confirm/<order_no>', methods=['POST'])
+    def api_recharge_confirm(order_no):
+        """确认充值（模拟支付成功）"""
+        if not current_user.is_authenticated:
+            return jsonify({'success': False, 'error': '请先登录'})
+        
+        recharge = LingStoneRecharge.query.filter_by(
+            order_no=order_no,
+            user_id=current_user.id
+        ).first()
+        
+        if not recharge:
+            return jsonify({'success': False, 'error': '订单不存在'})
+        
+        if recharge.status == 'completed':
+            return jsonify({'success': True, 'message': '已充值'})
+        
+        # 模拟支付成功
+        recharge.status = 'completed'
+        recharge.completed_at = datetime.utcnow()
+        
+        # 添加灵石
+        total_stones = recharge.lingstones_gained + recharge.bonus_gained
+        old_balance = current_user.spirit_stones or 0
+        current_user.spirit_stones = old_balance + total_stones
+        
+        # 创建交易记录
+        tx = LingStoneTransaction(
+            user_id=current_user.id,
+            tx_type='recharge',
+            amount=total_stones,
+            balance_before=old_balance,
+            balance_after=current_user.spirit_stones,
+            source=f'{recharge.payment_method}_pay',
+            recharge_id=recharge.id,
+            description=f'充值获得 {total_stones} 灵石'
+        )
+        db.session.add(tx)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'stones_gained': total_stones,
+            'new_balance': current_user.spirit_stones
+        })
+    
+    # 商城兑换API
+    @app.route('/api/shop/exchange', methods=['POST'])
+    def api_shop_exchange():
+        """申请兑换"""
+        if not current_user.is_authenticated:
+            return jsonify({'success': False, 'error': '请先登录'})
+        
+        data = request.json
+        item_id = data.get('item_id')
+        item_type = data.get('item_type')
+        price = data.get('price', 0)
+        contact = data.get('contact', '')
+        withdraw_method = data.get('withdraw_method')
+        account_number = data.get('account_number', '')
+        
+        # 检查余额
+        if (current_user.spirit_stones or 0) < price:
+            return jsonify({'success': False, 'error': '灵石余额不足'})
+        
+        # 提现特殊处理
+        if item_type == 'withdraw':
+            min_withdraw = WITHDRAW_SETTINGS['min_amount']
+            if price < min_withdraw:
+                return jsonify({'success': False, 'error': f'最低提现{min_withdraw}灵石'})
+            
+            fee = int(price * WITHDRAW_SETTINGS['fee_rate'])
+            actual_amount = price - fee
+            
+            exchange = LingStoneExchange(
+                user_id=current_user.id,
+                exchange_type='withdraw',
+                exchange_item='灵石提现',
+                lingstones_spent=price,
+                real_value=actual_amount,
+                status='pending',
+                withdraw_method=withdraw_method,
+                withdraw_account=account_number,
+                actual_amount=actual_amount,
+                fee=fee
+            )
+        else:
+            # 普通商品兑换
+            exchange = LingStoneExchange(
+                user_id=current_user.id,
+                exchange_type=item_type,
+                exchange_item=item_id,
+                lingstones_spent=price,
+                contact=contact,
+                status='pending'
+            )
+        
+        # 扣除灵石
+        old_balance = current_user.spirit_stones
+        current_user.spirit_stones = old_balance - price
+        
+        # 创建交易记录
+        tx = LingStoneTransaction(
+            user_id=current_user.id,
+            tx_type='exchange' if item_type != 'withdraw' else 'withdraw',
+            amount=-price,
+            balance_before=old_balance,
+            balance_after=current_user.spirit_stones,
+            source='shop',
+            exchange_id=exchange.id,
+            description=f'兑换 {item_id}'
+        )
+        db.session.add(tx)
+        db.session.add(exchange)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': '兑换申请已提交',
+            'exchange_id': exchange.id
+        })
+    
+    # 获取灵石余额
+    @app.route('/api/wallet/balance')
+    def api_wallet_balance():
+        """获取钱包余额"""
+        if not current_user.is_authenticated:
+            return jsonify({'balance': 0})
+        return jsonify({'balance': current_user.spirit_stones or 0})
+    
+    # 获取交易记录
+    @app.route('/api/wallet/transactions')
+    def api_wallet_transactions():
+        """获取交易记录"""
+        if not current_user.is_authenticated:
+            return jsonify({'success': False, 'error': '请先登录'})
+        
+        page = request.args.get('page', 1, type=int)
+        per_page = 20
+        
+        pagination = LingStoneTransaction.query.filter_by(
+            user_id=current_user.id
+        ).order_by(LingStoneTransaction.created_at.desc()).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
+        
+        transactions = [{
+            'id': tx.id,
+            'type': tx.tx_type,
+            'amount': tx.amount,
+            'balance_after': tx.balance_after,
+            'source': tx.source,
+            'description': tx.description,
+            'created_at': tx.created_at.isoformat() if tx.created_at else None
+        } for tx in pagination.items]
+        
+        return jsonify({
+            'success': True,
+            'transactions': transactions,
+            'has_more': pagination.has_next
+        })
+    
+    # 消费灵石API
+    @app.route('/api/wallet/spend', methods=['POST'])
+    def api_wallet_spend():
+        """消费灵石"""
+        if not current_user.is_authenticated:
+            return jsonify({'success': False, 'error': '请先登录'})
+        
+        data = request.json
+        amount = data.get('amount', 0)
+        reason = data.get('reason', '')
+        source = data.get('source', 'consume')
+        
+        if amount <= 0:
+            return jsonify({'success': False, 'error': '金额必须大于0'})
+        
+        if (current_user.spirit_stones or 0) < amount:
+            return jsonify({'success': False, 'error': '余额不足'})
+        
+        # 扣除灵石
+        old_balance = current_user.spirit_stones
+        current_user.spirit_stones = old_balance - amount
+        
+        # 创建交易记录
+        tx = LingStoneTransaction(
+            user_id=current_user.id,
+            tx_type='spend',
+            amount=-amount,
+            balance_before=old_balance,
+            balance_after=current_user.spirit_stones,
+            source=source,
+            description=reason
+        )
+        db.session.add(tx)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'new_balance': current_user.spirit_stones,
+            'spent': amount
+        })
+    
+    # Agent收益API
+    @app.route('/api/agent/earn', methods=['POST'])
+    def api_agent_earn():
+        """Agent获得收益"""
+        if not current_user.is_authenticated:
+            return jsonify({'success': False, 'error': '请先登录'})
+        
+        data = request.json
+        agent_id = data.get('agent_id')
+        amount = data.get('amount', 0)
+        source = data.get('source', 'gift')
+        
+        if amount <= 0:
+            return jsonify({'success': False, 'error': '金额必须大于0'})
+        
+        # 计算平台抽成后收益
+        net_amount = int(amount * 0.85)  # Agent获得85%
+        platform_fee = amount - net_amount
+        
+        # TODO: 找到CreatorAgent并更新收益
+        # creator_agent = CreatorAgent.query.get(agent_id)
+        # if creator_agent:
+        #     creator_agent.total_earnings += net_amount
+        
+        return jsonify({
+            'success': True,
+            'earned': net_amount,
+            'platform_fee': platform_fee
+        })
+    
+    return app

@@ -10,6 +10,11 @@ from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, Response
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
 
@@ -284,6 +289,50 @@ def faq_page():
 
 
 # ============ API推荐端点 ============
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    """客服联系页面"""
+    if request.method == 'POST':
+        nickname = request.form.get('nickname', '').strip()
+        email = request.form.get('email', '').strip()
+        category = request.form.get('category', '').strip()
+        message = request.form.get('message', '').strip()
+        
+        if not all([nickname, email, category, message]):
+            return jsonify({'success': False, 'message': '请填写完整信息'})
+        
+        # 发送邮件到客服
+        try:
+            subject = f"[SoulLink客服] {get_category_name(category)} - {nickname}"
+            body = f"""
+用户信息:
+- 昵称: {nickname}
+- 邮箱: {email}
+- 问题类型: {get_category_name(category)}
+
+问题描述:
+{message}
+
+---
+自动邮件系统
+"""
+            send_email('hikaru@qq.com', subject, body)
+            return jsonify({'success': True, 'message': '提交成功'})
+        except Exception as e:
+            app.logger.error(f"Contact form email error: {e}")
+            return jsonify({'success': False, 'message': '提交失败，请稍后重试'})
+    
+    return render_template('contact.html', lang='zh')
+
+def get_category_name(category):
+    names = {
+        'recharge': '充值问题',
+        'account': '账号问题', 
+        'feature': '功能建议',
+        'other': '其他问题'
+    }
+    return names.get(category, '其他问题')
 
 @app.route('/api/recommend')
 def api_recommend():
@@ -1867,8 +1916,9 @@ if __name__ == '__main__':
         create_demo_data()
     # Register supplementary routes
     try:
-        from routes_supplementary import register_supplementary_routes
+        from routes_supplementary import register_supplementary_routes, register_lingstone_routes
         register_supplementary_routes(app)
+        register_lingstone_routes(app, db)  # Register lingstone economy routes
     except Exception as e:
         print(f"Warning: Could not register supplementary routes: {e}")
     port = int(os.environ.get('PORT', 5000))

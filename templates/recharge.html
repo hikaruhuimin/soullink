@@ -895,7 +895,7 @@
     <!-- 选择充值套餐 -->
     <div class="package-grid">
         {% for package in packages %}
-        <div class="package-card {% if package.id == 'true_feeling' %}best-value{% endif %}" 
+        <div class="package-card {% if package.id == 'premium' %}best-value{% endif %}" 
              onclick="selectPackage('{{ package.id }}')" 
              ontouchend="selectPackage('{{ package.id }}')"
              id="pkg-{{ package.id }}">
@@ -904,12 +904,12 @@
             <div class="bonus-badge">+{{ package.bonus }}</div>
             {% endif %}
             
-            {% if package.id == 'true_feeling' %}
+            {% if package.id == 'premium' %}
             <div class="best-value-badge">{{ _('best_value') }}</div>
             {% endif %}
             
             <div class="package-icon">{{ package.icon }}</div>
-            <div class="package-name">{{ package.name.zh }}</div>
+            <div class="package-name">{{ package.name.zh if package.name is mapping else package.name }}</div>
             <div class="stone-amount">{{ package.amount }}</div>
             <div class="stone-label">💎 {{ _('stones') }}</div>
             
@@ -1011,14 +1011,12 @@ let selectedPayment = null;
 let countdownTimer = null;
 let currentOrderInfo = null;
 
-// 套餐数据
+// 套餐数据 - 新灵石充值套餐
 const packages = {
-    'light_feeling': { name: '轻触心动', amount: 10, price: 6, bonus: 0, icon: '✨' },
-    'sweet_moment': { name: '甜蜜时光', amount: 50, price: 28, bonus: 5, icon: '🌸' },
-    'true_feeling': { name: '真心实意', amount: 100, price: 50, bonus: 15, icon: '💖' },
-    'deep_connection': { name: '深度连接', amount: 200, price: 98, bonus: 40, icon: '💝' },
-    'soul_tie': { name: '灵魂羁绊', amount: 500, price: 238, bonus: 120, icon: '💕' },
-    'eternal_bond': { name: '永恒之约', amount: 1000, price: 468, bonus: 300, icon: '👑' }
+    'starter': { name: '新手礼包', amount: 30, price: 30, bonus: 5, icon: '🌱' },
+    'standard': { name: '标准充值', amount: 68, price: 68, bonus: 15, icon: '💎' },
+    'premium': { name: '超值礼包', amount: 198, price: 198, bonus: 50, icon: '👑', best_value: true },
+    'ultimate': { name: '尊享大礼包', amount: 498, price: 498, bonus: 150, icon: '🚀' }
 };
 
 function selectPackage(id) {
@@ -1461,4 +1459,13 @@ document.getElementById('successModal').addEventListener('click', function(e) {
     }
 });
 </script>
+
+<!-- 客服联系入口 -->
+<div style="text-align: center; padding: 30px 20px; margin-top: 20px; border-top: 1px solid var(--color-border-light);">
+    <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 10px;">充值遇到问题？</p>
+    <a href="/contact" style="color: var(--color-primary); font-weight: 600; text-decoration: none;">
+        💬 联系客服
+    </a>
+</div>
+
 {% endblock %}
