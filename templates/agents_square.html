@@ -438,7 +438,7 @@
     'calm': 'rgba(100, 180, 220, 0.3)'
 } %}
 {% endif %}
-{# 用户Agent占位数据 #}
+{# Agent占位数据 #}
 {% if not user_agents %}
 {% set user_agents = [] %}
 {% endif %}
@@ -461,17 +461,13 @@
         </button>
         <button class="tab-btn" data-tab="agents">
             <span class="tab-icon">🤖</span>
-            <span>系统Agent</span>
+            <span>Agent</span>
             <span class="tab-count">{{ system_agents|length }}</span>
         </button>
-        <button class="tab-btn" data-tab="user-agents">
-            <span class="tab-icon">🎨</span>
-            <span>用户Agent</span>
-            <span class="tab-count">{{ user_agents|length }}</span>
-        </button>
+        
         <button class="tab-btn" data-tab="humans">
             <span class="tab-icon">👤</span>
-            <span>在线人类</span>
+            <span>人类</span>
             <span class="tab-count" id="humansCount">{{ online_users|length }}</span>
         </button>
     </div>
@@ -481,7 +477,7 @@
         {% if system_agents %}
         <div class="square-section">
             <div class="section-label">
-                <span>🤖 灵犀Agent</span>
+                <span>🤖 Agent</span>
                 
             </div>
             <div class="cards-grid">
@@ -528,7 +524,7 @@
         {% if user_agents %}
         <div class="square-section">
             <div class="section-label">
-                <span>🎨 社区Agent</span>
+                <span>🤖 Agent</span>
                 
             </div>
             <div class="cards-grid">
@@ -560,7 +556,7 @@
         {% if online_users %}
         <div class="square-section">
             <div class="section-label">
-                <span>👤 在线人类</span>
+                <span>👤 人类</span>
                 <span class="section-badge badge-online">在线</span>
             </div>
             <div class="cards-grid">
@@ -585,11 +581,11 @@
         {% endif %}
     </div>
     
-    <!-- 系统Agent -->
+    <!-- Agent -->
     <div class="tab-content" id="agentsTab">
         <div class="square-section">
             <div class="section-label">
-                <span>🤖 灵犀Agent</span>
+                <span>🤖 Agent</span>
                 
             </div>
             <div class="cards-grid" id="agentsGrid">
@@ -598,11 +594,11 @@
         </div>
     </div>
     
-    <!-- 用户Agent -->
+    <!-- Agent -->
     <div class="tab-content" id="user-agentsTab">
         <div class="square-section">
             <div class="section-label">
-                <span>🎨 社区Agent</span>
+                <span>🤖 Agent</span>
                 
             </div>
             <div class="cards-grid" id="userAgentsGrid">
@@ -631,18 +627,18 @@
                 {% else %}
                 <div class="empty-state" style="grid-column: 1/-1;">
                     <div class="empty-state-icon">🎨</div>
-                    <p>暂无用户Agent</p>
+                    <p>暂无Agent</p>
                 </div>
                 {% endif %}
             </div>
         </div>
     </div>
     
-    <!-- 在线人类 -->
+    <!-- 人类 -->
     <div class="tab-content" id="humansTab">
         <div class="square-section">
             <div class="section-label">
-                <span>👤 在线人类</span>
+                <span>👤 人类</span>
                 <span class="section-badge badge-online">在线</span>
             </div>
             <div class="cards-grid" id="humansGrid">
@@ -688,7 +684,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.getElementById(tab + 'Tab').classList.add('active');
         
-        // 如果切换到在线人类标签，刷新在线用户列表
+        // 如果切换到人类标签，刷新在线用户列表
         if (tab === 'humans') {
             fetchOnlineUsers();
         }
@@ -710,7 +706,7 @@ async function fetchOnlineUsers() {
     }
 }
 
-// 更新在线人类网格
+// 更新人类网格
 function updateHumansGrid(users) {
     const grid = document.getElementById('humansGrid');
     const allGrid = document.querySelector('#allTab .square-section:last-child .cards-grid');
@@ -827,7 +823,7 @@ function showToast(message) {
     }, 2000);
 }
 
-// 初始化：渲染系统Agent到对应Tab
+// 初始化：渲染Agent到对应Tab
 document.addEventListener('DOMContentLoaded', function() {
     // AgentPortrait动画已在agent-portrait.js中自动绑定
     // 刷新在线用户
