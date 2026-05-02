@@ -373,6 +373,7 @@
                 <a href="/divination/dream" class="nav-link">AI解梦</a>
                 <a href="/meet" class="nav-link">奔现</a>
                 <a href="/divination" class="nav-link">占卜</a>
+                <a href="/undercover" class="nav-link">谁是卧底</a>
                 <a href="/shop" class="nav-link" style="color: #11998e; font-weight: 600;">灵石商城</a>
                                                 
                 {% if current_user.is_authenticated %}
@@ -476,6 +477,16 @@
                     </svg>
                 </span>
                 灵石商城
+            </a>
+            <a href="/undercover" class="bottom-nav-item">
+                <span class="bottom-nav-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="7" cy="10" r="4"/>
+                        <circle cx="13" cy="10" r="4"/>
+                        <path d="M7 6L13 14M13 6L7 14"/>
+                    </svg>
+                </span>
+                卧底
             </a>
         </div>
     </nav>
