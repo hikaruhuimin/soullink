@@ -79,6 +79,16 @@
     box-shadow: 0 8px 25px rgba(139, 94, 131, 0.25);
 }
 
+/* 动画肖像在卡片中的样式 */
+.agent-card .agent-portrait {
+    flex-shrink: 0;
+}
+
+.agent-card .portrait-frame {
+    width: 72px;
+    height: 72px;
+}
+
 .agent-header {
     display: flex;
     align-items: center;
@@ -262,10 +272,16 @@
         </div>
         <div class="agents-grid">
             {% for agent in female_agents %}
-            <a href="/agent/{{ agent.id }}" class="agent-card">
+            <a href="/agent/{{ agent.id }}" class="agent-card" data-agent-id="{{ agent.id }}">
                 <div class="agent-header">
-                    <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="agent-avatar">
-                    <span class="agent-status"></span>
+                    <div class="agent-portrait size-small animated" data-agent-portrait data-agent-id="{{ agent.id }}" data-avatar="{{ agent.avatar }}" data-mood="happy">
+                        <div class="portrait-frame">
+                            <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="portrait-img">
+                            <div class="portrait-overlay"></div>
+                            <div class="portrait-particles"></div>
+                            <div class="portrait-glow"></div>
+                        </div>
+                    </div>
                     {% if agent.voice %}
                     <span class="voice-badge" title="支持语音">🔊</span>
                     {% endif %}
@@ -298,10 +314,16 @@
         </div>
         <div class="agents-grid">
             {% for agent in male_agents %}
-            <a href="/agent/{{ agent.id }}" class="agent-card">
+            <a href="/agent/{{ agent.id }}" class="agent-card" data-agent-id="{{ agent.id }}">
                 <div class="agent-header">
-                    <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="agent-avatar">
-                    <span class="agent-status"></span>
+                    <div class="agent-portrait size-small animated" data-agent-portrait data-agent-id="{{ agent.id }}" data-avatar="{{ agent.avatar }}" data-mood="happy">
+                        <div class="portrait-frame">
+                            <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="portrait-img">
+                            <div class="portrait-overlay"></div>
+                            <div class="portrait-particles"></div>
+                            <div class="portrait-glow"></div>
+                        </div>
+                    </div>
                     {% if agent.voice %}
                     <span class="voice-badge" title="支持语音">🔊</span>
                     {% endif %}
@@ -327,4 +349,23 @@
         </div>
     </div>
 </div>
+
+<script>
+// 初始化广场页面Agent肖像动画
+document.addEventListener('DOMContentLoaded', function() {
+    // AgentPortrait.autoBind() 已在 agent-portrait.js 中自动调用
+    // 这里初始化已存在的肖像元素
+    document.querySelectorAll('.agent-card .agent-portrait').forEach(function(portrait) {
+        const agentId = portrait.dataset.agentId;
+        if (agentId) {
+            AgentPortrait.init(portrait, agentId, {
+                mood: portrait.dataset.mood || 'happy',
+                size: 'small',
+                showStatus: false,
+                particleInterval: 5000
+            });
+        }
+    });
+});
+</script>
 {% endblock %}

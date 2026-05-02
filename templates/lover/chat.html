@@ -2,15 +2,41 @@
 
 {% block title %}{{ lover.name }} - 聊天 - 灵犀{% endblock %}
 
+{% block extra_css %}
+<style>
+/* 恋人聊天页面动画肖像样式 */
+.chat-header .chat-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.chat-header .agent-portrait {
+    flex-shrink: 0;
+}
+
+.chat-header .portrait-frame {
+    width: 48px;
+    height: 48px;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="chat-page">
     <!-- 顶部导航 -->
     <div class="chat-header">
         <a href="/lover/home/{{ lover.id }}" class="back-btn">←</a>
         <div class="chat-info">
-            <div class="chat-avatar" style="background: linear-gradient(135deg, {{ lover.avatar_gradient }})">
-                <span>{{ lover.avatar_icon }}</span>
-                {% if lover.is_online %}<span class="online-dot"></span>{% endif %}
+            <div class="agent-portrait size-small" data-agent-id="lover-{{ lover.id }}" data-mood="love" id="loverPortrait">
+                <div class="portrait-frame">
+                    <div class="lover-avatar-display" style="background: linear-gradient(135deg, {{ lover.avatar_gradient }}); border-radius: 50%; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                        <span>{{ lover.avatar_icon }}</span>
+                    </div>
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-particles"></div>
+                    <div class="portrait-glow"></div>
+                </div>
             </div>
             <div class="chat-meta">
                 <span class="chat-name">{{ lover.name }}</span>
@@ -786,6 +812,18 @@ connectWebSocket();
 document.getElementById('messageInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         sendMessage();
+    }
+});
+
+// 初始化恋人肖像动画
+document.addEventListener('DOMContentLoaded', function() {
+    const portrait = document.getElementById('loverPortrait');
+    if (portrait) {
+        AgentPortrait.init(portrait, portrait.dataset.agentId, {
+            mood: 'love',
+            size: 'small',
+            showStatus: false
+        });
     }
 });
 </script>

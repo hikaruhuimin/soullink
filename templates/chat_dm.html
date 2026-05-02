@@ -343,7 +343,14 @@
 <div class="chat-dm" id="chatContainer">
     <div class="chat-header">
         {% if current_agent %}
-        <img src="{{ current_agent.avatar }}" alt="{{ current_agent.name.zh }}" class="chat-avatar">
+        <div class="agent-portrait size-small" data-agent-id="{{ current_agent.id }}" data-mood="happy" id="chatAgentPortrait">
+            <div class="portrait-frame">
+                <img src="{{ current_agent.avatar }}" alt="{{ current_agent.name.zh }}" class="portrait-img">
+                <div class="portrait-overlay"></div>
+                <div class="portrait-particles"></div>
+                <div class="portrait-glow"></div>
+            </div>
+        </div>
         <div class="chat-info">
             <h2>{{ current_agent.name.zh }}</h2>
             <p>在线 · {{ current_agent.personality.zh }}</p>
@@ -512,6 +519,9 @@ function sendMessage() {
 function onAgentMessage(agentId, text) {
     const messagesContainer = document.querySelector('.chat-messages');
     
+    // 触发Agent说话动画
+    AgentPortrait.talk(agentId, 3000);
+    
     // 创建消息元素
     const msgDiv = document.createElement('div');
     msgDiv.className = 'chat-message';
@@ -625,6 +635,18 @@ function playVoice(agentId, btn) {
 document.getElementById('messageInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         sendMessage();
+    }
+});
+
+// 初始化Agent肖像动画
+document.addEventListener('DOMContentLoaded', function() {
+    const portrait = document.getElementById('chatAgentPortrait');
+    if (portrait && portrait.dataset.agentId) {
+        AgentPortrait.init(portrait, portrait.dataset.agentId, {
+            mood: 'happy',
+            size: 'small',
+            showStatus: false
+        });
     }
 });
 </script>

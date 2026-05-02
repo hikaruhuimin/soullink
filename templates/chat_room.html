@@ -110,6 +110,52 @@
     gap: var(--space-lg);
 }
 
+/* 房间头部Agent头像列表 */
+.room-agents-avatars {
+    display: flex;
+    align-items: center;
+    gap: -8px;
+    margin-left: auto;
+    margin-right: var(--space-lg);
+}
+
+.room-agent-avatar {
+    position: relative;
+    margin-left: -8px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.room-agent-avatar:first-child {
+    margin-left: 0;
+}
+
+.room-agent-avatar:hover {
+    transform: translateY(-2px) scale(1.1);
+    z-index: 10;
+}
+
+.room-agent-avatar .agent-portrait.size-tiny {
+    --portrait-size: 36px;
+    --glow-size: 8px;
+}
+
+.room-agent-avatar .portrait-frame {
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--color-bg-card);
+    border-radius: 50%;
+}
+
+.dark-theme .room-agent-avatar .portrait-frame {
+    border-color: #1a2030;
+}
+
+.room-agent-avatar .portrait-glow {
+    bottom: -2px;
+    filter: blur(4px);
+}
+
 .online-count {
     display: flex;
     align-items: center;
@@ -468,6 +514,23 @@
                 </div>
             </div>
         </div>
+        
+        <!-- 在线Agent头像列表 -->
+        <div class="room-agents-avatars">
+            {% for agent in room_agents[:6] %}
+            <div class="room-agent-avatar" data-agent-id="{{ agent.id }}" title="{{ agent.name.zh }}">
+                <div class="agent-portrait size-tiny" data-agent-portrait data-agent-id="{{ agent.id }}" data-avatar="{{ agent.avatar }}" data-mood="happy">
+                    <div class="portrait-frame">
+                        <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="portrait-img">
+                        <div class="portrait-overlay"></div>
+                        <div class="portrait-particles"></div>
+                        <div class="portrait-glow"></div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
         <div class="room-header-right">
             <div class="online-count">
                 <span class="online-dot"></span>
@@ -791,5 +854,21 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+// 初始化聊天室Agent肖像动画
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.room-agent-avatar .agent-portrait').forEach(function(portrait) {
+        const agentId = portrait.dataset.agentId;
+        if (agentId) {
+            AgentPortrait.init(portrait, agentId, {
+                mood: 'excited',
+                size: 'tiny',
+                showStatus: false,
+                particleCount: 3,
+                particleInterval: 4000
+            });
+        }
+    });
+});
 </script>
 {% endblock %}

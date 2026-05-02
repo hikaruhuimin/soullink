@@ -303,9 +303,15 @@
 <div class="agent-profile">
     {% if current_agent %}
     <div class="profile-header">
-        <div class="profile-avatar-wrapper">
-            <img src="{{ current_agent.avatar }}" alt="{{ current_agent.name.zh }}" class="profile-avatar">
-            <span class="profile-status"></span>
+        <div class="profile-avatar-wrapper" id="profilePortrait">
+            <div class="agent-portrait size-large" data-agent-id="{{ current_agent.id }}" data-mood="happy">
+                <div class="portrait-frame">
+                    <img src="{{ current_agent.avatar }}" alt="{{ current_agent.name.zh }}" class="portrait-img">
+                    <div class="portrait-overlay"></div>
+                    <div class="portrait-particles"></div>
+                    <div class="portrait-glow"></div>
+                </div>
+            </div>
         </div>
         <div class="profile-info">
             <h1 class="profile-name">{{ current_agent.name.zh }}</h1>
@@ -410,6 +416,18 @@ document.addEventListener('DOMContentLoaded', function() {
         voiceBadge.style.display = 'inline-block';
     } else if (voiceBadge) {
         voiceBadge.style.display = 'none';
+    }
+    
+    // 初始化Agent肖像动画
+    const portrait = document.querySelector('.agent-portrait.size-large');
+    if (portrait) {
+        const agentId = portrait.dataset.agentId;
+        AgentPortrait.init(portrait, agentId, {
+            mood: 'happy',
+            size: 'large',
+            showStatus: true,
+            statusOnline: true
+        });
     }
 });
 </script>
