@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+
+{% block title %}我的钱包 - 灵犀{% endblock %}
+
+{% block content %}
+<style>
+.wallet-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 余额卡片 */
+.balance-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 24px;
+    padding: 40px 30px;
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.balance-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.balance-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.balance-amount {
+    font-size: 4rem;
+    font-weight: bold;
+    margin: 10px 0;
+    position: relative;
+}
+
+.balance-suffix {
+    font-size: 1.5rem;
+    opacity: 0.8;
+}
+
+.balance-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+    position: relative;
+}
+
+.btn-recharge {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-recharge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+.btn-shop {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-shop:hover {
+    background: white;
+    color: #667eea;
+}
+
+/* 统计卡片 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.stat-value.income { color: #4caf50; }
+.stat-value.expense { color: #f44336; }
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* 标签页 */
+.tabs {
+    display: flex;
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    color: #666;
+}
+
+.tab.active {
+    background: white;
+    color: #667eea;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.tab:hover:not(.active) {
+    background: rgba(255,255,255,0.5);
+}
+
+/* 交易记录 */
+.transaction-list {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.transaction-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+}
+
+.transaction-item:hover {
+    background: #fafafa;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.tx-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    margin-right: 15px;
+}
+
+.tx-icon.income { background: #e8f5e9; }
+.tx-icon.expense { background: #ffebee; }
+
+.tx-info {
+    flex: 1;
+}
+
+.tx-title {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.tx-time {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.tx-amount {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.tx-amount.positive { color: #4caf50; }
+.tx-amount.negative { color: #f44336; }
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.empty-state svg {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+/* 筛选器 */
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* 加载更多 */
+.load-more {
+    text-align: center;
+    padding: 20px;
+}
+
+.load-more button {
+    background: #f5f5f5;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.load-more button:hover {
+    background: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+    .balance-amount { font-size: 3rem; }
+    .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .stat-card { padding: 15px 10px; }
+    .stat-value { font-size: 1.2rem; }
+}
+</style>
+
+<div class="wallet-page">
+    <!-- 余额卡片 -->
+    <div class="balance-section">
+        <div class="balance-label">💎 我的灵石余额</div>
+        <div class="balance-amount">
+            {{ current_user.spirit_stones or 0 }}<span class="balance-suffix"> 灵石</span>
+        </div>
+        <div class="balance-actions">
+            <a href="/recharge" class="btn-recharge">⚡ 充值灵石</a>
+            <a href="/shop" class="btn-shop">🛒 兑换商城</a>
+        </div>
+    </div>
+
+    <!-- 统计 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value income">+{{ total_income }}</div>
+            <div class="stat-label">累计收入</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value expense">{{ total_expense }}</div>
+            <div class="stat-label">累计支出</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ current_user.spirit_stones or 0 }}</div>
+            <div class="stat-label">当前余额</div>
+        </div>
+    </div>
+
+    <!-- 标签页 -->
+    <div class="tabs">
+        <div class="tab active" data-tab="all">全部</div>
+        <div class="tab" data-tab="income">收入</div>
+        <div class="tab" data-tab="expense">支出</div>
+        <div class="tab" data-tab="exchange">兑换</div>
+    </div>
+
+    <!-- 筛选器 -->
+    <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">全部记录</button>
+        <button class="filter-btn" data-filter="recharge">充值</button>
+        <button class="filter-btn" data-filter="divination">占卜</button>
+        <button class="filter-btn" data-filter="chat">聊天</button>
+        <button class="filter-btn" data-filter="gift">礼物</button>
+        <button class="filter-btn" data-filter="shop">商城</button>
+    </div>
+
+    <!-- 交易记录列表 -->
+    <div class="transaction-list" id="transactionList">
+        {% if transactions %}
+            {% for tx in transactions %}
+            <div class="transaction-item" data-type="{{ tx.tx_type }}" data-source="{{ tx.source }}">
+                <div class="tx-icon {{ 'income' if tx.amount > 0 else 'expense' }}">
+                    {{ get_tx_icon(tx.tx_type, tx.source) }}
+                </div>
+                <div class="tx-info">
+                    <div class="tx-title">{{ tx.description or get_tx_title(tx.tx_type, tx.source) }}</div>
+                    <div class="tx-time">{{ tx.created_at.strftime('%Y-%m-%d %H:%M') if tx.created_at else '' }}</div>
+                </div>
+                <div class="tx-amount {{ 'positive' if tx.amount > 0 else 'negative' }}">
+                    {{ '+' if tx.amount > 0 else '' }}{{ tx.amount }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+                </svg>
+                <p>暂无交易记录</p>
+                <p style="font-size: 0.85rem; margin-top: 5px;">开始充值或消费后，这里将显示您的流水</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 加载更多 -->
+    {% if has_more %}
+    <div class="load-more">
+        <button onclick="loadMore()">加载更多</button>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Tab切换
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        filterTransactions('type', this.dataset.tab);
+    });
+});
+
+// 筛选按钮
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        filterTransactions('source', this.dataset.filter);
+    });
+});
+
+function filterTransactions(filterType, value) {
+    const items = document.querySelectorAll('.transaction-item');
+    items.forEach(item => {
+        let show = false;
+        if (filterType === 'type') {
+            show = value === 'all' || item.dataset.type === value;
+        } else if (filterType === 'source') {
+            show = value === 'all' || item.dataset.source === value;
+        }
+        item.style.display = show ? 'flex' : 'none';
+    });
+}
+
+function loadMore() {
+    // TODO: 实现分页加载
+    console.log('Load more transactions');
+}
+</script>
+{% endblock %}
