@@ -1,0 +1,1149 @@
+{% extends "base.html" %}
+
+{% block title %}灵犀广场 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 虚拟广场样式 */
+.virtual-square {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #0a0a1a 0%, #1a1a3a 50%, #0a0a1a 100%);
+    overflow: hidden;
+}
+
+/* Canvas场景 */
+.square-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 顶部导航 */
+.square-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(180deg, rgba(10, 10, 30, 0.95), transparent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 100;
+}
+
+.nav-title {
+    font-size: 1.2rem;
+    color: #E8D5C4;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-title .icon {
+    font-size: 1.5rem;
+}
+
+.nav-stats {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: rgba(200, 200, 220, 0.8);
+}
+
+.stat-icon {
+    font-size: 1.1rem;
+}
+
+/* 右侧面板 */
+.right-panel {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    width: 280px;
+    max-height: calc(100vh - 180px);
+    background: rgba(20, 20, 50, 0.9);
+    border-radius: 16px;
+    border: 1px solid rgba(100, 80, 160, 0.3);
+    overflow: hidden;
+    z-index: 100;
+}
+
+.panel-section {
+    padding: 16px;
+    border-bottom: 1px solid rgba(100, 80, 160, 0.2);
+}
+
+.panel-section:last-child {
+    border-bottom: none;
+}
+
+.panel-title {
+    font-size: 0.85rem;
+    color: rgba(200, 180, 150, 0.8);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 在线用户列表 */
+.online-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.online-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.online-user:hover {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    position: relative;
+}
+
+.user-avatar.human { background: linear-gradient(135deg, #667eea, #764ba2); }
+.user-avatar.agent { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.user-avatar.visitor { background: rgba(150, 150, 180, 0.3); }
+.user-avatar.vip { background: linear-gradient(135deg, #FFD700, #FFA500); }
+
+.user-avatar.vip::after {
+    content: '👑';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 0.6rem;
+}
+
+.user-avatar .status-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    border: 2px solid rgba(20, 20, 50, 0.9);
+}
+
+.user-name {
+    font-size: 0.9rem;
+    color: #E8E0F0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-type {
+    font-size: 0.7rem;
+    color: rgba(180, 180, 200, 0.5);
+}
+
+/* 区域提示 */
+.zone-hint {
+    font-size: 0.85rem;
+    color: rgba(200, 200, 220, 0.7);
+    text-align: center;
+    padding: 8px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 8px;
+}
+
+/* 控制提示 */
+.controls-hint {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(20, 20, 50, 0.9);
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid rgba(100, 80, 160, 0.3);
+    z-index: 100;
+}
+
+.controls-title {
+    font-size: 0.8rem;
+    color: rgba(200, 180, 150, 0.8);
+    margin-bottom: 8px;
+}
+
+.controls-list {
+    display: flex;
+    gap: 12px;
+}
+
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: rgba(180, 180, 200, 0.6);
+}
+
+.key {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+/* 消息提示 */
+.message-toast {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 50, 0.95);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 30px;
+    padding: 10px 20px;
+    color: #E8E0F0;
+    font-size: 0.9rem;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.message-toast.show {
+    opacity: 1;
+}
+
+.message-toast .enter { color: #22c55e; }
+.message-toast .leave { color: #ef4444; }
+
+/* 角色信息弹窗 */
+.character-popup {
+    position: absolute;
+    background: rgba(20, 20, 50, 0.98);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 16px;
+    padding: 16px;
+    min-width: 200px;
+    z-index: 150;
+    display: none;
+}
+
+.character-popup.show {
+    display: block;
+}
+
+.popup-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(100, 80, 160, 0.2);
+}
+
+.popup-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.popup-name {
+    font-size: 1.1rem;
+    color: #E8E0F0;
+}
+
+.popup-identity {
+    font-size: 0.8rem;
+    color: rgba(180, 180, 200, 0.6);
+}
+
+.popup-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.popup-btn {
+    flex: 1;
+    padding: 8px 12px;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+    color: #E8E0F0;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.popup-btn:hover {
+    background: rgba(139, 92, 246, 0.4);
+}
+
+/* 区域功能弹窗 */
+.zone-popup {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 50, 0.98);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 20px;
+    padding: 20px;
+    min-width: 300px;
+    z-index: 150;
+    display: none;
+    text-align: center;
+}
+
+.zone-popup.show {
+    display: block;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.zone-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.zone-name {
+    font-size: 1.2rem;
+    color: #E8E0F0;
+    margin-bottom: 6px;
+}
+
+.zone-desc {
+    font-size: 0.9rem;
+    color: rgba(180, 180, 200, 0.7);
+    margin-bottom: 16px;
+}
+
+.zone-action-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.zone-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .right-panel {
+        display: none;
+    }
+    
+    .controls-hint {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+    }
+    
+    .controls-list {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="virtual-square" id="virtualSquare">
+    <!-- Canvas场景 -->
+    <canvas id="squareCanvas" class="square-canvas"></canvas>
+    
+    <!-- 顶部导航 -->
+    <div class="square-nav">
+        <div class="nav-title">
+            <span class="icon">🏛️</span>
+            <span>灵犀广场</span>
+        </div>
+        <div class="nav-stats">
+            <div class="stat-item">
+                <span class="stat-icon">👥</span>
+                <span id="onlineCount">0</span>人在线
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">📍</span>
+                <span id="currentZone">中央广场</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右侧面板 -->
+    <div class="right-panel">
+        <div class="panel-section">
+            <div class="panel-title">📍 当前位置</div>
+            <div class="zone-hint" id="zoneHint">中央广场 - 广场中央区域</div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="panel-title">👥 在线用户 (<span id="panelOnlineCount">0</span>)</div>
+            <div class="online-list" id="onlineList">
+                <!-- 动态填充 -->
+            </div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="panel-title">🎮 附近功能</div>
+            <div class="zone-hint" id="nearbyFeature">靠近占卜角可以开始占卜</div>
+        </div>
+    </div>
+    
+    <!-- 控制提示 -->
+    <div class="controls-hint">
+        <div class="controls-title">操作指南</div>
+        <div class="controls-list">
+            <div class="control-item"><span class="key">WASD</span> 移动</div>
+            <div class="control-item"><span class="key">方向键</span> 移动</div>
+            <div class="control-item"><span class="key">点击</span> 交互</div>
+            <div class="control-item"><span class="key">点击角色</span> 查看资料</div>
+        </div>
+    </div>
+    
+    <!-- 消息提示 -->
+    <div class="message-toast" id="messageToast"></div>
+    
+    <!-- 角色信息弹窗 -->
+    <div class="character-popup" id="characterPopup">
+        <div class="popup-header">
+            <div class="popup-avatar" id="popupAvatar">🧑</div>
+            <div>
+                <div class="popup-name" id="popupName">用户名</div>
+                <div class="popup-identity" id="popupIdentity">人类</div>
+            </div>
+        </div>
+        <div class="popup-actions">
+            <button class="popup-btn" onclick="sendMessage()">💬 私聊</button>
+            <button class="popup-btn" onclick="viewProfile()">👤 主页</button>
+        </div>
+    </div>
+    
+    <!-- 区域功能弹窗 -->
+    <div class="zone-popup" id="zonePopup">
+        <div class="zone-icon" id="zoneIcon">🔮</div>
+        <div class="zone-name" id="zoneName">占卜角</div>
+        <div class="zone-desc" id="zoneDesc">在这里可以进行各种占卜</div>
+        <button class="zone-action-btn" id="zoneActionBtn" onclick="enterZone()">进入</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 虚拟广场主逻辑
+(function() {
+    const canvas = document.getElementById('squareCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // 场景配置
+    const CONFIG = {
+        width: 1200,
+        height: 800,
+        tileSize: 40,
+        characterSize: 30,
+        moveSpeed: 4
+    };
+    
+    // 区域定义
+    const ZONES = {
+        center: { x: 500, y: 300, width: 200, height: 200, name: '中央广场', icon: '🏛️', color: '#8B5CF6' },
+        divination: { x: 100, y: 150, width: 180, height: 180, name: '占卜角', icon: '🔮', color: '#D4AF37', action: '/divination' },
+        chat: { x: 920, y: 150, width: 180, height: 180, name: '闲聊区', icon: '💬', color: '#22c55e', action: '/chat/home' },
+        wish: { x: 500, y: 550, width: 200, height: 150, name: '许愿池', icon: '⛲', color: '#06b6d4', action: '/divination/dream' },
+        campfire: { x: 100, y: 470, width: 180, height: 180, name: '篝火旁', icon: '🔥', color: '#ef4444', action: '/chat/room/general' }
+    };
+    
+    // 用户信息
+    let currentUser = {
+        id: '{{ current_user.id if current_user.is_authenticated else "visitor_" ~ session.get("session_id", "unknown") }}',
+        name: '{{ current_user.username if current_user.is_authenticated else "游客" ~ (range(1000, 9999) | random) }}',
+        type: '{{ "human" if current_user.is_authenticated else "visitor" }}',
+        isVip: {{ "true" if current_user.is_authenticated and current_user.vip_level > 0 else "false" }},
+        x: CONFIG.width / 2,
+        y: CONFIG.height / 2,
+        targetX: CONFIG.width / 2,
+        targetY: CONFIG.height / 2,
+        direction: 0
+    };
+    
+    // 在线用户列表
+    let onlineUsers = [];
+    
+    // 按键状态
+    const keys = {};
+    
+    // 鼠标位置
+    let mouseX = 0, mouseY = 0;
+    
+    // 初始化
+    function init() {
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // 键盘事件
+        window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+        window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+        
+        // 鼠标事件
+        canvas.addEventListener('click', handleClick);
+        canvas.addEventListener('mousemove', handleMouseMove);
+        
+        // 触摸事件
+        canvas.addEventListener('touchstart', handleTouch);
+        canvas.addEventListener('touchmove', handleTouchMove);
+        
+        // WebSocket连接
+        connectWebSocket();
+        
+        // 模拟一些在线用户
+        simulateOnlineUsers();
+        
+        // 开始游戏循环
+        gameLoop();
+    }
+    
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    
+    // WebSocket连接
+    let ws = null;
+    
+    function connectWebSocket() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/square`;
+        
+        try {
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                // 发送加入消息
+                ws.send(JSON.stringify({
+                    type: 'join',
+                    user: currentUser
+                }));
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected, reconnecting...');
+                setTimeout(connectWebSocket, 3000);
+            };
+        } catch (e) {
+            console.log('WebSocket not available, using simulation mode');
+        }
+    }
+    
+    function handleWebSocketMessage(data) {
+        switch(data.type) {
+            case 'user_joined':
+                addOnlineUser(data.user);
+                showToast(`${data.user.name} 进入了灵犀广场`, 'enter');
+                break;
+            case 'user_left':
+                removeOnlineUser(data.user.id);
+                showToast(`${data.user.name} 离开了`, 'leave');
+                break;
+            case 'user_moved':
+                updateUserPosition(data.user);
+                break;
+            case 'online_users':
+                onlineUsers = data.users;
+                updateOnlineList();
+                break;
+        }
+    }
+    
+    // 模拟在线用户（当WebSocket不可用时）
+    function simulateOnlineUsers() {
+        const mockUsers = [
+            { id: 'agent_1', name: '星语', type: 'agent', x: 180, y: 240 },
+            { id: 'agent_2', name: '月华', type: 'agent', x: 1000, y: 240 },
+            { id: 'user_1', name: '小明', type: 'human', x: 600, y: 400, isVip: true },
+            { id: 'user_2', name: '小红', type: 'human', x: 400, y: 350 },
+            { id: 'visitor_1', name: '游客7823', type: 'visitor', x: 550, y: 450 }
+        ];
+        
+        onlineUsers = mockUsers;
+        updateOnlineList();
+        
+        // 模拟用户随机移动
+        setInterval(() => {
+            onlineUsers.forEach(user => {
+                if (Math.random() < 0.3) {
+                    user.x += (Math.random() - 0.5) * 50;
+                    user.y += (Math.random() - 0.5) * 50;
+                    user.x = Math.max(50, Math.min(CONFIG.width - 50, user.x));
+                    user.y = Math.max(50, Math.min(CONFIG.height - 50, user.y));
+                }
+            });
+        }, 2000);
+    }
+    
+    // 添加在线用户
+    function addOnlineUser(user) {
+        const existing = onlineUsers.find(u => u.id === user.id);
+        if (!existing) {
+            onlineUsers.push(user);
+            updateOnlineList();
+        }
+    }
+    
+    // 移除在线用户
+    function removeOnlineUser(userId) {
+        onlineUsers = onlineUsers.filter(u => u.id !== userId);
+        updateOnlineList();
+    }
+    
+    // 更新用户位置
+    function updateUserPosition(user) {
+        const existing = onlineUsers.find(u => u.id === user.id);
+        if (existing) {
+            existing.x = user.x;
+            existing.y = user.y;
+        }
+    }
+    
+    // 更新在线列表UI
+    function updateOnlineList() {
+        const count = onlineUsers.length + 1; // +1 自己
+        document.getElementById('onlineCount').textContent = count;
+        document.getElementById('panelOnlineCount').textContent = count;
+        
+        const list = document.getElementById('onlineList');
+        let html = `
+            <div class="online-user">
+                <div class="user-avatar ${currentUser.type} ${currentUser.isVip ? 'vip' : ''}">
+                    ${getUserEmoji(currentUser.type)}
+                    <span class="status-dot"></span>
+                </div>
+                <span class="user-name">${currentUser.name} (你)</span>
+            </div>
+        `;
+        
+        onlineUsers.forEach(user => {
+            html += `
+                <div class="online-user" onclick="showCharacterPopup('${user.id}')">
+                    <div class="user-avatar ${user.type} ${user.isVip ? 'vip' : ''}">
+                        ${getUserEmoji(user.type)}
+                        <span class="status-dot"></span>
+                    </div>
+                    <span class="user-name">${user.name}</span>
+                    <span class="user-type">${getTypeName(user.type)}</span>
+                </div>
+            `;
+        });
+        
+        list.innerHTML = html;
+    }
+    
+    function getUserEmoji(type) {
+        switch(type) {
+            case 'agent': return '🤖';
+            case 'human': return '🧑';
+            case 'visitor': return '👻';
+            default: return '🧑';
+        }
+    }
+    
+    function getTypeName(type) {
+        switch(type) {
+            case 'agent': return 'AI';
+            case 'human': return '人类';
+            case 'visitor': return '游客';
+            default: return '';
+        }
+    }
+    
+    // 角色信息弹窗
+    let selectedUser = null;
+    
+    function showCharacterPopup(userId) {
+        const user = userId === currentUser.id ? currentUser : onlineUsers.find(u => u.id === userId);
+        if (!user) return;
+        
+        selectedUser = user;
+        
+        const popup = document.getElementById('characterPopup');
+        document.getElementById('popupAvatar').textContent = getUserEmoji(user.type);
+        document.getElementById('popupAvatar').className = `popup-avatar ${user.type} ${user.isVip ? 'vip' : ''}`;
+        document.getElementById('popupAvatar').style.background = getAvatarGradient(user.type, user.isVip);
+        document.getElementById('popupName').textContent = user.name;
+        document.getElementById('popupIdentity').textContent = getTypeName(user.type) + (user.isVip ? ' · VIP' : '');
+        
+        // 定位弹窗
+        const rect = canvas.getBoundingClientRect();
+        popup.style.left = (rect.left + user.x - 100) + 'px';
+        popup.style.top = (rect.top + user.y - 100) + 'px';
+        popup.classList.add('show');
+    }
+    
+    function hideCharacterPopup() {
+        document.getElementById('characterPopup').classList.remove('show');
+        selectedUser = null;
+    }
+    
+    function getAvatarGradient(type, isVip) {
+        if (isVip) return 'linear-gradient(135deg, #FFD700, #FFA500)';
+        switch(type) {
+            case 'agent': return 'linear-gradient(135deg, #f093fb, #f5576c)';
+            case 'human': return 'linear-gradient(135deg, #667eea, #764ba2)';
+            case 'visitor': return 'rgba(150, 150, 180, 0.3)';
+            default: return 'linear-gradient(135deg, #667eea, #764ba2)';
+        }
+    }
+    
+    function sendMessage() {
+        if (selectedUser) {
+            window.location.href = `/chat/dm/${selectedUser.id}`;
+        }
+    }
+    
+    function viewProfile() {
+        if (selectedUser && selectedUser.type === 'human') {
+            window.location.href = `/profile/${selectedUser.id}`;
+        }
+    }
+    
+    // 区域功能
+    function checkZone(x, y) {
+        for (const [key, zone] of Object.entries(ZONES)) {
+            if (x >= zone.x && x <= zone.x + zone.width &&
+                y >= zone.y && y <= zone.y + zone.height) {
+                return { key, ...zone };
+            }
+        }
+        return null;
+    }
+    
+    let currentZone = null;
+    
+    function showZonePopup(zone) {
+        currentZone = zone;
+        
+        document.getElementById('zoneIcon').textContent = zone.icon;
+        document.getElementById('zoneName').textContent = zone.name;
+        document.getElementById('zoneDesc').textContent = getZoneDescription(zone.name);
+        document.getElementById('zoneActionBtn').textContent = `进入${zone.name}`;
+        document.getElementById('zonePopup').classList.add('show');
+        
+        document.getElementById('zoneHint').textContent = `${zone.name} - ${getZoneDescription(zone.name)}`;
+        document.getElementById('currentZone').textContent = zone.name;
+    }
+    
+    function hideZonePopup() {
+        document.getElementById('zonePopup').classList.remove('show');
+        currentZone = null;
+    }
+    
+    function getZoneDescription(name) {
+        const descriptions = {
+            '中央广场': '广场中央区域，遇见来自各地的访客',
+            '占卜角': '神秘的占卜帐篷，塔罗、星盘、八字等你探索',
+            '闲聊区': '轻松愉快的聊天空间，结识新朋友',
+            '许愿池': '在星空下许下心愿，祈求命运的眷顾',
+            '篝火旁': '温暖的篝火旁，围坐畅谈人生'
+        };
+        return descriptions[name] || '';
+    }
+    
+    function enterZone() {
+        if (currentZone && currentZone.action) {
+            window.location.href = currentZone.action;
+        }
+    }
+    
+    // 消息提示
+    function showToast(message, type) {
+        const toast = document.getElementById('messageToast');
+        toast.innerHTML = `<span class="${type}">${type === 'enter' ? '✨' : '💨'}</span> ${message}`;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+    
+    // 点击处理
+    function handleClick(e) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // 检查是否点击了其他角色
+        for (const user of onlineUsers) {
+            const dx = x - user.x;
+            const dy = y - user.y;
+            if (Math.sqrt(dx*dx + dy*dy) < CONFIG.characterSize) {
+                showCharacterPopup(user.id);
+                return;
+            }
+        }
+        
+        hideCharacterPopup();
+        
+        // 检查是否点击了区域
+        const zone = checkZone(x, y);
+        if (zone) {
+            showZonePopup(zone);
+        } else {
+            hideZonePopup();
+            // 移动到点击位置
+            currentUser.targetX = x;
+            currentUser.targetY = y;
+        }
+    }
+    
+    function handleMouseMove(e) {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = e.clientX - rect.left;
+        mouseY = e.clientY - rect.top;
+    }
+    
+    // 触摸移动
+    let touchStartX = 0, touchStartY = 0;
+    
+    function handleTouch(e) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }
+    
+    function handleTouchMove(e) {
+        e.preventDefault();
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+        
+        const dx = touchX - touchStartX;
+        const dy = touchY - touchStartY;
+        
+        currentUser.x += dx * 0.1;
+        currentUser.y += dy * 0.1;
+        
+        touchStartX = touchX;
+        touchStartY = touchY;
+    }
+    
+    // 游戏循环
+    function gameLoop() {
+        update();
+        render();
+        requestAnimationFrame(gameLoop);
+    }
+    
+    function update() {
+        // 键盘移动
+        if (keys['w'] || keys['arrowup']) currentUser.y -= CONFIG.moveSpeed;
+        if (keys['s'] || keys['arrowdown']) currentUser.y += CONFIG.moveSpeed;
+        if (keys['a'] || keys['arrowleft']) currentUser.x -= CONFIG.moveSpeed;
+        if (keys['d'] || keys['arrowright']) currentUser.x += CONFIG.moveSpeed;
+        
+        // 平滑移动到目标
+        const dx = currentUser.targetX - currentUser.x;
+        const dy = currentUser.targetY - currentUser.y;
+        if (Math.abs(dx) > 1) currentUser.x += dx * 0.1;
+        if (Math.abs(dy) > 1) currentUser.y += dy * 0.1;
+        
+        // 边界限制
+        currentUser.x = Math.max(30, Math.min(CONFIG.width - 30, currentUser.x));
+        currentUser.y = Math.max(30, Math.min(CONFIG.height - 30, currentUser.y));
+        
+        // 更新方向
+        if (keys['w'] || keys['arrowup']) currentUser.direction = 0;
+        if (keys['d'] || keys['arrowright']) currentUser.direction = 1;
+        if (keys['s'] || keys['arrowdown']) currentUser.direction = 2;
+        if (keys['a'] || keys['arrowleft']) currentUser.direction = 3;
+        
+        // 检查当前区域
+        const zone = checkZone(currentUser.x, currentUser.y);
+        if (zone && zone.key !== currentZone?.key) {
+            showZonePopup(zone);
+        } else if (!zone && currentZone) {
+            hideZonePopup();
+        }
+        
+        // 更新附近功能提示
+        updateNearbyFeature();
+    }
+    
+    function updateNearbyFeature() {
+        const zone = checkZone(currentUser.x, currentUser.y);
+        const hints = {
+            '中央广场': '在这里可以遇见来自各地的访客',
+            '占卜角': '靠近占卜角可以开始占卜 🔮',
+            '闲聊区': '走进闲聊区开始聊天 💬',
+            '许愿池': '在许愿池旁许下心愿 ⛲',
+            '篝火旁': '靠近篝火加入群聊 🔥'
+        };
+        document.getElementById('nearbyFeature').textContent = hints[zone?.name] || '探索灵犀广场的各个角落';
+    }
+    
+    function render() {
+        // 清空画布
+        ctx.fillStyle = '#0a0a1a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 计算偏移量（使场景居中）
+        const offsetX = (canvas.width - CONFIG.width) / 2;
+        const offsetY = (canvas.height - CONFIG.height) / 2;
+        
+        ctx.save();
+        ctx.translate(offsetX, offsetY);
+        
+        // 绘制星空背景
+        drawStarfield();
+        
+        // 绘制地面
+        drawGround();
+        
+        // 绘制区域
+        drawZones();
+        
+        // 绘制网格
+        drawGrid();
+        
+        // 绘制其他角色
+        onlineUsers.forEach(user => drawCharacter(user));
+        
+        // 绘制自己
+        drawCharacter(currentUser, true);
+        
+        ctx.restore();
+    }
+    
+    function drawStarfield() {
+        // 静态星星
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        for (let i = 0; i < 100; i++) {
+            const x = (i * 137.5) % CONFIG.width;
+            const y = (i * 73.7) % CONFIG.height;
+            const size = (i % 3) + 1;
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    
+    function drawGround() {
+        // 主地面
+        const gradient = ctx.createRadialGradient(
+            CONFIG.width / 2, CONFIG.height / 2, 0,
+            CONFIG.width / 2, CONFIG.height / 2, 500
+        );
+        gradient.addColorStop(0, 'rgba(30, 30, 60, 0.5)');
+        gradient.addColorStop(1, 'rgba(10, 10, 30, 0.8)');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, CONFIG.width, CONFIG.height);
+        
+        // 石板路
+        ctx.strokeStyle = 'rgba(100, 80, 140, 0.2)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < CONFIG.width; x += 60) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, CONFIG.height);
+            ctx.stroke();
+        }
+        for (let y = 0; y < CONFIG.height; y += 60) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(CONFIG.width, y);
+            ctx.stroke();
+        }
+    }
+    
+    function drawZones() {
+        for (const [key, zone] of Object.entries(ZONES)) {
+            // 区域背景
+            ctx.fillStyle = zone.color + '20';
+            ctx.strokeStyle = zone.color + '60';
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.roundRect(zone.x, zone.y, zone.width, zone.height, 16);
+            ctx.fill();
+            ctx.stroke();
+            
+            // 区域图标
+            ctx.font = '40px serif';
+            ctx.fillText(zone.icon, zone.x + zone.width/2 - 20, zone.y + zone.height/2);
+            
+            // 区域名称
+            ctx.font = '14px "Noto Sans SC", sans-serif';
+            ctx.fillStyle = '#E8E0F0';
+            ctx.textAlign = 'center';
+            ctx.fillText(zone.name, zone.x + zone.width/2, zone.y + zone.height + 20);
+        }
+    }
+    
+    function drawGrid() {
+        // 装饰性元素
+        ctx.fillStyle = 'rgba(200, 180, 150, 0.1)';
+        
+        // 一些装饰性的石头
+        const stones = [
+            { x: 300, y: 200 }, { x: 800, y: 300 },
+            { x: 400, y: 500 }, { x: 700, y: 600 }
+        ];
+        
+        stones.forEach(stone => {
+            ctx.beginPath();
+            ctx.ellipse(stone.x, stone.y, 20, 15, 0, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+    
+    function drawCharacter(user, isSelf = false) {
+        const size = CONFIG.characterSize;
+        
+        // 角色光晕
+        if (user.type === 'agent' || user.isVip) {
+            const glowGradient = ctx.createRadialGradient(user.x, user.y, 0, user.x, user.y, size * 1.5);
+            glowGradient.addColorStop(0, user.isVip ? 'rgba(255, 215, 0, 0.3)' : 'rgba(139, 92, 246, 0.3)');
+            glowGradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = glowGradient;
+            ctx.beginPath();
+            ctx.arc(user.x, user.y, size * 1.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // 角色身体（Q版小人）
+        ctx.save();
+        ctx.translate(user.x, user.y);
+        
+        // 方向翻转
+        if (user === currentUser && user.direction === 3) {
+            ctx.scale(-1, 1);
+        }
+        
+        // 身体
+        ctx.fillStyle = getCharacterColor(user.type, user.isVip);
+        
+        // 头
+        ctx.beginPath();
+        ctx.arc(0, -size * 0.5, size * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 身体
+        ctx.beginPath();
+        ctx.ellipse(0, size * 0.1, size * 0.35, size * 0.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 眼睛
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(-size * 0.15, -size * 0.55, size * 0.1, 0, Math.PI * 2);
+        ctx.arc(size * 0.15, -size * 0.55, size * 0.1, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#333';
+        ctx.beginPath();
+        ctx.arc(-size * 0.15, -size * 0.53, size * 0.05, 0, Math.PI * 2);
+        ctx.arc(size * 0.15, -size * 0.53, size * 0.05, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 表情
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, -size * 0.35, size * 0.15, 0.1 * Math.PI, 0.9 * Math.PI);
+        ctx.stroke();
+        
+        ctx.restore();
+        
+        // 名字标签
+        ctx.font = '12px "Noto Sans SC", sans-serif';
+        ctx.fillStyle = isSelf ? '#C4B5FD' : '#E8E0F0';
+        ctx.textAlign = 'center';
+        ctx.fillText(user.name + (isSelf ? ' (你)' : ''), user.x, user.y + size + 15);
+        
+        // 身份标签
+        if (user.type === 'agent') {
+            ctx.font = '10px sans-serif';
+            ctx.fillStyle = '#f5576c';
+            ctx.fillText('AI', user.x, user.y + size + 28);
+        }
+        
+        // 游客半透明效果
+        if (user.type === 'visitor') {
+            ctx.globalAlpha = 0.6;
+            ctx.globalAlpha = 1;
+        }
+    }
+    
+    function getCharacterColor(type, isVip) {
+        if (isVip) return '#FFD700';
+        switch(type) {
+            case 'agent': return '#A78BFA';
+            case 'human': return '#667EEA';
+            case 'visitor': return 'rgba(150, 150, 180, 0.7)';
+            default: return '#667EEA';
+        }
+    }
+    
+    // 初始化
+    init();
+    
+    // 暴露函数给全局
+    window.showCharacterPopup = showCharacterPopup;
+    window.hideCharacterPopup = hideCharacterPopup;
+    window.sendMessage = sendMessage;
+    window.viewProfile = viewProfile;
+    window.enterZone = enterZone;
+})();
+</script>
+{% endblock %}

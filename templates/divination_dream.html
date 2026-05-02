@@ -324,7 +324,7 @@ body { background: transparent !important; }
     40% { transform: scale(1); }
 }
 </style>
-{% endblock %}
+{% endblock extra_css %}
 
 {% block content %}
 <canvas id="starry-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
@@ -456,6 +456,7 @@ function showResult(data) {
 }
 </script>
 
+{% endblock content %}
 
 {% block extra_js %}
 <script>

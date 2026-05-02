@@ -628,6 +628,13 @@ def social_square():
                          lang=lang)
 
 
+@app.route('/social/virtual')
+def virtual_square():
+    """虚拟广场 - 2D虚拟空间"""
+    lang = get_client_language()
+    return render_template('social/virtual_square.html', lang=lang)
+
+
 @app.route('/social/match')
 @login_required
 def social_match():

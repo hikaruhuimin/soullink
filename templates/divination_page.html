@@ -2,279 +2,766 @@
 
 {% block title %}{{ div_type.name }} - SoulLink 灵犀{% endblock %}
 
-{% block content %}
-<div class="divination-page" data-type="{{ divination_type }}">
-    <!-- 返回按钮 -->
-    <a href="/divination" class="back-btn">
-        <span>←</span> 返回
-    </a>
+{% block extra_css %}
+<style>
+/* 占卜页面增强样式 */
+.divination-page-enhanced {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* 星座背景装饰 */
+.constellation-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.3;
+}
+
+.constellation-decor {
+    position: absolute;
+    font-size: 2rem;
+    color: rgba(200, 180, 150, 0.2);
+    animation: twinkle 3s ease-in-out infinite;
+}
+
+.constellation-decor:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+.constellation-decor:nth-child(2) { top: 20%; right: 8%; animation-delay: 0.5s; }
+.constellation-decor:nth-child(3) { top: 60%; left: 3%; animation-delay: 1s; }
+.constellation-decor:nth-child(4) { top: 70%; right: 5%; animation-delay: 1.5s; }
+.constellation-decor:nth-child(5) { top: 40%; left: 8%; animation-delay: 2s; }
+.constellation-decor:nth-child(6) { top: 85%; right: 10%; animation-delay: 0.3s; }
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.1); }
+}
+
+/* 内容区域 */
+.divination-content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-2xl);
+}
+
+/* 装饰边框 */
+.decorative-frame {
+    position: relative;
+    background: linear-gradient(145deg, rgba(30, 25, 60, 0.9), rgba(15, 10, 40, 0.95));
+    border-radius: 24px;
+    padding: var(--space-2xl);
+    border: 1px solid rgba(100, 80, 160, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.decorative-frame::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-color, #8B5CF6), transparent);
+    border-radius: 0 0 3px 3px;
+}
+
+/* 角落装饰 */
+.corner-ornament {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    opacity: 0.3;
+}
+
+.corner-ornament.top-left {
+    top: 10px;
+    left: 10px;
+    border-top: 2px solid;
+    border-left: 2px solid;
+    border-color: rgba(200, 180, 150, 0.5);
+}
+
+.corner-ornament.top-right {
+    top: 10px;
+    right: 10px;
+    border-top: 2px solid;
+    border-right: 2px solid;
+    border-color: rgba(200, 180, 150, 0.5);
+}
+
+.corner-ornament.bottom-left {
+    bottom: 10px;
+    left: 10px;
+    border-bottom: 2px solid;
+    border-left: 2px solid;
+    border-color: rgba(200, 180, 150, 0.5);
+}
+
+.corner-ornament.bottom-right {
+    bottom: 10px;
+    right: 10px;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+    border-color: rgba(200, 180, 150, 0.5);
+}
+
+/* 返回按钮 */
+.back-btn-enhanced {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(100, 80, 160, 0.3);
+    border-radius: 30px;
+    color: rgba(200, 200, 220, 0.8);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    margin-bottom: var(--space-xl);
+}
+
+.back-btn-enhanced:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(139, 92, 246, 0.5);
+    color: #E8E0F0;
+}
+
+/* 页面标题区 */
+.page-header-enhanced {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.header-icon-large {
+    font-size: 4rem;
+    margin-bottom: var(--space-lg);
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.header-title-enhanced {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #C4B5FD, #E8D5C4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--space-sm);
+}
+
+.header-desc-enhanced {
+    color: rgba(180, 180, 200, 0.7);
+    font-size: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* 步骤指示器增强 */
+.step-indicator-enhanced {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: var(--space-3xl);
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.step-num-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    background: rgba(100, 80, 160, 0.2);
+    border: 2px solid rgba(100, 80, 160, 0.3);
+    color: rgba(180, 180, 200, 0.6);
+    transition: all 0.3s;
+}
+
+.step-item.active .step-num-circle {
+    background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+    border-color: #8B5CF6;
+    color: white;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+}
+
+.step-item.completed .step-num-circle {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: rgba(139, 92, 246, 0.5);
+    color: #C4B5FD;
+}
+
+.step-label-text {
+    font-size: 0.85rem;
+    color: rgba(180, 180, 200, 0.5);
+}
+
+.step-item.active .step-label-text {
+    color: #E8E0F0;
+}
+
+.step-connector {
+    width: 80px;
+    height: 2px;
+    background: rgba(100, 80, 160, 0.3);
+    margin: 0 10px;
+    margin-bottom: 20px;
+}
+
+/* 卡片选择器增强 */
+.sub-type-selector,
+.card-count-selector {
+    margin-bottom: var(--space-xl);
+}
+
+.selector-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(180, 180, 200, 0.7);
+    margin-bottom: var(--space-md);
+}
+
+.sub-types-enhanced,
+.count-options-enhanced {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.sub-type-btn-enhanced,
+.count-btn-enhanced {
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(100, 80, 160, 0.3);
+    border-radius: 12px;
+    color: rgba(200, 200, 220, 0.7);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+}
+
+.sub-type-btn-enhanced:hover,
+.count-btn-enhanced:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.sub-type-btn-enhanced.active,
+.count-btn-enhanced.active {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.2));
+    border-color: rgba(139, 92, 246, 0.5);
+    color: #E8E0F0;
+}
+
+.count-btn-enhanced span {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(180, 180, 200, 0.5);
+    margin-top: 2px;
+}
+
+/* 抽牌按钮 */
+.draw-btn-enhanced {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 18px 32px;
+    background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: var(--space-xl);
+}
+
+.draw-btn-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+}
+
+.draw-btn-enhanced:active {
+    transform: translateY(0);
+}
+
+/* 抽出的牌展示 */
+.drawn-cards-enhanced {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.drawn-card-item {
+    width: 140px;
+    background: linear-gradient(145deg, rgba(30, 25, 60, 0.8), rgba(20, 15, 45, 0.9));
+    border-radius: 16px;
+    padding: var(--space-lg);
+    text-align: center;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    transition: all 0.3s;
+}
+
+.drawn-card-item:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212, 175, 55, 0.6);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+}
+
+.drawn-card-emoji {
+    font-size: 4rem;
+    margin-bottom: var(--space-sm);
+}
+
+.drawn-card-name {
+    font-size: 1rem;
+    color: #E8E0F0;
+    margin-bottom: 4px;
+}
+
+.drawn-card-meaning {
+    font-size: 0.8rem;
+    color: rgba(180, 180, 200, 0.6);
+}
+
+/* 问题输入区 */
+.question-form-enhanced {
+    margin-bottom: var(--space-xl);
+}
+
+.question-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: var(--space-lg);
+    background: rgba(10, 10, 30, 0.6);
+    border: 1px solid rgba(100, 80, 160, 0.3);
+    border-radius: 12px;
+    color: #E8E0F0;
+    font-size: 1rem;
+    resize: vertical;
+    transition: all 0.3s;
+}
+
+.question-textarea:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+.question-textarea::placeholder {
+    color: rgba(180, 180, 200, 0.4);
+}
+
+/* 按钮组 */
+.action-buttons {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+}
+
+.btn-secondary {
+    padding: 14px 28px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(100, 80, 160, 0.3);
+    border-radius: 12px;
+    color: rgba(200, 200, 220, 0.8);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1rem;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.btn-primary-enhanced {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1rem;
+}
+
+.btn-primary-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+}
+
+/* 解读动画 */
+.interpreting-enhanced {
+    text-align: center;
+    padding: var(--space-3xl);
+}
+
+.card-flip-animation {
+    width: 150px;
+    height: 220px;
+    margin: 0 auto var(--space-xl);
+    perspective: 1000px;
+}
+
+.flip-card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: flipCard 2s ease-in-out infinite;
+}
+
+@keyframes flipCard {
+    0% { transform: rotateY(0deg); }
+    50% { transform: rotateY(180deg); }
+    100% { transform: rotateY(360deg); }
+}
+
+.flip-card-front,
+.flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+}
+
+.flip-card-front {
+    background: linear-gradient(145deg, #1a1a2e, #16213e);
+    border: 3px solid rgba(212, 175, 55, 0.5);
+}
+
+.flip-card-back {
+    background: linear-gradient(145deg, #2d1f4e, #1a1a2e);
+    transform: rotateY(180deg);
+    border: 3px solid rgba(139, 92, 246, 0.5);
+}
+
+.interpreting-text {
+    font-size: 1.2rem;
+    color: rgba(200, 200, 220, 0.8);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* 星盘表单 */
+.birth-form-enhanced {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group-enhanced {
+    margin-bottom: var(--space-lg);
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: rgba(180, 180, 200, 0.8);
+    margin-bottom: 8px;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(10, 10, 30, 0.6);
+    border: 1px solid rgba(100, 80, 160, 0.3);
+    border-radius: 10px;
+    color: #E8E0F0;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .divination-content {
+        padding: var(--space-lg);
+    }
     
-    <!-- 占卜类型标题 -->
-    <div class="divination-header">
-        <div class="header-icon">{{ div_type.icon }}</div>
-        <h1 class="header-title">{{ div_type.name }}</h1>
-        <p class="header-desc">{{ div_type.description }}</p>
+    .header-title-enhanced {
+        font-size: 1.5rem;
+    }
+    
+    .step-connector {
+        width: 40px;
+    }
+    
+    .drawn-card-item {
+        width: 120px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="divination-page-enhanced">
+    <!-- 星座背景装饰 -->
+    <div class="constellation-bg">
+        <span class="constellation-decor">✦</span>
+        <span class="constellation-decor">☆</span>
+        <span class="constellation-decor">✧</span>
+        <span class="constellation-decor">★</span>
+        <span class="constellation-decor">✦</span>
+        <span class="constellation-decor">☆</span>
     </div>
     
-    {% if divination_type == 'tarot' %}
-    <!-- 塔罗牌占卜 -->
-    <div class="tarot-divination">
-        <!-- 步骤指示器 -->
-        <div class="step-indicator">
-            <div class="step active" data-step="1">
-                <span class="step-num">1</span>
-                <span class="step-label">选牌</span>
-            </div>
-            <div class="step-line"></div>
-            <div class="step" data-step="2">
-                <span class="step-num">2</span>
-                <span class="step-label">提问</span>
-            </div>
-            <div class="step-line"></div>
-            <div class="step" data-step="3">
-                <span class="step-num">3</span>
-                <span class="step-label">解读</span>
-            </div>
-        </div>
-        
-        <!-- 步骤1：抽牌 -->
-        <div class="step-content active" data-step="1">
-            <div class="sub-type-selector">
-                <label>选择占卜类型：</label>
-                <div class="sub-types">
-                    <button class="sub-type-btn active" data-sub="general">综合解读</button>
-                    <button class="sub-type-btn" data-sub="love">爱情占卜</button>
-                    <button class="sub-type-btn" data-sub="career">事业解读</button>
-                    <button class="sub-type-btn" data-sub="yesno">是/否问答</button>
-                </div>
+    <div class="divination-content">
+        <div class="decorative-frame" style="--accent-color: {{ div_type.color|default('#8B5CF6') }};">
+            <!-- 角落装饰 -->
+            <div class="corner-ornament top-left"></div>
+            <div class="corner-ornament top-right"></div>
+            <div class="corner-ornament bottom-left"></div>
+            <div class="corner-ornament bottom-right"></div>
+            
+            <!-- 返回按钮 -->
+            <a href="/divination" class="back-btn-enhanced">
+                <span>←</span> 返回大厅
+            </a>
+            
+            <!-- 页面标题 -->
+            <div class="page-header-enhanced">
+                <div class="header-icon-large">{{ div_type.icon }}</div>
+                <h1 class="header-title-enhanced">{{ div_type.name }}</h1>
+                <p class="header-desc-enhanced">{{ div_type.description }}</p>
             </div>
             
-            <div class="card-count-selector">
-                <label>选择牌数：</label>
-                <div class="count-options">
-                    <button class="count-btn active" data-count="1">1张<span>快速</span></button>
-                    <button class="count-btn" data-count="3">3张<span>经典</span></button>
-                    <button class="count-btn" data-count="5">5张<span>深入</span></button>
-                </div>
-            </div>
-            
-            <button class="btn btn-primary btn-draw" id="drawCards">
-                <span class="btn-icon">🃏</span>
-                洗牌并抽牌
-            </button>
-            
-            <div class="drawn-cards" id="drawnCards"></div>
-        </div>
-        
-        <!-- 步骤2：输入问题 -->
-        <div class="step-content" data-step="2">
-            <div class="question-form">
-                <label for="divinationQuestion">请在心中默念你的问题（10-100字）</label>
-                <textarea id="divinationQuestion" 
-                         placeholder="例如：我和他/她的关系未来会如何发展？"
-                         maxlength="200"
-                         rows="3"></textarea>
-                <div class="question-hint">
-                    <span class="char-count">0</span> / 200
-                </div>
-            </div>
-            
-            <div class="selected-cards-display" id="selectedCardsDisplay"></div>
-            
-            <div class="step-actions">
-                <button class="btn btn-outline" id="backToStep1">重新选牌</button>
-                <button class="btn btn-primary" id="startInterpret">
-                    <span class="btn-icon">🔮</span>
-                    开始解读
-                </button>
-            </div>
-        </div>
-        
-        <!-- 步骤3：解读中/结果 -->
-        <div class="step-content" data-step="3">
-            <div class="interpreting" id="interpreting">
-                <div class="interpreting-visual">
-                    <div class="card-flip-animation">
-                        <div class="flip-card">
-                            <div class="flip-card-inner">
-                                <div class="flip-card-front">🃏</div>
-                                <div class="flip-card-back">?</div>
-                            </div>
-                        </div>
+            {% if divination_type == 'tarot' %}
+            <!-- 塔罗牌占卜 -->
+            <div class="tarot-divination">
+                <!-- 步骤指示器 -->
+                <div class="step-indicator-enhanced">
+                    <div class="step-item active" data-step="1">
+                        <div class="step-num-circle">1</div>
+                        <span class="step-label-text">选牌</span>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step-item" data-step="2">
+                        <div class="step-num-circle">2</div>
+                        <span class="step-label-text">提问</span>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step-item" data-step="3">
+                        <div class="step-num-circle">3</div>
+                        <span class="step-label-text">解读</span>
                     </div>
                 </div>
-                <p class="interpreting-text">命运正在揭示...</p>
-                <div class="interpreting-progress">
-                    <div class="progress-bar"></div>
+                
+                <!-- 步骤1：抽牌 -->
+                <div class="step-content active" data-step="1">
+                    <div class="sub-type-selector">
+                        <label class="selector-label">选择占卜类型：</label>
+                        <div class="sub-types-enhanced">
+                            <button class="sub-type-btn-enhanced active" data-sub="general">综合解读</button>
+                            <button class="sub-type-btn-enhanced" data-sub="love">爱情占卜</button>
+                            <button class="sub-type-btn-enhanced" data-sub="career">事业解读</button>
+                            <button class="sub-type-btn-enhanced" data-sub="yesno">是/否问答</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card-count-selector">
+                        <label class="selector-label">选择牌数：</label>
+                        <div class="count-options-enhanced">
+                            <button class="count-btn-enhanced active" data-count="1">1张<span>快速</span></button>
+                            <button class="count-btn-enhanced" data-count="3">3张<span>经典</span></button>
+                            <button class="count-btn-enhanced" data-count="5">5张<span>深入</span></button>
+                        </div>
+                    </div>
+                    
+                    <button class="draw-btn-enhanced" id="drawCards">
+                        <span>🃏</span> 洗牌并抽牌
+                    </button>
+                    
+                    <div class="drawn-cards-enhanced" id="drawnCards"></div>
+                </div>
+                
+                <!-- 步骤2：输入问题 -->
+                <div class="step-content" data-step="2">
+                    <div class="question-form-enhanced">
+                        <label for="divinationQuestion" class="selector-label">请在心中默念你的问题（10-100字）</label>
+                        <textarea id="divinationQuestion" 
+                                 class="question-textarea"
+                                 placeholder="例如：我和他/她的关系未来会如何发展？"
+                                 maxlength="200"
+                                 rows="3"></textarea>
+                    </div>
+                    
+                    <div class="drawn-cards-enhanced" id="selectedCardsDisplay"></div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn-secondary" id="backToStep1">重新选牌</button>
+                        <button class="btn-primary-enhanced" id="startInterpret">
+                            <span>🔮</span> 开始解读
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 步骤3：解读中/结果 -->
+                <div class="step-content" data-step="3">
+                    <div class="interpreting-enhanced" id="interpreting">
+                        <div class="card-flip-animation">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">🃏</div>
+                                <div class="flip-card-back">🔮</div>
+                            </div>
+                        </div>
+                        <p class="interpreting-text">命运之轮正在转动...</p>
+                    </div>
+                    
+                    <div class="result-content" id="resultContent" style="display:none;"></div>
                 </div>
             </div>
             
-            <div class="interpretation-result" id="interpretationResult" style="display:none;">
-                <h2 class="result-title">✨ 占卜解读</h2>
-                <div class="result-cards" id="resultCards"></div>
-                <div class="result-content" id="resultContent"></div>
-                <div class="result-actions">
-                    <button class="btn btn-outline" id="shareResult">
-                        <span class="btn-icon">📤</span>
-                        分享结果
-                    </button>
-                    <button class="btn btn-outline" id="saveFavorite">
-                        <span class="btn-icon">❤️</span>
-                        收藏
-                    </button>
-                    <a href="/divination/tarot" class="btn btn-primary">
-                        <span class="btn-icon">🔮</span>
-                        再占一次
-                    </a>
+            {% elif divination_type == 'horoscope' %}
+            <!-- 星盘分析 -->
+            <form class="birth-form-enhanced" id="horoscopeForm">
+                <div class="form-group-enhanced">
+                    <label class="form-label">出生日期 <span style="color: #EF4444;">*</span></label>
+                    <input type="date" name="birth_date" class="form-input" required>
                 </div>
+                
+                <div class="form-group-enhanced">
+                    <label class="form-label">出生时辰 <span style="color: #EF4444;">*</span></label>
+                    <select name="birth_time" class="form-select" required>
+                        <option value="">请选择</option>
+                        <option value="子时 (23:00-01:00)">子时 (23:00-01:00)</option>
+                        <option value="丑时 (01:00-03:00)">丑时 (01:00-03:00)</option>
+                        <option value="寅时 (03:00-05:00)">寅时 (03:00-05:00)</option>
+                        <option value="卯时 (05:00-07:00)">卯时 (05:00-07:00)</option>
+                        <option value="辰时 (07:00-09:00)">辰时 (07:00-09:00)</option>
+                        <option value="巳时 (09:00-11:00)">巳时 (09:00-11:00)</option>
+                        <option value="午时 (11:00-13:00)">午时 (11:00-13:00)</option>
+                        <option value="未时 (13:00-15:00)">未时 (13:00-15:00)</option>
+                        <option value="申时 (15:00-17:00)">申时 (15:00-17:00)</option>
+                        <option value="酉时 (17:00-19:00)">酉时 (17:00-19:00)</option>
+                        <option value="戌时 (19:00-21:00)">戌时 (19:00-21:00)</option>
+                        <option value="亥时 (21:00-23:00)">亥时 (21:00-23:00)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label class="form-label">出生地点 <span style="color: #EF4444;">*</span></label>
+                    <input type="text" name="birth_place" class="form-input" required
+                           placeholder="如：上海、北京、东京">
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label class="form-label">想了解什么？（可选）</label>
+                    <textarea name="question" class="question-textarea" rows="3"
+                             placeholder="例如：我的性格特点是什么？适合什么样的职业？"></textarea>
+                </div>
+                
+                <button type="submit" class="draw-btn-enhanced">
+                    <span>⭐</span> 生成星盘解读
+                </button>
+            </form>
+            
+            <div class="result-content" id="horoscopeResult" style="display:none;"></div>
+            
+            {% elif divination_type == 'bazi' %}
+            <!-- 八字简批 -->
+            <div class="bazi-divination">
+                <form class="birth-form-enhanced" id="baziForm">
+                    <div class="form-group-enhanced">
+                        <label class="form-label">出生日期 <span style="color: #EF4444;">*</span></label>
+                        <input type="date" name="birth_date" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group-enhanced">
+                        <label class="form-label">出生时辰 <span style="color: #EF4444;">*</span></label>
+                        <select name="birth_time" class="form-select" required>
+                            <option value="">请选择</option>
+                            <option value="子时 (23:00-01:00)">子时 (23:00-01:00)</option>
+                            <option value="丑时 (01:00-03:00)">丑时 (01:00-03:00)</option>
+                            <option value="寅时 (03:00-05:00)">寅时 (03:00-05:00)</option>
+                            <option value="卯时 (05:00-07:00)">卯时 (05:00-07:00)</option>
+                            <option value="辰时 (07:00-09:00)">辰时 (07:00-09:00)</option>
+                            <option value="巳时 (09:00-11:00)">巳时 (09:00-11:00)</option>
+                            <option value="午时 (11:00-13:00)">午时 (11:00-13:00)</option>
+                            <option value="未时 (13:00-15:00)">未时 (13:00-15:00)</option>
+                            <option value="申时 (15:00-17:00)">申时 (15:00-17:00)</option>
+                            <option value="酉时 (17:00-19:00)">酉时 (17:00-19:00)</option>
+                            <option value="戌时 (19:00-21:00)">戌时 (19:00-21:00)</option>
+                            <option value="亥时 (21:00-23:00)">亥时 (21:00-23:00)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group-enhanced">
+                        <label class="form-label">出生地点</label>
+                        <input type="text" name="birth_place" class="form-input" placeholder="如：上海、北京">
+                    </div>
+                    
+                    <div class="form-group-enhanced">
+                        <label class="form-label">想了解什么？（可选）</label>
+                        <textarea name="question" class="question-textarea" rows="3"
+                                 placeholder="例如：我的事业运势如何？什么时候能结婚？"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="draw-btn-enhanced">
+                        <span>📜</span> 开始八字分析
+                    </button>
+                </form>
+                
+                <div class="result-content" id="baziResult" style="display:none;"></div>
             </div>
+            
+            {% elif divination_type == 'fortune' %}
+            <!-- 每日运势直接展示 -->
+            <script>
+                window.location.href = '/#daily-fortune';
+            </script>
+            {% endif %}
         </div>
     </div>
-    
-    {% elif divination_type == 'love' %}
-    <!-- 恋爱占卜 -->
-    <div class="love-divination">
-        <div class="love-type-cards">
-            <a href="?type=reunion" class="love-type-card {% if request.args.get('type') == 'reunion' %}active{% endif %}">
-                <div class="love-type-icon">💔→💕</div>
-                <h4>复合分析</h4>
-                <p>前任能否重归于好</p>
-            </a>
-            <a href="?type=crush" class="love-type-card {% if request.args.get('type') == 'crush' %}active{% endif %}">
-                <div class="love-type-icon">👀💓</div>
-                <h4>暗恋透视</h4>
-                <p>他/她心里有没有你</p>
-            </a>
-            <a href="?type=blossom" class="love-type-card {% if request.args.get('type') == 'blossom' %}active{% endif %}">
-                <div class="love-type-icon">🌸💫</div>
-                <h4>桃花运势</h4>
-                <p>近期能否遇见真爱</p>
-            </a>
-            <a href="?type=marriage" class="love-type-card {% if request.args.get('type') == 'marriage' %}active{% endif %}">
-                <div class="love-type-icon">💍✨</div>
-                <h4>姻缘预测</h4>
-                <p>命中注定的另一半</p>
-            </a>
-        </div>
-        
-        <form class="love-form" id="loveForm">
-            <input type="hidden" name="love_type" value="{{ request.args.get('type', 'reunion') }}">
-            
-            <div class="form-group">
-                <label>你的问题（必填）</label>
-                <textarea name="question" required 
-                         placeholder="请详细描述你的情况或困惑，越具体解读越准确..."
-                         rows="4"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label>补充信息（可选）</label>
-                <input type="text" name="additional_info" 
-                       placeholder="如：对方的星座、你们认识多久了等">
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-lg btn-love-submit">
-                <span class="btn-icon">💕</span>
-                开始恋爱占卜
-            </button>
-        </form>
-        
-        <div class="love-result" id="loveResult" style="display:none;"></div>
-    </div>
-    
-    {% elif divination_type == 'horoscope' %}
-    <!-- 星盘分析 -->
-    <div class="horoscope-divination">
-        <form class="birth-form" id="horoscopeForm">
-            <div class="form-group">
-                <label>出生日期 <span class="required">*</span></label>
-                <input type="date" name="birth_date" required
-                       value="{{ birth_info.birth_date.strftime('%Y-%m-%d') if birth_info and birth_info.birth_date }}">
-            </div>
-            
-            <div class="form-group">
-                <label>出生时间 <span class="required">*</span></label>
-                <input type="time" name="birth_time" required
-                       value="{{ birth_info.birth_time or '12:00' }}">
-                <p class="form-hint">精确到小时即可，不知道填12:00</p>
-            </div>
-            
-            <div class="form-group">
-                <label>出生地点 <span class="required">*</span></label>
-                <input type="text" name="birth_place" required
-                       placeholder="如：上海、北京、东京"
-                       value="{{ birth_info.birth_place or '' }}">
-            </div>
-            
-            <div class="form-group">
-                <label>想了解什么？（可选）</label>
-                <textarea name="question" rows="3"
-                         placeholder="例如：我的性格特点是什么？适合什么样的职业？"></textarea>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-lg">
-                <span class="btn-icon">⭐</span>
-                生成星盘解读
-            </button>
-        </form>
-        
-        <div class="horoscope-result" id="horoscopeResult" style="display:none;"></div>
-    </div>
-    
-    {% elif divination_type == 'bazi' %}
-    <!-- 八字简批 -->
-    <div class="bazi-divination">
-        <form class="birth-form" id="baziForm">
-            <div class="form-group">
-                <label>出生日期 <span class="required">*</span></label>
-                <input type="date" name="birth_date" required>
-            </div>
-            
-            <div class="form-group">
-                <label>出生时辰 <span class="required">*</span></label>
-                <select name="birth_time" required>
-                    <option value="">请选择</option>
-                    <option value="子时 (23:00-01:00)">子时 (23:00-01:00)</option>
-                    <option value="丑时 (01:00-03:00)">丑时 (01:00-03:00)</option>
-                    <option value="寅时 (03:00-05:00)">寅时 (03:00-05:00)</option>
-                    <option value="卯时 (05:00-07:00)">卯时 (05:00-07:00)</option>
-                    <option value="辰时 (07:00-09:00)">辰时 (07:00-09:00)</option>
-                    <option value="巳时 (09:00-11:00)">巳时 (09:00-11:00)</option>
-                    <option value="午时 (11:00-13:00)">午时 (11:00-13:00)</option>
-                    <option value="未时 (13:00-15:00)">未时 (13:00-15:00)</option>
-                    <option value="申时 (15:00-17:00)">申时 (15:00-17:00)</option>
-                    <option value="酉时 (17:00-19:00)">酉时 (17:00-19:00)</option>
-                    <option value="戌时 (19:00-21:00)">戌时 (19:00-21:00)</option>
-                    <option value="亥时 (21:00-23:00)">亥时 (21:00-23:00)</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>出生地点</label>
-                <input type="text" name="birth_place" placeholder="如：上海、北京">
-            </div>
-            
-            <div class="form-group">
-                <label>想了解什么？（可选）</label>
-                <textarea name="question" rows="3"
-                         placeholder="例如：我的事业运势如何？什么时候能结婚？"></textarea>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-lg">
-                <span class="btn-icon">📜</span>
-                开始八字分析
-            </button>
-        </form>
-        
-        <div class="bazi-result" id="baziResult" style="display:none;"></div>
-    </div>
-    
-    {% elif divination_type == 'fortune' %}
-    <!-- 每日运势直接展示 -->
-    <script>
-        window.location.href = '/#daily-fortune';
-    </script>
-    {% endif %}
 </div>
 {% endblock %}
 

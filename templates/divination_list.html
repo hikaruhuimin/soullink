@@ -1,154 +1,795 @@
 {% extends "base.html" %}
 
-{% block title %}选择占卜类型 - SoulLink 灵犀{% endblock %}
+{% block title %}占卜大厅 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 占卜大厅增强样式 */
+.divination-lobby {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-2xl);
+}
+
+/* 英雄区域 */
+.hero-section {
+    text-align: center;
+    padding: var(--space-4xl) 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.hero-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-lg);
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.hero-title {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #C4B5FD, #E8D5C4, #F0E6D3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--space-md);
+}
+
+.hero-subtitle {
+    color: rgba(200, 200, 220, 0.8);
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* 装饰分隔线 */
+.divider-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    margin: var(--space-3xl) 0;
+    color: rgba(200, 180, 150, 0.5);
+}
+
+.divider-ornament::before,
+.divider-ornament::after {
+    content: '';
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200, 180, 150, 0.3), transparent);
+}
+
+.divider-ornament .ornament-icon {
+    font-size: 1.5rem;
+}
+
+/* 经典占卜区 */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+}
+
+.section-icon {
+    font-size: 2rem;
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: #E8E0F0;
+}
+
+.section-desc {
+    color: rgba(180, 180, 200, 0.7);
+    font-size: 0.9rem;
+    margin-top: var(--space-xs);
+}
+
+/* 卡片网格 */
+.divination-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-xl);
+    margin-bottom: var(--space-4xl);
+}
+
+/* 精美占卜卡片 */
+.divination-card-enhanced {
+    background: linear-gradient(145deg, rgba(30, 25, 60, 0.8), rgba(20, 15, 45, 0.9));
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(100, 80, 160, 0.2);
+    cursor: pointer;
+}
+
+.divination-card-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--card-accent, #8B5CF6), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.divination-card-enhanced:hover {
+    transform: translateY(-8px);
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+}
+
+.divination-card-enhanced:hover::before {
+    opacity: 1;
+}
+
+/* 卡片视觉区域 */
+.card-visual-area {
+    height: 180px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.card-visual-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.6;
+}
+
+/* 塔罗牌视觉效果 */
+.tarot-visual {
+    position: relative;
+    width: 120px;
+    height: 180px;
+}
+
+.tarot-card-stack {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.tarot-card-stack .card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #1a1a2e, #16213e);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.tarot-card-stack .card:nth-child(1) {
+    transform: rotate(-8deg) translateY(8px);
+}
+
+.tarot-card-stack .card:nth-child(2) {
+    transform: rotate(-3deg) translateY(4px);
+}
+
+.tarot-card-stack .card:nth-child(3) {
+    transform: rotate(2deg);
+    z-index: 10;
+}
+
+.tarot-card-stack .card::before {
+    content: '✧';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    color: rgba(212, 175, 55, 0.6);
+}
+
+.tarot-card-stack .card::after {
+    content: 'TAROT';
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: rgba(212, 175, 55, 0.4);
+}
+
+.tarot-visual:hover .tarot-card-stack .card:nth-child(1) {
+    transform: rotate(-12deg) translateY(12px);
+}
+
+.tarot-visual:hover .tarot-card-stack .card:nth-child(2) {
+    transform: rotate(-6deg) translateY(8px);
+}
+
+/* 星盘视觉效果 */
+.horoscope-visual {
+    position: relative;
+    width: 160px;
+    height: 160px;
+}
+
+.zodiac-wheel {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    border-radius: 50%;
+    animation: rotate 60s linear infinite;
+}
+
+.zodiac-wheel::before {
+    content: '';
+    position: absolute;
+    inset: 15px;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 50%;
+}
+
+.zodiac-wheel::after {
+    content: '';
+    position: absolute;
+    inset: 35px;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.zodiac-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    color: rgba(255, 215, 0, 0.8);
+}
+
+.zodiac-symbols {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.zodiac-symbol {
+    position: absolute;
+    font-size: 1.2rem;
+    color: rgba(255, 215, 0, 0.5);
+}
+
+.zodiac-symbol:nth-child(1) { top: -5%; left: 50%; transform: translateX(-50%); }
+.zodiac-symbol:nth-child(2) { top: 10%; right: 10%; }
+.zodiac-symbol:nth-child(3) { top: 50%; right: -5%; transform: translateY(-50%); }
+.zodiac-symbol:nth-child(4) { bottom: 10%; right: 10%; }
+.zodiac-symbol:nth-child(5) { bottom: -5%; left: 50%; transform: translateX(-50%); }
+.zodiac-symbol:nth-child(6) { bottom: 10%; left: 10%; }
+.zodiac-symbol:nth-child(7) { top: 50%; left: -5%; transform: translateY(-50%); }
+.zodiac-symbol:nth-child(8) { top: 10%; left: 10%; }
+
+/* 八字视觉效果 */
+.bazi-visual {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.bazi-gua {
+    font-size: 3rem;
+    color: rgba(220, 180, 120, 0.8);
+    text-shadow: 0 0 20px rgba(220, 180, 120, 0.3);
+}
+
+.bazi-symbols-row {
+    display: flex;
+    gap: 15px;
+    font-size: 1.5rem;
+    color: rgba(220, 180, 120, 0.6);
+}
+
+/* 每日运势视觉效果 */
+.fortune-visual {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.sun-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, #FFD700, #FFA500);
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(255, 200, 0, 0.5);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.sun-rays {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    animation: spin 20s linear infinite;
+}
+
+.ray {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(to top, rgba(255, 200, 0, 0.8), transparent);
+    transform-origin: center 70px;
+}
+
+.ray:nth-child(1) { transform: translateX(-50%) rotate(0deg); }
+.ray:nth-child(2) { transform: translateX(-50%) rotate(30deg); }
+.ray:nth-child(3) { transform: translateX(-50%) rotate(60deg); }
+.ray:nth-child(4) { transform: translateX(-50%) rotate(90deg); }
+.ray:nth-child(5) { transform: translateX(-50%) rotate(120deg); }
+.ray:nth-child(6) { transform: translateX(-50%) rotate(150deg); }
+.ray:nth-child(7) { transform: translateX(-50%) rotate(180deg); }
+.ray:nth-child(8) { transform: translateX(-50%) rotate(210deg); }
+.ray:nth-child(9) { transform: translateX(-50%) rotate(240deg); }
+.ray:nth-child(10) { transform: translateX(-50%) rotate(270deg); }
+.ray:nth-child(11) { transform: translateX(-50%) rotate(300deg); }
+.ray:nth-child(12) { transform: translateX(-50%) rotate(330deg); }
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 恋爱占卜视觉效果 */
+.love-visual {
+    position: relative;
+    font-size: 4rem;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.15); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.1); }
+}
+
+/* 卡片内容区 */
+.card-content-area {
+    padding: var(--space-xl);
+}
+
+.card-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.2));
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: #C4B5FD;
+    margin-bottom: var(--space-sm);
+}
+
+.card-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: #E8E0F0;
+    margin-bottom: var(--space-sm);
+}
+
+.card-desc {
+    color: rgba(180, 180, 200, 0.7);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+}
+
+/* 历史典故区域 */
+.card-history {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: var(--space-md);
+    margin-top: var(--space-md);
+    border-left: 3px solid var(--card-accent, #8B5CF6);
+}
+
+.history-label {
+    font-size: 0.7rem;
+    color: rgba(200, 180, 150, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.history-text {
+    font-size: 0.85rem;
+    color: rgba(200, 200, 220, 0.8);
+    line-height: 1.5;
+}
+
+.card-meta-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    border-top: 1px solid rgba(100, 80, 160, 0.2);
+}
+
+.meta-tag {
+    font-size: 0.8rem;
+    color: rgba(180, 180, 200, 0.6);
+}
+
+/* 智能测试专区 */
+.test-section {
+    background: linear-gradient(145deg, rgba(30, 25, 60, 0.6), rgba(20, 15, 45, 0.7));
+    border-radius: 24px;
+    padding: var(--space-2xl);
+    margin-bottom: var(--space-4xl);
+    border: 1px solid rgba(100, 80, 160, 0.15);
+}
+
+.test-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+}
+
+.test-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: var(--space-xl);
+    text-align: center;
+    transition: all 0.3s;
+    border: 1px solid transparent;
+    text-decoration: none;
+}
+
+.test-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateY(-4px);
+}
+
+.test-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+}
+
+.test-title {
+    font-size: 1.1rem;
+    color: #E8E0F0;
+    margin-bottom: var(--space-xs);
+}
+
+.test-desc {
+    font-size: 0.85rem;
+    color: rgba(180, 180, 200, 0.6);
+    margin-bottom: var(--space-sm);
+}
+
+.test-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    background: rgba(139, 92, 246, 0.15);
+    border-radius: 10px;
+    font-size: 0.7rem;
+    color: #C4B5FD;
+}
+
+/* 提示卡片 */
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+.tip-box {
+    display: flex;
+    gap: var(--space-md);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: var(--space-lg);
+    border: 1px solid rgba(100, 80, 160, 0.1);
+}
+
+.tip-icon-box {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.tip-title {
+    font-size: 1rem;
+    color: #E8E0F0;
+    margin-bottom: 4px;
+}
+
+.tip-text {
+    font-size: 0.85rem;
+    color: rgba(180, 180, 200, 0.7);
+    line-height: 1.5;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 1.8rem;
+    }
+    
+    .divination-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-visual-area {
+        height: 150px;
+    }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1 class="page-title">
-        <span class="title-icon">🔮</span>
-        占卜大厅
-    </h1>
-    <p class="page-subtitle">选择你想要探索的命运领域</p>
-</div>
-
-<div class="divination-categories">
-    <!-- 主要占卜 -->
-    <section class="category-section">
-        <h2 class="category-title">
-            <span class="category-icon">✨</span>
-            经典占卜
-        </h2>
+<div class="divination-lobby">
+    <!-- 英雄区域 -->
+    <div class="hero-section">
+        <div class="hero-icon">🔮</div>
+        <h1 class="hero-title">灵犀占卜大厅</h1>
+        <p class="hero-subtitle">在星空下探索命运的奥秘，让古老的智慧为你指引方向</p>
+    </div>
+    
+    <div class="divider-ornament">
+        <span class="ornament-icon">✧ ★ ✧</span>
+    </div>
+    
+    <!-- 经典占卜区 -->
+    <section class="mb-4xl">
+        <div class="section-header">
+            <span class="section-icon">✨</span>
+            <div>
+                <h2 class="section-title">经典占卜</h2>
+                <p class="section-desc">穿越时空的古老智慧，照亮你前行的道路</p>
+            </div>
+        </div>
         
-        <div class="category-grid">
-            <a href="/divination/tarot" class="divination-card tarot-card">
-                <div class="card-visual">
-                    <div class="card-stack">
-                        <div class="stack-card"></div>
-                        <div class="stack-card"></div>
-                        <div class="stack-card main"></div>
+        <div class="divination-grid">
+            <!-- 塔罗牌 -->
+            <a href="/divination/tarot" class="divination-card-enhanced" style="--card-accent: #D4AF37;">
+                <div class="card-visual-area">
+                    <div class="card-visual-bg" style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(139, 92, 246, 0.1));"></div>
+                    <div class="tarot-visual">
+                        <div class="tarot-card-stack">
+                            <div class="card"></div>
+                            <div class="card"></div>
+                            <div class="card"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="card-content">
-                    <span class="card-badge">最受欢迎</span>
-                    <h3>塔罗牌占卜</h3>
-                    <p>通过神秘的塔罗牌，解读你的过去、现在与未来</p>
-                    <div class="card-meta">
-                        <span class="meta-item">🃏 78张牌</span>
-                        <span class="meta-item">⏱️ 3-5分钟</span>
+                <div class="card-content-area">
+                    <span class="card-badge">🔥 最受欢迎</span>
+                    <h3 class="card-title">塔罗牌占卜</h3>
+                    <p class="card-desc">通过78张神秘塔罗牌，解读你的过去、现在与未来，探索潜意识深处的指引。</p>
+                    <div class="card-history">
+                        <div class="history-label">📜 历史典故</div>
+                        <p class="history-text">塔罗牌起源于15世纪意大利，最初是纸牌游戏。17世纪起被神秘学家赋予象征意义，成为心灵探索的工具。其图案融合了埃及神话、卡巴拉生命之树与炼金术的智慧。</p>
                     </div>
-                </div>
-            </a>
-            
-            <a href="/divination/horoscope" class="divination-card horoscope-card">
-                <div class="card-visual">
-                    <div class="zodiac-circle">
-                        <span class="zodiac-sym">☉</span>
-                        <div class="orbit orbit-1"></div>
-                        <div class="orbit orbit-2"></div>
-                        <div class="orbit orbit-3"></div>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3>星盘分析</h3>
-                    <p>基于你的出生信息，揭示你的性格密码与命运轨迹</p>
-                    <div class="card-meta">
-                        <span class="meta-item">⭐ 行星相位</span>
-                        <span class="meta-item">⏱️ 5-10分钟</span>
+                    <div class="card-meta-info">
+                        <span class="meta-tag">🃏 78张牌</span>
+                        <span class="meta-tag">⏱️ 3-5分钟</span>
                     </div>
                 </div>
             </a>
             
-            <a href="/divination/bazi" class="divination-card bazi-card">
-                <div class="card-visual">
-                    <div class="bazi-symbols">
-                        <span>乾</span><span>坤</span>
-                        <span>震</span><span>巽</span>
+            <!-- 星盘分析 -->
+            <a href="/divination/horoscope" class="divination-card-enhanced" style="--card-accent: #FFD700;">
+                <div class="card-visual-area">
+                    <div class="card-visual-bg" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 180, 0, 0.1));"></div>
+                    <div class="horoscope-visual">
+                        <div class="zodiac-wheel"></div>
+                        <div class="zodiac-center">☉</div>
+                        <div class="zodiac-symbols">
+                            <span class="zodiac-symbol">♈</span>
+                            <span class="zodiac-symbol">♉</span>
+                            <span class="zodiac-symbol">♊</span>
+                            <span class="zodiac-symbol">♋</span>
+                            <span class="zodiac-symbol">♌</span>
+                            <span class="zodiac-symbol">♍</span>
+                            <span class="zodiac-symbol">♎</span>
+                            <span class="zodiac-symbol">♏</span>
+                        </div>
                     </div>
                 </div>
-                <div class="card-content">
-                    <h3>八字简批</h3>
-                    <p>东方命理智慧，解读你的人生格局与运势</p>
-                    <div class="card-meta">
-                        <span class="meta-item">📜 四柱八字</span>
-                        <span class="meta-item">⏱️ 3-5分钟</span>
+                <div class="card-content-area">
+                    <h3 class="card-title">星盘分析</h3>
+                    <p class="card-desc">基于你的出生信息，揭示太阳、月亮、上升星座的能量配置，解码你的性格密码。</p>
+                    <div class="card-history">
+                        <div class="history-label">📜 历史典故</div>
+                        <p class="history-text">占星术起源于4000多年前的巴比伦文明，后在古希腊达到鼎盛。中世纪时期，行星与星座被赋予丰富的象征意义，形成了完整的星盘分析体系，影响至今。</p>
+                    </div>
+                    <div class="card-meta-info">
+                        <span class="meta-tag">⭐ 行星相位</span>
+                        <span class="meta-tag">⏱️ 5-10分钟</span>
                     </div>
                 </div>
             </a>
             
-            <a href="/divination/fortune" class="divination-card fortune-card">
-                <div class="card-visual">
-                    <div class="sun-rays">
-                        <div class="ray"></div>
-                        <div class="ray"></div>
-                        <div class="ray"></div>
-                        <div class="ray"></div>
-                        <div class="ray"></div>
-                        <div class="ray"></div>
-                        <div class="ray"></div>
-                        <div class="ray"></div>
+            <!-- 八字命理 -->
+            <a href="/divination/bazi" class="divination-card-enhanced" style="--card-accent: #DCB478;">
+                <div class="card-visual-area">
+                    <div class="card-visual-bg" style="background: linear-gradient(135deg, rgba(220, 180, 120, 0.1), rgba(200, 150, 100, 0.1));"></div>
+                    <div class="bazi-visual">
+                        <div class="bazi-gua">☰</div>
+                        <div class="bazi-symbols-row">
+                            <span>乾</span>
+                            <span>坤</span>
+                            <span>震</span>
+                            <span>巽</span>
+                        </div>
                     </div>
                 </div>
-                <div class="card-content">
-                    <span class="card-badge">每日更新</span>
-                    <h3>每日运势</h3>
-                    <p>12星座今日运势，全方位指引你的每一天</p>
-                    <div class="card-meta">
-                        <span class="meta-item">⭐ 12星座</span>
-                        <span class="meta-item">⏱️ 即时</span>
+                <div class="card-content-area">
+                    <h3 class="card-title">八字命理</h3>
+                    <p class="card-desc">东方命理智慧结晶，通过天干地支的排列组合，解读你的人生格局与运势走向。</p>
+                    <div class="card-history">
+                        <div class="history-label">📜 历史典故</div>
+                        <p class="history-text">八字，又称四柱八字，起源于东汉时期的阴阳五行学说，至宋代徐子平集大成。其理论融合了天文学、数学与哲学，被历代帝王将相视为决策参考，历经千年传承。</p>
+                    </div>
+                    <div class="card-meta-info">
+                        <span class="meta-tag">📜 四柱八字</span>
+                        <span class="meta-tag">⏱️ 3-5分钟</span>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- 每日运势 -->
+            <a href="/divination/fortune" class="divination-card-enhanced" style="--card-accent: #FF9500;">
+                <div class="card-visual-area">
+                    <div class="card-visual-bg" style="background: linear-gradient(135deg, rgba(255, 150, 0, 0.1), rgba(255, 200, 0, 0.1));"></div>
+                    <div class="fortune-visual">
+                        <div class="sun-rays">
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                            <div class="ray"></div>
+                        </div>
+                        <div class="sun-core"></div>
+                    </div>
+                </div>
+                <div class="card-content-area">
+                    <span class="card-badge">🌟 每日更新</span>
+                    <h3 class="card-title">每日运势</h3>
+                    <p class="card-desc">12星座今日运势全解析，包含爱情、事业、财运、健康全方位指引，让你的每一天都有方向。</p>
+                    <div class="card-history">
+                        <div class="history-label">📜 历史典故</div>
+                        <p class="history-text">太阳运行至每个星座的位置被视为当天运势的关键。中国古代有"择日"传统，西方则有每日星象解读的习俗，祈求日月星辰的庇佑，指引日常生活的每一个选择。</p>
+                    </div>
+                    <div class="card-meta-info">
+                        <span class="meta-tag">⭐ 12星座</span>
+                        <span class="meta-tag">⏱️ 即时</span>
                     </div>
                 </div>
             </a>
         </div>
     </section>
     
-    <!-- 智能测试 -->
-    <section class="category-section love-category">
-        <h2 class="category-title">
-            <span class="category-icon">🧠</span>
-            智能测试专区
-        </h2>
-        <p class="category-desc">探索未知的自己，发现灵魂深处的秘密</p>
+    <!-- 智能测试专区 -->
+    <section class="test-section">
+        <div class="section-header">
+            <span class="section-icon">🧠</span>
+            <div>
+                <h2 class="section-title">智能测试专区</h2>
+                <p class="section-desc">探索未知的自己，发现灵魂深处的秘密</p>
+            </div>
+        </div>
         
-        <div class="love-grid">
-            <a href="/divination/mbti" class="love-card" style="background: linear-gradient(135deg, rgba(184, 169, 201, 0.2), rgba(212, 165, 165, 0.2));">
-                <div class="love-card-icon">✨🧩</div>
-                <h4>MBTI灵犀测试</h4>
-                <p>发现你的性格密码</p>
-                <span class="love-card-tag">新增</span>
+        <div class="test-grid">
+            <a href="/divination/mbti" class="test-card">
+                <div class="test-icon">🧩</div>
+                <h4 class="test-title">MBTI灵犀测试</h4>
+                <p class="test-desc">发现你的性格密码</p>
+                <span class="test-tag">✨ 新增</span>
             </a>
             
-            <a href="/divination/dream" class="love-card" style="background: linear-gradient(135deg, rgba(107, 91, 149, 0.15), rgba(139, 94, 131, 0.15));">
-                <div class="love-card-icon">🌙🔮</div>
-                <h4>AI智能解梦</h4>
-                <p>解读梦境的秘密</p>
-                <span class="love-card-tag">星语主持</span>
+            <a href="/divination/dream" class="test-card">
+                <div class="test-icon">🌙</div>
+                <h4 class="test-title">AI智能解梦</h4>
+                <p class="test-desc">解读梦境的秘密</p>
+                <span class="test-tag">星语主持</span>
             </a>
             
-            <a href="/divination/dream/encyclopedia" class="love-card">
-                <div class="love-card-icon">📖🦋</div>
-                <h4>梦境图鉴</h4>
-                <p>常见梦境解读大全</p>
+            <a href="/divination/dream/encyclopedia" class="test-card">
+                <div class="test-icon">📖</div>
+                <h4 class="test-title">梦境图鉴</h4>
+                <p class="test-desc">常见梦境解读大全</p>
+            </a>
+            
+            <a href="/divination/love" class="test-card">
+                <div class="test-icon">💕</div>
+                <h4 class="test-title">恋爱配对</h4>
+                <p class="test-desc">探索你的真命天子</p>
+                <span class="test-tag">热门</span>
             </a>
         </div>
     </section>
-</div>
-
-<!-- 提示信息 -->
-<div class="tips-section">
-    <div class="tip-card">
-        <span class="tip-icon">💡</span>
-        <div class="tip-content">
-            <h4>占卜小贴士</h4>
-            <p>找一个安静的环境，放空心灵，专注于你的问题，这样能得到更准确的指引。</p>
-        </div>
-    </div>
     
-    <div class="tip-card">
-        <span class="tip-icon">🎁</span>
-        <div class="tip-content">
-            <h4>每日免费</h4>
-            <p>每位用户每日可享受3次免费占卜，让命运眷顾每一天的你。</p>
+    <!-- 提示区域 -->
+    <section>
+        <div class="section-header">
+            <span class="section-icon">💡</span>
+            <div>
+                <h2 class="section-title">占卜须知</h2>
+            </div>
         </div>
-    </div>
+        
+        <div class="tips-grid">
+            <div class="tip-box">
+                <span class="tip-icon-box">🧘</span>
+                <div>
+                    <h4 class="tip-title">保持清净</h4>
+                    <p class="tip-text">找一个安静的环境，放空心灵，专注于你的问题，这样能得到更准确的指引。</p>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <span class="tip-icon-box">🎁</span>
+                <div>
+                    <h4 class="tip-title">每日免费</h4>
+                    <p class="tip-text">每位用户每日可享受3次免费占卜，让命运眷顾每一天的你。</p>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <span class="tip-icon-box">💭</span>
+                <div>
+                    <h4 class="tip-title">心诚则灵</h4>
+                    <p class="tip-text">占卜是自我探索的工具，结果仅供参考，真正的命运掌握在你自己的手中。</p>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 {% endblock %}
