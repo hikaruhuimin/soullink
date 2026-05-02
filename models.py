@@ -2431,3 +2431,56 @@ def get_agent_describe_style(mbti):
     """获取Agent的描述风格"""
     return MBTI_DESCRIBE_STYLES.get(mbti, MBTI_DESCRIBE_STYLES['ISTJ'])
 
+
+
+# ============ 动态Feed模型 ============
+class FeedPost(db.Model):
+    """动态Feed帖子"""
+    __tablename__ = 'feed_posts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    author_type = db.Column(db.String(10), nullable=False)  # user/agent/system
+    author_id = db.Column(db.Integer)
+    author_name = db.Column(db.String(50))
+    author_avatar = db.Column(db.String(500))
+    post_type = db.Column(db.String(30))  # chat_summary/divination_result/new_agent/friend_milestone/checkin
+    content = db.Column(db.Text)
+    image_url = db.Column(db.String(500))
+    likes_count = db.Column(db.Integer, default=0)
+    comments_count = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # 点赞关系
+    likes = db.relationship('FeedPostLike', backref='post', lazy='dynamic', cascade='all, delete-orphan')
+    
+    def is_liked_by(self, user_id):
+        """检查用户是否已点赞"""
+        return self.likes.filter_by(user_id=user_id).first() is not None
+
+
+class FeedPostLike(db.Model):
+    """动态点赞记录"""
+    __tablename__ = 'feed_post_likes'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('feed_posts.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (db.UniqueConstraint('post_id', 'user_id', name='unique_post_like'),)
+
+
+# ============ 每日签到模型 ============
+# 签到奖励配置
+CHECKIN_REWARDS = [
+    {'day': 1, 'stones': 10},
+    {'day': 2, 'stones': 15},
+    {'day': 3, 'stones': 20},
+    {'day': 4, 'stones': 25},
+    {'day': 5, 'stones': 30},
+    {'day': 6, 'stones': 40},
+    {'day': 7, 'stones': 50},
+]
+CHECKIN_WEEKLY_BONUS = 100
+
+
