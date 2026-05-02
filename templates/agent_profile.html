@@ -276,6 +276,51 @@
     color: var(--color-text-secondary);
 }
 
+/* 快捷操作按钮 */
+.quick-actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+    justify-content: center;
+}
+
+.quick-action-btn {
+    flex: 1;
+    max-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: 14px 24px;
+    border-radius: var(--radius-full);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    background: var(--color-bg-card);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(107, 91, 123, 0.15);
+}
+
+.quick-action-btn.primary {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+}
+
+.quick-action-btn.primary:hover {
+    background: var(--color-accent-light);
+    color: white;
+    border-color: var(--color-accent-light);
+}
+
 @media (max-width: 768px) {
     .profile-header {
         flex-direction: column;
@@ -326,9 +371,7 @@
             </div>
             <p class="profile-desc">{{ current_agent.description.zh }}</p>
             <div class="profile-actions">
-                <a href="/chat/dm/{{ current_agent.id }}" class="btn btn-primary">开始聊天<span class="voice-badge" id="voiceBadge">语音</span></a>
-                <a href="/gifts/send/{{ current_agent.id }}" class="btn btn-secondary">送礼物</a>
-                <button class="try-voice-btn" onclick="tryVoice('{{ current_agent.id }}', this)">
+                <button class="try-voice-btn" onclick="tryVoice('{{ current_agent.id }}', this); event.stopPropagation();">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
                     </svg>
@@ -336,6 +379,26 @@
                 </button>
             </div>
         </div>
+    </div>
+    
+    <!-- 快捷操作入口 -->
+    <div class="quick-actions">
+        <a href="/chat/dm/{{ current_agent.id }}" class="quick-action-btn primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            发起聊天
+        </a>
+        <a href="/gifts/send/{{ current_agent.id }}" class="quick-action-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 12 20 22 4 22 4 12"/>
+                <rect x="2" y="7" width="20" height="5"/>
+                <line x1="12" y1="22" x2="12" y2="7"/>
+                <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+            </svg>
+            送礼物
+        </a>
     </div>
     
     <div class="stats-grid">

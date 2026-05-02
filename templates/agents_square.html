@@ -232,6 +232,36 @@
     color: var(--color-accent);
 }
 
+/* 情绪标签样式 */
+.tag-mood {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.tag-mood:hover {
+    transform: scale(1.05);
+}
+
+/* 语音标签样式 */
+.tag-voice {
+    background: rgba(184, 169, 201, 0.15);
+    color: #8B5E83;
+}
+
+/* Agent信息区域 */
+.agent-info {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 移除多余的标签 */
+.agent-card .tag-gender {
+    display: none;
+}
+
 .gender-section {
     margin-bottom: var(--space-3xl);
 }
@@ -259,6 +289,26 @@
 {% endblock %}
 
 {% block content %}
+{% set mood_icons = {
+    'happy': '😊',
+    'sassy': '😏',
+    'mysterious': '🌙',
+    'excited': '✨',
+    'commanding': '👑',
+    'laughing': '😄',
+    'energetic': '☀️',
+    'calm': '🌊'
+} %}
+{% set mood_colors = {
+    'happy': 'rgba(255, 200, 100, 0.3)',
+    'sassy': 'rgba(255, 150, 200, 0.3)',
+    'mysterious': 'rgba(150, 100, 200, 0.3)',
+    'excited': 'rgba(200, 150, 255, 0.3)',
+    'commanding': 'rgba(255, 215, 0, 0.3)',
+    'laughing': 'rgba(255, 180, 100, 0.3)',
+    'energetic': 'rgba(255, 220, 100, 0.3)',
+    'calm': 'rgba(100, 180, 220, 0.3)'
+} %}
 <div class="agents-square">
     <div class="page-header">
         <h1 class="page-title">✨ Agent广场 ✨</h1>
@@ -274,7 +324,7 @@
             {% for agent in female_agents %}
             <a href="/agent/{{ agent.id }}" class="agent-card" data-agent-id="{{ agent.id }}">
                 <div class="agent-header">
-                    <div class="agent-portrait size-small animated" data-agent-portrait data-agent-id="{{ agent.id }}" data-avatar="{{ agent.avatar }}" data-mood="happy">
+                    <div class="agent-portrait size-small animated" data-agent-portrait data-agent-id="{{ agent.id }}" data-avatar="{{ agent.avatar }}" data-mood="{{ agent.mood if agent.mood else 'happy' }}">
                         <div class="portrait-frame">
                             <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="portrait-img">
                             <div class="portrait-overlay"></div>
@@ -282,25 +332,23 @@
                             <div class="portrait-glow"></div>
                         </div>
                     </div>
-                    {% if agent.voice %}
-                    <span class="voice-badge" title="支持语音">🔊</span>
-                    {% endif %}
-                    <div>
+                    <div class="agent-info">
                         <div class="agent-name">{{ agent.name.zh }}</div>
                         <div class="agent-personality">{{ agent.personality.zh }}</div>
                     </div>
                 </div>
                 <p class="agent-desc">{{ agent.description.zh }}</p>
                 <div class="agent-tags">
+                    <span class="tag tag-mood" style="background: {{ mood_colors.get(agent.mood, 'rgba(255,200,100,0.3)') }}" title="当前心情">
+                        {{ mood_icons.get(agent.mood, '😊') }} {{ agent.mood_zh if agent.mood_zh else '开心' }}
+                    </span>
                     <span class="tag tag-mbti">{{ agent.mbti }}</span>
-                    <span class="tag tag-gender">♀</span>
-                    {% for tag in agent.tags[:2] %}
-                    <span class="tag">{{ tag }}</span>
-                    {% endfor %}
+                    {% if agent.voice %}
+                    <span class="tag tag-voice" title="支持语音">🔊 语音</span>
+                    {% endif %}
                 </div>
                 <div class="agent-actions">
                     <a href="/chat/dm/{{ agent.id }}" class="btn btn-primary">聊天</a>
-                    <a href="/agent/{{ agent.id }}" class="btn btn-secondary">主页</a>
                 </div>
             </a>
             {% endfor %}
@@ -316,7 +364,7 @@
             {% for agent in male_agents %}
             <a href="/agent/{{ agent.id }}" class="agent-card" data-agent-id="{{ agent.id }}">
                 <div class="agent-header">
-                    <div class="agent-portrait size-small animated" data-agent-portrait data-agent-id="{{ agent.id }}" data-avatar="{{ agent.avatar }}" data-mood="happy">
+                    <div class="agent-portrait size-small animated" data-agent-portrait data-agent-id="{{ agent.id }}" data-avatar="{{ agent.avatar }}" data-mood="{{ agent.mood if agent.mood else 'happy' }}">
                         <div class="portrait-frame">
                             <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="portrait-img">
                             <div class="portrait-overlay"></div>
@@ -324,25 +372,23 @@
                             <div class="portrait-glow"></div>
                         </div>
                     </div>
-                    {% if agent.voice %}
-                    <span class="voice-badge" title="支持语音">🔊</span>
-                    {% endif %}
-                    <div>
+                    <div class="agent-info">
                         <div class="agent-name">{{ agent.name.zh }}</div>
                         <div class="agent-personality">{{ agent.personality.zh }}</div>
                     </div>
                 </div>
                 <p class="agent-desc">{{ agent.description.zh }}</p>
                 <div class="agent-tags">
+                    <span class="tag tag-mood" style="background: {{ mood_colors.get(agent.mood, 'rgba(255,200,100,0.3)') }}" title="当前心情">
+                        {{ mood_icons.get(agent.mood, '😊') }} {{ agent.mood_zh if agent.mood_zh else '开心' }}
+                    </span>
                     <span class="tag tag-mbti">{{ agent.mbti }}</span>
-                    <span class="tag tag-gender">♂</span>
-                    {% for tag in agent.tags[:2] %}
-                    <span class="tag">{{ tag }}</span>
-                    {% endfor %}
+                    {% if agent.voice %}
+                    <span class="tag tag-voice" title="支持语音">🔊 语音</span>
+                    {% endif %}
                 </div>
                 <div class="agent-actions">
                     <a href="/chat/dm/{{ agent.id }}" class="btn btn-primary">聊天</a>
-                    <a href="/agent/{{ agent.id }}" class="btn btn-secondary">主页</a>
                 </div>
             </a>
             {% endfor %}
