@@ -273,6 +273,19 @@ body::before {
     background: rgba(139, 92, 246, 0.5); transform: scale(1.05);
 }
 
+
+.type-card-mystic-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(139, 92, 246, 0.3); border: none;
+    border-radius: 8px; padding: 4px 8px; font-size: 10px;
+    color: #C4B5FD; cursor: pointer; transition: all 0.2s;
+    opacity: 0; z-index: 2;
+}
+.type-card:hover .type-card-mystic-btn { opacity: 1; }
+.type-card-mystic-btn:hover {
+    background: rgba(139, 92, 246, 0.5); transform: scale(1.05);
+}
+
 @media (min-width: 768px) {
     .culture-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -722,6 +735,96 @@ body::before {
     .mystical-section { padding: 24px; }
 }
 
+
+
+/* 神秘历史弹窗样式 */
+.mystical-history-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(2, 5, 21, 0.95); display: none; align-items: flex-end;
+    z-index: 1003; backdrop-filter: blur(10px);
+}
+.mystical-history-modal.active { display: flex; }
+
+.mystical-history-content {
+    background: linear-gradient(145deg, rgba(15, 12, 35, 0.98), rgba(8, 5, 25, 0.99));
+    border-radius: 24px 24px 0 0; width: 100%; max-height: 90vh; overflow-y: auto;
+    padding: 0; border: 1px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 0 -10px 40px rgba(139, 92, 246, 0.2);
+    animation: slideUp 0.4s ease;
+}
+
+.mystical-history-header-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+    position: sticky; top: 0; background: rgba(15, 12, 35, 0.98); z-index: 10;
+}
+
+.mystical-history-icon { font-size: 28px; }
+.mystical-history-title { font-size: 18px; font-weight: 700; color: #C4B5FD; flex: 1; }
+.mystical-history-close {
+    width: 32px; height: 32px; border: none; background: rgba(139, 92, 246, 0.2);
+    border-radius: 50%; font-size: 18px; cursor: pointer; color: #C4B5FD;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.mystical-history-body { padding: 20px; }
+
+.mystical-history-container {
+    font-family: 'Noto Serif SC', 'SimSun', serif;
+}
+
+.mystical-history-header {
+    text-align: center; margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.mystical-history-header .mystical-icon {
+    font-size: 48px; display: block; margin-bottom: 12px;
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5)); }
+    50% { filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.8)); }
+}
+
+.mystical-history-header h3 {
+    font-size: 22px; color: #E8D5C4; margin: 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.mystical-section {
+    background: rgba(30, 25, 60, 0.5);
+    border-radius: 16px; padding: 18px; margin-bottom: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    position: relative; overflow: hidden;
+}
+
+.mystical-section::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, #8b5cf6, #c4b5fd, #8b5cf6);
+}
+
+.mystical-subtitle {
+    font-size: 15px; color: #C4B5FD; margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+.mystical-text {
+    font-size: 14px; color: #C4D4E8; line-height: 1.9; margin: 0;
+    text-align: justify;
+}
+
+@media (min-width: 768px) {
+    .mystical-history-modal { align-items: center; }
+    .mystical-history-content {
+        border-radius: 24px; max-width: 600px; margin: 0 auto;
+    }
+    .mystical-section { padding: 24px; }
+}
+
 </style>
 {% endblock %}
 
@@ -999,6 +1102,18 @@ body::before {
 <div class="toast" id="toast"></div>
 
 <!-- 占卜文化详情弹窗 -->
+<!-- 神秘历史详情弹窗 -->
+<div class="mystical-history-modal" id="mysticalHistoryModal">
+    <div class="mystical-history-content">
+        <div class="mystical-history-header-bar">
+            <span class="mystical-history-icon" id="mysticalHistoryIcon">📚</span>
+            <span class="mystical-history-title">千年秘辛</span>
+            <button class="mystical-history-close" onclick="closeMysticalHistory()">×</button>
+        </div>
+        <div class="mystical-history-body" id="mysticalHistoryBody"></div>
+    </div>
+</div>
+
 <!-- 神秘历史详情弹窗 -->
 <div class="mystical-history-modal" id="mysticalHistoryModal">
     <div class="mystical-history-content">
@@ -1817,6 +1932,11 @@ document.addEventListener('DOMContentLoaded', function() {
         el.addEventListener('touchend', function(e) { setTimeout(() => { this.classList.remove('touched'); }, 150); }, { passive: true });
     });
 });
+
+document.getElementById('mysticalHistoryModal').addEventListener('click', function(e) { 
+    if (e.target === this) closeMysticalHistory(); 
+});
+
 
 document.getElementById('mysticalHistoryModal').addEventListener('click', function(e) { 
     if (e.target === this) closeMysticalHistory(); 
