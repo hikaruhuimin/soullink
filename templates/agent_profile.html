@@ -1026,7 +1026,7 @@ function showLoginSuccess() {
 // Voice demo function
 function playVoiceDemo(agentId, btn) {
     var originalHTML = btn.innerHTML;
-    btn.innerHTML = '<span>\u23f3</span><span>\u751f\u6210\u8bed\u97f3\u4e2d...</span>';
+    btn.innerHTML = '<span>⏳</span><span>生成语音中...</span>';
     btn.disabled = true;
     btn.style.opacity = '0.7';
     
@@ -1038,19 +1038,31 @@ function playVoiceDemo(agentId, btn) {
         .then(function(data) {
             if (!data.audio_url) throw new Error('No audio URL');
             var audio = new Audio(data.audio_url);
-            btn.innerHTML = '<span>\ud83d\udd0a</span><span>\u64ad\u653e\u4e2d...</span>';
+            btn.innerHTML = '<span>🔊</span><span>播放中...</span>';
             btn.style.opacity = '1';
             btn.classList.add('playing');
-            audio.play();
+            audio.play().catch(function(e) {
+                console.warn('Autoplay blocked, retrying:', e);
+                btn.innerHTML = '<span>▶️</span><span>点击播放</span>';
+                btn.disabled = false;
+                btn.onclick = function() {
+                    audio.play();
+                    btn.innerHTML = '<span>🔊</span><span>播放中...</span>';
+                    btn.disabled = true;
+                    btn.classList.add('playing');
+                };
+            });
             audio.onended = function() {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 btn.classList.remove('playing');
+                btn.onclick = function() { playVoiceDemo(agentId, btn); };
             };
             audio.onerror = function() {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 btn.classList.remove('playing');
+                btn.onclick = function() { playVoiceDemo(agentId, btn); };
             };
         })
         .catch(function(err) {
@@ -1059,6 +1071,6 @@ function playVoiceDemo(agentId, btn) {
             btn.disabled = false;
             btn.style.opacity = '1';
         });
-}
+}}
 </script>
 {% endblock %}
