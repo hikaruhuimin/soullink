@@ -1029,12 +1029,10 @@ def recharge():
     t = i18n.get(lang, i18n['zh'])
     
     packages = [
-        {'id': 'light_feeling', 'name': {'zh': '轻触心动', 'en': 'Light Touch', 'ja': '軽やか'}, 'amount': 10, 'price': 6, 'bonus': 0, 'icon': '✨'},
-        {'id': 'sweet_moment', 'name': {'zh': '甜蜜时光', 'en': 'Sweet Moment', 'ja': '甜蜜'}, 'amount': 50, 'price': 28, 'bonus': 5, 'icon': '🌸'},
-        {'id': 'true_feeling', 'name': {'zh': '真心实意', 'en': 'True Feeling', 'ja': '真心'}, 'amount': 100, 'price': 50, 'bonus': 15, 'icon': '💖'},
-        {'id': 'deep_connection', 'name': {'zh': '深度连接', 'en': 'Deep Connection', 'ja': '深度'}, 'amount': 200, 'price': 98, 'bonus': 40, 'icon': '💝'},
-        {'id': 'soul_tie', 'name': {'zh': '灵魂羁绊', 'en': 'Soul Tie', 'ja': '魂の絆'}, 'amount': 500, 'price': 238, 'bonus': 120, 'icon': '💕'},
-        {'id': 'eternal_bond', 'name': {'zh': '永恒之约', 'en': 'Eternal Bond', 'ja': '永遠の約束'}, 'amount': 1000, 'price': 468, 'bonus': 300, 'icon': '👑'}
+        {'id': 'starter', 'name': {'zh': '新手礼包', 'en': 'Starter Pack', 'ja': 'スターター'}, 'amount': 30, 'price': 30, 'bonus': 5, 'icon': '🌱', 'best_value': False},
+        {'id': 'standard', 'name': {'zh': '标准充值', 'en': 'Standard', 'ja': 'スタンダード'}, 'amount': 68, 'price': 68, 'bonus': 15, 'icon': '💎', 'best_value': False},
+        {'id': 'premium', 'name': {'zh': '超值礼包', 'en': 'Premium Bundle', 'ja': 'プレミアム'}, 'amount': 198, 'price': 198, 'bonus': 50, 'icon': '👑', 'best_value': True},
+        {'id': 'ultimate', 'name': {'zh': '尊享大礼包', 'en': 'Ultimate Bundle', 'ja': 'アルティメット'}, 'amount': 498, 'price': 498, 'bonus': 150, 'icon': '🚀', 'best_value': False}
     ]
     
     return render_template('recharge.html',

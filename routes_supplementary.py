@@ -1,6 +1,6 @@
 # 补充路由和API端点
 
-from flask import request, jsonify, session, render_template
+from flask import request, jsonify, session, render_template, redirect, url_for
 from functools import wraps
 
 # ============ 补充路由 ============
@@ -80,47 +80,18 @@ def register_supplementary_routes(app):
         
         return jsonify({'success': True, 'message': '充值成功'})
     
-    # 社交API
-    @app.route('/api/social/post', methods=['POST'])
-    def api_create_post():
-        data = request.json
-        content = data.get('content', '')
-        category = data.get('category', 'daily')
-        
-        return jsonify({'success': True, 'post_id': 1})
+    # 社交API (已移至app.py，避免冲突)
+    # @app.route('/api/social/post', methods=['POST'])
+    # def api_create_post():
+    #     ...
     
-    @app.route('/api/social/like', methods=['POST'])
-    def api_like_post():
-        data = request.json
-        post_id = data.get('post_id')
-        return jsonify({'success': True, 'like_count': 100})
+    # @app.route('/api/social/like', methods=['POST'])
+    # def api_like_post():
+    #     ...
     
-    @app.route('/api/social/share', methods=['POST'])
-    def api_share_post():
-        data = request.json
-        post_id = data.get('post_id')
-        return jsonify({'success': True})
-    
-    @app.route('/api/social/unlock', methods=['POST'])
-    def api_unlock_post():
-        data = request.json
-        post_id = data.get('post_id')
-        return jsonify({'success': True})
-    
-    @app.route('/api/social/comment', methods=['POST'])
-    def api_comment():
-        data = request.json
-        post_id = data.get('post_id')
-        text = data.get('text', '')
-        return jsonify({'success': True, 'comment_id': 1})
-    
-    @app.route('/api/social/comments/<int:post_id>')
-    def api_get_comments(post_id):
-        return jsonify({
-            'comments': [
-                {'id': 1, 'author': '用户A', 'text': '很棒！', 'avatar': '😀'}
-            ]
-        })
+    # @app.route('/api/social/comments/<int:post_id>')
+    # def api_get_comments(post_id):
+    #     ...
     
     # 匹配API
     @app.route('/api/social/match/swipe', methods=['POST'])
@@ -208,7 +179,7 @@ def register_supplementary_routes(app):
         return jsonify({'success': True})
     
     @app.route('/api/lover/gift/send', methods=['POST'])
-    def api_send_gift():
+    def api_lover_send_gift():
         data = request.json
         lover_id = data.get('lover_id')
         gift_id = data.get('gift_id')
@@ -436,11 +407,11 @@ def register_lingstone_routes(app, db):
         if not current_user.is_authenticated:
             return redirect(url_for('login'))
         
-        # 添加提现选项到商品列表
+        # 使用models中的商品列表，添加提现选项
         shop_items_with_withdraw = SHOP_ITEMS + [{
             'id': 'withdraw',
             'name': '灵石提现',
-            'desc': '灵石可提现至支付宝/微信/银行卡',
+            'desc': '灵石可提现至支付宝/微信/银行卡，最低100灵石',
             'price': 100,
             'icon': '💸',
             'type': 'withdraw',

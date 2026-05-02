@@ -1011,12 +1011,12 @@ let selectedPayment = null;
 let countdownTimer = null;
 let currentOrderInfo = null;
 
-// 套餐数据 - 新灵石充值套餐
+// 套餐数据 - 灵石充值套餐
 const packages = {
-    'starter': { name: '新手礼包', amount: 30, price: 30, bonus: 5, icon: '🌱' },
-    'standard': { name: '标准充值', amount: 68, price: 68, bonus: 15, icon: '💎' },
+    'starter': { name: '新手礼包', amount: 30, price: 30, bonus: 5, icon: '🌱', best_value: false },
+    'standard': { name: '标准充值', amount: 68, price: 68, bonus: 15, icon: '💎', best_value: false },
     'premium': { name: '超值礼包', amount: 198, price: 198, bonus: 50, icon: '👑', best_value: true },
-    'ultimate': { name: '尊享大礼包', amount: 498, price: 498, bonus: 150, icon: '🚀' }
+    'ultimate': { name: '尊享大礼包', amount: 498, price: 498, bonus: 150, icon: '🚀', best_value: false }
 };
 
 function selectPackage(id) {

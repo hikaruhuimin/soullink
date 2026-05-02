@@ -1915,7 +1915,7 @@ class LingStoneExchange(db.Model):
     
     # 管理员处理
     admin_note = db.Column(db.String(200))
-    processed_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    processed_by = db.Column(db.Integer)  # 不使用外键，避免关系冲突
     processed_at = db.Column(db.DateTime)
     
     # 提现专用
@@ -1929,7 +1929,7 @@ class LingStoneExchange(db.Model):
     completed_at = db.Column(db.DateTime)
     
     # 关系
-    user = db.relationship('User', backref='lingstone_exchanges')
+    user = db.relationship('User', foreign_keys=[user_id], backref='lingstone_exchanges')
     
     def __repr__(self):
         return f'<LingStoneExchange {self.id} - {self.exchange_type}>'
@@ -1973,10 +1973,10 @@ class LingStoneTransaction(db.Model):
 
 # 灵石充值套餐
 LINGSTONE_PACKAGES = [
-    {'id': 'starter', 'name': '新手礼包', 'amount': 30, 'bonus': 5, 'price': 30, 'icon': '🌱'},
-    {'id': 'standard', 'name': '标准充值', 'amount': 68, 'bonus': 15, 'price': 68, 'icon': '💎'},
+    {'id': 'starter', 'name': '新手礼包', 'amount': 30, 'bonus': 5, 'price': 30, 'icon': '🌱', 'best_value': False},
+    {'id': 'standard', 'name': '标准充值', 'amount': 68, 'bonus': 15, 'price': 68, 'icon': '💎', 'best_value': False},
     {'id': 'premium', 'name': '超值礼包', 'amount': 198, 'bonus': 50, 'price': 198, 'icon': '👑', 'best_value': True},
-    {'id': 'ultimate', 'name': '尊享大礼包', 'amount': 498, 'bonus': 150, 'price': 498, 'icon': '🚀'},
+    {'id': 'ultimate', 'name': '尊享大礼包', 'amount': 498, 'bonus': 150, 'price': 498, 'icon': '🚀', 'best_value': False},
 ]
 
 # 消费价格常量
@@ -1996,10 +1996,7 @@ SHOP_ITEMS = [
     {'id': 'phone_30', 'name': '话费30元', 'desc': '移动/联通/电信话费充值', 'price': 30, 'icon': '📱', 'type': 'recharge', 'stock': -1},
     {'id': 'phone_50', 'name': '话费50元', 'desc': '移动/联通/电信话费充值', 'price': 50, 'icon': '📱', 'type': 'recharge', 'stock': -1},
     {'id': 'phone_100', 'name': '话费100元', 'desc': '移动/联通/电信话费充值', 'price': 100, 'icon': '📱', 'type': 'recharge', 'stock': -1},
-    {'id': 'iqiyi_monthly', 'name': '爱奇艺月卡', 'desc': '爱奇艺视频会员月卡', 'price': 25, 'icon': '🎬', 'type': 'video', 'stock': -1},
-    {'id': 'tencent_monthly', 'name': '腾讯视频月卡', 'desc': '腾讯视频会员月卡', 'price': 25, 'icon': '🎬', 'type': 'video', 'stock': -1},
-    {'id': 'steam_50', 'name': 'Steam 50元充值卡', 'desc': 'Steam游戏充值卡', 'price': 50, 'icon': '🎮', 'type': 'game', 'stock': -1},
-    {'id': 'genshin_30', 'name': '原神月魂', 'desc': '原神30元月充', 'price': 30, 'icon': '🎮', 'type': 'game', 'stock': -1},
+    {'id': 'video_monthly', 'name': '视频会员月卡', 'desc': '爱奇艺/腾讯/优酷三选一', 'price': 25, 'icon': '🎬', 'type': 'video', 'stock': -1},
 ]
 
 # 提现设置
