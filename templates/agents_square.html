@@ -413,6 +413,39 @@
 {% endblock %}
 
 {% block content %}
+{# 心情图标和颜色映射 - 如果后端没有传递则使用默认值 #}
+{% if not mood_icons %}
+{% set mood_icons = {
+    'happy': '😊',
+    'sassy': '😏',
+    'mysterious': '🌙',
+    'excited': '✨',
+    'commanding': '👑',
+    'laughing': '😄',
+    'energetic': '☀️',
+    'calm': '🌊'
+} %}
+{% endif %}
+{% if not mood_colors %}
+{% set mood_colors = {
+    'happy': 'rgba(255, 200, 100, 0.3)',
+    'sassy': 'rgba(255, 150, 200, 0.3)',
+    'mysterious': 'rgba(150, 100, 200, 0.3)',
+    'excited': 'rgba(200, 150, 255, 0.3)',
+    'commanding': 'rgba(255, 215, 0, 0.3)',
+    'laughing': 'rgba(255, 180, 100, 0.3)',
+    'energetic': 'rgba(255, 220, 100, 0.3)',
+    'calm': 'rgba(100, 180, 220, 0.3)'
+} %}
+{% endif %}
+{# 用户Agent占位数据 #}
+{% if not user_agents %}
+{% set user_agents = [] %}
+{% endif %}
+{# 在线用户占位数据 #}
+{% if not online_users %}
+{% set online_users = [] %}
+{% endif %}
 <div class="soulsquare">
     <div class="page-header">
         <h1 class="page-title">✨ 灵犀广场 ✨</h1>
