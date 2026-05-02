@@ -22,75 +22,17 @@ body::before {
     display: none !important;
 }
 
-/* ========== 宇宙星象图背景特效 ========== */
+/* ========== 深色背景 ========== */
 .starry-bg {
     position: relative;
     min-height: 100vh;
-    background: #020515;
+    background: #0f172a;
     overflow: hidden;
 }
 
-/* 宇宙背景图 - 缓慢漂移动画 */
-.starry-bg::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 120%;
-    height: 120%;
-    background: url('/static/images/universe_bg.jpg') center center no-repeat;
-    background-size: cover;
-    animation: cosmosDrift 120s ease-in-out infinite alternate;
-    z-index: 0;
-    opacity: 0.85;
-}
 
-/* 星云呼吸效果 - 背景明暗变化 */
-.starry-bg::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(ellipse at 30% 20%, rgba(88, 28, 135, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(30, 58, 138, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(15, 23, 42, 0.3) 0%, transparent 70%);
-    animation: nebulaBreath 8s ease-in-out infinite;
-    z-index: 1;
-    pointer-events: none;
-}
 
-/* 星空缓慢漂移动画 */
-@keyframes cosmosDrift {
-    0% {
-        transform: scale(1) translate(0, 0);
-    }
-    25% {
-        transform: scale(1.05) translate(-2%, -1%);
-    }
-    50% {
-        transform: scale(1.1) translate(-1%, 2%);
-    }
-    75% {
-        transform: scale(1.05) translate(2%, -2%);
-    }
-    100% {
-        transform: scale(1) translate(1%, 1%);
-    }
-}
 
-/* 星云呼吸动画 */
-@keyframes nebulaBreath {
-    0%, 100% {
-        opacity: 0.6;
-        filter: brightness(1);
-    }
-    50% {
-        opacity: 1;
-        filter: brightness(1.2);
-    }
-}
 
 /* 闪烁星星容器 */
 .stars-container {
