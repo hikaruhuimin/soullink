@@ -3562,7 +3562,8 @@ def api_memories():
 # ============ 管理后台 ============
 
 import functools
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'soullink-admin-2026')
+ADMIN_USERNAME = 'admin'
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Soullink_Admin2026!')
 
 def admin_required(f):
     @functools.wraps(f)
@@ -5073,19 +5074,19 @@ def admin_content():
         if search:
             query = query.filter(GossipPost.content.contains(search))
         posts = query.order_by(GossipPost.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
-        return render_template('admin_content.html', lang=lang, tab=tab, 
+        return render_template('admin/admin_content.html', lang=lang, tab=tab, 
             total_gossip=total_gossip, today_gossip=today_gossip, total_comments=total_comments,
             posts=posts.items if posts else [], search=search)
     
     elif tab == 'matches':
         # AI红娘匹配记录
         matches = SocialMatch.query.order_by(SocialMatch.id.desc()).limit(50).all() if hasattr(SocialMatch, 'query') else []
-        return render_template('admin_content.html', lang=lang, tab=tab,
+        return render_template('admin/admin_content.html', lang=lang, tab=tab,
             total_matches=total_matches, today_matches=today_matches, matches=matches)
     
     elif tab == 'divination':
         divinations = Divination.query.order_by(Divination.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
-        return render_template('admin_content.html', lang=lang, tab=tab,
+        return render_template('admin/admin_content.html', lang=lang, tab=tab,
             total_divinations=total_divinations, today_divinations=today_divinations,
             divinations=divinations.items if divinations else [])
     
@@ -5097,10 +5098,10 @@ def admin_content():
             {'id': 2, 'name': '魔术师 The Magician', 'card_type': 'tarot', 'keywords': '创造、意志、技能'},
             {'id': 3, 'name': '女祭司 The High Priestess', 'card_type': 'tarot', 'keywords': '直觉、神秘、智慧'},
         ]
-        return render_template('admin_content.html', lang=lang, tab=tab,
+        return render_template('admin/admin_content.html', lang=lang, tab=tab,
             total_templates=total_templates, template_categories=template_categories, templates=templates)
     
-    return render_template('admin_content.html', lang=lang, tab=tab)
+    return render_template('admin/admin_content.html', lang=lang, tab=tab)
 
 @app.route('/admin/content/gossip/<int:post_id>/delete', methods=['POST'])
 @admin_required

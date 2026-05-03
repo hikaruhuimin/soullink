@@ -67,6 +67,8 @@ class User(UserMixin, db.Model):
     gender = db.Column(db.String(10))
     timezone = db.Column(db.String(50), default='Asia/Tokyo')
     birthday = db.Column(db.Date)
+    mbti = db.Column(db.String(4))  # MBTI类型
+    zodiac = db.Column(db.String(20))  # 星座
     
     # 会员状态
     vip_level = db.Column(db.Integer, default=VIP_LEVEL_NONE)

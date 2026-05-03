@@ -9,11 +9,12 @@
 body{background:#F5F3F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#333;min-height:100vh}
 .nav{background:#fff;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,0.05);position:sticky;top:0;z-index:100}
 .nav h1{font-size:18px;color:#6B5B7B;display:flex;align-items:center;gap:8px}
-.nav-right{display:flex;align-items:center;gap:16px}
+.nav-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .nav a{color:#8B5E83;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;transition:all .2s}
 .nav a:hover{background:#F5F3F0}
+.nav a.active{background:#8B5E83;color:#fff}
 .lang-select{display:flex;gap:4px}
-.lang-select a{padding:4px 8px;font-size:12px;border-radius:4px;color:#B8A9C9}
+.lang-select a{padding:4px 8px;font-size:12px;border-radius:4px;color:#B8A9C9;text-decoration:none}
 .lang-select a.active{background:#8B5E83;color:#fff}
 .container{max-width:1200px;margin:24px auto;padding:0 24px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px}
@@ -35,7 +36,7 @@ tr:last-child td{border-bottom:none}
 .badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
 .badge-vip{background:linear-gradient(135deg,#F0E6F6,#E8D6F0);color:#8B5E83}
 .badge-free{background:#F0F0F0;color:#999}
-.badge-active{background:#E8F5E9;color:#4CAF50}
+.badge-active{background:#E8F5E9;color:#2E7D32}
 .chart-container{height:200px;display:flex;align-items:flex-end;gap:8px;padding:16px 0}
 .bar{flex:1;background:linear-gradient(180deg,#B8A9C9,#D4C4D8);border-radius:4px 4px 0 0;min-height:4px;position:relative;transition:all .3s}
 .bar:hover{background:linear-gradient(180deg,#8B5E83,#A880A0)}
@@ -45,11 +46,11 @@ tr:last-child td{border-bottom:none}
 .info-item:last-child{border-bottom:none}
 .info-item label{color:#B8A9C9;font-size:13px}
 .info-item .value{color:#6B5B7B;font-weight:600}
-.action-btn{padding:6px 12px;border:none;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
-.btn-danger{background:#FFEBEE;color:#c62828}
-.btn-danger:hover{background:#FFCDD2}
-.btn-primary{background:#E8F5E9;color:#2E7D32}
-.btn-primary:hover{background:#C8E6C9}
+.quick-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:16px}
+.quick-link{padding:16px;background:#F5F3F0;border-radius:12px;text-decoration:none;color:#6B5B7B;text-align:center;transition:all .2s}
+.quick-link:hover{background:#E8E4E0;transform:translateY(-2px)}
+.quick-link .icon{font-size:24px;margin-bottom:8px}
+.quick-link .label{font-size:13px;font-weight:500}
 @media(max-width:768px){.container{padding:0 16px}.nav{padding:12px 16px}.nav-right{flex-wrap:wrap}.grid-2{grid-template-columns:1fr}}
 </style>
 </head>
@@ -62,9 +63,9 @@ tr:last-child td{border-bottom:none}
 <a href="?lang=en" class="{% if lang=='en' %}active{% endif %}">EN</a>
 <a href="?lang=ja" class="{% if lang=='ja' %}active{% endif %}">JA</a>
 </div>
-<a href="/admin">Dashboard</a>
+<a href="/admin" class="active">Dashboard</a>
 <a href="/admin/users">Users</a>
-<a href="/admin/stats">Stats</a>
+<a href="/admin/content">Content</a>
 <a href="/admin/settings">Settings</a>
 <a href="/admin/logout" style="color:#c62828">Logout</a>
 </div>
@@ -72,34 +73,38 @@ tr:last-child td{border-bottom:none}
 <div class="container">
 <div class="stats">
 <div class="stat-card">
-<h3>Total Users</h3>
+<h3>{% if lang == 'zh' %}总用户数{% elif lang == 'ja' %}総ユーザー{% else %}Total Users{% endif %}</h3>
 <div class="num">{{ total_users }}</div>
-<div class="trend">Registered users</div>
+<div class="trend">{% if lang == 'zh' %}注册用户总数{% elif lang == 'ja' %}登録済み{% else %}Registered users{% endif %}</div>
 </div>
 <div class="stat-card">
-<h3>Today New</h3>
+<h3>{% if lang == 'zh' %}今日新增{% elif lang == 'ja' %}今日{% else %}Today New{% endif %}</h3>
 <div class="num small">{{ new_today }}</div>
-<div class="trend">New registrations today</div>
+<div class="trend">{% if lang == 'zh' %}今日注册{% elif lang == 'ja' %}今日の登録{% else %}New registrations today{% endif %}</div>
 </div>
 <div class="stat-card">
-<h3>Active Users</h3>
+<h3>{% if lang == 'zh' %}活跃用户{% elif lang == 'ja' %}アクティブ{% else %}Active Users{% endif %}</h3>
 <div class="num small">{{ active_users }}</div>
-<div class="trend">Last 7 days</div>
+<div class="trend">{% if lang == 'zh' %}7天内登录{% elif lang == 'ja' %}7日内{% else %}Last 7 days{% endif %}</div>
 </div>
 <div class="stat-card">
-<h3>Spirit Stones</h3>
+<h3>{% if lang == 'zh' %}灵石流通{% elif lang == 'ja' %}霊石流通{% else %}Spirit Stones{% endif %}</h3>
 <div class="num small">{{ total_spirit_stones }}</div>
-<div class="trend">Total in circulation</div>
+<div class="trend">{% if lang == 'zh' %}平台总流通量{% elif lang == 'ja' %}総流通量{% else %}Total in circulation{% endif %}</div>
 </div>
 </div>
+
 <div class="section">
 <div class="section-header">
-<h2>📊 Registration Trend (Last 7 Days)</h2>
-<a href="/admin/stats" class="more">View All →</a>
+<h2>📊 {% if lang == 'zh' %}注册趋势（最近7天）{% elif lang == 'ja' %}登録推移（7日間）{% else %}Registration Trend (Last 7 Days){% endif %}</h2>
+<a href="/admin/stats" class="more">{% if lang == 'zh' %}查看全部 →{% else %}View All →{% endif %}</a>
 </div>
+{% set max_count = 1 %}
+{% for item in registration_trend %}{% if item.count > max_count %}{% set max_count = item.count %}{% endif %}{% endfor %}
 <div class="chart-container">
 {% for item in registration_trend %}
-<div class="bar" style="height:{{ (item.count / (registration_trend|max(attribute='count') + 1) * 180)|round }}px">
+{% set height = ((item.count / max_count) * 180)|round if max_count > 0 else 0 %}
+<div class="bar" style="height:{{ height }}px">
 <span class="value">{{ item.count }}</span>
 </div>
 {% endfor %}
@@ -108,20 +113,21 @@ tr:last-child td{border-bottom:none}
 {% for item in registration_trend %}<span>{{ item.date }}</span>{% endfor %}
 </div>
 </div>
+
 <div class="grid-2">
 <div class="section">
 <div class="section-header">
-<h2>👥 Recent Users</h2>
-<a href="/admin/users" class="more">View All →</a>
+<h2>👥 {% if lang == 'zh' %}最近用户{% elif lang == 'ja' %}最近のユーザー{% else %}Recent Users{% endif %}</h2>
+<a href="/admin/users" class="more">{% if lang == 'zh' %}查看全部 →{% else %}View All →{% endif %}</a>
 </div>
 <table>
-<thead><tr><th>ID</th><th>Username</th><th>VIP</th><th>Stones</th></tr></thead>
+<thead><tr><th>ID</th><th>{% if lang == 'zh' %}用户名{% elif lang == 'ja' %}ユーザー{% else %}Username{% endif %}</th><th>{% if lang == 'zh' %}VIP{% elif lang == 'ja' %}会員{% else %}VIP{% endif %}</th><th>{% if lang == 'zh' %}灵石{% elif lang == 'ja' %}霊石{% else %}Stones{% endif %}</th></tr></thead>
 <tbody>
 {% for u in recent_users %}
 <tr>
 <td>{{ u.id }}</td>
 <td>{{ u.username }}</td>
-<td><span class="badge badge-vip if u.vip_level else badge-free">{{ 'VIP ' ~ u.vip_level if u.vip_level else 'Free' }}</span></td>
+<td><span class="badge {% if u.vip_level %}badge-vip{% else %}badge-free{% endif %}">{% if u.vip_level %}VIP {{ u.vip_level }}{% else %}{% if lang == 'zh' %}免费{% elif lang == 'ja' %}無料{% else %}Free{% endif %}{% endif %}</span></td>
 <td>{{ u.spirit_stones }}</td>
 </tr>
 {% endfor %}
@@ -130,24 +136,52 @@ tr:last-child td{border-bottom:none}
 </div>
 <div class="section">
 <div class="section-header">
-<h2>📈 Quick Stats</h2>
+<h2>📈 {% if lang == 'zh' %}快速统计{% elif lang == 'ja' %}クイック統計{% else %}Quick Stats{% endif %}</h2>
 </div>
 <div class="info-item">
-<label>VIP Users</label>
+<label>{% if lang == 'zh' %}VIP用户{% elif lang == 'ja' %}VIP{% else %}VIP Users{% endif %}</label>
 <span class="value">{{ vip_users }}</span>
 </div>
 <div class="info-item">
-<label>Free Users</label>
+<label>{% if lang == 'zh' %}免费用户{% elif lang == 'ja' %}無料{% else %}Free Users{% endif %}</label>
 <span class="value">{{ total_users - vip_users }}</span>
 </div>
 <div class="info-item">
-<label>Gifts Sent</label>
+<label>{% if lang == 'zh' %}已发送礼物{% elif lang == 'ja' %}送信済み{% else %}Gifts Sent{% endif %}</label>
 <span class="value">{{ total_gifts }}</span>
 </div>
 <div class="info-item">
-<label>Earnings Records</label>
+<label>{% if lang == 'zh' %}收益记录{% elif lang == 'ja' %}収益{% else %}Earnings Records{% endif %}</label>
 <span class="value">{{ total_earnings }}</span>
 </div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-header">
+<h2>⚡ {% if lang == 'zh' %}快速操作{% elif lang == 'ja' %}クイックアクション{% else %}Quick Actions{% endif %}</h2>
+</div>
+<div class="quick-links">
+<a href="/admin/users" class="quick-link">
+<div class="icon">👥</div>
+<div class="label">{% if lang == 'zh' %}用户管理{% elif lang == 'ja' %}ユーザー{% else %}Users{% endif %}</div>
+</a>
+<a href="/admin/content?tab=gossip" class="quick-link">
+<div class="icon">🌙</div>
+<div class="label">{% if lang == 'zh' %}树洞管理{% elif lang == 'ja' %}樹洞{% else %}Gossip{% endif %}</div>
+</a>
+<a href="/admin/content?tab=matches" class="quick-link">
+<div class="icon">💕</div>
+<div class="label">{% if lang == 'zh' %}匹配记录{% elif lang == 'ja' %}マッチ{% else %}Matches{% endif %}</div>
+</a>
+<a href="/admin/content?tab=divination" class="quick-link">
+<div class="icon">🔮</div>
+<div class="label">{% if lang == 'zh' %}占卜记录{% elif lang == 'ja' %}占卜{% else %}Divination{% endif %}</div>
+</a>
+<a href="/admin/settings" class="quick-link">
+<div class="icon">⚙️</div>
+<div class="label">{% if lang == 'zh' %}系统设置{% elif lang == 'ja' %}設定{% else %}Settings{% endif %}</div>
+</a>
 </div>
 </div>
 </div>
