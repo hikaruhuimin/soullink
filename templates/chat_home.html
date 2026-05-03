@@ -156,7 +156,7 @@
     font-family: var(--font-display);
     font-size: 1.25rem;
     font-weight: 500;
-    color: var(--color-text);
+    color: #e0d0ff;
     margin-bottom: var(--space-lg);
     display: flex;
     align-items: center;
@@ -178,16 +178,28 @@
 }
 
 .room-card {
-    background: var(--color-bg-card);
+    /* 统一深色背景：深靛蓝紫色渐变 */
+    background: linear-gradient(135deg, #1e1b4b, #312e81) !important;
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     transition: all var(--transition-normal);
     text-decoration: none;
     color: inherit;
-    border: 1px solid var(--color-border-light);
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
     position: relative;
     overflow: hidden;
+}
+
+.room-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+    pointer-events: none;
 }
 
 .room-card::after {
@@ -204,40 +216,83 @@
 
 .room-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3);
 }
 
 .room-card:hover::after {
     opacity: 1;
 }
 
+/* 所有文字统一为白色/浅色 */
+.room-card .room-info h3 {
+    color: #ffffff !important;
+}
+
+.room-card .room-desc {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.room-card .room-agents {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.room-card .room-viewers {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.room-card .room-status {
+    color: #4ade80;
+}
+
+/* 保留dark卡片的深灰色样式（深夜树洞） */
 .room-card.dark {
-    background: #1a2030;
-    border-color: #2a3548;
+    background: linear-gradient(135deg, #1e2030, #2a3548) !important;
+    border-color: rgba(74, 90, 123, 0.3) !important;
 }
 
 .room-card.dark .room-info h3,
 .room-card.dark .room-desc {
-    color: #e0e0e0;
+    color: #e0e0e0 !important;
 }
 
 .room-card.dark .room-agents {
-    color: #888;
+    color: #888 !important;
 }
 
+.room-card.dark:hover {
+    box-shadow: 0 8px 30px rgba(74, 90, 123, 0.3);
+}
+
+/* 保留VIP卡片的金色样式 */
 .room-card.vip {
-    background: linear-gradient(135deg, #2a2520 0%, #3a3530 100%);
-    border-color: rgba(184, 160, 96, 0.3);
+    background: linear-gradient(135deg, #2a2520, #3a3530) !important;
+    border-color: rgba(184, 160, 96, 0.3) !important;
 }
 
 .room-card.vip .room-info h3 {
-    color: #d4af37;
+    color: #d4af37 !important;
 }
 
-.room-card.vip .room-icon {
+.room-card.vip:hover {
+    box-shadow: 0 8px 30px rgba(184, 160, 96, 0.3);
+}
+
+/* VIP标识 */
+.vip-badge {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
     background: linear-gradient(135deg, #d4af37 0%, #b8963a 100%);
+    color: white;
+    font-size: 0.6875rem;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-weight: 500;
 }
 
+
+
+/* 房间组件样式 - 统一浅色文字 */
 .room-header {
     display: flex;
     align-items: center;
@@ -260,18 +315,18 @@
     font-family: var(--font-display);
     font-size: 1.125rem;
     font-weight: 500;
-    color: var(--color-text);
+    color: #ffffff;
     margin-bottom: var(--space-xs);
 }
 
 .room-agents {
     font-size: 0.875rem;
-    color: var(--color-text-muted);
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .room-desc {
     font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.85);
     line-height: 1.6;
     margin-bottom: var(--space-md);
 }
@@ -281,16 +336,12 @@
     align-items: center;
     justify-content: space-between;
     padding-top: var(--space-md);
-    border-top: 1px solid var(--color-border-light);
-}
-
-.dark .room-footer {
-    border-top-color: #2a3548;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .room-viewers {
     font-size: 0.8125rem;
-    color: var(--color-text-muted);
+    color: rgba(255, 255, 255, 0.7);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -301,7 +352,7 @@
     align-items: center;
     gap: 6px;
     font-size: 0.75rem;
-    color: var(--color-success);
+    color: #4ade80;
 }
 
 .room-status::before {
@@ -321,35 +372,18 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: var(--color-bg-cream);
+    background: rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.625rem;
-    border: 2px solid var(--color-bg-card);
+    border: 2px solid rgba(255, 255, 255, 0.1);
     margin-left: -6px;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .room-agent-avatar:first-child {
     margin-left: 0;
-}
-
-.dark .room-agent-avatar {
-    border-color: #1a2030;
-    background: #2a3548;
-}
-
-/* VIP标识 */
-.vip-badge {
-    position: absolute;
-    top: var(--space-md);
-    right: var(--space-md);
-    background: linear-gradient(135deg, #d4af37 0%, #b8963a 100%);
-    color: white;
-    font-size: 0.6875rem;
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
-    font-weight: 500;
 }
 
 @media (max-width: 768px) {
