@@ -4264,3 +4264,514 @@ def admin_agent_regenerate_key(agent_id):
     db.session.commit()
     flash('已重新生成API Key: {}'.format(agent.name))
     return redirect(request.referrer or '/admin/agents/creator')
+
+
+# ============ 灵魂伴侣画像 / Soulmate Portrait ============
+
+@app.route('/soulmate-portrait')
+def soulmate_portrait():
+    """灵魂伴侣AI画像页面"""
+    lang = get_client_language()
+    stones_left = 3  # 默认免费次数
+    
+    if current_user.is_authenticated:
+        # 检查用户使用次数，可以扩展为数据库记录
+        stones_left = 3
+    
+    return render_template('soulmate_portrait.html', 
+                         lang=lang,
+                         stones_left=stones_left,
+                         t=lambda key: TRANSLATIONS.get(lang, TRANSLATIONS['zh']).get(key, key))
+
+
+@app.route('/api/soulmate-portrait/generate', methods=['POST'])
+@login_required
+def generate_soulmate_portrait():
+    """生成灵魂伴侣画像API"""
+    data = request.get_json()
+    nickname = data.get('nickname')
+    birthday = data.get('birthday')
+    zodiac = data.get('zodiac')
+    wish = data.get('wish', '')
+    
+    if not all([nickname, birthday, zodiac]):
+        return jsonify({'error': '请填写完整信息'})
+    
+    # 检查灵石（免费3次后扣10灵石）
+    user = current_user
+    if user.spirit_stones < 10:
+        return jsonify({'error': TRANSLATIONS.get(get_client_language(), TRANSLATIONS['zh']).get('not_enough_stones', '灵石不足，请前往充值')})
+    
+    # 扣除灵石
+    user.spirit_stones -= 10
+    
+    # 生成画像内容（基于模板+随机）
+    appearances = [
+        'TA有一双温柔的眼睛，仿佛能看穿你的心事。高挺的鼻梁，微微上扬的嘴角，总带着淡淡的微笑。',
+        'TA的气质与众不同，既有成熟的稳重，又不失少年的纯真。深邃的眼眸中藏着对生活的热爱。',
+        'TA中等身材，举止优雅。笑起来的时候会露出可爱的虎牙，让人忍不住也跟着开心起来。',
+        'TA有着一头柔顺的长发，眼神清澈明亮。安静的坐在那里，就已经是世间最美的风景。',
+        'TA身材高挑，走路带风。但当你靠近时，会发现TA的内心比外表更加温暖。'
+    ]
+    
+    personalities = [
+        'TA性格温和，待人真诚。懂得倾听，也善于表达。在你需要的时候，总能给出最恰当的安慰。',
+        'TA阳光开朗，喜欢尝试新鲜事物。和你在一起的时候，TA总是充满活力，带给你无限惊喜。',
+        'TA内敛含蓄，但对感情专一。一旦认定了你，就会用全部的真心来守护这份感情。',
+        'TA幽默风趣，总能让周围的人感到轻松愉快。和你在一起，生活永远不会无聊。',
+        'TA成熟稳重，有责任感。在你迷茫的时候，TA会是你最坚强的后盾和依靠。'
+    ]
+    
+    encounters = [
+        '你们在一个下着细雨的傍晚相遇。TA为你撑起一把伞，那一刻，时间仿佛静止了。',
+        '在一个朋友的聚会上，你们的目光不期而遇。TA的微笑让你心跳加速，命运从此交织。',
+        '你们是同事/同学，日久生情。某个加班的夜晚，TA递来一杯热咖啡，你的心融化了。',
+        '在旅途中，你们不约而同来到同一个景点。TA主动帮你拍照，从此结下了缘分。',
+        '通过网络你们相识相知，TA的文字温暖了你的每一个夜晚，终于决定见面。'
+    ]
+    
+    divinations = [
+        f'从星座角度看，{nickname}与{zodiac}的TA有着天然的心灵契合。你们之间的缘分指数达到95%以上！',
+        f'根据占卜显示，{nickname}的灵魂伴侣就在你身边不远处。TA正在等待与你相遇的那一刻。',
+        f'今日运势：遇见灵魂伴侣的概率大增！{nickname}的真诚会吸引到命中注定的TA。',
+        f'占卜解读：{nickname}的理想伴侣具有{zodiac}的特质，你们的相遇将会是命运的安排。',
+        f'从生命数字来看，{nickname}与TA的相遇将带来人生中最美好的改变。把握当下的每一次相遇。'
+    ]
+    
+    return jsonify({
+        'appearance': random.choice(appearances),
+        'personality': random.choice(personalities),
+        'encounter': random.choice(encounters),
+        'divination': random.choice(divinations)
+    })
+
+
+# ============ AI情书 / Love Letter ============
+
+@app.route('/love-letter')
+def love_letter():
+    """AI情书生成页面"""
+    lang = get_client_language()
+    stones_left = 3
+    
+    if current_user.is_authenticated:
+        stones_left = 3
+    
+    return render_template('love_letter.html',
+                         lang=lang,
+                         stones_left=stones_left,
+                         t=lambda key: TRANSLATIONS.get(lang, TRANSLATIONS['zh']).get(key, key))
+
+
+@app.route('/api/love-letter/generate', methods=['POST'])
+@login_required
+def generate_love_letter():
+    """生成AI情书API"""
+    data = request.get_json()
+    recipient = data.get('recipient')
+    feeling = data.get('feeling')
+    keywords = data.get('keywords', '')
+    
+    if not all([recipient, feeling]):
+        return jsonify({'error': '请填写完整信息'})
+    
+    # 检查灵石
+    user = current_user
+    if user.spirit_stones < 10:
+        return jsonify({'error': TRANSLATIONS.get(get_client_language(), TRANSLATIONS['zh']).get('not_enough_stones', '灵石不足')})
+    
+    user.spirit_stones -= 10
+    
+    # 根据情感类型生成情书
+    letter_templates = {
+        'secret_love': [
+            f'''从第一次见到你的那一刻起，我的世界就悄悄改变了。
+
+你的每一个微笑，每一次不经意的眼神，都让我心跳加速。我不知道自己是从什么时候开始喜欢你的，也许是那次你帮我捡起掉落的书本，也许是某个午后你认真学习的侧脸。
+
+{keywords}，我一直把这份感情藏在心底最深处。我害怕说出来会打破现在的美好，害怕连朋友都做不成。但每当看到你，我的心就会不受控制地狂跳。
+
+如果你也对我有一点点感觉，请给我一个暗示，好吗？''',
+            f'''有些话，我犹豫了很久，还是决定写下来。
+
+{recipient}，你知道吗？喜欢一个人原来是这种感觉。看到你的消息会忍不住微笑，想到你会紧张得手心出汗，你身边的每一个人都让我嫉妒。
+
+{keywords}
+
+我没有勇气当面告诉你，只能把这份暗恋藏在心里。也许有一天，我会变得足够勇敢，可以站在你面前，说出这句简单却沉重的话。
+
+但现在，让我继续做那个默默守护你的人吧。'''
+        ],
+        'confession': [
+            f'''{recipient}，我有话想对你说。
+
+从认识你的第一天起，我就知道你是我一直在等待的人。你的善良、你的真诚、你的每一个小习惯，都让我越来越无法自拔。
+
+{keywords}
+
+我知道表白需要勇气，但我更害怕错过你。所以今天，我要告诉你——
+
+我喜欢你。不是普通的喜欢，是想和你一起走完余生的那种喜欢。
+
+你愿意给我一个机会，让我用一生来证明这份感情吗？''',
+            f'''写这封信的时候，我的心跳得很快。
+
+{recipient}，我喜欢你。从第一次见面，到现在的每一天，我的心里都只有你。
+
+{keywords}
+
+我不想再隐藏自己的感情了。我想要光明正大地喜欢你，想要在你身边照顾你、保护你、陪伴你。
+
+你愿意做我的男/女朋友吗？我会用我全部的真心来爱你。'''
+        ],
+        'missing': [
+            f'''{recipient}，今天特别想你。
+
+距离上次见面已经{keywords or '很久'}了，每一天我都在数着日子。不知道你在那边过得好不好，有没有按时吃饭，有没有想我。
+
+翻看我们的聊天记录，每一条都让我嘴角上扬。那些你说的话，你发的表情，都被我小心翼翼地收藏着。
+
+等你回来，我想第一时间见到你。给你一个大大的拥抱，告诉你我有多想你。
+
+愿你一切安好，我会在这里等你。''',
+            f'''亲爱的{recipient}：
+
+见字如面。
+
+今天的风很温柔，云很柔软，但我最想的还是你。一个人在城市的街头走过，看到相似的背影都会忍不住多看几眼，因为那可能是你。
+
+{keywords}
+
+距离分开的日子越长，想念就越深。这大概就是爱情的魔力吧。
+
+期待与你重逢的那一天，届时我要把这段时间所有的想念，都化作紧紧的拥抱。
+
+想你。'''
+        ],
+        'apology': [
+            f'''{recipient}，请允许我说一声对不起。
+
+我知道自己有时候很笨，不知道怎么表达感情。我可能说过让你伤心的话，做过让你失望的事。
+
+{keywords}
+
+但请你相信，我从来没有想过要伤害你。每一次争吵之后，我都在反思自己。我知道，有些话说出口就收不回来了。
+
+如果我的某些行为让你感到不舒服，我真的很抱歉。请给我一个机会，让我用行动来弥补。
+
+我不想因为我的不成熟而失去你。你对我来说太重要了。''',
+            f'''亲爱的{recipient}：
+
+提笔写下这封信的时候，我的心情很沉重。
+
+我知道自己错了。上次的事情，我真的很后悔。那句伤人的话，我无数次想收回，但它已经说出口了。
+
+{keywords}
+
+我不求你现在就原谅我，只希望你知道，我是真的很在乎你。我愿意改变，愿意学习如何更好地爱你。
+
+给我一点时间，让我用实际行动来证明我的诚意。'''
+        ],
+        'declaration': [
+            f'''{recipient}，这是我对你的爱情宣言。
+
+我爱你，爱你的全部。爱你笑起来的样子，爱你生气时鼓起的脸颊，爱你认真时的专注，爱你偶尔的小任性。
+
+{keywords}
+
+我愿意牵着你的手，走过每一个春夏秋冬。在你开心的时候和你一起笑，在你难过的时候给你肩膀依靠。
+
+从今以后，我的世界只有你。你愿意和我一起，书写属于我们的故事吗？''',
+            f'''致我最深爱的{recipient}：
+
+我从来没有对任何人说过这样的话，但对你，我愿意把所有的爱都告诉你。
+
+你是我生命中最美好的意外。从遇见你的那一刻起，我就知道，你是我要找的那个人。
+
+{keywords}
+
+不管未来有多少风雨，我都想和你一起面对。我会用一生的时间来爱你、守护你、珍惜你。
+
+这就是我的爱情宣言，刻在心底，永不改变。'''
+        ]
+    }
+    
+    letters = letter_templates.get(feeling, letter_templates['declaration'])
+    return jsonify({'letter': random.choice(letters)})
+
+
+# ============ 前世今生 / Past Life ============
+
+@app.route('/past-life')
+def past_life():
+    """前世今生测试页面"""
+    lang = get_client_language()
+    stones_left = 3
+    
+    if current_user.is_authenticated:
+        stones_left = 3
+    
+    return render_template('past_life.html',
+                         lang=lang,
+                         stones_left=stones_left,
+                         t=lambda key: TRANSLATIONS.get(lang, TRANSLATIONS['zh']).get(key, key))
+
+
+@app.route('/api/past-life/generate', methods=['POST'])
+@login_required
+def generate_past_life():
+    """生成前世故事API"""
+    data = request.get_json()
+    nickname = data.get('nickname')
+    birthday = data.get('birthday')
+    
+    if not all([nickname, birthday]):
+        return jsonify({'error': '请填写完整信息'})
+    
+    # 检查灵石
+    user = current_user
+    if user.spirit_stones < 10:
+        return jsonify({'error': TRANSLATIONS.get(get_client_language(), TRANSLATIONS['zh']).get('not_enough_stones', '灵石不足')})
+    
+    user.spirit_stones -= 10
+    
+    # 生成前世故事
+    eras = ['唐朝贞观年间', '宋朝汴京', '明朝万历年间', '清朝康熙年间', '民国初期']
+    
+    identities = [
+        f'一位才华横溢的书生，名动京城。文采飞扬，却不为功名，只为等一位知己。',
+        f'一位温柔婉约的大家闺秀，琴棋书画样样精通。待字闺中，只为等命中注定的那个人。',
+        f'一位行侠仗义的江湖剑客，剑法超群。浪迹天涯，只为寻找一个可以停留的港湾。',
+        f'一位悬壶济世的医者，妙手回春。走遍山川，只为救助天下苍生。',
+        f'一位宫廷画师，技艺精湛。笔下山水人物皆成绝响，却只为画心中所爱之人。'
+    ]
+    
+    stories = [
+        f'那一年，{nickname}进京赶考，途中遇见一位女子。四目相对的瞬间，仿佛穿越了千年时光。可惜金榜题名时，佳人已不知所踪。这段未了的情缘，一直延续到今生。',
+        f'在一个月圆之夜，{nickname}与命中注定的人在西湖畔相遇。他们吟诗作对，彻夜长谈。可惜天亮之后，女子化作一缕青烟消散。原来她是修炼千年的狐仙，只为与他了却一段情缘。',
+        f'战乱年代，{nickname}与爱人失散。他们约定三年后在老地方相见，却因战火永别。{nickname}一生未娶，将那份爱深埋心底，等待来生再续前缘。',
+        f'在一次偶然的机会中，{nickname}救下了一只受伤的白鹤。后来得知，白鹤是仙界仙子下凡。为了报恩，仙子在梦中与{nickname}相恋数载，却始终未能相见。这段跨越仙凡的爱恋，终于在今生有了结果。',
+        f'{nickname}是宫廷御医，与公主相恋却无法相守。公主被迫远嫁和亲，{nickname}从此郁郁寡欢。他们在佛前许下来生之约，今生终于得以重逢。'
+    ]
+    
+    connections = [
+        f'你的今生名字中仍带有前世的一些特质。你对某些场景有莫名的熟悉感，也许是因为前世的记忆尚未完全消散。命中注定的人，与你有着相似的灵魂印记。',
+        f'你的性格中保留着前世的某些特点。比起今生所学，你更相信直觉。对传统文化有天然的亲近感，前世的某些才华在今生的某些时刻会突然显现。',
+        f'你的梦中偶尔会出现前世的片段。那份未了的情缘，如今正在以另一种方式延续。真正与你契合的人，可能就在你身边，只是你们还没有认出彼此。',
+        f'前世的遗憾，今生来弥补。你对某些人有莫名的信任感，对某些事有超乎寻常的直觉。这就是灵魂深处的前世记忆在指引你。',
+        f'你的今生与前世有着奇妙的缘分。某些似曾相识的场景，某个第一眼就心动的人，也许都是前世注定的安排。灵魂记得一切，只是在等待合适的时机唤醒。'
+    ]
+    
+    era = random.choice(eras)
+    return jsonify({
+        'era': era,
+        'identity': random.choice(identities),
+        'story': random.choice(stories),
+        'connection': random.choice(connections)
+    })
+
+
+# ============ 节日仪式 / Rituals ============
+
+def get_current_festival():
+    """获取当前节日"""
+    today = datetime.now()
+    month = today.month
+    day = today.day
+    
+    # 判断节日
+    if month == 7 and day >= 7 and day <= 14:
+        return 'qixi'
+    elif month == 2 and day == 14:
+        return 'valentine'
+    elif month == 12 and day >= 24 and day <= 25:
+        return 'christmas'
+    elif month == 1 and day == 1:
+        return 'new_year'
+    elif month == 9 or month == 10:
+        return 'mid_autumn'
+    elif month == 12 and day >= 21:
+        return 'winter_solstice'
+    else:
+        # 检查是否满月/新月（简化为每月特定日期）
+        day_of_month = today.day
+        if 14 <= day_of_month <= 17:
+            return 'full_moon'
+        elif day_of_month <= 3:
+            return 'new_moon'
+    
+    return 'none'
+
+
+@app.route('/rituals')
+def rituals():
+    """节日仪式页面"""
+    lang = get_client_language()
+    current_festival = get_current_festival()
+    
+    festival_names = {
+        'zh': {
+            'full_moon': '满月',
+            'new_moon': '新月',
+            'qixi': '七夕',
+            'valentine': '情人节',
+            'winter_solstice': '冬至',
+            'new_year': '新年',
+            'mid_autumn': '中秋',
+            'christmas': '圣诞节',
+            'none': '普通日子'
+        },
+        'en': {
+            'full_moon': 'Full Moon',
+            'new_moon': 'New Moon',
+            'qixi': 'Qixi Festival',
+            'valentine': "Valentine's Day",
+            'winter_solstice': 'Winter Solstice',
+            'new_year': 'New Year',
+            'mid_autumn': 'Mid-Autumn',
+            'christmas': 'Christmas',
+            'none': 'Ordinary Day'
+        },
+        'ja': {
+            'full_moon': '満月',
+            'new_moon': '新月',
+            'qixi': '七夕',
+            'valentine': 'バレンタインデー',
+            'winter_solstice': '冬至',
+            'new_year': '新年',
+            'mid_autumn': '中秋',
+            'christmas': 'クリスマス',
+            'none': '普通の日'
+        }
+    }
+    
+    festival_desc = {
+        'zh': {
+            'full_moon': '满月之夜，月光能量最强，适合许下关于感情、财富、健康的愿望。',
+            'new_moon': '新月代表新的开始，适合许下关于事业、学习、成长的愿望。',
+            'qixi': '七夕是中国传统情人节，牛郎织女相会的日子，适合许下关于爱情的心愿。',
+            'valentine': "情人节，适合许下关于爱情和浪漫的心愿。",
+            'winter_solstice': '冬至是一年中夜晚最长的日子，适合进行灵性修行和冥想。',
+            'new_year': '新年新气象，适合许下新一年的愿望和计划。',
+            'mid_autumn': '中秋月圆人团圆，适合许下关于家庭和睦的愿望。',
+            'christmas': '圣诞节日，适合许下关于爱与和平的愿望。',
+            'none': '每一天都是独特的日子，随时可以许愿。'
+        },
+        'en': {
+            'full_moon': 'Full moon night has the strongest lunar energy, perfect for wishes about love, wealth, and health.',
+            'new_moon': 'New moon represents new beginnings, perfect for wishes about career, learning, and growth.',
+            'qixi': 'Qixi is Chinese Valentine\'s Day, perfect for love wishes.',
+            'valentine': "Valentine's Day is perfect for love and romance wishes.",
+            'winter_solstice': 'Winter solstice has the longest night, perfect for spiritual practice.',
+            'new_year': 'New Year brings new hopes and plans.',
+            'mid_autumn': 'Mid-autumn full moon is perfect for family harmony wishes.',
+            'christmas': 'Christmas is perfect for love and peace wishes.',
+            'none': 'Every day is special, you can make wishes anytime.'
+        },
+        'ja': {
+            'full_moon': '満月の夜、月エネルギー最も強く、愛・富・健康の願いに最適。',
+            'new_moon': '新月は新しい始まり 代表、Career・勉強・成長の願いに最適。',
+            'qixi': '七夕は中国のバレンタインデー、愛の願い頃に最適。',
+            'valentine': 'バレンタインデーは愛とロマンスの願い頃に最適。',
+            'winter_solstice': '冬至は最も長い夜、靈性修行に最適。',
+            'new_year': '新年、新たな希望と計画を立てる頃。',
+            'mid_autumn': '中秋、家族の平和の願い頃に最適。',
+            'christmas': 'クリスマス、愛と平和の願い頃に最適。',
+            'none': '毎日特別な日、願いはいつでも叶えられます。'
+        }
+    }
+    
+    festival_icons = {
+        'full_moon': '🌕',
+        'new_moon': '🌑',
+        'qixi': '💕',
+        'valentine': '💝',
+        'winter_solstice': '❄️',
+        'new_year': '🎊',
+        'mid_autumn': '🥮',
+        'christmas': '🎄',
+        'none': '✨'
+    }
+    
+    return render_template('rituals.html',
+                         lang=lang,
+                         current_festival=current_festival,
+                         festival_name=festival_names.get(lang, festival_names['zh']).get(current_festival, '✨'),
+                         festival_desc=festival_desc.get(lang, festival_desc['zh']).get(current_festival, ''),
+                         festival_icon=festival_icons.get(current_festival, '✨'),
+                         t=lambda key: TRANSLATIONS.get(lang, TRANSLATIONS['zh']).get(key, key))
+
+
+@app.route('/api/rituals/wish', methods=['POST'])
+@login_required
+def submit_wish():
+    """提交愿望API"""
+    data = request.get_json()
+    wish = data.get('wish')
+    festival = data.get('festival', 'full_moon')
+    
+    if not wish:
+        return jsonify({'error': '请写下你的愿望'})
+    
+    # 生成愿望能量解读
+    energies = [
+        '你的愿望承载着强大的正面能量！月光会帮助你聚焦目标，宇宙将为你开启新的可能。记住，愿望需要行动来配合才会实现。继续相信自己，你的心愿正在被宇宙接收。',
+        '这份愿望的能量非常纯净。它与你的灵魂深处紧密相连，代表着你内心最真实的渴望。保持这份纯真和期待，宇宙会在最合适的时机回应你。',
+        '月光照耀下，你的愿望被注入了温柔而坚定的力量。不要着急实现，持续保持正面的心态，你的心愿会在恰当的时候以意想不到的方式来到你身边。',
+        '这是一个充满潜力的愿望！它与你的生命轨迹完美契合。在接下来的日子里，留意身边的巧合和机遇，那可能是宇宙在回应你。',
+        '你的愿望像一颗种子，已经在月光下被种下。现在需要的是耐心浇灌和持续相信。宇宙听到了你的声音，它会在最完美的时刻为你安排。'
+    ]
+    
+    return jsonify({'energy': random.choice(energies)})
+
+
+@app.route('/api/rituals/love-divination', methods=['POST'])
+@login_required
+def love_divination():
+    """姻缘占卜API"""
+    fortunes = [
+        {'name': '上上签 - 缘定今生', 'detail': '你的姻缘即将到来！命中注定的人可能就在你身边。保持开放的心态，不要错过每一次相遇的机会。'},
+        {'name': '上签 - 良缘天成', 'detail': '你有一段非常好的姻缘正在酝酿中。那个特别的人很快就会出现，敞开心扉迎接这份爱情吧。'},
+        {'name': '中签 - 静待花开', 'detail': '你的缘分需要一点时间。不要着急，保持自我，提升自己，爱情会在最合适的时候降临。'},
+        {'name': '中签 - 有缘无分', 'detail': '近期可能会有一些感情纠葛，但不要气馁。真正的缘分值得等待，继续前进吧。'},
+        {'name': '上签 - 桃花运旺', 'detail': '你这段时间桃花运非常旺盛！可能会有多人对你表达好感，理性选择，不要被表象迷惑。'}
+    ]
+    
+    return jsonify(random.choice(fortunes))
+
+
+@app.route('/api/rituals/newyear-fortune', methods=['POST'])
+@login_required
+def newyear_fortune():
+    """新年运势签API"""
+    signs = ['🌟', '✨', '💫', '⭐', '🌙', '☀️', '🎊', '🎉']
+    colors = ['红色', '金色', '蓝色', '绿色', '紫色', '粉色', '白色', '黄色']
+    directions = ['东方', '西方', '南方', '北方', '东南', '西南', '东北', '西北']
+    
+    fortunes = [
+        {'sign': '🌟', 'name': '大吉', 'detail': '新的一年万事如意！所有的努力都将得到回报，财运、爱情、事业三丰收。'},
+        {'sign': '✨', 'name': '吉', 'detail': '运势平稳上升，会有意想不到的好运降临。把握机会，勇敢追求自己的梦想。'},
+        {'sign': '💫', 'name': '小吉', 'detail': '稳扎稳打的一年，虽然不会有大的惊喜，但小确幸会不断出现。'},
+        {'sign': '🌙', 'name': '平', 'detail': '需要付出更多努力才能获得回报。但这是成长的一年，不要怕困难。'}
+    ]
+    
+    fortune = random.choice(fortunes)
+    fortune['lucky_color'] = random.choice(colors)
+    fortune['lucky_number'] = random.randint(1, 99)
+    fortune['lucky_direction'] = random.choice(directions)
+    
+    return jsonify(fortune)
+
+
+@app.route('/api/rituals/festivals', methods=['GET'])
+def get_festivals():
+    """获取即将到来的节日列表"""
+    festivals = [
+        {'name': '满月', 'icon': '🌕', 'days': 14},
+        {'name': '新月', 'icon': '🌑', 'days': 3},
+        {'name': '七夕', 'icon': '💕', 'days': 30},
+        {'name': '情人节', 'icon': '💝', 'days': 45},
+        {'name': '新年', 'icon': '🎊', 'days': 120},
+        {'name': '春节', 'icon': '🧧', 'days': 150}
+    ]
+    return jsonify(festivals)

@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+.pastlife-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.pastlife-header {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    border-radius: 24px;
+    color: #f7fafc;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.pastlife-header::before {
+    content: '👻';
+    position: absolute;
+    font-size: 120px;
+    opacity: 0.1;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.pastlife-header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.pastlife-header p {
+    opacity: 0.8;
+}
+
+.form-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-group input:focus {
+    border-color: #4a5568;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.1);
+}
+
+.btn-generate {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-generate:hover {
+    transform: translateY(-2px);
+}
+
+/* 古风水墨卡片样式 */
+.pastlife-card {
+    background: linear-gradient(135deg, #faf5eb 0%, #f5f0e6 100%);
+    border-radius: 16px;
+    padding: 40px 30px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    margin: 30px 0;
+    border: 3px solid #d4a574;
+}
+
+.pastlife-card::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 1px dashed #d4a574;
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+.card-ink-decoration {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    opacity: 0.1;
+}
+
+.card-header-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.card-title-ancient {
+    font-size: 2rem;
+    color: #4a5568;
+    margin-bottom: 10px;
+    font-family: 'STKaiti', 'KaiTi', serif;
+}
+
+.card-era {
+    display: inline-block;
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+}
+
+.pastlife-content {
+    padding: 20px;
+}
+
+.pastlife-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 12px;
+    border-left: 4px solid #d4a574;
+}
+
+.pastlife-section-title {
+    font-size: 1.1rem;
+    color: #4a5568;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.pastlife-section-content {
+    color: #666;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.card-footer-section {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed #d4a574;
+}
+
+.share-text-ancient {
+    color: #4a5568;
+    font-size: 1rem;
+    font-style: italic;
+}
+
+.btn-download {
+    margin-top: 20px;
+    padding: 14px 30px;
+    background: white;
+    color: #4a5568;
+    border: 2px solid #4a5568;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-download:hover {
+    background: #4a5568;
+    color: white;
+}
+
+.result-section {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e0e0e0;
+    border-top-color: #4a5568;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pastlife-container">
+    <div class="pastlife-header">
+        <h1>{{ t('past_life') or '前世今生' }}</h1>
+        <p>{{ t('past_life_desc') or '探索你的前世故事' }}</p>
+    </div>
+
+    {% if current_user.is_authenticated %}
+    <div class="stones-info {% if stones_left <= 0 %}warning{% endif %}">
+        {{ t('free_uses_left') or '剩余免费次数' }}: <strong>{{ stones_left }}</strong> {{ t('times') or '次' }}
+        {% if stones_left <= 0 %}
+        | {{ t('cost_stones') or '消耗10灵石' }}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="form-card" id="formSection">
+        <form id="pastlifeForm">
+            <div class="form-group">
+                <label>{{ t('enter_nickname') or '输入昵称' }}</label>
+                <input type="text" id="nickname" name="nickname" required placeholder="{{ t('enter_nickname') or '输入你的昵称' }}">
+            </div>
+
+            <div class="form-group">
+                <label>{{ t('enter_birthday') or '选择生日' }}</label>
+                <input type="date" id="birthday" name="birthday" required>
+            </div>
+
+            <button type="submit" class="btn-generate" id="generateBtn">
+                🔮 {{ t('generate_past_life') or '探索前世' }}
+            </button>
+        </form>
+    </div>
+
+    <div class="loading" id="loadingSection" style="display: none;">
+        <div class="spinner"></div>
+        <p>{{ t('generating') or '正在解读中...' }}</p>
+    </div>
+
+    <div class="result-section" id="resultSection">
+        <div class="pastlife-card" id="pastlifeCard">
+            <div class="card-header-section">
+                <h2 class="card-title-ancient">{{ t('your_past_life') or '你的前世' }}</h2>
+                <div class="card-era" id="cardEra"></div>
+            </div>
+            
+            <div class="pastlife-content">
+                <div class="pastlife-section">
+                    <div class="pastlife-section-title">👤 {{ t('past_life_title') or '前世身份' }}</div>
+                    <div class="pastlife-section-content" id="cardIdentity"></div>
+                </div>
+                
+                <div class="pastlife-section">
+                    <div class="pastlife-section-title">📜 {{ t('past_story') or '前世往事' }}</div>
+                    <div class="pastlife-section-content" id="cardStory"></div>
+                </div>
+                
+                <div class="pastlife-section">
+                    <div class="pastlife-section-title">🔗 {{ t('rebirth_connection') or '轮回联系' }}</div>
+                    <div class="pastlife-section-content" id="cardConnection"></div>
+                </div>
+            </div>
+            
+            <div class="card-footer-section">
+                <div class="share-text-ancient">
+                    👻 {{ t('past_life_share_text') or '我的前世竟然是... 在灵犀测测你的' }}
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 25px;">
+            <button class="btn-download" onclick="downloadPastlife()">
+                📥 {{ t('save_image') or '保存图片' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const form = document.getElementById('pastlifeForm');
+const formSection = document.getElementById('formSection');
+const loadingSection = document.getElementById('loadingSection');
+const resultSection = document.getElementById('resultSection');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const nickname = document.getElementById('nickname').value;
+    const birthday = document.getElementById('birthday').value;
+    
+    if (!nickname || !birthday) {
+        alert('{{ t('please_fill_all') or '请填写完整信息' }}');
+        return;
+    }
+    
+    formSection.style.display = 'none';
+    loadingSection.style.display = 'block';
+    
+    try {
+        const response = await fetch('/api/past-life/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nickname, birthday })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            alert(data.error);
+            formSection.style.display = 'block';
+            loadingSection.style.display = 'none';
+            return;
+        }
+        
+        document.getElementById('cardEra').textContent = data.era;
+        document.getElementById('cardIdentity').textContent = data.identity;
+        document.getElementById('cardStory').textContent = data.story;
+        document.getElementById('cardConnection').textContent = data.connection;
+        
+        loadingSection.style.display = 'none';
+        resultSection.style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('生成失败，请重试');
+        formSection.style.display = 'block';
+        loadingSection.style.display = 'none';
+    }
+});
+
+function downloadPastlife() {
+    const card = document.getElementById('pastlifeCard');
+    html2canvas(card, {
+        backgroundColor: '#faf5eb',
+        scale: 2,
+        useCORS: true
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'past-life.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+.soulmate-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.soulmate-header {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 24px;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.soulmate-header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.soulmate-header p {
+    opacity: 0.9;
+}
+
+.form-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-generate {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-generate:hover {
+    transform: translateY(-2px);
+}
+
+.btn-generate:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.free-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+
+/* 分享卡片样式 */
+.share-card {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 24px;
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.share-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.card-content {
+    position: relative;
+    z-index: 1;
+}
+
+.card-logo {
+    font-size: 1.2rem;
+    color: #667eea;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.card-nickname {
+    font-size: 1.3rem;
+    color: #764ba2;
+    margin-bottom: 20px;
+}
+
+.card-portrait {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+    text-align: left;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.card-section {
+    margin-bottom: 15px;
+}
+
+.card-section-title {
+    font-size: 0.9rem;
+    color: #667eea;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-section-content {
+    color: #444;
+    line-height: 1.6;
+}
+
+.card-share-text {
+    margin-top: 25px;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    font-size: 1rem;
+}
+
+.btn-download {
+    margin-top: 20px;
+    padding: 14px 30px;
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-download:hover {
+    background: #667eea;
+    color: white;
+}
+
+.result-section {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e0e0e0;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.stones-info {
+    text-align: center;
+    padding: 15px;
+    background: #fff3e0;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    color: #e65100;
+}
+
+.stones-info.warning {
+    background: #ffebee;
+    color: #c62828;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="soulmate-container">
+    <div class="soulmate-header">
+        <h1>{{ t('soulmate_portrait') or '灵魂伴侣画像' }}</h1>
+        <p>{{ t('soulmate_portrait_desc') or 'AI为你描绘灵魂伴侣的模样' }}</p>
+    </div>
+
+    {% if current_user.is_authenticated %}
+    <div class="stones-info {% if stones_left <= 0 %}warning{% endif %}">
+        {{ t('free_uses_left') or '剩余免费次数' }}: <strong>{{ stones_left }}</strong> {{ t('times') or '次' }}
+        {% if stones_left <= 0 %}
+        | {{ t('cost_stones') or '消耗10灵石' }}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="form-card" id="formSection">
+        <form id="soulmateForm">
+            <div class="form-group">
+                <label>{{ t('enter_nickname') or '输入昵称' }}</label>
+                <input type="text" id="nickname" name="nickname" required placeholder="{{ t('enter_nickname') or '输入你的昵称' }}">
+            </div>
+
+            <div class="form-group">
+                <label>{{ t('enter_birthday') or '选择生日' }}</label>
+                <input type="date" id="birthday" name="birthday" required>
+            </div>
+
+            <div class="form-group">
+                <label>{{ t('select_zodiac') or '选择星座' }}</label>
+                <select id="zodiac" name="zodiac" required>
+                    <option value="">{{ t('select_zodiac') or '选择星座' }}</option>
+                    <option value="aries">♈ 白羊座 Aries</option>
+                    <option value="taurus">♉ 金牛座 Taurus</option>
+                    <option value="gemini">♊ 双子座 Gemini</option>
+                    <option value="cancer">♋ 巨蟹座 Cancer</option>
+                    <option value="leo">♌ 狮子座 Leo</option>
+                    <option value="virgo">♍ 处女座 Virgo</option>
+                    <option value="libra">♎ 天秤座 Libra</option>
+                    <option value="scorpio">♏ 天蝎座 Scorpio</option>
+                    <option value="sagittarius">♐ 射手座 Sagittarius</option>
+                    <option value="capricorn">♑ 摩羯座 Capricorn</option>
+                    <option value="aquarius">♒ 水瓶座 Aquarius</option>
+                    <option value="pisces">♓ 双鱼座 Pisces</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>{{ t('ideal_partner_wish') or '对理想伴侣的期许' }}</label>
+                <textarea id="wish" name="wish" rows="4" placeholder="{{ t('wish_placeholder') or '描述你心中理想伴侣的样子...' }}"></textarea>
+            </div>
+
+            <button type="submit" class="btn-generate" id="generateBtn">
+                {{ t('generate_portrait') or '生成画像' }}
+            </button>
+        </form>
+    </div>
+
+    <div class="loading" id="loadingSection" style="display: none;">
+        <div class="spinner"></div>
+        <p>{{ t('generating') or '正在生成中...' }}</p>
+    </div>
+
+    <div class="result-section" id="resultSection">
+        <div class="share-card" id="shareCard">
+            <div class="card-content">
+                <div class="card-logo">✨ 灵犀 SoulLink</div>
+                <h2 class="card-title">{{ t('your_soulmate') or '你的灵魂伴侣' }}</h2>
+                <div class="card-nickname" id="cardNickname"></div>
+                
+                <div class="card-portrait">
+                    <div class="card-section">
+                        <div class="card-section-title">{{ t('appearance') or '外貌特征' }}</div>
+                        <div class="card-section-content" id="cardAppearance"></div>
+                    </div>
+                    <div class="card-section">
+                        <div class="card-section-title">{{ t('personality') or '性格特点' }}</div>
+                        <div class="card-section-content" id="cardPersonality"></div>
+                    </div>
+                    <div class="card-section">
+                        <div class="card-section-title">{{ t('encounter_scene') or '相遇场景' }}</div>
+                        <div class="card-section-content" id="cardEncounter"></div>
+                    </div>
+                    <div class="card-section">
+                        <div class="card-section-title">{{ t('divination_style') or '占卜解读' }}</div>
+                        <div class="card-section-content" id="cardDivination"></div>
+                    </div>
+                </div>
+                
+                <div class="card-share-text" id="shareText">
+                    {{ t('soulmate_share_text') or '我在灵犀找到了我的灵魂伴侣画像✨' }}
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 25px;">
+            <button class="btn-download" onclick="downloadCard()">
+                📥 {{ t('save_image') or '保存图片' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const form = document.getElementById('soulmateForm');
+const formSection = document.getElementById('formSection');
+const loadingSection = document.getElementById('loadingSection');
+const resultSection = document.getElementById('resultSection');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const nickname = document.getElementById('nickname').value;
+    const birthday = document.getElementById('birthday').value;
+    const zodiac = document.getElementById('zodiac').value;
+    const wish = document.getElementById('wish').value;
+    
+    if (!nickname || !birthday || !zodiac) {
+        alert('{{ t('please_fill_all') or '请填写完整信息' }}');
+        return;
+    }
+    
+    formSection.style.display = 'none';
+    loadingSection.style.display = 'block';
+    
+    try {
+        const response = await fetch('/api/soulmate-portrait/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nickname, birthday, zodiac, wish })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            alert(data.error);
+            formSection.style.display = 'block';
+            loadingSection.style.display = 'none';
+            return;
+        }
+        
+        document.getElementById('cardNickname').textContent = nickname + ' 的灵魂伴侣';
+        document.getElementById('cardAppearance').textContent = data.appearance;
+        document.getElementById('cardPersonality').textContent = data.personality;
+        document.getElementById('cardEncounter').textContent = data.encounter;
+        document.getElementById('cardDivination').textContent = data.divination;
+        
+        loadingSection.style.display = 'none';
+        resultSection.style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('生成失败，请重试');
+        formSection.style.display = 'block';
+        loadingSection.style.display = 'none';
+    }
+});
+
+function downloadCard() {
+    const card = document.getElementById('shareCard');
+    html2canvas(card, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'soulmate-portrait.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
+</script>
+{% endblock %}

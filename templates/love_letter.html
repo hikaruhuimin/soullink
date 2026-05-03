@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+.letter-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.letter-header {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+    border-radius: 24px;
+    color: #d63384;
+    margin-bottom: 30px;
+}
+
+.letter-header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.letter-header p {
+    opacity: 0.9;
+}
+
+.form-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: #ff9a9e;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 154, 158, 0.1);
+}
+
+.feeling-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.feeling-option {
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.feeling-option:hover {
+    border-color: #ff9a9e;
+}
+
+.feeling-option.selected {
+    border-color: #ff9a9e;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    color: white;
+}
+
+.btn-generate {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    color: #d63384;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-generate:hover {
+    transform: translateY(-2px);
+}
+
+/* 信纸卡片样式 */
+.letter-card {
+    background: linear-gradient(135deg, #fef9f0 0%, #faf3e8 100%);
+    border-radius: 8px;
+    padding: 50px 40px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    margin: 30px 0;
+}
+
+.letter-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a574' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    border-radius: 8px;
+}
+
+.letter-header-part {
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.letter-date {
+    font-size: 0.9rem;
+    color: #8b7355;
+    margin-bottom: 20px;
+}
+
+.letter-dear {
+    font-size: 1.8rem;
+    color: #d63384;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.letter-recipient {
+    font-size: 1.5rem;
+    color: #d63384;
+    font-weight: bold;
+}
+
+.letter-content {
+    font-size: 1.1rem;
+    line-height: 2;
+    color: #4a4a4a;
+    text-align: justify;
+    position: relative;
+    min-height: 200px;
+    white-space: pre-wrap;
+}
+
+.letter-signature {
+    text-align: right;
+    margin-top: 40px;
+    font-style: italic;
+    color: #8b7355;
+    position: relative;
+}
+
+.letter-signature-name {
+    font-size: 1.3rem;
+    color: #d63384;
+    margin-top: 10px;
+}
+
+.letter-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed #d4a574;
+    color: #8b7355;
+    font-size: 0.9rem;
+    position: relative;
+}
+
+.btn-download {
+    margin-top: 20px;
+    padding: 14px 30px;
+    background: white;
+    color: #ff9a9e;
+    border: 2px solid #ff9a9e;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-download:hover {
+    background: #ff9a9e;
+    color: white;
+}
+
+.result-section {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #fecfef;
+    border-top-color: #ff9a9e;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="letter-container">
+    <div class="letter-header">
+        <h1>{{ t('love_letter') or 'AI情书' }}</h1>
+        <p>{{ t('love_letter_desc') or '用优美的文字传达你的心意' }}</p>
+    </div>
+
+    {% if current_user.is_authenticated %}
+    <div class="stones-info {% if stones_left <= 0 %}warning{% endif %}">
+        {{ t('free_uses_left') or '剩余免费次数' }}: <strong>{{ stones_left }}</strong> {{ t('times') or '次' }}
+        {% if stones_left <= 0 %}
+        | {{ t('cost_stones') or '消耗10灵石' }}
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="form-card" id="formSection">
+        <form id="letterForm">
+            <div class="form-group">
+                <label>{{ t('recipient_name') or '收信人称呼' }}</label>
+                <input type="text" id="recipient" name="recipient" required placeholder="{{ t('recipient_name') or '收信人称呼' }}">
+            </div>
+
+            <div class="form-group">
+                <label>{{ t('feeling_type') or '情感类型' }}</label>
+                <input type="hidden" id="feeling" name="feeling" value="">
+                <div class="feeling-options">
+                    <div class="feeling-option" data-value="secret_love">
+                        💫 {{ t('secret_love') or '暗恋' }}
+                    </div>
+                    <div class="feeling-option" data-value="confession">
+                        💕 {{ t('confession') or '表白' }}
+                    </div>
+                    <div class="feeling-option" data-value="missing">
+                        🌙 {{ t('missing') or '思念' }}
+                    </div>
+                    <div class="feeling-option" data-value="apology">
+                        🙏 {{ t('apology') or '道歉' }}
+                    </div>
+                    <div class="feeling-option" data-value="declaration">
+                        💖 {{ t('declaration') or '告白' }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>{{ t('keywords') or '关键词' }}</label>
+                <textarea id="keywords" name="keywords" rows="3" placeholder="{{ t('keywords_placeholder') or '写下想表达的情感关键词...' }}"></textarea>
+            </div>
+
+            <button type="submit" class="btn-generate" id="generateBtn">
+                💌 {{ t('generate_letter') or '生成情书' }}
+            </button>
+        </form>
+    </div>
+
+    <div class="loading" id="loadingSection" style="display: none;">
+        <div class="spinner"></div>
+        <p>{{ t('generating') or '正在生成中...' }}</p>
+    </div>
+
+    <div class="result-section" id="resultSection">
+        <div class="letter-card" id="letterCard">
+            <div class="letter-header-part">
+                <div class="letter-date" id="letterDate"></div>
+                <div class="letter-dear">{{ t('dear') or '亲爱的' }}</div>
+                <div class="letter-recipient" id="cardRecipient"></div>
+            </div>
+            
+            <div class="letter-content" id="letterContent"></div>
+            
+            <div class="letter-signature">
+                <div>——</div>
+                <div class="letter-signature-name">来自灵犀的你</div>
+            </div>
+            
+            <div class="letter-footer">
+                💌 {{ t('letter_share_text') or '这封情书来自灵犀💌' }}
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 25px;">
+            <button class="btn-download" onclick="downloadLetter()">
+                📥 {{ t('save_image') or '保存图片' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+// 情感选项点击
+document.querySelectorAll('.feeling-option').forEach(option => {
+    option.addEventListener('click', () => {
+        document.querySelectorAll('.feeling-option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        document.getElementById('feeling').value = option.dataset.value;
+    });
+});
+
+const form = document.getElementById('letterForm');
+const formSection = document.getElementById('formSection');
+const loadingSection = document.getElementById('loadingSection');
+const resultSection = document.getElementById('resultSection');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const recipient = document.getElementById('recipient').value;
+    const feeling = document.getElementById('feeling').value;
+    const keywords = document.getElementById('keywords').value;
+    
+    if (!recipient || !feeling) {
+        alert('{{ t('please_fill_all') or '请填写完整信息' }}');
+        return;
+    }
+    
+    formSection.style.display = 'none';
+    loadingSection.style.display = 'block';
+    
+    try {
+        const response = await fetch('/api/love-letter/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recipient, feeling, keywords })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            alert(data.error);
+            formSection.style.display = 'block';
+            loadingSection.style.display = 'none';
+            return;
+        }
+        
+        const now = new Date();
+        document.getElementById('letterDate').textContent = now.toLocaleDateString();
+        document.getElementById('cardRecipient').textContent = recipient;
+        document.getElementById('letterContent').textContent = data.letter;
+        
+        loadingSection.style.display = 'none';
+        resultSection.style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('生成失败，请重试');
+        formSection.style.display = 'block';
+        loadingSection.style.display = 'none';
+    }
+});
+
+function downloadLetter() {
+    const card = document.getElementById('letterCard');
+    html2canvas(card, {
+        backgroundColor: '#faf3e8',
+        scale: 2,
+        useCORS: true
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'love-letter.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
+</script>
+{% endblock %}
