@@ -4,193 +4,209 @@
     
     <!-- 首页 -->
     <url>
-        <loc>https://soullink.app/</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/?lang=ja"/>
-        <lastmod>2025-05-01</lastmod>
+        <loc>https://soullink-cnz2.onrender.com/</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/?lang=ja"/>
+        <lastmod>2025-05-04</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
     
     <!-- 认证页面 -->
     <url>
-        <loc>https://soullink.app/auth/login</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/auth/login?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/auth/login?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/auth/login?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/auth/login</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/auth/login?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/auth/login?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/auth/login?lang=ja"/>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://soullink.app/auth/register</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/auth/register?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/auth/register?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/auth/register?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/auth/register</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/auth/register?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/auth/register?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/auth/register?lang=ja"/>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <!-- 占卜服务 -->
     <url>
-        <loc>https://soullink.app/divination</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/divination?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/divination?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/divination?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/divination</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/divination?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/divination?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/divination?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.95</priority>
     </url>
     <url>
-        <loc>https://soullink.app/divination/tarot</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/divination/tarot?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/divination/tarot?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/divination/tarot?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/divination/tarot</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/divination/tarot?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/divination/tarot?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/divination/tarot?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://soullink.app/divination/horoscope</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/divination/horoscope?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/divination/horoscope?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/divination/horoscope?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/divination/horoscope</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/divination/horoscope?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/divination/horoscope?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/divination/horoscope?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://soullink.app/divination/bazi</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/divination/bazi?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/divination/bazi?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/divination/bazi?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/divination/bazi</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/divination/bazi?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/divination/bazi?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/divination/bazi?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.85</priority>
     </url>
     <url>
-        <loc>https://soullink.app/divination/love</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/divination/love?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/divination/love?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/divination/love?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/divination/love</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/divination/love?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/divination/love?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/divination/love?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://soullink.app/divination/fortune</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/divination/fortune?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/divination/fortune?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/divination/fortune?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/divination/fortune</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/divination/fortune?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/divination/fortune?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/divination/fortune?lang=ja"/>
         <changefreq>daily</changefreq>
         <priority>0.95</priority>
+    </url>
+    <url>
+        <loc>https://soullink-cnz2.onrender.com/divination/dream</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/divination/dream?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/divination/dream?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/divination/dream?lang=ja"/>
+        <changefreq>weekly</changefreq>
+        <priority>0.85</priority>
+    </url>
+    <url>
+        <loc>https://soullink-cnz2.onrender.com/divination/mbti</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/divination/mbti?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/divination/mbti?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/divination/mbti?lang=ja"/>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
     </url>
     
     <!-- AI恋人 -->
     <url>
-        <loc>https://soullink.app/lover</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/lover?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/lover?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/lover?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/lover</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/lover?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/lover?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/lover?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <!-- 通道 -->
     <url>
-        <loc>https://soullink.app/human</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/human?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/human?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/human?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/human</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/human?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/human?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/human?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://soullink.app/agent</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/agent?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/agent?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/agent?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/agent</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/agent?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/agent?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/agent?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <!-- 社交 -->
     <url>
-        <loc>https://soullink.app/social/square</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/social/square?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/social/square?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/social/square?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/social/square</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/social/square?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/social/square?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/social/square?lang=ja"/>
         <changefreq>daily</changefreq>
         <priority>0.85</priority>
     </url>
     
     <!-- 会员 -->
     <url>
-        <loc>https://soullink.app/membership</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/membership?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/membership?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/membership?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/membership</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/membership?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/membership?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/membership?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.85</priority>
     </url>
     
     <!-- FAQ页面 -->
     <url>
-        <loc>https://soullink.app/faq</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.app/faq?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.app/faq?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.app/faq?lang=ja"/>
+        <loc>https://soullink-cnz2.onrender.com/faq</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink-cnz2.onrender.com/faq?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soullink-cnz2.onrender.com/faq?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink-cnz2.onrender.com/faq?lang=ja"/>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     
     <!-- 其他页面 -->
     <url>
-        <loc>https://soullink.app/profile</loc>
+        <loc>https://soullink-cnz2.onrender.com/profile</loc>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
-        <loc>https://soullink.app/history</loc>
+        <loc>https://soullink-cnz2.onrender.com/history</loc>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
-        <loc>https://soullink.app/about</loc>
+        <loc>https://soullink-cnz2.onrender.com/about</loc>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
     </url>
     <url>
-        <loc>https://soullink.app/privacy</loc>
+        <loc>https://soullink-cnz2.onrender.com/privacy</loc>
         <changefreq>yearly</changefreq>
         <priority>0.4</priority>
     </url>
     <url>
-        <loc>https://soullink.app/terms</loc>
+        <loc>https://soullink-cnz2.onrender.com/terms</loc>
         <changefreq>yearly</changefreq>
         <priority>0.4</priority>
     </url>
     
-    <!-- API端点 -->
+    <!-- API端点 (noindex) -->
     <url>
-        <loc>https://soullink.app/api/agent-info</loc>
+        <loc>https://soullink-cnz2.onrender.com/api/agent-info</loc>
         <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
+        <priority>0.3</priority>
     </url>
     <url>
-        <loc>https://soullink.app/api/recommend</loc>
+        <loc>https://soullink-cnz2.onrender.com/api/recommend</loc>
         <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
+        <priority>0.3</priority>
     </url>
     
     <!-- 语言切换路由 -->
     <url>
-        <loc>https://soullink.app/lang/zh</loc>
+        <loc>https://soullink-cnz2.onrender.com/lang/zh</loc>
         <changefreq>weekly</changefreq>
         <priority>0.3</priority>
     </url>
     <url>
-        <loc>https://soullink.app/lang/en</loc>
+        <loc>https://soullink-cnz2.onrender.com/lang/en</loc>
         <changefreq>weekly</changefreq>
         <priority>0.3</priority>
     </url>
     <url>
-        <loc>https://soullink.app/lang/ja</loc>
+        <loc>https://soullink-cnz2.onrender.com/lang/ja</loc>
         <changefreq>weekly</changefreq>
         <priority>0.3</priority>
     </url>

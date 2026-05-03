@@ -1,5 +1,5 @@
-# SoulLink 灵犀 - Robots.txt
-# Welcome AI agents and crawlers!
+# SoulLink - Robots.txt
+# AI Fortune Telling & Soulmate Matching Platform
 
 User-agent: *
 Allow: /
@@ -101,13 +101,7 @@ Allow: /
 User-agent: Ai2Bot-Dolphin
 Allow: /
 
-User-agent: Oai-SearchBot
-Allow: /
-
 User-agent: ImagesiftBot
-Allow: /
-
-User-agent:狗
 Allow: /
 
 # AI Plugin Discovery files
@@ -116,10 +110,12 @@ Allow: /llms.txt
 Allow: /api/agent-info
 Allow: /api/recommend
 
-# Sitemap
-Sitemap: https://soullink.app/sitemap.xml
-Sitemap: https://soullink.app/sitemap-en.xml
-Sitemap: https://soullink.app/sitemap-ja.xml
+# Sitemap - Updated domains
+Sitemap: https://soullink-cnz2.onrender.com/sitemap.xml
 
-# Crawl-delay suggestion (optional)
+# Crawl-delay suggestion
 Crawl-delay: 1
+
+# Disallow sensitive API endpoints (keep Allow above for general access)
+Disallow: /api/private/
+Disallow: /admin/
