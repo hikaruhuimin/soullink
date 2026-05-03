@@ -534,6 +534,22 @@
                     </div>
                 </div>
                 
+                <!-- 发现下拉 -->
+                <div class="nav-parent {% if request.path in ['/soulmate-portrait', '/love-letter', '/past-life', '/rituals'] %}active{% endif %}">
+                    <button class="nav-parent-btn" onclick="toggleDropdown(this)">
+                        ✨ 发现
+                        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 4L5 7L8 4"/>
+                        </svg>
+                    </button>
+                    <div class="nav-dropdown">
+                        <a href="/soulmate-portrait" class="nav-dropdown-item {% if request.path == '/soulmate-portrait' %}active{% endif %}">💝 灵魂伴侣画像</a>
+                        <a href="/love-letter" class="nav-dropdown-item {% if request.path == '/love-letter' %}active{% endif %}">💌 AI情书</a>
+                        <a href="/past-life" class="nav-dropdown-item {% if request.path == '/past-life' %}active{% endif %}">👻 前世今生</a>
+                        <a href="/rituals" class="nav-dropdown-item {% if request.path == '/rituals' %}active{% endif %}">🌙 节日仪式</a>
+                    </div>
+                </div>
+                
                 <!-- 右侧操作 -->
                 <div class="nav-actions">
                     <div class="nav-lang-dropdown">
