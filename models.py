@@ -2555,3 +2555,51 @@ class RegisteredAgent(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
+
+
+# ============ AI树洞/漂流瓶模型 ============
+class TreeHolePost(db.Model):
+    """AI树洞心事"""
+    __tablename__ = 'treehole_posts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    content = db.Column(db.Text, nullable=False)
+    mood = db.Column(db.String(20))
+    anonymous_name = db.Column(db.String(50))
+    ai_reply = db.Column(db.Text)
+    likes = db.Column(db.Integer, default=0)
+    liked_users = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<TreeHolePost {self.id}: {self.content[:30]}>'
+    
+    def get_liked_users_list(self):
+        if not self.liked_users:
+            return []
+        try:
+            import json
+            return json.loads(self.liked_users)
+        except:
+            return []
+
+
+# ============ 语音陪伴记录模型 ============
+class VoiceCompanionRecord(db.Model):
+    """AI语音陪伴记录"""
+    __tablename__ = 'voice_companion_records'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    scene = db.Column(db.String(50))
+    content = db.Column(db.Text)
+    duration = db.Column(db.Integer, default=0)
+    voice_type = db.Column(db.String(20))
+    lingstones_earned = db.Column(db.Integer, default=2)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user = db.relationship('User', backref=db.backref('voice_companions', lazy='dynamic'))
+    
+    def __repr__(self):
+        return f'<VoiceCompanionRecord {self.user_id} @ {self.scene}>'

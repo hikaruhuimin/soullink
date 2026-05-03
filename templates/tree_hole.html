@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="treehole-page">
+    <style>
+        .treehole-page {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 80px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0c1929 0%, #1a1a2e 100%);
+        }
+        .treehole-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .treehole-title {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        .treehole-desc {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.95rem;
+        }
+        .post-form {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .post-textarea {
+            width: 100%;
+            min-height: 120px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            color: #fff;
+            font-size: 1rem;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        .post-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        .post-textarea::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        .mood-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .mood-tag {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid transparent;
+            border-radius: 20px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .mood-tag:hover, .mood-tag.selected {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+            color: #fff;
+        }
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .anonymous-input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: #fff;
+            font-size: 0.9rem;
+            width: 150px;
+        }
+        .anonymous-input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        .post-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4);
+        }
+        .section-title {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .bottles-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .bottle-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .bottle-card::before {
+            content: '🍃';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 80px;
+            opacity: 0.1;
+        }
+        .bottle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .bottle-author {
+            color: #60a5fa;
+            font-size: 0.9rem;
+        }
+        .bottle-time {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.8rem;
+        }
+        .bottle-mood {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 10px;
+        }
+        .bottle-content {
+            color: #fff;
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+        .ai-reply {
+            background: rgba(168, 85, 247, 0.1);
+            border-left: 3px solid #a855f7;
+            padding: 12px 15px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 15px;
+        }
+        .ai-reply-label {
+            color: #a78bfa;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        .ai-reply-content {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .bottle-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .like-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .like-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        .like-btn.liked {
+            background: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .share-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255,255,255,0.5);
+        }
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .page-btn {
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .page-btn:hover, .page-btn.active {
+            background: rgba(59, 130, 246, 0.3);
+        }
+        .login-tip {
+            text-align: center;
+            padding: 15px;
+            background: rgba(251, 191, 36, 0.1);
+            border-radius: 12px;
+            color: #fbbf24;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .share-card-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .share-card-modal.show {
+            display: flex;
+        }
+        .share-card {
+            width: 350px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+        }
+        .share-card-title {
+            color: #60a5fa;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        .share-card-content {
+            color: #fff;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+        }
+        .share-card-ai {
+            color: #a78bfa;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+        .share-card-close {
+            padding: 10px 25px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 20px;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+
+    <div class="treehole-header">
+        <h1 class="treehole-title">🍃 {{ _('tree_hole_title') }}</h1>
+        <p class="treehole-desc">{{ _('tree_hole_desc') }}</p>
+    </div>
+
+    {% if current_user.is_authenticated %}
+    <div class="login-tip">💡 {{ _('login_to_earn') }} - 发布心事可得1灵石</div>
+    {% endif %}
+
+    <div class="post-form">
+        <textarea class="post-textarea" id="secretContent" placeholder="{{ _('secret_placeholder') }}" maxlength="500"></textarea>
+        
+        <div class="mood-tags">
+            <span class="mood-tag" data-mood="happy">{{ _('mood_happy') }}</span>
+            <span class="mood-tag" data-mood="peaceful">{{ _('mood_peaceful') }}</span>
+            <span class="mood-tag" data-mood="love">{{ _('mood_love') }}</span>
+            <span class="mood-tag" data-mood="sad">{{ _('mood_sad') }}</span>
+            <span class="mood-tag" data-mood="anxious">{{ _('mood_anxious') }}</span>
+        </div>
+
+        <div class="post-actions">
+            <input type="text" class="anonymous-input" id="anonymousName" placeholder="匿名昵称（选填）" value="{{ current_user.username if current_user.is_authenticated else '' }}">
+            <button class="post-btn" id="postBtn">{{ _('share_secret') }}</button>
+        </div>
+    </div>
+
+    <div class="section-title">
+        <span>✨</span>
+        <span>{{ _('drift_bottles') }}</span>
+    </div>
+
+    <div class="bottles-container" id="bottlesContainer">
+        {% if posts.items %}
+            {% for post in posts.items %}
+            <div class="bottle-card" data-id="{{ post.id }}">
+                <div class="bottle-header">
+                    <div>
+                        <span class="bottle-author">{{ post.anonymous_name or '匿名旅人' }}</span>
+                        {% if post.mood %}
+                        <span class="bottle-mood">{{ post.mood }}</span>
+                        {% endif %}
+                    </div>
+                    <span class="bottle-time">{{ post.created_at.strftime('%Y-%m-%d %H:%M') if post.created_at else '' }}</span>
+                </div>
+                <div class="bottle-content">{{ post.content }}</div>
+                {% if post.ai_reply %}
+                <div class="ai-reply">
+                    <div class="ai-reply-label">{{ _('ai_reply') }}</div>
+                    <div class="ai-reply-content">{{ post.ai_reply }}</div>
+                </div>
+                {% endif %}
+                <div class="bottle-actions">
+                    <button class="like-btn" data-id="{{ post.id }}">
+                        ❤️ <span class="like-count">{{ post.likes }}</span>
+                    </button>
+                    <button class="share-btn" onclick="showShareCard('{{ post.id }}', `{{ post.content | e }}`, `{{ post.ai_reply | e }}`)">
+                        📤 {{ _('share_card') }}
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🍃</div>
+            <p>{{ _('no_secrets_yet') }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if posts.pages > 1 %}
+    <div class="pagination">
+        {% for p in range(1, posts.pages + 1) %}
+        <a href="?page={{ p }}" class="page-btn {% if p == posts.page %}active{% endif %}">{{ p }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="share-card-modal" id="shareCardModal">
+        <div class="share-card">
+            <div class="share-card-title">🍃 AI树洞 · 漂流瓶</div>
+            <div class="share-card-content" id="shareCardContent"></div>
+            <div class="share-card-ai" id="shareCardAi"></div>
+            <button class="share-card-close" onclick="closeShareCard()">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedMood = '';
+
+        document.querySelectorAll('.mood-tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                document.querySelectorAll('.mood-tag').forEach(t => t.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedMood = this.dataset.mood;
+            });
+        });
+
+        document.getElementById('postBtn')?.addEventListener('click', async function() {
+            const content = document.getElementById('secretContent').value.trim();
+            const anonymousName = document.getElementById('anonymousName').value.trim() || '匿名旅人';
+
+            if (!content) {
+                alert('请输入心事内容');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/tree-hole', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        content: content,
+                        mood: selectedMood,
+                        anonymous_name: anonymousName
+                    })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('发布成功！AI正在回复...');
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('发布失败，请重试');
+            }
+        });
+
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const id = this.dataset.id;
+                try {
+                    const response = await fetch('/api/tree-hole/like', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({post_id: id})
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.classList.toggle('liked');
+                        this.querySelector('.like-count').textContent = data.likes;
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+        });
+
+        function showShareCard(id, content, aiReply) {
+            document.getElementById('shareCardContent').textContent = content;
+            document.getElementById('shareCardAi').textContent = aiReply || '';
+            document.getElementById('shareCardModal').classList.add('show');
+        }
+
+        function closeShareCard() {
+            document.getElementById('shareCardModal').classList.remove('show');
+        }
+
+        document.getElementById('shareCardModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeShareCard();
+        });
+    </script>
+</div>
+{% endblock %}

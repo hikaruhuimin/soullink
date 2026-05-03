@@ -5263,3 +5263,188 @@ def admin_user_update_page(user_id):
     
     db.session.commit()
     return redirect(f'/admin/user/{user_id}')
+
+# ============ 用户中心路由 ============
+@app.route('/profile')
+@login_required
+def profile_page():
+    """用户中心页面"""
+    lang = session.get('lang', 'zh')
+    user = User.query.get(current_user.id)
+    
+    # 计算注册天数
+    register_days = (datetime.utcnow() - user.created_at).days + 1
+    
+    # 今日是否签到
+    today = datetime.utcnow().date()
+    today_signin = DailySignin.query.filter_by(user_id=user.id, signin_date=today).first()
+    today_signed = today_signin is not None
+    
+    # 签到连续天数
+    signin_streak = 0
+    check_date = today
+    while True:
+        signin = DailySignin.query.filter_by(user_id=user.id, signin_date=check_date).first()
+        if signin:
+            signin_streak += 1
+            check_date -= timedelta(days=1)
+        else:
+            break
+    
+    # 占卜次数
+    divination_count = user.divinations.count()
+    
+    # 心动次数（树洞点赞数）
+    crush_count = 0
+    if hasattr(SocialProfile, 'query'):
+        profile = SocialProfile.query.filter_by(user_id=user.id).first()
+        if profile:
+            crush_count = profile.followers_count
+    
+    # 配对成功次数
+    match_count = 0
+    if hasattr(SocialMatch, 'query'):
+        profile = SocialProfile.query.filter_by(user_id=user.id).first()
+        if profile:
+            match_count = SocialMatch.query.filter(
+                db.or_(
+                    SocialMatch.profile1_id == profile.id,
+                    SocialMatch.profile2_id == profile.id
+                ),
+                SocialMatch.is_matched == True
+            ).count()
+    
+    return render_template('profile/index.html', 
+        lang=lang, user=user,
+        register_days=register_days,
+        today_signed=today_signed,
+        signin_streak=signin_streak,
+        divination_count=divination_count,
+        crush_count=crush_count,
+        match_count=match_count)
+
+@app.route('/profile/edit', methods=['GET', 'POST'])
+@login_required
+def profile_edit_page():
+    """个人资料编辑页面"""
+    lang = session.get('lang', 'zh')
+    user = User.query.get(current_user.id)
+    
+    if request.method == 'POST':
+        data = request.get_json()
+        
+        if 'username' in data:
+            user.username = data['username']
+        if 'mbti' in data:
+            user.mbti = data['mbti']
+        if 'birthday' in data and data['birthday']:
+            try:
+                user.birthday = datetime.strptime(data['birthday'], '%Y-%m-%d').date()
+                # 自动计算星座
+                user.zodiac = calculate_zodiac(user.birthday.month, user.birthday.day)
+            except:
+                pass
+        if 'bio' in data:
+            user.bio = data['bio']
+        if 'interests' in data:
+            # 兴趣标签存储到social_profile
+            profile = SocialProfile.query.filter_by(user_id=user.id).first()
+            if profile:
+                profile.interests = data['interests']
+            else:
+                profile = SocialProfile(
+                    user_id=user.id,
+                    display_name=user.username,
+                    interests=data['interests']
+                )
+                db.session.add(profile)
+        
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Profile updated'})
+    
+    # MBTI类型列表
+    mbti_types = ['INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP',
+                  'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ', 'ISTP', 'ISFP', 'ESTP', 'ESFP']
+    
+    # 兴趣标签
+    interest_tags = ['音乐', '电影', '阅读', '旅行', '美食', '运动', '摄影', '绘画',
+                     '游戏', '动漫', '科技', '设计', '时尚', '健身', '烹饪', '宠物']
+    
+    # 获取用户已选标签
+    profile = SocialProfile.query.filter_by(user_id=user.id).first()
+    user_interests_list = []
+    user_interests_str = ''
+    if profile and profile.interests:
+        user_interests_list = [t.strip() for t in profile.interests.split(',') if t.strip()]
+        user_interests_str = profile.interests
+    
+    return render_template('profile/edit.html',
+        lang=lang, user=user,
+        mbti_types=mbti_types,
+        interest_tags=interest_tags,
+        user_interests=user_interests_list,
+        user_interests_str=user_interests_str)
+
+@app.route('/profile/settings', methods=['GET', 'POST'])
+@login_required
+def profile_settings_page():
+    """设置页面"""
+    lang = session.get('lang', 'zh')
+    return render_template('profile/settings.html', lang=lang)
+
+@app.route('/api/user/notification', methods=['POST'])
+@login_required
+def update_notification():
+    """更新通知设置"""
+    data = request.get_json()
+    user = User.query.get(current_user.id)
+    
+    if data.get('type') == 'divinationNotice':
+        user.notification_enabled = data.get('enabled', True)
+    
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/api/user/change_password', methods=['POST'])
+@login_required
+def change_user_password():
+    """修改密码"""
+    data = request.get_json()
+    user = User.query.get(current_user.id)
+    
+    old_password = data.get('old_password', '')
+    new_password = data.get('new_password', '')
+    
+    if not user.check_password(old_password):
+        return jsonify({'success': False, 'message': 'Current password is incorrect'})
+    
+    if len(new_password) < 6:
+        return jsonify({'success': False, 'message': 'Password must be at least 6 characters'})
+    
+    user.set_password(new_password)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Password changed successfully'})
+
+# 星座计算函数
+def calculate_zodiac(month, day):
+    """根据月份和日期计算星座"""
+    zodiac_table = [
+        ((1, 20), '摩羯座'), ((2, 19), '水瓶座'), ((3, 21), '双鱼座'),
+        ((4, 20), '白羊座'), ((5, 21), '金牛座'), ((6, 21), '双子座'),
+        ((7, 23), '巨蟹座'), ((8, 23), '狮子座'), ((9, 23), '处女座'),
+        ((10, 23), '天秤座'), ((11, 22), '天蝎座'), ((12, 22), '射手座'),
+        ((12, 31), '摩羯座')
+    ]
+    
+    for (m, d), zodiac in zodiac_table:
+        if (month < m) or (month == m and day <= d):
+            return zodiac
+    return '摩羯座'
+
+# ============ /my 别名 ============
+@app.route('/my')
+@login_required
+def my_page():
+    """用户中心别名"""
+    return redirect('/profile')
