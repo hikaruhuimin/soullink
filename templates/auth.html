@@ -411,6 +411,89 @@
         padding: 1rem;
     }
 }
+
+/* 验证码样式 */
+.captcha-section {
+    margin-bottom: 1.25rem;
+}
+
+.captcha-wrapper {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.captcha-image {
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    transition: transform 0.2s;
+}
+
+.captcha-image:hover {
+    transform: scale(1.05);
+}
+
+.captcha-input {
+    flex: 1;
+}
+
+.refresh-captcha {
+    background: none;
+    border: none;
+    color: var(--color-gold);
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0.25rem;
+}
+
+.refresh-captcha:hover {
+    text-decoration: underline;
+}
+
+.captcha-error {
+    color: #f44336;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* 修复按钮样式 - 确保按钮可见 */
+.auth-submit-btn {
+    display: block !important;
+    width: 100% !important;
+    padding: 0.875rem 1.5rem !important;
+    background: linear-gradient(135deg, #B8A9C9, #9B8BB8) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(184, 169, 201, 0.4) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.auth-submit-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(184, 169, 201, 0.5) !important;
+    background: linear-gradient(135deg, #C4B5D4, #A89CC3) !important;
+}
+
+.auth-submit-btn:active {
+    transform: translateY(0) !important;
+}
+
+/* 确保原始按钮隐藏或覆盖 */
+.btn.btn-primary.btn-block {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+}
+
 </style>
 {% endblock %}
 
@@ -469,7 +552,18 @@
                 <a href="/auth/forgot" class="forgot-link">{{ _('forgot_password') }}</a>
             </div>
             
-            <button type="submit" class="btn btn-primary btn-block">{{ _('login') }}</button>
+            <button type="submit" class="btn btn-primary btn-block auth-submit-btn">{{ _('login') }}</button>
+            
+            {# 登录验证码（失败3次后显示） #}
+            {% if require_captcha %}
+            <div class="captcha-section" style="margin-top: 1rem;">
+                <div class="captcha-wrapper">
+                    <img src="/captcha" alt="captcha" class="captcha-image" id="loginCaptchaImg" onclick="this.src='/captcha?'+Math.random()">
+                    <input type="text" name="captcha_answer" placeholder="{{ _('enter_captcha') }}" required style="width: 100%; padding: 0.75rem; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 10px; color: var(--color-text); font-size: 1rem;">
+                </div>
+                <p class="verification-hint">{{ _('math_captcha_hint') }}</p>
+            </div>
+            {% endif %}
             
             <div class="auth-footer">
                 {{ _('no_account') }}<a href="/auth/register">{{ _('register_now') }}</a>
@@ -544,7 +638,16 @@
                 <input type="password" name="confirm_password" required placeholder="{{ _('enter_password_again') }}" minlength="6" id="confirmPasswordInput">
             </div>
             
-            <button type="submit" class="btn btn-primary btn-block">{{ _('register') }}</button>
+            <button type="submit" class="btn btn-primary btn-block auth-submit-btn">{{ _('register') }}</button>
+            
+            {# 注册验证码 #}
+            <div class="captcha-section" style="margin-top: 1rem;">
+                <div class="captcha-wrapper">
+                    <img src="/captcha" alt="captcha" class="captcha-image" id="registerCaptchaImg" onclick="this.src='/captcha?'+Math.random()">
+                    <input type="text" name="captcha_answer" placeholder="{{ _('enter_captcha') }}" required style="width: 100%; padding: 0.75rem; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 10px; color: var(--color-text); font-size: 1rem;">
+                </div>
+                <p class="verification-hint">{{ _('math_captcha_hint') }}</p>
+            </div>
             
             <p class="auth-footer">
                 {{ _('agree_terms') }}<a href="/terms">{{ _('terms_link') }}</a>{{ ' ' + _('and' if 'and' in TRANSLATIONS[lang] else '和') + ' ' }}<a href="/privacy">{{ _('privacy_link') }}</a>

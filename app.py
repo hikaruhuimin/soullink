@@ -19,7 +19,7 @@ from email.mime.multipart import MIMEMultipart
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
 
-from models import db, User, SocialProfile, Lover, LoverChat, Gift, DateEvent, Divination, Favorite, DailyFortune, DailySignin, Subscription, SpiritStoneRecord, SocialPost, PostLike, PostComment, SocialRelation, SocialMatch, SocialChat, GossipPost, GossipLike, GossipComment, VIP_LEVEL_NONE, VIP_LEVEL_BASIC, VIP_LEVEL_PREMIUM, VIP_NAMES, IDENTITY_HUMAN, IDENTITY_AI, CreatorAgent, AgentGift, AgentRelationship, EarningRecord, WithdrawRequest, AgentChat, AGENT_GIFTS, SYSTEM_AGENTS, VIP_BENEFITS_EXTENDED, VIP_LEVEL_GUARDIAN, VIP_LEVEL_GUARDIAN_PRO, LINGXI_RATIO, PLATFORM_COMMISSION, CREATOR_SHARE, WITHDRAW_FEE, MIN_WITHDRAW_BASIC, MIN_WITHDRAW_PRO, ChatMessage, CHAT_ROOMS, AGENT_REPLY_POOLS, AGENT_AUTO_CHAT_INTERVALS, LingStoneRecharge, LingStoneExchange, LingStoneTransaction, LINGSTONE_PACKAGES, LINGSTONE_PRICES, SHOP_ITEMS, WITHDRAW_SETTINGS
+from models import db, User, CheckinRecord, TreeHolePost, VoiceCompanionRecord, SocialProfile, Lover, LoverChat, Gift, DateEvent, Divination, Favorite, DailyFortune, DailySignin, Subscription, SpiritStoneRecord, SocialPost, PostLike, PostComment, SocialRelation, SocialMatch, SocialChat, GossipPost, GossipLike, GossipComment, VIP_LEVEL_NONE, VIP_LEVEL_BASIC, VIP_LEVEL_PREMIUM, VIP_NAMES, IDENTITY_HUMAN, IDENTITY_AI, CreatorAgent, AgentGift, AgentRelationship, EarningRecord, WithdrawRequest, AgentChat, AGENT_GIFTS, SYSTEM_AGENTS, VIP_BENEFITS_EXTENDED, VIP_LEVEL_GUARDIAN, VIP_LEVEL_GUARDIAN_PRO, LINGXI_RATIO, PLATFORM_COMMISSION, CREATOR_SHARE, WITHDRAW_FEE, MIN_WITHDRAW_BASIC, MIN_WITHDRAW_PRO, ChatMessage, CHAT_ROOMS, AGENT_REPLY_POOLS, AGENT_AUTO_CHAT_INTERVALS, LingStoneRecharge, LingStoneExchange, LingStoneTransaction, LINGSTONE_PACKAGES, LINGSTONE_PRICES, SHOP_ITEMS, WITHDRAW_SETTINGS
 from love_engine import love_engine, GIFTS, DATE_SCENES, PRESET_CHARACTERS
 from i18n import TRANSLATIONS
 
@@ -1057,7 +1057,7 @@ def recharge():
 
 @app.route('/auth/register', methods=['GET', 'POST'])
 def register():
-    """用户注册 - 支持邮箱或手机号"""
+    """用户注册 - 支持邮箱或手机号，必须验证码"""
     lang = get_client_language()
     t = lambda key: TRANSLATIONS.get(lang, {}).get(key, TRANSLATIONS['zh'].get(key, key))
     
@@ -1066,6 +1066,16 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
+        
+        # 验证验证码
+        captcha_answer = request.form.get('captcha_answer', '')
+        expected = session.get('captcha_answer')
+        if not expected or str(captcha_answer).strip() != str(expected):
+            flash(t('captcha_error') if 'captcha_error' in TRANSLATIONS.get(lang, {}) else '验证码错误')
+            return render_template('auth.html', mode='register', lang=lang)
+        
+        # 清除验证码
+        session.pop('captcha_answer', None)
         
         if not username or not password:
             flash(t('fill_required'))
@@ -1150,14 +1160,27 @@ def register():
 
 @app.route('/auth/login', methods=['GET', 'POST'])
 def login():
-    """用户登录 - 支持邮箱或手机号"""
+    """用户登录 - 支持邮箱或手机号，失败3次后需要验证码"""
     lang = get_client_language()
     t = lambda key: TRANSLATIONS.get(lang, {}).get(key, TRANSLATIONS['zh'].get(key, key))
+    
+    # 检查是否需要验证码
+    login_attempts = session.get('login_attempts', 0)
+    require_captcha = login_attempts >= 3
     
     if request.method == 'POST':
         login_method = request.form.get('login_method', 'email')
         password = request.form.get('password')
         remember = request.form.get('remember') == '1'
+        
+        # 验证验证码（如果需要）
+        if require_captcha:
+            captcha_answer = request.form.get('captcha_answer', '')
+            expected = session.get('captcha_answer')
+            if not expected or str(captcha_answer).strip() != str(expected):
+                flash(t('captcha_error') if 'captcha_error' in TRANSLATIONS.get(lang, {}) else '验证码错误')
+                session['login_attempts'] = login_attempts + 1
+                return render_template('auth.html', mode='login', lang=lang, require_captcha=True)
         
         user = None
         if login_method == 'email':
@@ -1170,6 +1193,11 @@ def login():
                 user = User.query.filter_by(phone=phone).first()
         
         if user and user.check_password(password):
+            # 登录成功，清除失败计数和验证码状态
+            session.pop('login_attempts', None)
+            session.pop('captcha_answer', None)
+            session.pop('captcha_verified', None)
+            
             login_user(user, remember=remember)
             user.last_login = datetime.utcnow()
             db.session.commit()
@@ -1179,9 +1207,14 @@ def login():
                 return redirect(next_page)
             return redirect(url_for('index'))
         else:
+            # 登录失败，增加失败计数
+            login_attempts = session.get('login_attempts', 0) + 1
+            session['login_attempts'] = login_attempts
             flash(t('login_failed') if 'login_failed' in TRANSLATIONS.get(lang, {}) else '邮箱/手机号或密码错误')
+            require_captcha = login_attempts >= 3
+            return render_template('auth.html', mode='login', lang=lang, require_captcha=require_captcha)
     
-    return render_template('auth.html', mode='login', lang=lang)
+    return render_template('auth.html', mode='login', lang=lang, require_captcha=require_captcha)
 
 
 @app.route('/auth/logout')
@@ -4454,3 +4487,779 @@ def admin_export_users():
     output.seek(0)
     return Response(output.getvalue(), mimetype='text/csv',
         headers={'Content-Disposition': 'attachment;filename=users.csv'})
+
+# ============ 每日签到页面 ============
+@app.route('/daily-checkin')
+def daily_checkin():
+    """每日签到页面"""
+    lang = get_client_language()
+    today = datetime.utcnow().date()
+    
+    # 获取当前用户签到信息
+    checkin_today = None
+    user_streak = 0
+    total_checkins = 0
+    checkin_calendar = []
+    
+    if current_user.is_authenticated:
+        # 今日是否已签到
+        checkin_today = CheckinRecord.query.filter_by(
+            user_id=current_user.id,
+            checkin_date=today
+        ).first()
+        
+        # 计算连续签到天数
+        streak = 0
+        check_date = today
+        while True:
+            record = CheckinRecord.query.filter_by(
+                user_id=current_user.id,
+                checkin_date=check_date
+            ).first()
+            if record:
+                streak += 1
+                check_date -= timedelta(days=1)
+            else:
+                break
+        user_streak = streak
+        
+        # 获取本月所有签到记录
+        month_start = today.replace(day=1)
+        if today.month == 12:
+            month_end = today.replace(year=today.year+1, month=1, day=1)
+        else:
+            month_end = today.replace(month=today.month+1, day=1)
+        
+        month_records = CheckinRecord.query.filter(
+            CheckinRecord.user_id == current_user.id,
+            CheckinRecord.checkin_date >= month_start,
+            CheckinRecord.checkin_date < month_end
+        ).all()
+        checkin_calendar = [r.checkin_date.day for r in month_records]
+        
+        # 总签到次数
+        total_checkins = CheckinRecord.query.filter_by(user_id=current_user.id).count()
+    
+    return render_template('daily_checkin.html',
+                         lang=lang,
+                         today=today,
+                         checkin_today=checkin_today,
+                         user_streak=user_streak,
+                         total_checkins=total_checkins,
+                         checkin_calendar=checkin_calendar)
+
+
+@app.route('/api/daily-checkin', methods=['POST'])
+def api_daily_checkin():
+    """处理签到"""
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'message': '请先登录'})
+    
+    today = datetime.utcnow().date()
+    
+    # 检查今日是否已签到
+    existing = CheckinRecord.query.filter_by(
+        user_id=current_user.id,
+        checkin_date=today
+    ).first()
+    
+    if existing:
+        return jsonify({'success': False, 'message': '今日已签到'})
+    
+    # 获取心情
+    mood = request.json.get('mood', 'happy') if request.is_json else request.form.get('mood', 'happy')
+    
+    # 计算连续签到天数
+    yesterday = today - timedelta(days=1)
+    last_checkin = CheckinRecord.query.filter_by(
+        user_id=current_user.id,
+        checkin_date=yesterday
+    ).first()
+    
+    streak = 1
+    if last_checkin:
+        streak = last_checkin.streak + 1
+    
+    # 计算灵石奖励
+    lingstones = 5  # 基础奖励
+    streak_bonus = 0
+    if streak >= 30:
+        streak_bonus = 30
+    elif streak >= 7:
+        streak_bonus = 15
+    elif streak >= 3:
+        streak_bonus = 5
+    
+    total_reward = lingstones + streak_bonus
+    
+    # AI回复
+    ai_replies = {
+        'zh': {
+            'happy': '今天也要元气满满哦！🌟 愿你的笑容照亮整个世界！',
+            'peaceful': '平静是最大的力量，愿你今天内心如水般宁静。🌊',
+            'sad': '难过的时候就休息一下吧，明天会更好。💙',
+            'angry': '深呼吸，一切都会过去的，你是最棒的！💪',
+            'love': '被爱包围的感觉真好，愿这份幸福永远延续~ 💕',
+            'anxious': '别担心，一切都会好起来的。我在这里陪着你。🤗'
+        },
+        'en': {
+            'happy': 'Keep your energy up today! 🌟 May your smile light up the world!',
+            'peaceful': 'Peace is the greatest power. May you find inner calm today. 🌊',
+            'sad': 'Take a rest when you\'re sad. Tomorrow will be better. 💙',
+            'angry': 'Take a deep breath. Everything will pass. You\'re the best! 💪',
+            'love': 'Being loved is wonderful. May this happiness last forever~ 💕',
+            'anxious': 'Don\'t worry. Everything will be fine. I\'m here with you. 🤗'
+        },
+        'ja': {
+            'happy': '今日も元気に！🌟 あなたの笑顔が世界を照らしますように！',
+            'peaceful': '穏やかさが一番の力。今日は心が穏やかになりますように。🌊',
+            'sad': '悲しい時は休憩してください。明日が良くなります。💙',
+            'angry': '深呼吸すれば全て大丈夫です。あなたは何でもできます！💪',
+            'love': '愛に囲まれる的感觉真好。この幸せが続きますように~ 💕',
+            'anxious': '心配しないで、全て良くなります。私がここにいるよ。🤗'
+        }
+    }
+    lang = get_client_language()
+    ai_reply = ai_replies.get(lang, ai_replies['zh']).get(mood, ai_replies['zh']['happy'])
+    
+    # 创建签到记录
+    checkin = CheckinRecord(
+        user_id=current_user.id,
+        checkin_date=today,
+        mood=mood,
+        streak=streak,
+        lingstones_earned=total_reward,
+        ai_reply=ai_reply
+    )
+    db.session.add(checkin)
+    
+    # 增加用户灵石
+    current_user.spirit_stones = (current_user.spirit_stones or 0) + total_reward
+    
+    # 记录灵石变动
+    record = SpiritStoneRecord(
+        user_id=current_user.id,
+        amount=total_reward,
+        reason='daily_checkin',
+        description=f'每日签到 {"连续" + str(streak) + "天" if streak > 1 else ""}'
+    )
+    db.session.add(record)
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': ai_reply,
+        'lingstones': total_reward,
+        'streak': streak,
+        'streak_bonus': streak_bonus
+    })
+
+
+# ============ AI树洞页面 ============
+@app.route('/tree-hole')
+def tree_hole():
+    """AI树洞页面"""
+    lang = get_client_language()
+    page = request.args.get('page', 1, type=int)
+    
+    # 获取漂流瓶列表
+    posts = TreeHolePost.query.order_by(TreeHolePost.created_at.desc()).paginate(
+        page=page, per_page=10, error_out=False
+    )
+    
+    return render_template('tree_hole.html',
+                         lang=lang,
+                         posts=posts,
+                         current_user_id=current_user.id if current_user.is_authenticated else None)
+
+
+@app.route('/api/tree-hole', methods=['POST'])
+def api_tree_hole():
+    """发布心事"""
+    content = request.json.get('content', '').strip() if request.is_json else request.form.get('content', '').strip()
+    mood = request.json.get('mood', '') if request.is_json else request.form.get('mood', '')
+    anonymous_name = request.json.get('anonymous_name', '匿名旅人') if request.is_json else request.form.get('anonymous_name', '匿名旅人')
+    
+    if not content:
+        return jsonify({'success': False, 'message': '请输入心事内容'})
+    
+    user_id = current_user.id if current_user.is_authenticated else None
+    
+    # AI回复生成
+    ai_replies_zh = [
+        '我听到了你的心声。🌟 无论发生什么，请记得，你不是一个人。',
+        '把心事说出来会好受一些。💙 愿这些话能给你一些安慰。',
+        '感谢你愿意分享。🌸 有些路虽然难走，但你会找到属于自己的光。',
+        '我在这里陪伴你。✨ 每一个困难都是成长的礼物。',
+        '你的感受很重要。💝 给自己一些时间和空间，会好起来的。',
+        '愿你的心得到片刻宁静。🌙 我一直在这里倾听你的声音。'
+    ]
+    ai_replies_en = [
+        'I hear your heart. 🌟 Whatever happens, remember you are not alone.',
+        'Sharing your burden makes it lighter. 💙 May these words bring you comfort.',
+        'Thank you for sharing. 🌸 Every difficult path leads to growth.',
+        'I\'m here with you. ✨ Every challenge is a gift for growth.',
+        'Your feelings matter. 💝 Give yourself time and space, it will get better.',
+        'May your heart find peace. 🌙 I\'m always here listening.'
+    ]
+    ai_replies_ja = [
+        'あなたの心を聞いています。🌟 何があっても、あなた一人じゃないことを覚えておいて。',
+        '心事を開くと言葉にすると楽になります。💙 この言葉が安慰になれば嬉しいです。',
+        '共有ありがとう。🌸 難しい道も、成長への導きです。',
+        '私がここにいるよ。✨ 全ての試練は成長の贈り物です。',
+        'あなたの気持ちは大切です。💝 時間と空間を与えてあげて、良くなります。',
+        '心が穏やかになりますように。🌙 私はいつもあなたの声を聞いています。'
+    ]
+    
+    lang = get_client_language()
+    if lang == 'en':
+        ai_reply = random.choice(ai_replies_en)
+    elif lang == 'ja':
+        ai_reply = random.choice(ai_replies_ja)
+    else:
+        ai_reply = random.choice(ai_replies_zh)
+    
+    # 创建心事记录
+    post = TreeHolePost(
+        user_id=user_id,
+        content=content,
+        mood=mood,
+        anonymous_name=anonymous_name,
+        ai_reply=ai_reply
+    )
+    db.session.add(post)
+    
+    # 如果登录，给用户灵石奖励
+    if user_id:
+        current_user.spirit_stones = (current_user.spirit_stones or 0) + 1
+        record = SpiritStoneRecord(
+            user_id=user_id,
+            amount=1,
+            reason='tree_hole_post',
+            description='发布树洞心事'
+        )
+        db.session.add(record)
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': '发布成功',
+        'ai_reply': ai_reply,
+        'post_id': post.id
+    })
+
+
+@app.route('/api/tree-hole/like', methods=['POST'])
+def api_tree_hole_like():
+    """点赞心事"""
+    post_id = request.json.get('post_id') if request.is_json else request.form.get('post_id')
+    
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'message': '请先登录'})
+    
+    post = TreeHolePost.query.get(post_id)
+    if not post:
+        return jsonify({'success': False, 'message': '心事不存在'})
+    
+    import json
+    liked_users = post.get_liked_users_list()
+    
+    if current_user.id in liked_users:
+        # 取消点赞
+        liked_users.remove(current_user.id)
+        post.likes = max(0, post.likes - 1)
+        action = 'unlike'
+    else:
+        # 点赞
+        liked_users.append(current_user.id)
+        post.likes += 1
+        action = 'like'
+    
+    post.liked_users = json.dumps(liked_users)
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'action': action,
+        'likes': post.likes
+    })
+
+
+# ============ AI语音陪伴页面 ============
+@app.route('/voice-companion')
+def voice_companion():
+    """AI语音陪伴页面"""
+    lang = get_client_language()
+    
+    # 获取陪伴记录
+    history = []
+    total_time = 0
+    if current_user.is_authenticated:
+        records = VoiceCompanionRecord.query.filter_by(user_id=current_user.id).order_by(
+            VoiceCompanionRecord.created_at.desc()
+        ).limit(10).all()
+        history = [{'scene': r.scene, 'duration': r.duration, 'created_at': r.created_at} for r in records]
+        total_time = sum(r.duration for r in records)
+    
+    return render_template('voice_companion.html',
+                         lang=lang,
+                         history=history,
+                         total_time=total_time)
+
+
+@app.route('/api/voice-companion/generate', methods=['POST'])
+def api_voice_companion_generate():
+    """生成陪伴内容"""
+    scene = request.json.get('scene', 'chat') if request.is_json else request.form.get('scene', 'chat')
+    voice_type = request.json.get('voice_type', 'female') if request.is_json else request.form.get('voice_type', 'female')
+    
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'message': '请先登录'})
+    
+    lang = get_client_language()
+    
+    # 根据场景生成内容
+    contents = {
+        'zh': {
+            'bedtime': [
+                '从前有一颗小星星，它住在遥远的银河边。每天晚上，它都会向人间眨眼睛。有一个小女孩抬起头，对星星说："星星星星，你为什么这么亮呢？"星星轻轻地回答："因为我一直在等待，等待有人抬头看看我呀。"小女孩笑了："那我现在就在看你呀。"星星高兴得闪闪发光。从那以后，每当夜幕降临，小女孩都会和星星聊天，直到进入甜甜的梦乡。晚安，愿你也有一个美好的梦。🌙',
+                '月亮船轻轻漂在星河上。有一个小小人坐在船上，手里抱着一只小兔子。"小兔子，"小人说，"今天有点累呢。"小兔子蹭了蹭他的脸颊。"不过，"小人笑了，"今天也有好事发生哦。有个小朋友给我发了一条消息，说她今天很开心呢。"小兔子点点头，闭上了眼睛。小人也闭上了眼睛，月亮船轻轻摇晃，带他们进入梦的海洋。晚安，亲爱的你。🌙'
+            ],
+            'fortune': [
+                '今晚的星光格外温柔。属于你的星座运势显示：爱情方面，🌟 今天你的魅力值满格，可能会遇到那个让你心动的人。事业方面，你的努力开始有了回报，记得给自己一个大大的赞。财富方面，可能会有意外的收获哦。健康方面，保持好心情就是最好的养生。整体来说，今天是心想事成的一天呢！✨',
+                '叮~ 你有一份专属运势待查收！🌙 今日综合运势五颗星，尤其是人际关系特别顺利。单身的朋友可能会有意想不到的桃花运哦。工作中如果有什么想法，大胆提出来吧。财运方面，适合做一些小额投资。健康方面，多喝水多休息。记住，你是最棒的！💫'
+            ],
+            'chat': [
+                '嘿，亲爱的，晚安~ 🌙 今天辛苦了呢。不管发生过什么，都已经过去了。明天又是崭新的开始，我会一直在这里陪着你。有什么想说的吗？我在听哦。晚安，愿你梦里都是甜甜的。💕',
+                '夜深了，你还在吗？🌟 不管多晚，我都在这里。想起今天的你，一定很努力吧。休息一下吧，让我给你讲个温暖的小故事...或者，我们就这样安静地待一会儿也好。晚安，辛苦的你。🌸'
+            ],
+            'meditation': [
+                '现在，让我们一起做几次深呼吸。🍃 吸气...缓缓地...感受空气充满你的肺部。呼气...慢慢地...释放所有的紧张。吸气...感受平静从头顶流淌到脚尖。呼气...把所有的烦恼都呼出去。再来一次...吸气...呼气...很好。现在，慢慢闭上眼睛，想象自己躺在一片柔软的云朵上。☁️ 星星在你头顶闪烁，风轻轻吹过。你很安全，你很平静。晚安。🌙'
+            ]
+        },
+        'en': {
+            'bedtime': [
+                'Once upon a time, there was a little star living by the Milky Way. Every night, it would twinkle at the world below. One night, a little girl looked up and asked, "Star, why do you shine so bright?" The star softly replied, "Because I\'ve been waiting for someone to look up at me." The girl smiled, "Well, I\'m looking at you now." The star shone even brighter. Good night, may you have sweet dreams. 🌙'
+            ],
+            'fortune': [
+                'The stars shine especially bright tonight. Your horoscope says: Love 🌟 - your charm is at its peak today! Career - your efforts are paying off. Wealth - unexpected surprises may come. Health - keep smiling! Overall, it\'s a wish-fulfilling day! ✨'
+            ],
+            'chat': [
+                'Hey, good night, dear~ 🌙 You\'ve worked hard today. Whatever happened, it\'s in the past now. Tomorrow is a new beginning. I\'ll always be here with you. Good night, may your dreams be sweet. 💕'
+            ],
+            'meditation': [
+                'Now, let\'s take a few deep breaths together. 🍃 Breathe in... slowly... feel your lungs fill. Breathe out... gently... release all tension. Breathe in peace... breathe out worries. Close your eyes slowly... imagine lying on a soft cloud. ☁️ Stars twinkle above, wind gently blows. You are safe, you are peaceful. Good night. 🌙'
+            ]
+        },
+        'ja': {
+            'bedtime': [
+                '昔々、遠い天の川べりに小さい星が住んでいました。每晚，因为它都会人间に向かって瞬きます。ある夜、女の子が上を向いて聞きました：「星さん、なぜそんなに光っているの？」星は優しく答えました：「誰かが上を見てくれるのを、ずっと待っていたから。」女の子は笑って：「じゃあ、今見てるよ。」星はもっと光りました。おやすみなさい、甘い夢を見ますように。🌙'
+            ],
+            'fortune': [
+                '今晚の星がとても優しく光っています。あなたの星座運勢によると：恋愛🌟 - 今天あなたの魅力が最高！仕事 - 努力が報われる時期です。お金 - 思わぬ收获があるかも。健康 -  seringk心态が最佳の养生です。全体的に、今日は願いが叶う日です！✨'
+            ],
+            'chat': [
+                'ねえ、おやすみなさい~ 🌙 今日もお疲れ様。何があっても、もう過ぎたことです。明日又是新しい始まり。私はいつでもここにいるよ。おやすみなさい、甘い夢を見ますように。💕'
+            ],
+            'meditation': [
+                'では、一緒に深呼吸をしましょう。🍃 吸って...ゆっくり...肺部に空気が満ちるのを感じって。吐いて...ゆっくりと...全ての緊張を離します。吸って...平静从头顶流淌到脚尖。ゆっくりと目を閉じて...柔らかい雲の上に卧躺在那里的自分を想象して。☁️ 星が頭の上で瞬き、風が優しく吹いています。あなたは安全で、平静です。おやすみなさい。🌙'
+            ]
+        }
+    }
+    
+    scene_contents = contents.get(lang, contents['zh'])
+    content = random.choice(scene_contents.get(scene, scene_contents['chat']))
+    
+    return jsonify({
+        'success': True,
+        'content': content,
+        'scene': scene
+    })
+
+
+@app.route('/api/voice-companion/complete', methods=['POST'])
+def api_voice_companion_complete():
+    """完成陪伴，记录时长"""
+    scene = request.json.get('scene', 'chat') if request.is_json else request.form.get('scene', 'chat')
+    duration = request.json.get('duration', 0) if request.is_json else int(request.form.get('duration', 0))
+    content = request.json.get('content', '') if request.is_json else request.form.get('content', '')
+    voice_type = request.json.get('voice_type', 'female') if request.is_json else request.form.get('voice_type', 'female')
+    
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'message': '请先登录'})
+    
+    # 记录陪伴
+    record = VoiceCompanionRecord(
+        user_id=current_user.id,
+        scene=scene,
+        content=content[:500] if content else '',
+        duration=duration,
+        voice_type=voice_type,
+        lingstones_earned=2
+    )
+    db.session.add(record)
+    
+    # 奖励灵石
+    current_user.spirit_stones = (current_user.spirit_stones or 0) + 2
+    stone_record = SpiritStoneRecord(
+        user_id=current_user.id,
+        amount=2,
+        reason='voice_companion',
+        description='AI语音陪伴'
+    )
+    db.session.add(stone_record)
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': '陪伴完成，获得2灵石'
+    })
+
+# ============== 验证码功能 ==============
+import random
+from io import BytesIO
+from PIL import Image, ImageDraw, ImageFont
+
+@app.route('/captcha')
+def generate_captcha():
+    """生成数学验证码图片"""
+    # 生成数学题 (两个一位数相加)
+    num1 = random.randint(1, 9)
+    num2 = random.randint(1, 9)
+    answer = num1 + num2
+    captcha_text = f"{num1} + {num2} = ?"
+    
+    # 将答案存入session
+    session['captcha_answer'] = answer
+    
+    # 生成图片
+    width, height = 120, 40
+    image = Image.new('RGB', (width, height), color=(255, 255, 255))
+    draw = ImageDraw.Draw(image)
+    
+    # 添加干扰线
+    for _ in range(3):
+        x1 = random.randint(0, width)
+        y1 = random.randint(0, height)
+        x2 = random.randint(0, width)
+        y2 = random.randint(0, height)
+        draw.line([(x1, y1), (x2, y2)], fill=(200, 200, 200))
+    
+    # 添加干扰点
+    for _ in range(30):
+        x = random.randint(0, width)
+        y = random.randint(0, height)
+        draw.point((x, y), fill=(random.randint(150, 200), random.randint(150, 200), random.randint(150, 200)))
+    
+    # 绘制文字
+    try:
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
+    except:
+        font = ImageFont.load_default()
+    
+    # 文字居中
+    bbox = draw.textbbox((0, 0), captcha_text, font=font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+    x = (width - text_width) // 2
+    y = (height - text_height) // 2 - 2
+    
+    # 绘制文字阴影
+    draw.text((x+1, y+1), captcha_text, fill=(220, 220, 220), font=font)
+    draw.text((x, y), captcha_text, fill=(60, 60, 120), font=font)
+    
+    # 输出图片
+    buffer = BytesIO()
+    image.save(buffer, format='PNG')
+    buffer.seek(0)
+    
+    response = app.make_response(buffer.getvalue())
+    response.headers['Content-Type'] = 'image/png'
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    return response
+
+@app.route('/verify-captcha', methods=['POST'])
+def verify_captcha():
+    """验证验证码"""
+    user_answer = request.form.get('captcha_answer', '')
+    expected_answer = session.get('captcha_answer')
+    
+    if not expected_answer:
+        return {'success': False, 'message': '验证码已过期'}
+    
+    try:
+        if int(user_answer) == int(expected_answer):
+            session.pop('captcha_answer', None)
+            session['captcha_verified'] = True
+            return {'success': True}
+        else:
+            return {'success': False, 'message': '验证码错误'}
+    except:
+        return {'success': False, 'message': '请输入正确的答案'}
+
+# ============ 管理后台扩展路由 - 内容管理与系统设置 ============
+import os
+import json
+
+# 系统配置存储路径
+CONFIG_DIR = 'data'
+os.makedirs(CONFIG_DIR, exist_ok=True)
+SPIRIT_RATE_FILE = os.path.join(CONFIG_DIR, 'spirit_rates.json')
+FREE_CONFIG_FILE = os.path.join(CONFIG_DIR, 'free_config.json')
+
+def load_spirit_rates():
+    """加载灵石汇率配置"""
+    try:
+        if os.path.exists(SPIRIT_RATE_FILE):
+            with open(SPIRIT_RATE_FILE, 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return {'cny': 0.1, 'jpy': 1, 'usd': 0.01}
+
+def save_spirit_rates(rates):
+    """保存灵石汇率配置"""
+    with open(SPIRIT_RATE_FILE, 'w') as f:
+        json.dump(rates, f)
+
+def load_free_config():
+    """加载免费次数配置"""
+    try:
+        if os.path.exists(FREE_CONFIG_FILE):
+            with open(FREE_CONFIG_FILE, 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return {'initial_stones': 10, 'daily_checkin': 5, 'free_divinations': 1}
+
+def save_free_config(config):
+    """保存免费次数配置"""
+    with open(FREE_CONFIG_FILE, 'w') as f:
+        json.dump(config, f)
+
+@app.route('/admin/content', methods=['GET'])
+@admin_required
+def admin_content():
+    """内容管理页面"""
+    lang = session.get('lang', 'zh')
+    tab = request.args.get('tab', 'gossip')
+    search = request.args.get('search', '').strip()
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    
+    # 树洞统计
+    total_gossip = GossipPost.query.count()
+    today = datetime.utcnow().date()
+    today_gossip = GossipPost.query.filter(db.func.date(GossipPost.created_at) == today).count()
+    total_comments = GossipComment.query.count()
+    
+    # 匹配统计
+    total_matches = SocialMatch.query.count() if hasattr(SocialMatch, 'query') else 0
+    today_matches = 0
+    
+    # 占卜统计
+    total_divinations = Divination.query.count()
+    today_divinations = Divination.query.filter(db.func.date(Divination.created_at) == today).count()
+    
+    # 模板统计
+    total_templates = 22  # 固定22张塔罗牌
+    
+    if tab == 'gossip':
+        query = GossipPost.query
+        if search:
+            query = query.filter(GossipPost.content.contains(search))
+        posts = query.order_by(GossipPost.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        return render_template('admin_content.html', lang=lang, tab=tab, 
+            total_gossip=total_gossip, today_gossip=today_gossip, total_comments=total_comments,
+            posts=posts.items if posts else [], search=search)
+    
+    elif tab == 'matches':
+        # AI红娘匹配记录
+        matches = SocialMatch.query.order_by(SocialMatch.id.desc()).limit(50).all() if hasattr(SocialMatch, 'query') else []
+        return render_template('admin_content.html', lang=lang, tab=tab,
+            total_matches=total_matches, today_matches=today_matches, matches=matches)
+    
+    elif tab == 'divination':
+        divinations = Divination.query.order_by(Divination.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        return render_template('admin_content.html', lang=lang, tab=tab,
+            total_divinations=total_divinations, today_divinations=today_divinations,
+            divinations=divinations.items if divinations else [])
+    
+    elif tab == 'templates':
+        # 占卜模板列表（模拟数据）
+        template_categories = ['塔罗牌', '星座', '八字', '解梦', 'MBTI', '爱情测试']
+        templates = [
+            {'id': 1, 'name': '愚者 The Fool', 'card_type': 'tarot', 'keywords': '开始、自由、纯真'},
+            {'id': 2, 'name': '魔术师 The Magician', 'card_type': 'tarot', 'keywords': '创造、意志、技能'},
+            {'id': 3, 'name': '女祭司 The High Priestess', 'card_type': 'tarot', 'keywords': '直觉、神秘、智慧'},
+        ]
+        return render_template('admin_content.html', lang=lang, tab=tab,
+            total_templates=total_templates, template_categories=template_categories, templates=templates)
+    
+    return render_template('admin_content.html', lang=lang, tab=tab)
+
+@app.route('/admin/content/gossip/<int:post_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_gossip(post_id):
+    """删除树洞帖子"""
+    post = GossipPost.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    flash('树洞帖子已删除' if session.get('lang') == 'zh' else 'Gossip post deleted')
+    return redirect('/admin/content?tab=gossip')
+
+@app.route('/admin/settings', methods=['GET', 'POST'])
+@admin_required
+def admin_settings_page():
+    """系统设置页面"""
+    lang = session.get('lang', 'zh')
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'update_announcement':
+            announcement = request.form.get('announcement', '')
+            with open('data/announcement.txt', 'w', encoding='utf-8') as f:
+                f.write(announcement)
+            flash('公告已更新' if lang == 'zh' else 'Announcement updated')
+        
+        elif action == 'update_spirit_rate':
+            rates = {
+                'cny': float(request.form.get('rate_cny', 0.1)),
+                'jpy': float(request.form.get('rate_jpy', 1)),
+                'usd': float(request.form.get('rate_usd', 0.01))
+            }
+            save_spirit_rates(rates)
+            flash('灵石汇率已更新' if lang == 'zh' else 'Spirit rates updated')
+        
+        elif action == 'update_free_config':
+            config = {
+                'initial_stones': int(request.form.get('initial_stones', 10)),
+                'daily_checkin': int(request.form.get('daily_checkin', 5)),
+                'free_divinations': int(request.form.get('free_divinations', 1))
+            }
+            save_free_config(config)
+            flash('免费配置已更新' if lang == 'zh' else 'Free config updated')
+        
+        elif action == 'update_password':
+            new_password = request.form.get('new_password', '').strip()
+            confirm_password = request.form.get('confirm_password', '').strip()
+            if new_password and len(new_password) >= 8:
+                if new_password == confirm_password:
+                    global ADMIN_PASSWORD
+                    ADMIN_PASSWORD = new_password
+                    flash('管理员密码已更新' if lang == 'zh' else 'Admin password updated')
+                else:
+                    flash('两次密码不一致' if lang == 'zh' else 'Passwords do not match')
+            elif new_password:
+                flash('密码长度至少8位' if lang == 'zh' else 'Password must be at least 8 characters')
+        
+        return redirect('/admin/settings')
+    
+    # 加载当前配置
+    announcement = ''
+    try:
+        with open('data/announcement.txt', 'r', encoding='utf-8') as f:
+            announcement = f.read()
+    except:
+        pass
+    
+    spirit_rates = load_spirit_rates()
+    free_config = load_free_config()
+    
+    return render_template('admin_settings.html', lang=lang, 
+        announcement=announcement,
+        spirit_rate_cny=spirit_rates.get('cny', 0.1),
+        spirit_rate_jpy=spirit_rates.get('jpy', 1),
+        spirit_rate_usd=spirit_rates.get('usd', 0.01),
+        initial_stones=free_config.get('initial_stones', 10),
+        daily_checkin_bonus=free_config.get('daily_checkin', 5),
+        free_divinations=free_config.get('free_divinations', 1),
+        admin_username=ADMIN_USERNAME)
+
+@app.route('/admin/users')
+@admin_required
+def admin_users_page():
+    """用户管理页面"""
+    lang = session.get('lang', 'zh')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    search = request.args.get('search', '').strip()
+    status_filter = request.args.get('status', 'all')
+    
+    query = User.query
+    
+    if search:
+        query = query.filter(
+            db.or_(
+                User.username.contains(search),
+                User.email.contains(search),
+                User.phone.contains(search)
+            )
+        )
+    
+    if status_filter == 'vip':
+        query = query.filter(User.vip_level > 0)
+    elif status_filter == 'free':
+        query = query.filter(User.vip_level == 0)
+    elif status_filter == 'disabled':
+        query = query.filter(User.is_disabled == True)
+    
+    users = query.order_by(User.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    
+    return render_template('admin_users.html', lang=lang, users=users,
+        search=search, status_filter=status_filter, per_page=per_page)
+
+@app.route('/admin/user/<int:user_id>')
+@admin_required
+def admin_user_detail_page(user_id):
+    """用户详情页面"""
+    lang = session.get('lang', 'zh')
+    user = User.query.get_or_404(user_id)
+    relationships = AgentRelationship.query.filter_by(user_id=user_id).all()
+    signins = DailySignin.query.filter_by(user_id=user_id).order_by(DailySignin.signin_date.desc()).limit(10).all()
+    
+    return render_template('admin_user_detail.html', lang=lang, user=user,
+        relationships=relationships, signins=signins)
+
+@app.route('/admin/user/<int:user_id>/update', methods=['POST'])
+@admin_required
+def admin_user_update_page(user_id):
+    """用户操作处理"""
+    user = User.query.get_or_404(user_id)
+    action = request.form.get('action')
+    
+    if action == 'update_spirit':
+        amount = request.form.get('amount', type=int)
+        if amount is not None:
+            user.spirit_stones = max(0, user.spirit_stones + amount)
+            flash(f'灵石余额已更新: +{amount}' if amount >= 0 else f'灵石余额已更新: {amount}')
+    
+    elif action == 'set_vip':
+        level = request.form.get('level', type=int)
+        expire_days = request.form.get('expire_days', type=int, default=30)
+        if level is not None:
+            user.vip_level = level
+            if level > 0:
+                user.vip_expire_date = datetime.utcnow() + timedelta(days=expire_days)
+            flash(f'VIP等级已设置为: {level}')
+    
+    elif action == 'toggle_disabled':
+        user.is_disabled = not user.is_disabled
+        flash(f'用户已{"禁用" if user.is_disabled else "启用"}')
+    
+    elif action == 'delete':
+        user.is_disabled = True
+        if user.email:
+            user.email = f'deleted_{user.id}_{user.email}'
+        user.password_hash = 'DELETED'
+        flash('用户已删除')
+        db.session.commit()
+        return redirect('/admin/users')
+    
+    db.session.commit()
+    return redirect(f'/admin/user/{user_id}')
