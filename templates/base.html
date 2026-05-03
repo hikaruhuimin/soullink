@@ -31,14 +31,14 @@
     <link rel="stylesheet" href="/static/css/agent-portrait.css">
     
     <style>
-        /* Navigation - 优雅简洁 */
+        /* Navigation - 紧凑分组 */
         .navbar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: var(--z-sticky);
-            background: rgba(253, 252, 250, 0.92);
+            background: rgba(253, 252, 250, 0.95);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--color-border-light);
         }
@@ -46,19 +46,19 @@
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 var(--space-xl);
+            padding: 0 var(--space-lg);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 72px;
+            height: 60px;
         }
         
         .nav-logo {
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
+            gap: 6px;
             font-family: var(--font-display);
-            font-size: 1.375rem;
+            font-size: 1.25rem;
             font-weight: 500;
             color: var(--color-text);
             text-decoration: none;
@@ -71,35 +71,93 @@
         .nav-menu {
             display: flex;
             align-items: center;
-            gap: var(--space-xl);
+            gap: 2px;
         }
         
-        .nav-link {
-            font-size: 0.9375rem;
-            font-weight: 400;
-            color: var(--color-text-secondary);
-            text-decoration: none;
-            transition: color var(--transition-fast);
+        /* 主导航项（带下拉） */
+        .nav-parent {
             position: relative;
         }
         
-        .nav-link:hover {
-            color: var(--color-text);
+        .nav-parent-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 14px;
+            background: transparent;
+            border: none;
+            color: var(--color-text-secondary);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
         }
         
-        .nav-link::after {
-            content: '';
+        .nav-parent-btn:hover,
+        .nav-parent.active .nav-parent-btn {
+            color: var(--color-accent);
+            background: rgba(184, 169, 201, 0.1);
+        }
+        
+        .nav-parent-btn svg {
+            width: 10px;
+            height: 10px;
+            transition: transform 0.2s;
+        }
+        
+        .nav-parent:hover .nav-parent-btn svg,
+        .nav-parent.active .nav-parent-btn svg {
+            transform: rotate(180deg);
+        }
+        
+        /* 下拉菜单 - 深色半透明 */
+        .nav-dropdown {
+            display: none;
             position: absolute;
-            bottom: -4px;
+            top: 100%;
             left: 0;
-            width: 0;
-            height: 1px;
-            background: var(--color-primary);
-            transition: width var(--transition-fast);
+            margin-top: 6px;
+            min-width: 160px;
+            background: rgba(40, 35, 50, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 100;
         }
         
-        .nav-link:hover::after {
-            width: 100%;
+        .nav-parent:hover .nav-dropdown,
+        .nav-parent.active .nav-dropdown {
+            display: block;
+        }
+        
+        .nav-dropdown-item {
+            display: block;
+            padding: 10px 14px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.8125rem;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.15s;
+        }
+        
+        .nav-dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .nav-dropdown-item.active {
+            background: rgba(184, 169, 201, 0.3);
+            color: white;
+        }
+        
+        /* 右侧操作区 */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         
         .nav-lang-dropdown {
@@ -110,18 +168,18 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            padding: 8px 12px;
+            padding: 6px 10px;
             background: transparent;
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-full);
+            border-radius: 6px;
             color: var(--color-text-secondary);
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             cursor: pointer;
-            transition: all var(--transition-fast);
+            transition: all 0.2s;
         }
         
         .nav-lang-btn:hover {
-            border-color: var(--color-primary);
+            border-color: var(--color-accent);
             color: var(--color-text);
         }
         
@@ -130,13 +188,15 @@
             position: absolute;
             top: 100%;
             right: 0;
-            margin-top: 8px;
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border-light);
-            border-radius: var(--radius-md);
-            padding: 8px;
-            min-width: 120px;
-            box-shadow: var(--shadow-md);
+            margin-top: 6px;
+            background: rgba(40, 35, 50, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 6px;
+            min-width: 100px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            z-index: 101;
         }
         
         .nav-lang-menu.show {
@@ -145,35 +205,49 @@
         
         .lang-option {
             display: block;
-            padding: 10px 16px;
-            color: var(--color-text-secondary);
+            padding: 8px 12px;
+            color: rgba(255, 255, 255, 0.85);
             text-decoration: none;
-            border-radius: var(--radius-sm);
-            font-size: 0.875rem;
-            transition: all var(--transition-fast);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            transition: all 0.15s;
         }
         
         .lang-option:hover {
-            background: var(--color-bg-cream);
-            color: var(--color-text);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
         
         .lang-option.active {
-            background: rgba(184, 169, 201, 0.12);
-            color: var(--color-accent);
+            background: rgba(184, 169, 201, 0.3);
+            color: white;
+        }
+        
+        .nav-link {
+            padding: 8px 12px;
+            color: var(--color-text-secondary);
+            font-size: 0.8125rem;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: var(--color-text);
+            background: rgba(184, 169, 201, 0.08);
         }
         
         .nav-btn {
             display: inline-flex;
             align-items: center;
-            padding: 10px 20px;
+            padding: 8px 16px;
             background: var(--color-accent);
             color: white;
-            font-size: 0.9375rem;
+            font-size: 0.8125rem;
             font-weight: 500;
-            border-radius: var(--radius-full);
+            border-radius: 6px;
             text-decoration: none;
-            transition: all var(--transition-fast);
+            transition: all 0.2s;
         }
         
         .nav-btn:hover {
@@ -185,7 +259,7 @@
         .nav-toggle {
             display: none;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
             padding: 8px;
             background: none;
             border: none;
@@ -193,10 +267,9 @@
         }
         
         .nav-toggle span {
-            width: 20px;
+            width: 18px;
             height: 1.5px;
             background: var(--color-text);
-            transition: all var(--transition-fast);
         }
         
         /* Main Content */
@@ -312,39 +385,82 @@
         
         /* Responsive */
         @media (max-width: 768px) {
+            .nav-container {
+                height: 56px;
+                padding: 0 12px;
+            }
+            
             .nav-menu {
                 display: none;
-                position: absolute;
-                top: 72px;
+                position: fixed;
+                top: 56px;
                 left: 0;
                 right: 0;
-                background: var(--color-bg-card);
-                flex-direction: row;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                padding: 12px 16px;
-                gap: 16px;
+                bottom: 60px;
+                background: rgba(253, 252, 250, 0.98);
+                flex-direction: column;
+                align-items: stretch;
+                padding: 16px;
+                gap: 8px;
+                overflow-y: auto;
                 border-bottom: 1px solid var(--color-border-light);
                 box-shadow: var(--shadow-lg);
-                -webkit-overflow-scrolling: touch;
-                white-space: nowrap;
             }
             
             .nav-menu.show {
                 display: flex;
-                flex-direction: row;
             }
             
             .nav-toggle {
                 display: flex;
             }
             
-            .bottom-nav {
+            /* 移动端主导航按钮 */
+            .nav-parent {
+                width: 100%;
+            }
+            
+            .nav-parent-btn {
+                width: 100%;
+                justify-content: space-between;
+                padding: 14px 16px;
+                font-size: 0.9375rem;
+                background: rgba(184, 169, 201, 0.08);
+                border-radius: 10px;
+            }
+            
+            .nav-dropdown {
+                position: static;
+                display: none;
+                margin-top: 8px;
+                background: rgba(40, 35, 50, 0.95);
+                box-shadow: none;
+                border: none;
+            }
+            
+            .nav-dropdown.show {
                 display: block;
             }
             
+            .nav-dropdown-item {
+                padding: 12px 16px;
+                font-size: 0.875rem;
+            }
+            
+            .nav-actions {
+                margin-top: 16px;
+                padding-top: 16px;
+                border-top: 1px solid var(--color-border-light);
+                justify-content: center;
+                gap: 12px;
+            }
+            
+            .bottom-nav {
+                display: flex;
+            }
+            
             .main-content {
-                padding-bottom: 80px;
+                padding-bottom: 72px;
             }
         }
     </style>
@@ -372,62 +488,72 @@
             </button>
             
             <div class="nav-menu" id="navMenu">
-                <a href="/feed" class="nav-link" style="color: #8b5cf6;">✨ 动态</a>
-                <a href="/agents" class="nav-link">灵犀广场</a>
-                <a href="/chat" class="nav-link">聊天室</a>
-                <a href="/divination/dream" class="nav-link">AI解梦</a>
-                <a href="/meet" class="nav-link">奔现</a>
-                <a href="/divination" class="nav-link">占卜</a>
-                <a href="/match/zodiac" class="nav-link" style="color: #ff6b9d;">✨ 星座配对</a>
-                <a href="/match/matchmaker" class="nav-link" style="color: #a78bfa;">💘 AI红娘</a>
-                <a href="/undercover" class="nav-link">谁是卧底</a>
-                <a href="/soulmate-portrait" class="nav-link" style="color: #ec4899;">💝 灵魂伴侣</a>
-                <a href="/love-letter" class="nav-link" style="color: #f43f5e;">💌 情书</a>
-                <a href="/past-life" class="nav-link" style="color: #6b7280;">👻 前世今生</a>
-                <a href="/rituals" class="nav-link" style="color: #8b5cf6;">🌙 节日仪式</a>
-                <a href="/shop" class="nav-link" style="color: #11998e; font-weight: 600;">灵石商城</a>
-                                                
-                {% if current_user.is_authenticated %}
-                <a href="/wallet" class="nav-link" title="我的钱包">💎 {{ current_user.spirit_stones or 0 }}</a>
-                <a href="/friends" class="nav-link" id="friendsNav" title="好友列表">
-                    👥 好友
-                    <span id="friendRequestBadge" style="display: none;"></span>
-                </a>
-                <button class="nav-checkin-btn" id="checkinBtn" onclick="openCheckinModal()" style="
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                    padding: 8px 16px;
-                    background: linear-gradient(135deg, #f59e0b, #d97706);
-                    color: white;
-                    border: none;
-                    border-radius: 20px;
-                    font-size: 0.875rem;
-                    cursor: pointer;
-                    transition: all 0.3s;
-                ">
-                    🔔 签到
-                    <span id="streakBadge" style="display: none; background: rgba(255,255,255,0.3); padding: 2px 6px; border-radius: 10px; font-size: 0.75rem;"></span>
-                </button>
-                {% endif %}
-                
-                <div class="nav-lang-dropdown">
-                    <button class="nav-lang-btn" onclick="toggleLangMenu()">
-                        {{ lang|upper or 'ZH' }}
+                <!-- 占卜下拉 -->
+                <div class="nav-parent {% if '/divination' in request.path %}active{% endif %}">
+                    <button class="nav-parent-btn" onclick="toggleDropdown(this)">
+                        占卜
+                        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 4L5 7L8 4"/>
+                        </svg>
                     </button>
-                    <div class="nav-lang-menu" id="langMenu">
-                        <a href="/lang/zh" class="lang-option {% if lang == 'zh' %}active{% endif %}">中文</a>
-                        <a href="/lang/en" class="lang-option {% if lang == 'en' %}active{% endif %}">English</a>
-                        <a href="/lang/ja" class="lang-option {% if lang == 'ja' %}active{% endif %}">日本語</a>
+                    <div class="nav-dropdown">
+                        <a href="/divination" class="nav-dropdown-item {% if request.path == '/divination' %}active{% endif %}">AI占卜</a>
+                        <a href="/divination/dream" class="nav-dropdown-item {% if request.path == '/divination/dream' %}active{% endif %}">AI解梦</a>
+                        <a href="/daily-checkin" class="nav-dropdown-item {% if request.path == '/daily-checkin' %}active{% endif %}">每日运势</a>
                     </div>
                 </div>
                 
-                {% if current_user.is_authenticated %}
-                <a href="/settings" class="nav-link">{{ current_user.username }}</a>
-                {% else %}
-                <a href="/auth/login" class="nav-link">登录</a>
-                <a href="/auth/register" class="nav-btn">开始探索</a>
-                {% endif %}
+                <!-- AI红娘下拉 -->
+                <div class="nav-parent {% if '/match' in request.path %}active{% endif %}">
+                    <button class="nav-parent-btn" onclick="toggleDropdown(this)">
+                        AI红娘
+                        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 4L5 7L8 4"/>
+                        </svg>
+                    </button>
+                    <div class="nav-dropdown">
+                        <a href="/match/zodiac" class="nav-dropdown-item {% if '/match/zodiac' in request.path %}active{% endif %}">星座配对</a>
+                        <a href="/meet" class="nav-dropdown-item {% if request.path == '/meet' %}active{% endif %}">奔现</a>
+                    </div>
+                </div>
+                
+                <!-- 聊天室下拉 -->
+                <div class="nav-parent {% if request.path in ['/chat', '/agents', '/undercover', '/tree-hole'] %}active{% endif %}">
+                    <button class="nav-parent-btn" onclick="toggleDropdown(this)">
+                        聊天室
+                        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M2 4L5 7L8 4"/>
+                        </svg>
+                    </button>
+                    <div class="nav-dropdown">
+                        <a href="/chat" class="nav-dropdown-item {% if request.path == '/chat' %}active{% endif %}">进入聊天</a>
+                        <a href="/agents" class="nav-dropdown-item {% if request.path == '/agents' %}active{% endif %}">灵犀广场</a>
+                        <a href="/tree-hole" class="nav-dropdown-item {% if request.path == '/tree-hole' %}active{% endif %}">深夜树洞</a>
+                        <a href="/undercover" class="nav-dropdown-item {% if request.path == '/undercover' %}active{% endif %}">谁是卧底</a>
+                    </div>
+                </div>
+                
+                <!-- 右侧操作 -->
+                <div class="nav-actions">
+                    <div class="nav-lang-dropdown">
+                        <button class="nav-lang-btn" onclick="toggleLangMenu()">
+                            {{ lang|upper or 'ZH' }}
+                        </button>
+                        <div class="nav-lang-menu" id="langMenu">
+                            <a href="/lang/zh" class="lang-option {% if lang == 'zh' %}active{% endif %}">中文</a>
+                            <a href="/lang/en" class="lang-option {% if lang == 'en' %}active{% endif %}">English</a>
+                            <a href="/lang/ja" class="lang-option {% if lang == 'ja' %}active{% endif %}">日本語</a>
+                        </div>
+                    </div>
+                    
+                    {% if current_user.is_authenticated %}
+                    <a href="/wallet" class="nav-link">{{ current_user.spirit_stones or 0 }}</a>
+                    <a href="/settings" class="nav-link">{{ current_user.username }}</a>
+                    {% else %}
+                    <a href="/auth/login" class="nav-link">登录</a>
+                    <a href="/auth/register" class="nav-btn">开始探索</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
@@ -558,11 +684,32 @@
             document.getElementById('langMenu').classList.toggle('show');
         }
         
+        function toggleDropdown(btn) {
+            const parent = btn.closest('.nav-parent');
+            const dropdown = parent.querySelector('.nav-dropdown');
+            const isOpen = dropdown.style.display === 'block';
+            
+            // 关闭所有下拉
+            document.querySelectorAll('.nav-dropdown').forEach(d => d.style.display = 'none');
+            
+            // 切换当前下拉
+            if (!isOpen) {
+                dropdown.style.display = 'block';
+            }
+        }
+        
+        // 点击空白处关闭下拉
         document.addEventListener('click', function(e) {
-            const dropdown = document.querySelector('.nav-lang-dropdown');
-            const menu = document.getElementById('langMenu');
-            if (dropdown && !dropdown.contains(e.target)) {
-                menu.classList.remove('show');
+            // 语言菜单
+            const langDropdown = document.querySelector('.nav-lang-dropdown');
+            const langMenu = document.getElementById('langMenu');
+            if (langDropdown && !langDropdown.contains(e.target)) {
+                langMenu.classList.remove('show');
+            }
+            
+            // 导航下拉（移动端点击外部关闭）
+            if (!e.target.closest('.nav-parent')) {
+                document.querySelectorAll('.nav-dropdown').forEach(d => d.style.display = '');
             }
         });
         
