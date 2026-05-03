@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'zh' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}编辑个人资料 - SoulLink{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <style>
+        :root {
+            --gradient-romantic: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            --gradient-pink: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --gradient-purple: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            --color-pink: #ff6b9d;
+            --color-pink-light: #ffc2d4;
+            --color-gold: #d4a574;
+            --color-gold-light: #f5e6d3;
+        }
+
+        body {
+            background: linear-gradient(180deg, #fef8fa 0%, #fff 100%);
+            min-height: 100vh;
+            font-family: 'Noto Sans SC', -apple-system, sans-serif;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* Form */
+        .profile-form {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(255, 107, 157, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-label .required {
+            color: var(--color-pink);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-pink);
+            box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #ccc;
+        }
+
+        textarea.form-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Avatar Upload */
+        .avatar-upload {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--gradient-pink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-actions {
+            flex: 1;
+        }
+
+        .avatar-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid var(--color-pink);
+            color: var(--color-pink);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .avatar-btn:hover {
+            background: var(--color-pink);
+            color: white;
+        }
+
+        /* Gender Selection */
+        .gender-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .gender-option {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gender-option:hover {
+            border-color: var(--color-pink-light);
+        }
+
+        .gender-option.selected {
+            border-color: var(--color-pink);
+            background: rgba(255, 107, 157, 0.05);
+        }
+
+        .gender-option .icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        .gender-option .label {
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        /* MBTI Selection */
+        .mbti-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .mbti-option {
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .mbti-option:hover {
+            border-color: var(--color-pink-light);
+        }
+
+        .mbti-option.selected {
+            border-color: var(--color-pink);
+            background: rgba(255, 107, 157, 0.05);
+            color: var(--color-pink);
+        }
+
+        /* Interest Tags */
+        .interest-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .interest-tag {
+            padding: 8px 16px;
+            border: 2px solid #eee;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .interest-tag:hover {
+            border-color: var(--color-pink-light);
+        }
+
+        .interest-tag.selected {
+            border-color: var(--color-pink);
+            background: var(--color-pink);
+            color: white;
+        }
+
+        /* Birthday */
+        .birthday-input {
+            display: flex;
+            gap: 12px;
+        }
+
+        .birthday-input select {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .birthday-input select:focus {
+            outline: none;
+            border-color: var(--color-pink);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-romantic);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(255, 107, 157, 0.4);
+            margin-top: 32px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(255, 107, 157, 0.5);
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            margin-bottom: 16px;
+        }
+
+        .success-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--color-pink);
+            margin-bottom: 12px;
+        }
+
+        .success-text {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        /* Navigation */
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 12px 20px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 50px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            border-color: var(--color-pink);
+            color: var(--color-pink);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .mbti-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .avatar-upload {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .gender-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% extends "base.html" %}
+
+    {% block content %}
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="page-icon">💝</div>
+            <h1 class="page-title">完善个人资料</h1>
+            <p class="page-subtitle">让AI红娘更精准地为你匹配</p>
+        </div>
+
+        <!-- Profile Form -->
+        <form class="profile-form" id="profileForm">
+            <!-- Basic Info -->
+            <div class="form-section">
+                <h3 class="section-title">👤 基本信息</h3>
+
+                <!-- Avatar -->
+                <div class="form-group">
+                    <label class="form-label">头像</label>
+                    <div class="avatar-upload">
+                        <div class="avatar-preview" id="avatarPreview">
+                            {{ current_user.username[0] if current_user.username else '👤' }}
+                        </div>
+                        <div class="avatar-actions">
+                            <label class="avatar-btn">
+                                📷 上传头像
+                                <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                            </label>
+                            <p style="color: #999; font-size: 0.8rem; margin-top: 8px;">支持 JPG/PNG，建议正方形图片</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gender -->
+                <div class="form-group">
+                    <label class="form-label">性别 <span class="required">*</span></label>
+                    <div class="gender-options">
+                        <div class="gender-option {% if current_user.gender == 'male' %}selected{% endif %}" data-gender="male" onclick="selectGender(this)">
+                            <div class="icon">👨</div>
+                            <div class="label">男</div>
+                        </div>
+                        <div class="gender-option {% if current_user.gender == 'female' %}selected{% endif %}" data-gender="female" onclick="selectGender(this)">
+                            <div class="icon">👩</div>
+                            <div class="label">女</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="genderInput" name="gender" value="{{ current_user.gender or '' }}">
+                </div>
+
+                <!-- Birthday -->
+                <div class="form-group">
+                    <label class="form-label">生日 <span class="required">*</span></label>
+                    <div class="birthday-input">
+                        <input type="date" class="form-input" id="birthdayInput" name="birthday" 
+                               value="{{ current_user.birthday.strftime('%Y-%m-%d') if current_user.birthday else '' }}"
+                               max="{{ today }}" required>
+                    </div>
+                    {% if current_user.zodiac_sign %}
+                    <p style="color: var(--color-pink); font-size: 0.9rem; margin-top: 8px;">
+                        ♈ 您的星座：{{ current_user.zodiac_sign }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Personality -->
+            <div class="form-section">
+                <h3 class="section-title">🧠 性格测试</h3>
+
+                <!-- MBTI -->
+                <div class="form-group">
+                    <label class="form-label">MBTI性格类型</label>
+                    <div class="mbti-grid" id="mbtiGrid">
+                        {% for mbti in ['INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP', 'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ', 'ISTP', 'ISFP', 'ESTP', 'ESFP'] %}
+                        <div class="mbti-option {% if current_user.mbti == mbti %}selected{% endif %}" data-mbti="{{ mbti }}" onclick="selectMBTI(this)">
+                            {{ mbti }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" id="mbtiInput" name="mbti" value="{{ current_user.mbti or '' }}">
+                    <p style="color: #999; font-size: 0.8rem; margin-top: 8px;">
+                        还没测试？<a href="/divination/mbti" style="color: var(--color-pink);">去测试MBTI →</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Interests -->
+            <div class="form-section">
+                <h3 class="section-title">💫 兴趣爱好</h3>
+
+                <div class="form-group">
+                    <label class="form-label">选择你的兴趣标签 <span class="required">*</span></label>
+                    <div class="interest-tags" id="interestTags">
+                        {% set interests_list = (current_user.interests.split(',') if current_user.interests else []) %}
+                        {% for interest in ['旅行', '音乐', '游戏', '美食', '运动', '阅读', '电影', '摄影', '绘画', '健身', '瑜伽', '跑步', '跳舞', '唱歌', '宠物', '编程', '科技', '时尚', '美妆', '投资'] %}
+                        <div class="interest-tag {% if interest in interests_list %}selected{% endif %}" data-interest="{{ interest }}" onclick="toggleInterest(this)">
+                            {{ interest }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" id="interestsInput" name="interests" value="{{ current_user.interests or '' }}">
+                </div>
+
+                <!-- Bio -->
+                <div class="form-group">
+                    <label class="form-label">自我介绍</label>
+                    <textarea class="form-input" id="bioInput" name="bio" placeholder="用一句话介绍自己，让TA更了解你..." maxlength="200">{{ current_user.bio or '' }}</textarea>
+                </div>
+            </div>
+
+            <!-- Looking For -->
+            <div class="form-section">
+                <h3 class="section-title">💝 期待的TA</h3>
+
+                <div class="form-group">
+                    <label class="form-label">你希望遇到什么样的TA？</label>
+                    <textarea class="form-input" id="lookingForInput" name="looking_for" placeholder="描述一下你期待的TA..." maxlength="200">{{ current_user.looking_for or '' }}</textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                💕 保存资料
+            </button>
+        </form>
+
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">🎉</div>
+            <h2 class="success-title">资料已保存!</h2>
+            <p class="success-text">现在可以去AI红娘那里看看有谁在等你~</p>
+            <a href="/match/matchmaker" class="nav-link" style="display: inline-block; background: var(--gradient-romantic); color: white; border: none;">💘 AI红娘匹配</a>
+            <div class="nav-links">
+                <a href="/match/zodiac" class="nav-link">♈ 星座配对</a>
+                <a href="/divination" class="nav-link">🔮 AI占卜</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let selectedGender = '{{ current_user.gender or "" }}';
+        let selectedMBTI = '{{ current_user.mbti or "" }}';
+        let selectedInterests = new Set({{ "'" + "','".join(interests_list) + "'" if interests_list else '' | safe }});
+        
+        // Initialize selected interests from current data
+        {% if current_user.interests %}
+            {% for interest in current_user.interests.split(',') %}
+                selectedInterests.add('{{ interest.strip() }}');
+            {% endfor %}
+        {% endif %}
+
+        function selectGender(element) {
+            document.querySelectorAll('.gender-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedGender = element.dataset.gender;
+            document.getElementById('genderInput').value = selectedGender;
+        }
+
+        function selectMBTI(element) {
+            document.querySelectorAll('.mbti-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedMBTI = element.dataset.mbti;
+            document.getElementById('mbtiInput').value = selectedMBTI;
+        }
+
+        function toggleInterest(element) {
+            const interest = element.dataset.interest;
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                selectedInterests.delete(interest);
+            } else {
+                element.classList.add('selected');
+                selectedInterests.add(interest);
+            }
+            document.getElementById('interestsInput').value = Array.from(selectedInterests).join(',');
+        }
+
+        // Avatar upload preview
+        document.getElementById('avatarInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').innerHTML = 
+                        `<img src="${e.target.result}" alt="Avatar">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Form submission
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!selectedGender) {
+                showToast('请选择性别');
+                return;
+            }
+
+            const birthday = document.getElementById('birthdayInput').value;
+            if (!birthday) {
+                showToast('请选择生日');
+                return;
+            }
+
+            if (selectedInterests.size === 0) {
+                showToast('请至少选择一个兴趣标签');
+                return;
+            }
+
+            const formData = {
+                gender: selectedGender,
+                birthday: birthday,
+                mbti: selectedMBTI,
+                interests: Array.from(selectedInterests).join(','),
+                bio: document.getElementById('bioInput').value,
+                looking_for: document.getElementById('lookingForInput').value
+            };
+
+            // Handle avatar upload
+            const avatarInput = document.getElementById('avatarInput');
+            if (avatarInput.files[0]) {
+                formData.avatar = await readFileAsBase64(avatarInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('/match/api/profile/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('profileForm').style.display = 'none';
+                    document.getElementById('successMessage').classList.add('show');
+                    showToast('资料保存成功!');
+                } else {
+                    showToast(data.error || '保存失败，请重试');
+                }
+            } catch (error) {
+                showToast('请求失败，请重试');
+            }
+        });
+
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Update interests input on load
+        document.getElementById('interestsInput').value = Array.from(selectedInterests).join(',');
+    </script>
+    {% endblock %}
+</body>
+</html>
