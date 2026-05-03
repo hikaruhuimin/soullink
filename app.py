@@ -3,6 +3,7 @@
 
 import os
 import json
+import re
 import random
 import string
 import hashlib
