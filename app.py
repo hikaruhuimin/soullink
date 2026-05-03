@@ -1056,22 +1056,48 @@ def recharge():
 
 @app.route('/auth/register', methods=['GET', 'POST'])
 def register():
+    """用户注册 - 支持邮箱或手机号"""
     lang = get_client_language()
     
     if request.method == 'POST':
-        email = request.form.get('email')
+        register_method = request.form.get('register_method', 'email')
         username = request.form.get('username')
         password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
         
-        if not email or not username or not password:
+        if not username or not password:
             flash('请填写所有必填项')
-            return render_template('auth/register.html', lang=lang)
+            return render_template('auth.html', mode='register', lang=lang)
         
-        if User.query.filter_by(email=email).first():
-            flash('该邮箱已被注册')
-            return render_template('auth/register.html', lang=lang)
+        if password != confirm_password:
+            flash('两次输入的密码不一致')
+            return render_template('auth.html', mode='register', lang=lang)
         
-        user = User(email=email, username=username)
+        # 根据注册方式获取标识符
+        email = None
+        phone = None
+        if register_method == 'email':
+            email = request.form.get('email')
+            if not email:
+                flash('请输入邮箱地址')
+                return render_template('auth.html', mode='register', lang=lang)
+        else:
+            phone = request.form.get('phone')
+            if not phone or not re.match(r'^1[3-9]\d{9}$', phone):
+                flash('请输入有效的手机号（11位）')
+                return render_template('auth.html', mode='register', lang=lang)
+        
+        # 检查邮箱或手机号是否已被注册
+        if email:
+            if User.query.filter_by(email=email).first():
+                flash('该邮箱已被注册')
+                return render_template('auth.html', mode='register', lang=lang)
+        if phone:
+            if User.query.filter_by(phone=phone).first():
+                flash('该手机号已被注册')
+                return render_template('auth.html', mode='register', lang=lang)
+        
+        user = User(email=email, phone=phone, username=username)
         user.set_password(password)
         user.api_key = generate_api_key()
         user.spirit_stones = 100  # 注册赠送100灵石
@@ -1081,15 +1107,13 @@ def register():
         selected_avatar = request.form.get('selected_avatar', '🌟')
         
         if avatar_file and avatar_file.filename:
-            # 处理自定义上传头像
             allowed = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
             ext = avatar_file.filename.rsplit('.', 1)[-1].lower() if '.' in avatar_file.filename else ''
             if ext in allowed:
                 avatar_file.seek(0, 2)
                 size = avatar_file.tell()
                 avatar_file.seek(0)
-                if size <= 2 * 1024 * 1024:  # 2MB
-                    # 创建目录
+                if size <= 2 * 1024 * 1024:
                     os.makedirs('static/avatars', exist_ok=True)
                     filename = f'user_{int(datetime.now().timestamp())}.{ext}'
                     filepath = os.path.join('static', 'avatars', filename)
@@ -1100,7 +1124,6 @@ def register():
             else:
                 flash('仅支持 JPG/PNG/GIF/WebP 格式')
         else:
-            # 使用预设emoji头像
             user.avatar = f'/static/avatars/emoji_{hashlib.md5(selected_avatar.encode()).hexdigest()[:8]}.png'
         
         db.session.add(user)
@@ -1120,31 +1143,42 @@ def register():
         flash('注册成功！请登录')
         return redirect(url_for('login'))
     
-    return render_template('auth/register.html', lang=lang)
+    return render_template('auth.html', mode='register', lang=lang)
 
 
 @app.route('/auth/login', methods=['GET', 'POST'])
 def login():
+    """用户登录 - 支持邮箱或手机号"""
     lang = get_client_language()
     
     if request.method == 'POST':
-        email = request.form.get('email')
+        login_method = request.form.get('login_method', 'email')
         password = request.form.get('password')
+        remember = request.form.get('remember') == '1'
         
-        user = User.query.filter_by(email=email).first()
+        user = None
+        if login_method == 'email':
+            email = request.form.get('email')
+            if email:
+                user = User.query.filter_by(email=email).first()
+        else:
+            phone = request.form.get('phone')
+            if phone:
+                user = User.query.filter_by(phone=phone).first()
         
         if user and user.check_password(password):
-            login_user(user)
+            login_user(user, remember=remember)
             user.last_login = datetime.utcnow()
             db.session.commit()
             
-            flash('登录成功！')
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('index'))
+            if next_page and next_page.startswith('/'):
+                return redirect(next_page)
+            return redirect(url_for('index'))
         else:
-            flash('邮箱或密码错误')
+            flash('邮箱/手机号或密码错误')
     
-    return render_template('auth/login.html', lang=lang)
+    return render_template('auth.html', mode='login', lang=lang)
 
 
 @app.route('/auth/logout')
