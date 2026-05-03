@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('share_card', '分享卡片') }} - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.share-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px;
+    min-height: calc(100vh - 72px);
+}
+
+.share-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.share-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #E8D5C4;
+    margin-bottom: 8px;
+}
+
+.share-subtitle {
+    font-size: 0.95rem;
+    color: #A0A8C0;
+}
+
+.card-preview {
+    background: rgba(15, 20, 50, 0.75);
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+    border: 1px solid rgba(100, 120, 180, 0.2);
+}
+
+#shareCardContainer {
+    transform: scale(0.75);
+    transform-origin: center;
+    margin: -60px 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.btn-save, .btn-copy {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #8B5CF6, #C4B5FD);
+    color: white;
+    border: none;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+}
+
+.btn-copy {
+    background: rgba(255, 255, 255, 0.05);
+    color: #E8D5C4;
+    border: 1px solid rgba(100, 120, 180, 0.3);
+}
+
+.btn-copy:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(139, 92, 246, 0.5);
+}
+
+.tips {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.tips-title {
+    font-size: 0.9rem;
+    color: #C4B5FD;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tips-content {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+}
+
+.hidden-card {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="share-container">
+    <div class="share-header">
+        <h1 class="share-title">✨ {{ t('share_your_result', '分享你的结果') }}</h1>
+        <p class="share-subtitle">{{ t('save_share_hint', '长按保存图片或分享给好友') }}</p>
+    </div>
+    
+    <div class="card-preview">
+        <div id="shareCardContainer">
+            <!-- 卡片将通过JS动态渲染 -->
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        <button class="btn-save" onclick="saveCard()">
+            <span>📥</span>
+            {{ t('save_image', '保存图片') }}
+        </button>
+        <button class="btn-copy" onclick="copyToClipboard()">
+            <span>📋</span>
+            {{ t('copy_text', '复制文字') }}
+        </button>
+    </div>
+    
+    <div class="tips">
+        <div class="tips-title">
+            <span>💡</span>
+            {{ t('tips', '小提示') }}
+        </div>
+        <div class="tips-content">
+            {{ t('save_tips', '点击"保存图片"后，长按卡片可保存到相册，或直接截图保存') }}
+        </div>
+    </div>
+</div>
+
+<!-- 用于渲染卡片的隐藏容器 -->
+<div id="hiddenCardContainer" class="hidden-card"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const cardData = {{ card_data|tojson }};
+
+// 渲染分享卡片
+function renderShareCard() {
+    const container = document.getElementById('shareCardContainer');
+    const hiddenContainer = document.getElementById('hiddenCardContainer');
+    
+    const cardHTML = `
+        <div id="shareCard" style="
+            width: 400px;
+            height: 600px;
+            background: linear-gradient(145deg, #1a1033 0%, #2d1f5c 25%, #4a2c7a 50%, #1a1033 100%);
+            border-radius: 24px;
+            padding: 32px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Noto Sans SC', -apple-system, sans-serif;
+            color: white;
+        ">
+            <div style="
+                position: absolute;
+                top: -100px;
+                right: -100px;
+                width: 300px;
+                height: 300px;
+                background: radial-gradient(circle, rgba(196, 181, 253, 0.3) 0%, transparent 70%);
+                border-radius: 50%;
+            "></div>
+            <div style="
+                position: absolute;
+                bottom: -50px;
+                left: -50px;
+                width: 200px;
+                height: 200px;
+                background: radial-gradient(circle, rgba(255, 215, 100, 0.2) 0%, transparent 70%);
+                border-radius: 50%;
+            "></div>
+            
+            <div style="
+                display: flex;
+                justify-content: center;
+                gap: 16px;
+                margin-bottom: 24px;
+                font-size: 24px;
+                opacity: 0.7;
+            ">
+                <span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 32px;">
+                <div style="
+                    font-size: 18px;
+                    font-weight: 600;
+                    background: linear-gradient(135deg, #C4B5FD 0%, #FFD700 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    letter-spacing: 4px;
+                ">SoulLink</div>
+                <div style="font-size: 12px; color: rgba(255, 255, 255, 0.6); letter-spacing: 2px;">灵犀</div>
+            </div>
+            
+            <div style="
+                text-align: center;
+                margin-bottom: 16px;
+                font-size: 14px;
+                color: rgba(255, 255, 255, 0.5);
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            ">${cardData.card_type || '测试结果'}</div>
+            
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="
+                    font-size: 64px;
+                    font-weight: 700;
+                    background: linear-gradient(135deg, #ffffff 0%, #e8d5c4 50%, #C4B5FD 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    margin-bottom: 8px;
+                    line-height: 1.2;
+                ">${cardData.main_result || '???'}</div>
+                <div style="font-size: 24px; color: rgba(255, 255, 255, 0.9); font-weight: 500;">${cardData.sub_result || ''}</div>
+            </div>
+            
+            <div style="
+                width: 60px;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, #C4B5FD, transparent);
+                margin: 0 auto 24px;
+            "></div>
+            
+            <div style="
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 16px;
+                padding: 20px;
+                margin-bottom: 24px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            ">
+                <p style="
+                    font-size: 14px;
+                    line-height: 1.8;
+                    color: rgba(255, 255, 255, 0.85);
+                    text-align: center;
+                    margin: 0;
+                ">${cardData.description || '探索命运，发现自我'}</p>
+            </div>
+            
+            <div style="
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+                margin-bottom: 24px;
+            ">
+                ${(cardData.tags || []).map(tag => `
+                    <span style="
+                        background: rgba(196, 181, 253, 0.2);
+                        color: #C4B5FD;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                    ">${tag}</span>
+                `).join('')}
+            </div>
+            
+            <div style="
+                position: absolute;
+                bottom: 24px;
+                left: 0;
+                right: 0;
+                text-align: center;
+            ">
+                <div style="font-size: 11px; color: rgba(255, 255, 255, 0.4); letter-spacing: 1px;">SoulLink 灵犀</div>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = cardHTML;
+    hiddenContainer.innerHTML = cardHTML;
+}
+
+// 保存卡片为图片
+async function saveCard() {
+    const card = document.getElementById('shareCard');
+    if (!card) return;
+    
+    try {
+        const canvas = await html2canvas(card, {
+            backgroundColor: null,
+            scale: 2,
+            useCORS: true,
+            logging: false
+        });
+        
+        const link = document.createElement('a');
+        link.download = `SoulLink_${cardData.card_type || 'share'}_${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    } catch (err) {
+        alert('保存失败，请尝试截图保存');
+        console.error(err);
+    }
+}
+
+// 复制文字到剪贴板
+function copyToClipboard() {
+    const text = `${cardData.main_result || ''} ${cardData.sub_result || ''}
+${cardData.description || ''}
+
+——来自 SoulLink 灵犀
+
+🔮 ${cardData.card_type || '测试'} | ✨ 发现你的灵魂伴侣`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        alert('已复制到剪贴板');
+    }).catch(() => {
+        alert('复制失败，请手动复制');
+    });
+}
+
+// 页面加载完成后渲染卡片
+document.addEventListener('DOMContentLoaded', renderShareCard);
+</script>
+{% endblock %}

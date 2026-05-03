@@ -76,6 +76,7 @@ class User(UserMixin, db.Model):
     
     # 虚拟货币
     spirit_stones = db.Column(db.Integer, default=10)
+    invite_code = db.Column(db.String(10), unique=True)  # 邀请码
     
     # 设置
     language = db.Column(db.String(10), default='zh')

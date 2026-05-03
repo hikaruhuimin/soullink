@@ -1,0 +1,19 @@
+{# 分享按钮片段 - 可嵌入到各个结果页面 #}
+<div class="share-buttons" style="margin-top: 24px; display: flex; gap: 12px; justify-content: center;">
+    <a href="/share/card/{{ card_type }}" class="btn-share-card" style="
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(196, 181, 253, 0.2));
+        border: 1px solid rgba(139, 92, 246, 0.4);
+        border-radius: 24px;
+        color: #E8D5C4;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.3s;
+    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(139, 92, 246, 0.3)';" onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+        <span style="font-size: 1.2em;">📱</span>
+        {{ t('share_card', '分享卡片') }}
+    </a>
+</div>
