@@ -540,25 +540,273 @@ body::before {
 .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
 .start-btn:active { transform: scale(0.98); }
 
-/* Divination Animation */
+/* ========================================
+   ADVANCED CRYSTAL BALL - Premium Version
+   ======================================== */
+
+/* Main Container */
 .divination-animation { text-align: center; padding: 40px 0; }
 
-.crystal-ball-container { position: relative; width: 120px; height: 120px; margin: 0 auto 30px; }
+.crystal-ball-container { 
+    position: relative; 
+    width: 140px; 
+    height: 160px; 
+    margin: 0 auto 30px; 
+}
 
+/* Outer Glow Effect */
 .crystal-glow {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 100%; height: 100%; background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
-    animation: pulse 1.5s infinite;
+    position: absolute; 
+    top: 0; 
+    left: 50%; 
+    transform: translateX(-50%);
+    width: 160px; 
+    height: 160px; 
+    background: radial-gradient(ellipse at center, 
+        rgba(168, 85, 247, 0.4) 0%, 
+        rgba(139, 92, 246, 0.2) 30%, 
+        rgba(236, 72, 153, 0.1) 60%,
+        transparent 80%);
+    filter: blur(10px);
+    animation: glowPulse 2s ease-in-out infinite;
+    z-index: 0;
 }
 
-@keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.7; } }
-
-.crystal-icon {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-size: 48px; animation: rotate 3s linear infinite;
+@keyframes glowPulse { 
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 1; } 
+    50% { transform: translateX(-50%) scale(1.15); opacity: 0.7; } 
 }
 
-@keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+/* Crystal Sphere */
+.crystal-sphere {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: 
+        radial-gradient(ellipse at 30% 30%, 
+            rgba(192, 132, 252, 0.6) 0%, 
+            rgba(168, 85, 247, 0.4) 20%,
+            transparent 50%),
+        radial-gradient(ellipse at 50% 50%,
+            rgba(30, 20, 60, 0.9) 0%,
+            rgba(60, 40, 100, 0.7) 30%,
+            rgba(100, 70, 160, 0.5) 60%,
+            rgba(139, 92, 246, 0.3) 80%,
+            rgba(168, 85, 247, 0.2) 100%);
+    box-shadow: 
+        0 0 30px rgba(168, 85, 247, 0.5),
+        inset 0 0 20px rgba(192, 132, 252, 0.3),
+        inset 0 -20px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: sphereFloat 3s ease-in-out infinite;
+    z-index: 1;
+}
+
+@keyframes sphereFloat {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* Glass Reflection / Highlight */
+.crystal-sphere::before {
+    content: '';
+    position: absolute;
+    top: 12%;
+    left: 15%;
+    width: 35%;
+    height: 25%;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.6) 0%, 
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%);
+    border-radius: 50%;
+    filter: blur(2px);
+}
+
+/* Secondary highlight */
+.crystal-sphere::after {
+    content: '';
+    position: absolute;
+    top: 20%;
+    right: 20%;
+    width: 15%;
+    height: 10%;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    filter: blur(1px);
+}
+
+/* Mystical particles inside sphere */
+.sphere-particles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    animation: rotateParticle 4s linear infinite;
+    z-index: 1;
+}
+
+.sphere-particles::before {
+    content: '✦';
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: rgba(255, 215, 0, 0.8);
+    animation: twinkle 1.5s ease-in-out infinite;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.sphere-particles::after {
+    content: '✧';
+    position: absolute;
+    bottom: 15%;
+    right: 20%;
+    font-size: 6px;
+    color: rgba(192, 132, 252, 0.8);
+    animation: twinkle 1.8s ease-in-out infinite reverse;
+    text-shadow: 0 0 5px rgba(192, 132, 252, 0.5);
+}
+
+@keyframes rotateParticle {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+}
+
+/* Premium Stand */
+.crystal-stand {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 45px;
+    z-index: 2;
+}
+
+/* Stand top ring */
+.stand-ring {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 15px;
+    background: linear-gradient(180deg, 
+        #D4AF37 0%, 
+        #FFD700 20%,
+        #B8860B 60%,
+        #8B7355 100%);
+    border-radius: 50%;
+    box-shadow: 
+        0 2px 5px rgba(0, 0, 0, 0.3),
+        inset 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Stand neck */
+.stand-neck {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(90deg,
+        #8B7355 0%,
+        #D4AF37 30%,
+        #FFD700 50%,
+        #D4AF37 70%,
+        #8B7355 100%);
+    clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+}
+
+/* Stand base */
+.stand-base {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 18px;
+    background: linear-gradient(180deg,
+        #FFD700 0%,
+        #D4AF37 20%,
+        #B8860B 60%,
+        #8B7355 100%);
+    border-radius: 50%;
+    box-shadow: 
+        0 3px 8px rgba(0, 0, 0, 0.4),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+/* Base decorative gem */
+.stand-gem {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle at 30% 30%,
+        #E066FF 0%,
+        #9932CC 50%,
+        #4B0082 100%);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 8px rgba(153, 50, 204, 0.6),
+        inset 0 0 4px rgba(255, 255, 255, 0.3);
+    animation: gemGlow 2s ease-in-out infinite;
+}
+
+@keyframes gemGlow {
+    0%, 100% { box-shadow: 0 0 8px rgba(153, 50, 204, 0.6), inset 0 0 4px rgba(255, 255, 255, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(153, 50, 204, 0.8), inset 0 0 6px rgba(255, 255, 255, 0.5); }
+}
+
+/* Ambient sparkles around the ball */
+.crystal-sparkles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.sparkle {
+    position: absolute;
+    font-size: 10px;
+    animation: sparkleFloat 3s ease-in-out infinite;
+}
+
+.sparkle:nth-child(1) { top: 15%; left: 5%; animation-delay: 0s; }
+.sparkle:nth-child(2) { top: 25%; right: 8%; animation-delay: 0.5s; }
+.sparkle:nth-child(3) { top: 60%; left: 3%; animation-delay: 1s; }
+.sparkle:nth-child(4) { top: 70%; right: 5%; animation-delay: 1.5s; }
+
+.sparkle::before {
+    content: '✦';
+    color: rgba(255, 215, 0, 0.8);
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes sparkleFloat {
+    0%, 100% { opacity: 0.3; transform: translateY(0) scale(1); }
+    50% { opacity: 1; transform: translateY(-8px) scale(1.3); }
+}
 
 .tarot-cards { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
 
@@ -1036,7 +1284,58 @@ body::before {
             <span class="deco-star">⭐</span>
         </div>
         <div class="hero-content">
-            <span class="hero-icon">🔮</span>
+            <span class="hero-icon">
+    <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: float 3s ease-in-out infinite;">
+        <!-- Glow effect -->
+        <defs>
+            <radialGradient id="sphereGrad" cx="35%" cy="35%" r="60%" fx="25%" fy="25%">
+                <stop offset="0%" stop-color="#E0B0FF" stop-opacity="0.8"/>
+                <stop offset="40%" stop-color="#9966CC" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#4B0082" stop-opacity="0.9"/>
+            </radialGradient>
+            <radialGradient id="innerGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#DDA0DD" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#8A2BE2" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="standGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#FFD700"/>
+                <stop offset="50%" stop-color="#DAA520"/>
+                <stop offset="100%" stop-color="#B8860B"/>
+            </linearGradient>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+        
+        <!-- Outer glow -->
+        <ellipse cx="48" cy="40" rx="32" ry="32" fill="url(#innerGlow)" opacity="0.5"/>
+        
+        <!-- Crystal sphere -->
+        <circle cx="48" cy="38" r="28" fill="url(#sphereGrad)" filter="url(#glow)"/>
+        
+        <!-- Glass highlights -->
+        <ellipse cx="38" cy="28" rx="10" ry="7" fill="white" opacity="0.4" transform="rotate(-30 38 28)"/>
+        <circle cx="56" cy="32" r="4" fill="white" opacity="0.25"/>
+        
+        <!-- Inner mystical particles -->
+        <circle cx="42" cy="42" r="2" fill="#FFD700" opacity="0.8"/>
+        <circle cx="52" cy="48" r="1.5" fill="#E0B0FF" opacity="0.7"/>
+        <circle cx="46" cy="50" r="1" fill="#FFD700" opacity="0.6"/>
+        
+        <!-- Premium Stand -->
+        <ellipse cx="48" cy="68" rx="18" ry="5" fill="url(#standGrad)"/>
+        <rect x="42" y="62" width="12" height="8" fill="url(#standGrad)"/>
+        <ellipse cx="48" cy="62" rx="16" ry="4" fill="#FFD700"/>
+        
+        <!-- Stand gem -->
+        <circle cx="48" cy="69" r="4" fill="#9932CC"/>
+        <circle cx="47" cy="68" r="1.5" fill="white" opacity="0.4"/>
+    </svg>
+</span>
             <h1>AI智能占卜</h1>
             <p>探索你的命运，解锁未来秘密</p>
         </div>
@@ -1221,7 +1520,22 @@ body::before {
                 <div class="divination-animation">
                     <div class="crystal-ball-container">
                         <div class="crystal-glow"></div>
-                        <span class="crystal-icon" id="animIcon">🔮</span>
+                        <div class="crystal-sphere">
+                            <div class="sphere-particles"></div>
+                        </div>
+                        <div class="crystal-stand">
+                            <div class="stand-ring"></div>
+                            <div class="stand-neck"></div>
+                            <div class="stand-base">
+                                <div class="stand-gem"></div>
+                            </div>
+                        </div>
+                        <div class="crystal-sparkles">
+                            <span class="sparkle"></span>
+                            <span class="sparkle"></span>
+                            <span class="sparkle"></span>
+                            <span class="sparkle"></span>
+                        </div>
                     </div>
                     <div class="tarot-cards">
                         <div class="tarot-card-anim">🃏</div>
