@@ -3557,10 +3557,22 @@ def admin_logout():
 @admin_required
 def admin_dashboard():
     """管理后台仪表盘"""
+    lang = session.get('lang', 'zh')
     total_users = User.query.count()
     today = datetime.utcnow().date()
-    new_today = User.query.filter(db.func.date(User.id) == today).count()
-    total_rels = AgentRelationship.query.count()
+    new_today = User.query.filter(db.func.date(User.created_at) == today).count()
+    seven_days_ago = datetime.utcnow() - timedelta(days=7)
+    active_users = User.query.filter(User.last_login >= seven_days_ago).count()
+    total_spirit_stones = db.session.query(db.func.sum(User.spirit_stones)).scalar() or 0
+    vip_users = User.query.filter(User.vip_level > 0).count()
+    
+    # 最近7天注册趋势
+    registration_trend = []
+    for i in range(7):
+        date = today - timedelta(days=6-i)
+        count = User.query.filter(db.func.date(User.created_at) == date).count()
+        registration_trend.append({'date': date.strftime('%m/%d'), 'count': count})
+    
     total_gifts = AgentGift.query.count()
     total_earnings = EarningRecord.query.count()
     agents_stats = []
@@ -3570,22 +3582,31 @@ def admin_dashboard():
         agents_stats.append({'agent': a, 'rel_count': rel_count, 'gift_count': gift_count})
     recent_users = User.query.order_by(User.id.desc()).limit(10).all()
     return render_template('admin_dashboard.html',
+        lang=lang,
         total_users=total_users, new_today=new_today,
-        total_rels=total_rels, total_gifts=total_gifts,
+        active_users=active_users, total_spirit_stones=total_spirit_stones,
+        vip_users=vip_users, registration_trend=registration_trend,
+        total_gifts=total_gifts, total_earnings=total_earnings,
         agents_stats=agents_stats, recent_users=recent_users)
 
 @app.route('/admin/users')
 @admin_required
 def admin_users():
     """用户列表"""
+    lang = session.get('lang', 'zh')
     page = request.args.get('page', 1, type=int)
     per_page = 20
     search = request.args.get('search', '').strip()
+    status_filter = request.args.get('status', 'all')
     query = User.query
     if search:
         query = query.filter(db.or_(User.username.contains(search), User.email.contains(search)))
+    if status_filter == 'vip':
+        query = query.filter(User.vip_level > 0)
+    elif status_filter == 'free':
+        query = query.filter(User.vip_level == 0)
     users = query.order_by(User.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    return render_template('admin_users.html', users=users, search=search)
+    return render_template('admin_users.html', lang=lang, users=users, search=search, status_filter=status_filter)
 
 @app.route('/admin/user/<int:user_id>')
 @admin_required
@@ -4301,3 +4322,135 @@ def admin_agent_regenerate_key(agent_id):
     db.session.commit()
     flash('已重新生成API Key: {}'.format(agent.name))
     return redirect(request.referrer or '/admin/agents/creator')
+
+
+# ============ 新增管理后台路由 ============
+
+@app.route('/admin/stats')
+@admin_required
+def admin_stats():
+    """数据统计"""
+    lang = session.get('lang', 'zh')
+    today = datetime.utcnow().date()
+    
+    # 注册趋势
+    registration_trend = []
+    for i in range(30):
+        date = today - timedelta(days=29-i)
+        count = User.query.filter(db.func.date(User.created_at) == date).count()
+        registration_trend.append({'date': date.strftime('%m/%d'), 'count': count})
+    
+    # 会员分布
+    vip_distribution = {
+        'free': User.query.filter(User.vip_level == 0).count(),
+        'basic': User.query.filter(User.vip_level == 1).count(),
+        'premium': User.query.filter(User.vip_level == 2).count(),
+        'guardian': 0
+    }
+    
+    # 消费排行
+    top_spenders = []
+    try:
+        top_spenders = db.session.query(
+            User.id, User.username, db.func.sum(AgentGift.gift_price).label('total')
+        ).join(AgentGift, AgentGift.sender_id == User.id
+        ).group_by(User.id).order_by(db.desc('total')).limit(10).all()
+    except:
+        pass
+    
+    # 日活跃
+    daily_active = []
+    for i in range(7):
+        date = today - timedelta(days=6-i)
+        count = User.query.filter(db.func.date(User.last_login) == date).count()
+        daily_active.append({'date': date.strftime('%m/%d'), 'count': count})
+    
+    return render_template('admin_stats.html', lang=lang,
+        registration_trend=registration_trend, vip_distribution=vip_distribution,
+        top_spenders=top_spenders, top_inviters=[], daily_active=daily_active)
+
+@app.route('/admin/settings', methods=['GET', 'POST'])
+@admin_required
+def admin_settings():
+    """系统设置"""
+    lang = session.get('lang', 'zh')
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'update_announcement':
+            import os
+            announcement = request.form.get('announcement', '')
+            os.makedirs('data', exist_ok=True)
+            with open('data/announcement.txt', 'w', encoding='utf-8') as f:
+                f.write(announcement)
+            flash('公告已更新')
+        elif action == 'update_config':
+            new_password = request.form.get('new_password', '').strip()
+            if new_password and len(new_password) >= 8:
+                global ADMIN_PASSWORD
+                ADMIN_PASSWORD = new_password
+                flash('管理员密码已更新')
+    
+    announcement = ''
+    try:
+        with open('data/announcement.txt', 'r', encoding='utf-8') as f:
+            announcement = f.read()
+    except:
+        pass
+    
+    return render_template('admin_settings.html', lang=lang, announcement=announcement, admin_username=ADMIN_USERNAME)
+
+@app.route('/admin/user/<int:user_id>/update', methods=['POST'])
+@admin_required
+def admin_user_update(user_id):
+    """用户操作"""
+    user = User.query.get_or_404(user_id)
+    action = request.form.get('action')
+    
+    if action == 'update_spirit':
+        amount = request.form.get('amount', type=int)
+        if amount is not None:
+            user.spirit_stones = max(0, user.spirit_stones + amount)
+            flash(f'已更新灵石余额: {"+" if amount >= 0 else ""}{amount}')
+    elif action == 'set_vip':
+        level = request.form.get('level', type=int)
+        expire_days = request.form.get('expire_days', type=int, default=30)
+        if level is not None:
+            user.vip_level = level
+            if level > 0:
+                user.vip_expire_date = datetime.utcnow() + timedelta(days=expire_days)
+            flash(f'已设置VIP等级为: {level}')
+    elif action == 'toggle_disabled':
+        if hasattr(user, 'is_disabled'):
+            user.is_disabled = not user.is_disabled
+            flash(f'用户已{"禁用" if user.is_disabled else "启用"}')
+    elif action == 'delete':
+        if hasattr(user, 'is_disabled'):
+            user.is_disabled = True
+        if user.email:
+            user.email = f'deleted_{user.id}_{user.email}'
+        user.password_hash = 'DELETED'
+        flash('用户已删除')
+        db.session.commit()
+        return redirect('/admin/users')
+    
+    db.session.commit()
+    return redirect(f'/admin/user/{user_id}')
+
+@app.route('/admin/export/users')
+@admin_required
+def admin_export_users():
+    """导出用户数据"""
+    import csv
+    from io import StringIO
+    users = User.query.all()
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Username', 'Email', 'Phone', 'VIP Level', 'Spirit Stones', 'Registered', 'Last Login'])
+    for u in users:
+        writer.writerow([u.id, u.username, u.email or '', u.phone or '',
+            u.vip_level, u.spirit_stones,
+            u.created_at.strftime('%Y-%m-%d') if u.created_at else '',
+            u.last_login.strftime('%Y-%m-%d') if u.last_login else ''])
+    output.seek(0)
+    return Response(output.getvalue(), mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment;filename=users.csv'})

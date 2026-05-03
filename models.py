@@ -82,6 +82,7 @@ class User(UserMixin, db.Model):
     # API Key（Agent模式）
     api_key = db.Column(db.String(64), unique=True)
     is_agent = db.Column(db.Boolean, default=False)  # 是否是Agent模式
+    is_disabled = db.Column(db.Boolean, default=False)  # 是否被禁用
     
     # 社交资料
     social_profile = db.relationship('SocialProfile', backref='user', uselist=False, cascade='all, delete-orphan')

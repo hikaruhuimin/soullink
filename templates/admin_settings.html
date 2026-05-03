@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'zh' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SoulLink Admin - Settings</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#F5F3F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#333;min-height:100vh}
+.nav{background:#fff;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,0.05);position:sticky;top:0;z-index:100}
+.nav h1{font-size:18px;color:#6B5B7B}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav a{color:#8B5E83;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;transition:all .2s}
+.nav a:hover{background:#F5F3F0}
+.lang-select{display:flex;gap:4px}
+.lang-select a{padding:4px 8px;font-size:12px;border-radius:4px;color:#B8A9C9}
+.lang-select a.active{background:#8B5E83;color:#fff}
+.container{max-width:800px;margin:24px auto;padding:0 24px}
+.section{background:#fff;border-radius:16px;padding:32px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+.section h2{font-size:18px;color:#6B5B7B;margin-bottom:24px;font-weight:600;display:flex;align-items:center;gap:8px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:13px;color:#666;margin-bottom:8px;font-weight:500}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 16px;border:1px solid #E8E4E0;border-radius:10px;font-size:14px;outline:none;transition:all .3s;background:#fff}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:#B8A9C9;box-shadow:0 0 0 3px rgba(184,169,201,0.2)}
+.form-group textarea{resize:vertical;min-height:120px;font-family:inherit}
+.form-group small{font-size:12px;color:#B8A9C9;margin-top:6px;display:block}
+.btn{padding:12px 24px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:#8B5E83;color:#fff}
+.btn-primary:hover{background:#6B5B7B}
+.btn-danger{background:#FFEBEE;color:#c62828}
+.btn-danger:hover{background:#FFCDD2}
+.flash{color:#2E7D32;background:#E8F5E9;padding:12px 16px;border-radius:8px;margin-bottom:20px;font-size:14px}
+.config-list{margin-top:16px}
+.config-item{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid #F0EDEA}
+.config-item:last-child{border-bottom:none}
+.config-item label{font-size:14px;color:#333}
+.config-item .value{font-size:14px;color:#8B5E83;font-weight:600}
+.config-item input[type="password"]{width:200px;padding:8px 12px;border:1px solid #E8E4E0;border-radius:6px;font-size:14px}
+.info-box{background:#F0F4FF;border-radius:10px;padding:16px;margin-top:24px}
+.info-box h4{font-size:14px;color:#6B5B7B;margin-bottom:8px}
+.info-box p{font-size:13px;color:#666;line-height:1.6}
+.info-box code{background:#fff;padding:2px 6px;border-radius:4px;font-size:12px}
+@media(max-width:768px){.container{padding:0 16px}.nav{padding:12px 16px}}
+</style>
+</head>
+<body>
+<div class="nav">
+<h1>🧿 SoulLink Admin</h1>
+<div class="nav-right">
+<div class="lang-select">
+<a href="?lang=zh" class="{% if lang=='zh' %}active{% endif %}">中文</a>
+<a href="?lang=en" class="{% if lang=='en' %}active{% endif %}">EN</a>
+<a href="?lang=ja" class="{% if lang=='ja' %}active{% endif %}">JA</a>
+</div>
+<a href="/admin">Dashboard</a>
+<a href="/admin/users">Users</a>
+<a href="/admin/stats">Stats</a>
+<a href="/admin/settings">Settings</a>
+<a href="/admin/logout" style="color:#c62828">Logout</a>
+</div>
+</div>
+<div class="container">
+<div class="section">
+<h2>📢 Website Announcement</h2>
+{% with messages = get_flashed_messages() %}{% if messages %}
+<div class="flash">{{ messages[0] }}</div>
+{% endif %}{% endwith %}
+<form method="POST">
+<input type="hidden" name="action" value="update_announcement">
+<div class="form-group">
+<label>Announcement Content</label>
+<textarea name="announcement" placeholder="Enter announcement text (supports HTML)">{{ announcement }}</textarea>
+<small>This announcement will be displayed on the website homepage. Supports HTML formatting.</small>
+</div>
+<button type="submit" class="btn btn-primary">💾 Save Announcement</button>
+</form>
+</div>
+<div class="section">
+<h2>🔐 Admin Account</h2>
+<form method="POST" onsubmit="return confirm('Change admin password?')">
+<input type="hidden" name="action" value="update_config">
+<div class="form-group">
+<label>Admin Username</label>
+<input type="text" value="{{ admin_username }}" disabled>
+<small>Username cannot be changed</small>
+</div>
+<div class="form-group">
+<label>New Password</label>
+<input type="password" name="new_password" placeholder="Leave blank to keep current">
+<small>Minimum 8 characters</small>
+</div>
+<button type="submit" class="btn btn-primary">🔒 Update Password</button>
+</form>
+</div>
+<div class="section">
+<h2>⚙️ System Configuration</h2>
+<div class="config-list">
+<div class="config-item">
+<label>Database</label>
+<span class="value">SQLite (soullink_v2.db)</span>
+</div>
+<div class="config-item">
+<label>Flask Environment</label>
+<span class="value">{{ 'Production' if not app.debug else 'Development' }}</span>
+</div>
+<div class="config-item">
+<label>Supported Languages</label>
+<span class="value">zh / en / ja</span>
+</div>
+</div>
+<div class="info-box">
+<h4>📋 Server Information</h4>
+<p>
+The website is running on Render cloud platform.<br>
+Database: <code>data/soullink_v2.db</code><br>
+For advanced configurations, please modify the <code>config.py</code> file.
+</p>
+</div>
+</div>
+<div class="section">
+<h2>🆘 Quick Actions</h2>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+<a href="/admin/export/users" class="btn btn-primary" style="background:#4CAF50">📥 Export Users CSV</a>
+<a href="/admin/users?status=vip" class="btn btn-primary">👑 View VIP Users</a>
+<a href="/admin/users?status=disabled" class="btn btn-danger">🚫 View Disabled Users</a>
+</div>
+</div>
+</div>
+</body>
+</html>
