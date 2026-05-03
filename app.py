@@ -1059,6 +1059,7 @@ def recharge():
 def register():
     """用户注册 - 支持邮箱或手机号"""
     lang = get_client_language()
+    t = lambda key: TRANSLATIONS.get(lang, {}).get(key, TRANSLATIONS['zh'].get(key, key))
     
     if request.method == 'POST':
         register_method = request.form.get('register_method', 'email')
@@ -1067,11 +1068,11 @@ def register():
         confirm_password = request.form.get('confirm_password')
         
         if not username or not password:
-            flash('请填写所有必填项')
+            flash(t('fill_required'))
             return render_template('auth.html', mode='register', lang=lang)
         
         if password != confirm_password:
-            flash('两次输入的密码不一致')
+            flash(t('password_mismatch'))
             return render_template('auth.html', mode='register', lang=lang)
         
         # 根据注册方式获取标识符
@@ -1080,22 +1081,22 @@ def register():
         if register_method == 'email':
             email = request.form.get('email')
             if not email:
-                flash('请输入邮箱地址')
+                flash(t('enter_email_addr'))
                 return render_template('auth.html', mode='register', lang=lang)
         else:
             phone = request.form.get('phone')
             if not phone or not re.match(r'^1[3-9]\d{9}$', phone):
-                flash('请输入有效的手机号（11位）')
+                flash(t('enter_valid_phone'))
                 return render_template('auth.html', mode='register', lang=lang)
         
         # 检查邮箱或手机号是否已被注册
         if email:
             if User.query.filter_by(email=email).first():
-                flash('该邮箱已被注册')
+                flash(t('email_already_reg'))
                 return render_template('auth.html', mode='register', lang=lang)
         if phone:
             if User.query.filter_by(phone=phone).first():
-                flash('该手机号已被注册')
+                flash(t('phone_already_reg'))
                 return render_template('auth.html', mode='register', lang=lang)
         
         user = User(email=email, phone=phone, username=username)
@@ -1121,9 +1122,9 @@ def register():
                     avatar_file.save(filepath)
                     user.avatar = f'/static/avatars/{filename}'
                 else:
-                    flash('图片大小不能超过2MB')
+                    flash(t('img_size_exceed'))
             else:
-                flash('仅支持 JPG/PNG/GIF/WebP 格式')
+                flash(t('img_format_error'))
         else:
             user.avatar = f'/static/avatars/emoji_{hashlib.md5(selected_avatar.encode()).hexdigest()[:8]}.png'
         
@@ -1141,7 +1142,7 @@ def register():
         db.session.add(profile)
         db.session.commit()
         
-        flash('注册成功！请登录')
+        flash(t('register_success'))
         return redirect(url_for('login'))
     
     return render_template('auth.html', mode='register', lang=lang)
@@ -1151,6 +1152,7 @@ def register():
 def login():
     """用户登录 - 支持邮箱或手机号"""
     lang = get_client_language()
+    t = lambda key: TRANSLATIONS.get(lang, {}).get(key, TRANSLATIONS['zh'].get(key, key))
     
     if request.method == 'POST':
         login_method = request.form.get('login_method', 'email')
@@ -1177,7 +1179,7 @@ def login():
                 return redirect(next_page)
             return redirect(url_for('index'))
         else:
-            flash('邮箱/手机号或密码错误')
+            flash(t('login_failed') if 'login_failed' in TRANSLATIONS.get(lang, {}) else '邮箱/手机号或密码错误')
     
     return render_template('auth.html', mode='login', lang=lang)
 
@@ -1186,7 +1188,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('已退出登录')
+    flash('logged_out' if 'logged_out' in TRANSLATIONS.get(get_client_language(), {}) else '已退出登录')
     return redirect(url_for('index'))
 
 

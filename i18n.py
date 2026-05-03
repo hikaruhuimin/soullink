@@ -345,6 +345,7 @@ TRANSLATIONS = {
         
         # Register page
         'phone_register': '手机注册',
+        'email_register': '邮箱注册',
         'phone_number': '手机号码',
         'select_country': '选择国家',
         'verification_code': '验证码',
@@ -358,6 +359,42 @@ TRANSLATIONS = {
         'complete_registration': '完成注册',
         'already_have_account': '已有账号？',
         'login_now': '立即登录',
+        
+        # 注册登录页面新增
+        'app_slogan': '命运的指引，源于心与心的连接',
+        'email_login': '邮箱登录',
+        'phone_login': '手机号登录',
+        'enter_email': '请输入邮箱',
+        'enter_phone': '请输入手机号',
+        'enter_password': '请输入密码',
+        'enter_username': '给自己起个昵称',
+        'remember_me': '记住我',
+        'no_account': '还没有账号？',
+        'register_now': '立即注册',
+        'choose_avatar': '选择头像',
+        'upload_avatar': '上传头像',
+        'email_desc': '用于登录和找回密码',
+        'valid_email_hint': '请输入有效的邮箱地址',
+        'phone_desc': '请输入11位手机号',
+        'phone_format_hint': '中国大陆手机号（11位数字）',
+        'password_min': '至少6位字符',
+        'confirm_password': '确认密码',
+        'enter_password_again': '请再次输入密码',
+        'terms_link': '《使用条款》',
+        'privacy_link': '《隐私政策》',
+        'have_account': '已有账号？',
+        
+        # 表单验证消息
+        'fill_required': '请填写所有必填项',
+        'password_mismatch': '两次输入的密码不一致',
+        'enter_email_addr': '请输入邮箱地址',
+        'enter_valid_phone': '请输入有效的手机号（11位）',
+        'email_already_reg': '该邮箱已被注册',
+        'phone_already_reg': '该手机号已被注册',
+        'register_success': '注册成功！请登录',
+        'img_size_exceed': '图片大小不能超过2MB',
+        'img_format_error': '仅支持 JPG/PNG/GIF/WebP 格式',
+        'please_fill_all': '请填写所有必填项',
     },
     
     'en': {
@@ -596,6 +633,7 @@ TRANSLATIONS = {
         
         # Register page
         'phone_register': 'Phone Register',
+        'email_register': 'Email Register',
         'phone_number': 'Phone Number',
         'select_country': 'Select Country',
         'verification_code': 'Verification Code',
@@ -609,6 +647,42 @@ TRANSLATIONS = {
         'complete_registration': 'Complete Registration',
         'already_have_account': 'Already have an account?',
         'login_now': 'Login Now',
+        
+        # Register/Login page new
+        'app_slogan': "Fate's guidance, from heart to heart",
+        'email_login': 'Email Login',
+        'phone_login': 'Phone Login',
+        'enter_email': 'Enter email address',
+        'enter_phone': 'Enter phone number',
+        'enter_password': 'Enter password',
+        'enter_username': 'Choose a nickname for yourself',
+        'remember_me': 'Remember me',
+        'no_account': "Don't have an account?",
+        'register_now': 'Register Now',
+        'choose_avatar': 'Choose Avatar',
+        'upload_avatar': 'Upload Avatar',
+        'email_desc': 'For login and password recovery',
+        'valid_email_hint': 'Please enter a valid email address',
+        'phone_desc': 'Enter 11-digit phone number',
+        'phone_format_hint': 'Chinese mainland phone (11 digits)',
+        'password_min': 'At least 6 characters',
+        'confirm_password': 'Confirm Password',
+        'enter_password_again': 'Enter password again',
+        'terms_link': 'Terms of Service',
+        'privacy_link': 'Privacy Policy',
+        'have_account': 'Already have an account?',
+        
+        # Form validation messages
+        'fill_required': 'Please fill all required fields',
+        'password_mismatch': 'Passwords do not match',
+        'enter_email_addr': 'Please enter email address',
+        'enter_valid_phone': 'Please enter a valid phone number (11 digits)',
+        'email_already_reg': 'This email is already registered',
+        'phone_already_reg': 'This phone number is already registered',
+        'register_success': 'Registration successful! Please login',
+        'img_size_exceed': 'Image size cannot exceed 2MB',
+        'img_format_error': 'Only JPG/PNG/GIF/WebP formats supported',
+        'please_fill_all': 'Please fill all required fields',
     },
     
     'ja': {
@@ -644,7 +718,7 @@ TRANSLATIONS = {
         'compare_plans': 'プラン比較',
         'feature': '機能',
         'free': '無料',
-        'basic': '-basic',
+        'basic': 'Basic',
         'elite': 'エリート',
         
         # Portals
@@ -695,7 +769,7 @@ TRANSLATIONS = {
         'view_all_responses': 'すべて見る',
         'comments': 'コメント',
         'write_comment': 'コメントを書く...',
-        'what_mind': '今何在想...' ,
+        'what_mind': '今何在想...',
         'publish': '发布',
         'share': '共有',
         
@@ -720,22 +794,47 @@ TRANSLATIONS = {
         'register': '登録',
         'phone_placeholder': '電話番号を入力',
         'password': 'パスワード',
+        'set_password': 'パスワード設定',
+        'nickname': 'ニックネーム',
         'remember_me': 'ログイン状態を保持',
         'forgot_password': 'パスワードをお忘れ',
         'or': 'または',
+        'wechat_login': 'WeChatログイン',
+        'apple_login': 'Appleログイン',
+        'or_explore_as': 'またはゲストとして体験',
+        'login_as_agent': 'Agentとしてログイン',
+        'verify_code': '認証コード',
+        'send_code': 'コードを送信',
+        'resend': '再送信',
+        'agree_terms': 'に同意します',
+        'privacy_policy': 'プライバシーポリシー',
         'please_enter_phone': '電話番号を入力してください',
+        'please_fill_all_fields': 'すべてのフィールドを入力してください',
         'login_success': 'ログイン成功',
         'login_failed': 'ログイン失敗',
+        'register_success': '登録成功',
+        'register_failed': '登録失敗',
+        'please_agree_terms': '利用規約に同意してください',
         
         # Agent
         'energy': 'エネルギー',
         'popularity': '人気',
         'earnings': '収益',
         'daily_tasks': 'デイリータスク',
+        'do_it': '去做',
+        'social_activity': 'ソーシャルアクティビティ',
+        'post_update': '投稿する',
+        'agent_chat': 'Agentチャット',
+        'earnings_center': '収益センター',
+        'chat_earnings': 'チャット収益',
+        'like_earnings': 'いいね収益',
+        'gift_earnings': 'ギフト収益',
         'withdraw': '出金',
         'leaderboard': 'ランキング',
+        'view_full_ranking': 'ランキングを見る',
         'api_access': 'API接入',
         'api_desc': '他のアプリからAgentを利用',
+        'view_api_docs': 'APIドキュメントを見る',
         
         # 温かい相伴メンバーシップ - 新規
         'companion_tiers': '相伴套餐',
@@ -824,6 +923,7 @@ TRANSLATIONS = {
         
         # Register page
         'phone_register': '電話番号登録',
+        'email_register': 'メール登録',
         'phone_number': '電話番号',
         'select_country': '国を選択',
         'verification_code': '認証コード',
@@ -837,26 +937,41 @@ TRANSLATIONS = {
         'complete_registration': '登録完了',
         'already_have_account': 'すでにアカウントをお持ちですか？',
         'login_now': 'ログイン',
-    }
+        
+        # 登録・ログインページ 新規
+        'app_slogan': '運命の導き、心と心の繋がりから',
+        'email_login': 'メールログイン',
+        'phone_login': '電話番号ログイン',
+        'enter_email': 'メールアドレスを入力',
+        'enter_phone': '電話番号を入力',
+        'enter_password': 'パスワードを入力',
+        'enter_username': 'ニックネームを決める',
+        'remember_me': 'ログイン状態を保持',
+        'no_account': 'アカウントをお持ちでない方？',
+        'register_now': '今すぐ登録',
+        'choose_avatar': 'アバターを選択',
+        'upload_avatar': 'アバターをアップロード',
+        'email_desc': 'ログインとパスワード回復用',
+        'valid_email_hint': '有効なメールアドレスを入力してください',
+        'phone_desc': '11桁の電話番号を入力',
+        'phone_format_hint': '中国の携帯電話番号（11桁）',
+        'password_min': '6文字以上',
+        'confirm_password': 'パスワード確認',
+        'enter_password_again': 'パスワードを再入力',
+        'terms_link': '利用規約',
+        'privacy_link': 'プライバシーポリシー',
+        'have_account': 'すでにアカウントをお持ちですか？',
+        
+        # フォーム検証メッセージ
+        'fill_required': 'すべての必須項目を入力してください',
+        'password_mismatch': 'パスワードが一致しません',
+        'enter_email_addr': 'メールアドレスを入力してください',
+        'enter_valid_phone': '有効な電話番号（11桁）を入力してください',
+        'email_already_reg': 'このメールアドレスは既に登録されています',
+        'phone_already_reg': 'この電話番号は既に登録されています',
+        'register_success': '登録成功！ログインしてください',
+        'img_size_exceed': '画像サイズは2MBを超えることはできません',
+        'img_format_error': 'JPG/PNG/GIF/WebP形式のみ対応',
+        'please_fill_all': 'すべての必須項目を入力してください',
+    },
 }
-
-
-def get_translation(key, lang='zh', **kwargs):
-    """获取翻译文本"""
-    translations = TRANSLATIONS.get(lang, TRANSLATIONS['zh'])
-    text = translations.get(key, TRANSLATIONS['zh'].get(key, key))
-    
-    if kwargs:
-        try:
-            return text.format(**kwargs)
-        except (KeyError, ValueError):
-            return text
-    
-    return text
-
-
-def _(key, **kwargs):
-    """快捷翻译函数"""
-    from flask import session
-    lang = session.get('language', 'zh')
-    return get_translation(key, lang, **kwargs)
