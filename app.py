@@ -1318,8 +1318,137 @@ def recharge():
                          spirit_stones=current_user.spirit_stones if current_user.is_authenticated else 0,
                          packages=packages,
                          lang=lang,
+                         paypal_client_id=PAYPAL_CLIENT_ID,
                          **t)
 
+
+# ============ PayPal Payment ============
+import base64
+import uuid
+
+PAYPAL_API = "https://api-m.paypal.com"  # Live (use sandbox for testing)
+PAYPAL_CLIENT_ID = os.environ.get("PAYPAL_CLIENT_ID", "sandbox-client-id")
+PAYPAL_CLIENT_SECRET = os.environ.get("PAYPAL_CLIENT_SECRET", "sandbox-secret")
+
+def _get_paypal_token():
+    """Get PayPal OAuth token"""
+    import requests
+    auth = base64.b64encode(f"{PAYPAL_CLIENT_ID}:{PAYPAL_CLIENT_SECRET}".encode()).decode()
+    r = requests.post(f"{PAYPAL_API}/v1/oauth2/token",
+        headers={"Authorization": f"Basic {auth}", "Accept": "application/json"},
+        data={"grant_type": "client_credentials"}, timeout=15)
+    return r.json().get("access_token")
+
+@app.route("/api/paypal/create-order", methods=["POST"])
+@login_required
+def paypal_create_order():
+    """Create PayPal order for recharge"""
+    data = request.json
+    package_id = data.get("package_id")
+    package = next((p for p in LINGSTONE_PACKAGES if p["id"] == package_id), None)
+    if not package:
+        return jsonify({"success": False, "error": "无效的套餐"})
+
+    price = package["price"]
+    currency = "USD"
+
+    token = _get_paypal_token()
+    if not token:
+        return jsonify({"success": False, "error": "PayPal认证失败"})
+
+    import requests
+    order_no = f"SL{uuid.uuid4().hex[:12].upper()}"
+
+    r = requests.post(f"{PAYPAL_API}/v2/checkout/orders",
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        json={
+            "intent": "CAPTURE",
+            "purchase_units": [{
+                "reference_id": order_no,
+                "description": f"SoulLink灵石充值 - {package['name']}",
+                "amount": {"currency_code": currency, "value": str(price)}
+            }]
+        }, timeout=15)
+
+    if r.status_code not in (200, 201):
+        return jsonify({"success": False, "error": "PayPal订单创建失败"})
+
+    paypal_order = r.json()
+
+    # Save order to DB
+    from models import LingStoneRecharge
+    recharge = LingStoneRecharge(
+        user_id=current_user.id,
+        amount_paid=price,
+        lingstones_gained=package["amount"],
+        bonus_gained=package.get("bonus", 0),
+        payment_method="paypal",
+        status="pending",
+        order_no=order_no,
+        transaction_id=paypal_order.get("id", "")
+    )
+    db.session.add(recharge)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "order_no": order_no,
+        "paypal_order_id": paypal_order["id"],
+        "amount": price,
+        "currency": currency
+    })
+
+@app.route("/api/paypal/capture-order", methods=["POST"])
+@login_required
+def paypal_capture_order():
+    """Capture PayPal payment after user approval"""
+    data = request.json
+    paypal_order_id = data.get("paypal_order_id")
+    order_no = data.get("order_no")
+
+    token = _get_paypal_token()
+    if not token:
+        return jsonify({"success": False, "error": "PayPal认证失败"})
+
+    import requests
+    r = requests.post(f"{PAYPAL_API}/v2/checkout/orders/{paypal_order_id}/capture",
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        json={}, timeout=15)
+
+    if r.status_code not in (200, 201):
+        return jsonify({"success": False, "error": "支付捕获失败"})
+
+    capture = r.json()
+    if capture.get("status") != "COMPLETED":
+        return jsonify({"success": False, "error": "支付未完成"})
+
+    # Credit stones
+    from models import LingStoneRecharge, LingStoneTransaction
+    recharge = LingStoneRecharge.query.filter_by(order_no=order_no).first()
+    if not recharge:
+        return jsonify({"success": False, "error": "订单不存在"})
+
+    recharge.status = "completed"
+    recharge.transaction_id = capture.get("id", paypal_order_id)
+    recharge.completed_at = datetime.utcnow()
+
+    total_stones = recharge.lingstones_gained + (recharge.bonus_gained or 0)
+    current_user.spirit_stones = (current_user.spirit_stones or 0) + total_stones
+
+    tx = LingStoneTransaction(
+        user_id=current_user.id, tx_type="recharge",
+        amount=total_stones, recharge_id=recharge.id,
+        description=f"PayPal充值灵石 x{total_stones}"
+    )
+    db.session.add(tx)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "支付成功",
+        "stones": total_stones,
+        "balance": current_user.spirit_stones
+    })
 
 # ============ Mock Payment (debug) ============
 @app.route('/mock-pay/<order_no>')

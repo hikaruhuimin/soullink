@@ -467,9 +467,20 @@
                 </div>
                 <div class="payment-radio"></div>
             </div>
+            <div class="payment-method" onclick="selectPayment('paypal')">
+                <div class="payment-method-icon">🅿️</div>
+                <div class="payment-method-info">
+                    <div class="payment-method-name">PayPal</div>
+                    <div class="payment-method-desc">Credit / Debit Card</div>
+                </div>
+                <div class="payment-radio"></div>
+            </div>
         </div>
 
-        <button class="recharge-action-btn" id="rechargeBtn" onclick="doRecharge()">
+        <!-- PayPal Button Container (hidden by default) -->
+        <div id="paypal-button-container" style="display:none; margin-bottom:16px;"></div>
+
+        <button class="recharge-action-btn" id="rechargeBtn" onclick="doRecharge()" style="display:flex;">
             🔮 立即充值
         </button>
     </div>
@@ -524,13 +535,84 @@ function selectPayment(method) {
         'alipay': '支付宝',
         'wechatpay': '微信支付',
         'stripe': 'Stripe',
-        'crypto': '加密货币'
+        'crypto': '加密货币',
+        'paypal': 'PayPal'
     };
     document.querySelectorAll('.payment-method').forEach(el => {
         if (el.textContent.includes(methodMap[method])) {
             el.classList.add('selected');
         }
     });
+    
+    // Toggle PayPal button container
+    const paypalContainer = document.getElementById('paypal-button-container');
+    const rechargeBtn = document.getElementById('rechargeBtn');
+    if (method === 'paypal') {
+        paypalContainer.style.display = 'block';
+        rechargeBtn.style.display = 'none';
+        // Render PayPal buttons if not already rendered
+        if (typeof paypal !== 'undefined' && !window._paypalRendered) {
+            renderPayPalButtons();
+        }
+    } else {
+        paypalContainer.style.display = 'none';
+        rechargeBtn.style.display = 'flex';
+    }
+}
+
+function renderPayPalButtons() {
+    if (typeof paypal === 'undefined') return;
+    window._paypalRendered = true;
+    paypal.Buttons({
+        createOrder: async function() {
+            if (!selectedPackage) {
+                showToast('请先选择充值套餐', 'error');
+                return;
+            }
+            showProcessing(true);
+            const response = await fetch('/api/paypal/create-order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    package_id: selectedPackage
+                })
+            });
+            const data = await response.json();
+            showProcessing(false);
+            if (!data.success) {
+                showToast(data.error || '创建订单失败', 'error');
+                throw new Error(data.error);
+            }
+            window._paypalOrderNo = data.order_no;
+            return data.paypal_order_id;
+        },
+        onApprove: async function(data) {
+            showProcessing(true);
+            const captureResponse = await fetch('/api/paypal/capture-order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    paypal_order_id: data.orderID,
+                    order_no: window._paypalOrderNo
+                })
+            });
+            const result = await captureResponse.json();
+            showProcessing(false);
+            if (result.success) {
+                showToast(`🎉 支付成功！获得 ${result.stones} 灵石`, 'success');
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showToast(result.error || '支付确认失败', 'error');
+            }
+        },
+        onCancel: function() {
+            showToast('支付已取消', 'error');
+        },
+        onError: function(err) {
+            showToast('支付出错，请重试', 'error');
+            console.error('PayPal Error:', err);
+        }
+    }).render('#paypal-button-container');
 }
 
 function showToast(message, type) {
@@ -635,10 +717,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const payResult = params.get('pay_result');
     if (payResult === 'success') {
         showToast('🎉 充值成功！灵石已到账', 'success');
-        setTimeout(() => location.reload(), 2000);
+    setTimeout(() => location.reload(), 2000);
     } else if (payResult === 'failed') {
         showToast('❌ 支付失败，请重试', 'error');
     }
-});
-</script>
+});</script>
+
+{% block extra_js %}
+{% if paypal_client_id and paypal_client_id != 'sandbox-client-id' %}
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD" data-sdk-integration-source="button-factory"></script>
+{% else %}
+<script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD" data-sdk-integration-source="button-factory"></script>
+{% endif %}
+{% endblock %}
+{% endblock %}
 {% endblock %}
