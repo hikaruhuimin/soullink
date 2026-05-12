@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('send_gift') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="gift-page">
+    <a href="/lover/home/{{ lover.id }}" class="back-link">← {{ _('back') }}</a>
+    
+    <!-- 恋人信息 -->
+    <div class="lover-mini-card">
+        <div class="mini-avatar" style="background: linear-gradient(135deg, {{ lover.avatar_gradient }})">
+            {{ lover.avatar_icon }}
+        </div>
+        <div class="mini-info">
+            <h2>{{ lover.name }}</h2>
+            <p>{{ _('ideal_gifts', name=lover.name) }}</p>
+        </div>
+    </div>
+
+    <!-- 余额显示 -->
+    <div class="balance-bar">
+        <span>💎 {{ _('your_stones') }}: {{ user_stones }}</span>
+        <button onclick="showRecharge()">+ {{ _('recharge') }}</button>
+    </div>
+
+    <!-- 礼物分类 -->
+    <div class="gift-categories">
+        <button class="category-btn active" data-category="all">{{ _('all') }}</button>
+        {% for cat in gift_categories %}
+        <button class="category-btn" data-category="{{ cat.id }}">{{ cat.icon }} {{ cat.name }}</button>
+        {% endfor %}
+    </div>
+
+    <!-- 礼物列表 -->
+    <div class="gift-grid">
+        {% for gift in gifts %}
+        <div class="gift-item" data-id="{{ gift.id }}" data-price="{{ gift.price }}" onclick="selectGift('{{ gift.id }}')">
+            <div class="gift-icon-wrapper" style="background: {{ gift.bg_color }}">
+                <span class="gift-icon">{{ gift.icon }}</span>
+            </div>
+            <span class="gift-name">{{ gift.name }}</span>
+            <span class="gift-price">{{ gift.price }}💎</span>
+            {% if gift.is_popular %}
+            <span class="popular-tag">🔥</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 已选礼物预览 -->
+    <div class="selected-preview hidden" id="selectedPreview">
+        <div class="preview-content">
+            <div class="preview-icon" id="previewIcon"></div>
+            <div class="preview-info">
+                <h3 id="previewName"></h3>
+                <span id="previewPrice"></span>
+            </div>
+        </div>
+        <textarea id="giftMessage" placeholder="{{ _('gift_message_placeholder') }}" rows="2"></textarea>
+        <button class="send-btn" onclick="sendGift()">{{ _('send_gift') }}</button>
+    </div>
+</div>
+
+<!-- 充值提示弹窗 -->
+<div class="modal hidden" id="rechargeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ _('recharge_needed') }}</h3>
+            <button onclick="closeRecharge()">×</button>
+        </div>
+        <div class="modal-body">
+            <p>{{ _('recharge_message') }}</p>
+            <p class="recharge-amount">{{ _('need_more', amount='50') }}💎</p>
+        </div>
+        <div class="modal-footer">
+            <button class="recharge-btn" onclick="goToRecharge()">{{ _('recharge_now') }}</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.gift-page {
+    padding: 16px;
+    padding-bottom: 100px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.lover-mini-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.mini-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.mini-info h2 {
+    margin: 0 0 2px 0;
+    font-size: 16px;
+}
+
+.mini-info p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.balance-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.balance-bar button {
+    padding: 6px 14px;
+    background: #f59e0b;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.gift-categories {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.category-btn {
+    padding: 8px 14px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 20px;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.category-btn.active {
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border-color: transparent;
+}
+
+.gift-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.gift-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 4px;
+    background: white;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.gift-item:active {
+    transform: scale(0.95);
+}
+
+.gift-item.selected {
+    border: 2px solid #f59e0b;
+    background: #fffbeb;
+}
+
+.gift-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.gift-icon {
+    font-size: 28px;
+}
+
+.gift-name {
+    font-size: 12px;
+    margin-bottom: 2px;
+    text-align: center;
+}
+
+.gift-price {
+    font-size: 11px;
+    color: #f59e0b;
+}
+
+.popular-tag {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 14px;
+}
+
+.selected-preview {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 16px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+}
+
+.preview-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.preview-icon {
+    width: 50px;
+    height: 50px;
+    background: #fef3c7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.preview-info h3 {
+    margin: 0 0 2px 0;
+    font-size: 16px;
+}
+
+.preview-info span {
+    color: #f59e0b;
+}
+
+.selected-preview textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    resize: none;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.send-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+}
+
+.modal-header {
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.modal-body {
+    padding: 20px 16px;
+}
+
+.modal-body p {
+    margin: 0 0 8px 0;
+}
+
+.recharge-amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f59e0b;
+}
+
+.modal-footer {
+    padding: 0 16px 16px;
+}
+
+.recharge-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+</style>
+
+<script>
+let selectedGift = null;
+const userStones = {{ user_stones }};
+
+const giftPrices = {{ gift_prices | tojson }};
+
+function selectGift(giftId) {
+    document.querySelectorAll('.gift-item').forEach(item => item.classList.remove('selected'));
+    event.target.closest('.gift-item').classList.add('selected');
+    
+    selectedGift = giftId;
+    const gift = giftPrices[giftId];
+    
+    document.getElementById('previewIcon').textContent = gift.icon;
+    document.getElementById('previewIcon').style.background = gift.bg_color;
+    document.getElementById('previewName').textContent = gift.name;
+    document.getElementById('previewPrice').textContent = gift.price + '💎';
+    document.getElementById('selectedPreview').classList.remove('hidden');
+}
+
+function sendGift() {
+    if (!selectedGift) return;
+    
+    const price = parseInt(giftPrices[selectedGift].price);
+    
+    if (userStones < price) {
+        document.getElementById('rechargeModal').classList.remove('hidden');
+        return;
+    }
+    
+    const message = document.getElementById('giftMessage').value;
+    
+    fetch('/api/lover/gift', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            lover_id: {{ lover.id }},
+            gift_id: selectedGift,
+            message: message
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            showToast('{{ _("gift_sent") }}');
+            setTimeout(() => {
+                window.location.href = '/lover/home/{{ lover.id }}';
+            }, 1500);
+        } else {
+            showToast(data.error || '{{ _("send_failed") }}');
+        }
+    });
+}
+
+function closeRecharge() {
+    document.getElementById('rechargeModal').classList.add('hidden');
+}
+
+function goToRecharge() {
+    window.location.href = '/membership#recharge';
+}
+
+// 分类筛选
+document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const category = this.dataset.category;
+        document.querySelectorAll('.gift-item').forEach(item => {
+            if (category === 'all' || item.dataset.category === category) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

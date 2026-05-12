@@ -1,0 +1,609 @@
+     1|{% extends "base.html" %}
+     2|
+     3|{% block title %}每日签到 - SoulLink{% endblock %}
+     4|
+     5|{% block extra_css %}
+     6|<style>
+     7|/* 宇宙背景 */
+     8|.cosmos-bg {
+     9|    position: fixed;
+    10|    top: 0;
+    11|    left: 0;
+    12|    width: 100%;
+    13|    height: 100%;
+    14|    background: 
+    15|        radial-gradient(ellipse at 20% 80%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+    16|        radial-gradient(ellipse at 80% 20%, rgba(239, 68, 68, 0.12) 0%, transparent 50%),
+    17|        radial-gradient(ellipse at 50% 50%, rgba(20, 20, 40, 0.95) 0%, #0a0a1a 100%);
+    18|    background-attachment: fixed;
+    19|    z-index: -1;
+    20|}
+    21|
+    22|.cosmos-bg::before {
+    23|    content: '';
+    24|    position: absolute;
+    25|    top: 0;
+    26|    left: 0;
+    27|    width: 100%;
+    28|    height: 100%;
+    29|    background-image: url('/static/images/universe_starmap.jpg');
+    30|    background-size: cover;
+    31|    background-position: center;
+    32|    opacity: 0.3;
+    33|}
+    34|
+    35|/* 签到容器 */
+    36|.checkin-container {
+    37|    max-width: 480px;
+    38|    margin: 0 auto;
+    39|    padding: 24px 16px 80px;
+    40|    position: relative;
+    41|    z-index: 1;
+    42|}
+    43|
+    44|/* 页面标题 */
+    45|.checkin-header {
+    46|    text-align: center;
+    47|    margin-bottom: 32px;
+    48|}
+    49|
+    50|.checkin-header h1 {
+    51|    font-family: 'Cormorant Garamond', serif;
+    52|    font-size: 2.2rem;
+    53|    font-weight: 600;
+    54|    color: white;
+    55|    margin-bottom: 8px;
+    56|}
+    57|
+    58|.checkin-header p {
+    59|    color: rgba(255, 255, 255, 0.7);
+    60|    font-size: 0.95rem;
+    61|}
+    62|
+    63|/* 签到卡片 */
+    64|.checkin-card {
+    65|    background: rgba(255, 255, 255, 0.05);
+    66|    backdrop-filter: blur(20px);
+    67|    border: 1px solid rgba(255, 255, 255, 0.1);
+    68|    border-radius: 24px;
+    69|    padding: 24px;
+    70|    margin-bottom: 20px;
+    71|}
+    72|
+    73|/* 连续签到状态 */
+    74|.streak-status {
+    75|    text-align: center;
+    76|    margin-bottom: 24px;
+    77|}
+    78|
+    79|.streak-number {
+    80|    font-size: 4rem;
+    81|    font-weight: 700;
+    82|    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #fcd34d 100%);
+    83|    -webkit-background-clip: text;
+    84|    -webkit-text-fill-color: transparent;
+    85|    background-clip: text;
+    86|    line-height: 1;
+    87|}
+    88|
+    89|.streak-label {
+    90|    color: rgba(255, 255, 255, 0.8);
+    91|    font-size: 1rem;
+    92|    margin-top: 8px;
+    93|}
+    94|
+    95|.streak-fire {
+    96|    display: inline-block;
+    97|    margin-left: 8px;
+    98|    font-size: 2rem;
+    99|    animation: pulse 1.5s ease-in-out infinite;
+   100|}
+   101|
+   102|@keyframes pulse {
+   103|    0%, 100% { transform: scale(1); }
+   104|    50% { transform: scale(1.2); }
+   105|}
+   106|
+   107|/* 签到按钮 */
+   108|.checkin-btn {
+   109|    display: block;
+   110|    width: 100%;
+   111|    padding: 16px;
+   112|    border-radius: 16px;
+   113|    font-size: 1.1rem;
+   114|    font-weight: 600;
+   115|    cursor: pointer;
+   116|    transition: all 0.3s ease;
+   117|    border: none;
+   118|    text-align: center;
+   119|}
+   120|
+   121|.checkin-btn.can-checkin {
+   122|    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+   123|    color: white;
+   124|    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+   125|}
+   126|
+   127|.checkin-btn.can-checkin:hover {
+   128|    transform: translateY(-2px);
+   129|    box-shadow: 0 6px 30px rgba(245, 158, 11, 0.5);
+   130|}
+   131|
+   132|.checkin-btn.checked-in {
+   133|    background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(16, 185, 129, 0.2) 100%);
+   134|    color: #10b981;
+   135|    border: 2px solid #10b981;
+   136|    cursor: default;
+   137|}
+   138|
+   139|.checkin-btn.disabled {
+   140|    background: rgba(255, 255, 255, 0.1);
+   141|    color: rgba(255, 255, 255, 0.5);
+   142|    cursor: not-allowed;
+   143|}
+   144|
+   145|/* 本月日历 */
+   146|.calendar-section {
+   147|    margin-top: 24px;
+   148|}
+   149|
+   150|.calendar-title {
+   151|    color: white;
+   152|    font-size: 1rem;
+   153|    margin-bottom: 12px;
+   154|    display: flex;
+   155|    align-items: center;
+   156|    gap: 8px;
+   157|}
+   158|
+   159|.calendar-grid {
+   160|    display: grid;
+   161|    grid-template-columns: repeat(7, 1fr);
+   162|    gap: 6px;
+   163|}
+   164|
+   165|.calendar-day {
+   166|    aspect-ratio: 1;
+   167|    display: flex;
+   168|    align-items: center;
+   169|    justify-content: center;
+   170|    border-radius: 50%;
+   171|    font-size: 0.85rem;
+   172|    color: rgba(255, 255, 255, 0.6);
+   173|    background: rgba(255, 255, 255, 0.05);
+   174|}
+   175|
+   176|.calendar-day.header {
+   177|    background: transparent;
+   178|    color: rgba(255, 255, 255, 0.4);
+   179|    font-size: 0.75rem;
+   180|}
+   181|
+   182|.calendar-day.checked {
+   183|    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+   184|    color: white;
+   185|    font-weight: 600;
+   186|}
+   187|
+   188|.calendar-day.today {
+   189|    border: 2px solid rgba(167, 139, 250, 0.5);
+   190|}
+   191|
+   192|/* 奖励阶梯 */
+   193|.rewards-section {
+   194|    margin-top: 24px;
+   195|}
+   196|
+   197|.section-title {
+   198|    color: white;
+   199|    font-size: 1.1rem;
+   200|    margin-bottom: 16px;
+   201|    display: flex;
+   202|    align-items: center;
+   203|    gap: 8px;
+   204|}
+   205|
+   206|.rewards-grid {
+   207|    display: grid;
+   208|    grid-template-columns: repeat(7, 1fr);
+   209|    gap: 8px;
+   210|}
+   211|
+   212|.reward-item {
+   213|    text-align: center;
+   214|    padding: 12px 4px;
+   215|    background: rgba(255, 255, 255, 0.05);
+   216|    border-radius: 12px;
+   217|    transition: all 0.3s ease;
+   218|}
+   219|
+   220|.reward-item:hover {
+   221|    background: rgba(255, 255, 255, 0.1);
+   222|}
+   223|
+   224|.reward-item.achieved {
+   225|    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%);
+   226|    border: 1px solid rgba(16, 185, 129, 0.3);
+   227|}
+   228|
+   229|.reward-item.current {
+   230|    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
+   231|    border: 2px solid rgba(245, 158, 11, 0.5);
+   232|    animation: glow 2s ease-in-out infinite;
+   233|}
+   234|
+   235|@keyframes glow {
+   236|    0%, 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.3); }
+   237|    50% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
+   238|}
+   239|
+   240|.reward-day {
+   241|    font-size: 0.8rem;
+   242|    color: rgba(255, 255, 255, 0.6);
+   243|    margin-bottom: 4px;
+   244|}
+   245|
+   246|.reward-stones {
+   247|    font-size: 1rem;
+   248|    font-weight: 600;
+   249|    color: #fbbf24;
+   250|}
+   251|
+   252|.reward-item.achieved .reward-stones {
+   253|    color: #10b981;
+   254|}
+   255|
+   256|/* 周奖励卡片 */
+   257|.weekly-bonus-card {
+   258|    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
+   259|    border: 1px solid rgba(239, 68, 68, 0.3);
+   260|    border-radius: 16px;
+   261|    padding: 20px;
+   262|    margin-top: 20px;
+   263|    text-align: center;
+   264|}
+   265|
+   266|.weekly-bonus-title {
+   267|    color: #f87171;
+   268|    font-size: 1rem;
+   269|    margin-bottom: 8px;
+   270|}
+   271|
+   272|.weekly-bonus-amount {
+   273|    font-size: 2.5rem;
+   274|    font-weight: 700;
+   275|    color: #fbbf24;
+   276|    margin-bottom: 8px;
+   277|}
+   278|
+   279|.weekly-bonus-desc {
+   280|    color: rgba(255, 255, 255, 0.7);
+   281|    font-size: 0.85rem;
+   282|}
+   283|
+   284|/* Toast通知 */
+   285|.toast {
+   286|    position: fixed;
+   287|    bottom: 100px;
+   288|    left: 50%;
+   289|    transform: translateX(-50%) translateY(20px);
+   290|    background: rgba(20, 20, 40, 0.95);
+   291|    backdrop-filter: blur(10px);
+   292|    border: 1px solid rgba(245, 158, 11, 0.3);
+   293|    color: white;
+   294|    padding: 12px 24px;
+   295|    border-radius: 30px;
+   296|    font-size: 0.9rem;
+   297|    opacity: 0;
+   298|    transition: all 0.3s ease;
+   299|    z-index: 1000;
+   300|}
+   301|
+   302|.toast.show {
+   303|    opacity: 1;
+   304|    transform: translateX(-50%) translateY(0);
+   305|}
+   306|
+   307|/* 成功动画 */
+   308|@keyframes celebrate {
+   309|    0% { transform: scale(1); }
+   310|    50% { transform: scale(1.1); }
+   311|    100% { transform: scale(1); }
+   312|}
+   313|
+   314|.celebrate {
+   315|    animation: celebrate 0.5s ease;
+   316|}
+   317|
+   318|/* 签到成功弹窗 */
+   319|.success-modal {
+   320|    position: fixed;
+   321|    top: 0;
+   322|    left: 0;
+   323|    width: 100%;
+   324|    height: 100%;
+   325|    background: rgba(0, 0, 0, 0.8);
+   326|    display: none;
+   327|    align-items: center;
+   328|    justify-content: center;
+   329|    z-index: 2000;
+   330|}
+   331|
+   332|.success-modal.show {
+   333|    display: flex;
+   334|}
+   335|
+   336|.success-content {
+   337|    background: linear-gradient(135deg, rgba(30, 30, 50, 0.98) 0%, rgba(20, 20, 40, 0.98) 100%);
+   338|    border: 1px solid rgba(245, 158, 11, 0.3);
+   339|    border-radius: 24px;
+   340|    padding: 32px;
+   341|    text-align: center;
+   342|    max-width: 320px;
+   343|    animation: fadeInUp 0.4s ease;
+   344|}
+   345|
+   346|@keyframes fadeInUp {
+   347|    from { opacity: 0; transform: translateY(20px); }
+   348|    to { opacity: 1; transform: translateY(0); }
+   349|}
+   350|
+   351|.success-icon {
+   352|    font-size: 4rem;
+   353|    margin-bottom: 16px;
+   354|}
+   355|
+   356|.success-title {
+   357|    color: white;
+   358|    font-size: 1.3rem;
+   359|    margin-bottom: 8px;
+   360|}
+   361|
+   362|.success-info {
+   363|    color: rgba(255, 255, 255, 0.7);
+   364|    font-size: 0.9rem;
+   365|    margin-bottom: 16px;
+   366|}
+   367|
+   368|.success-stones {
+   369|    font-size: 2rem;
+   370|    font-weight: 700;
+   371|    color: #fbbf24;
+   372|    margin-bottom: 20px;
+   373|}
+   374|
+   375|.success-btn {
+   376|    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+   377|    color: white;
+   378|    border: none;
+   379|    padding: 12px 32px;
+   380|    border-radius: 12px;
+   381|    font-size: 1rem;
+   382|    cursor: pointer;
+   383|    transition: all 0.3s ease;
+   384|}
+   385|
+   386|.success-btn:hover {
+   387|    transform: translateY(-2px);
+   388|    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+   389|}
+   390|
+   391|/* 移动端适配 */
+   392|@media (max-width: 480px) {
+   393|    .rewards-grid {
+   394|        grid-template-columns: repeat(4, 1fr);
+   395|    }
+   396|    
+   397|    .rewards-grid .reward-item:nth-child(n+8) {
+   398|        grid-column: span 1;
+   399|    }
+   400|}
+   401|</style>
+   402|{% endblock %}
+   403|
+   404|{% block content %}
+   405|<div class="cosmos-bg"></div>
+   406|
+   407|<div class="checkin-container">
+   408|    <div class="checkin-header">
+   409|        <h1>🌟 每日签到</h1>
+   410|        <p>连续签到，灵石多多</p>
+   411|    </div>
+   412|    
+   413|    <!-- 签到主卡片 -->
+   414|    <div class="checkin-card">
+   415|        <div class="streak-status">
+   416|            <div class="streak-number" id="streakNumber">{{ user_streak }}</div>
+   417|            <div class="streak-label">
+   418|                连续签到天数
+   419|                {% if user_streak >= 7 %}
+   420|                <span class="streak-fire">🔥</span>
+   421|                {% endif %}
+   422|            </div>
+   423|        </div>
+   424|        
+   425|        <button class="checkin-btn {% if checked_in %}checked-in{% else %}can-checkin{% endif %}" 
+   426|                id="checkinBtn" onclick="doCheckin()">
+   427|            {% if checked_in %}
+   428|            ✓ 今日已签到
+   429|            {% else %}
+   430|            🔔 立即签到
+   431|            {% endif %}
+   432|        </button>
+   433|        
+   434|        <!-- 本月日历 -->
+   435|        <div class="calendar-section">
+   436|            <div class="calendar-title">
+   437|                <span>📅</span> {{ today.strftime("%Y年%m月") if today else "" }}
+   438|            </div>
+   439|            <div class="calendar-grid">
+   440|                <div class="calendar-day header">日</div>
+   441|                <div class="calendar-day header">一</div>
+   442|                <div class="calendar-day header">二</div>
+   443|                <div class="calendar-day header">三</div>
+   444|                <div class="calendar-day header">四</div>
+   445|                <div class="calendar-day header">五</div>
+   446|                <div class="calendar-day header">六</div>
+   447|                
+   448|                {% for i in range(first_day_weekday + 1) %}
+   449|                <div class="calendar-day"></div>
+   450|                {% endfor %}
+   451|                
+   452|                {% for day in range(1, days_in_month + 1) %}
+   453|                    {% if day <= current_day %}
+   454|                        {% set is_checked = day in checked_dates %}
+   455|                        {% set is_today = day == current_day %}
+   456|                        <div class="calendar-day {% if is_checked %}checked{% endif %} {% if is_today %}today{% endif %}">
+   457|                            {{ day }}
+   458|                        </div>
+   459|                    {% else %}
+   460|                        <div class="calendar-day">{{ day }}</div>
+   461|                    {% endif %}
+   462|                {% endfor %}
+   463|            </div>
+   464|        </div>
+   465|    </div>
+   466|    
+   467|    <!-- 阶梯奖励 -->
+   468|    <div class="checkin-card rewards-section">
+   469|        <div class="section-title">
+   470|            <span>🎁</span> 签到奖励
+   471|        </div>
+   472|        <div class="rewards-grid">
+   473|            {% for reward in rewards %}
+   474|            <div class="reward-item {% if user_streak >= reward.day %}achieved{% endif %} {% if user_streak == reward.day - 1 %}current{% endif %}">
+   475|                <div class="reward-day">第{{ reward.day }}天</div>
+   476|                <div class="reward-stones">+{{ reward.stones }}</div>
+   477|            </div>
+   478|            {% endfor %}
+   479|        </div>
+   480|    </div>
+   481|    
+   482|    <!-- 周奖励 -->
+   483|    <div class="weekly-bonus-card">
+   484|        <div class="weekly-bonus-title">🌈 周末双倍惊喜</div>
+   485|        <div class="weekly-bonus-amount">+{{ 5 }}灵石</div>
+   486|        <div class="weekly-bonus-desc">连续签到7天额外奖励</div>
+   487|    </div>
+   488|    
+   489|    <!-- 里程碑奖励 -->
+   490|    <div class="checkin-card rewards-section">
+   491|        <div class="section-title">
+   492|            <span>🏆</span> 里程碑奖励
+   493|        </div>
+   494|        <div class="rewards-grid" style="grid-template-columns:repeat(3,1fr);">
+   495|            {% for m in milestones %}
+   496|            <div class="reward-item {% if user_streak >= m.day %}achieved{% elif user_streak >= m.day - 2 %}current{% endif %}" id="milestone-{{ m.day }}">
+   497|                <div class="reward-day">连续{{ m.day }}天</div>
+   498|                <div class="reward-stones">+{{ m.stones }}💎</div>
+   499|                {% if user_streak >= m.day %}achieved{% elif user_streak >= m.day - 2 %}current{% endif %}" id="milestone-{{ m.day }}">
+                <div class="reward-day">连续{{ m.day }}天</div>
+                <div class="reward-stones">+{{ m.stones }}💎</div>
+                {% if user_streak >= m.day %}
+                <div style="font-size:0.7rem;color:#10b981;margin-top:4px;">✅ 已达成</div>
+                {% elif user_streak >= m.day - 2 %}
+                <div style="font-size:0.7rem;color:#fbbf24;margin-top:4px;">即将达成</div>
+                {% else %}
+                <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin-top:4px;">还需{{ m.day - user_streak }}天</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- 签到成功弹窗 -->
+<div class="success-modal" id="successModal">
+    <div class="success-content">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">签到成功！</div>
+        <div class="success-info" id="successInfo">连续签到 1 天</div>
+        <div class="success-stones" id="successStones">+10 灵石</div>
+        {% if can_claim_weekly %}
+        <div style="color: #f87171; font-size: 0.85rem; margin-bottom: 16px;">
+            🎊 解锁周末双倍奖励！
+        </div>
+        {% endif %}
+        <button class="success-btn" onclick="closeSuccessModal()">太棒了</button>
+    </div>
+</div>
+
+<!-- Toast通知 -->
+<div class="toast" id="toast"></div>
+
+<script>
+function doCheckin() {
+    const btn = document.getElementById('checkinBtn');
+    if (btn.classList.contains('checked-in')) return;
+    
+    btn.disabled = true;
+    btn.textContent = '签到中...';
+    
+    fetch('/api/checkin', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            // 更新UI
+            document.getElementById('streakNumber').textContent = data.user_streak;
+            btn.className = 'checkin-btn checked-in';
+            btn.textContent = '✓ 今日已签到';
+            
+            // 显示成功弹窗
+            showSuccessModal(data.user_streak, data.reward_stones);
+            
+            // 更新日历
+            const today = new Date().getDate();
+            const todayCell = document.querySelector(`.calendar-day:nth-child(${today + 7 + 1})`);
+            if (todayCell) {
+                todayCell.classList.add('checked');
+            }
+            
+            // 更新周签到按钮
+            if (data.has_weekly_bonus) {
+                showToast('🎊 获得周末双倍灵石奖励！');
+            }
+        } else {
+            showToast(data.error || '签到失败');
+            btn.textContent = '🔔 立即签到';
+        }
+        btn.disabled = false;
+    })
+    .catch(err => {
+        showToast('签到失败，请重试');
+        btn.textContent = '🔔 立即签到';
+        btn.disabled = false;
+    });
+}
+
+function showSuccessModal(streak, stones) {
+    const modal = document.getElementById('successModal');
+    document.getElementById('successInfo').textContent = `连续签到 ${streak} 天`;
+    document.getElementById('successStones').textContent = `+${stones} 灵石`;
+    modal.classList.add('show');
+}
+
+function closeSuccessModal() {
+    document.getElementById('successModal').classList.remove('show');
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2500);
+}
+
+// 点击弹窗背景关闭
+document.getElementById('successModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeSuccessModal();
+    }
+});
+</script>
+{% endblock %}

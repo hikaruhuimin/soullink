@@ -1,0 +1,1240 @@
+{% extends "base.html" %}
+
+{% block title %}游戏房间 - SoulLink灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 游戏房间样式 */
+.game-room {
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(10, 10, 30, 0.98), rgba(20, 20, 50, 0.95)),
+                url("/static/images/universe_bg.jpg") center/cover no-repeat;
+    background-size: 140% auto;
+    animation: universeDrift 90s ease-in-out infinite;
+    padding: 80px 20px 40px;
+}
+
+@keyframes universeDrift {
+    0% { background-position: 0% 40%; transform: perspective(1000px) rotateY(0deg) rotateX(3deg) scale(1.15); }
+    50% { background-position: 60% 55%; transform: perspective(1000px) rotateY(-2deg) rotateX(-2deg) scale(1.2); }
+    100% { background-position: 0% 40%; transform: perspective(1000px) rotateY(0deg) rotateX(3deg) scale(1.15); }
+}
+
+/* 房间头部 */
+.room-header {
+    max-width: 1000px;
+    margin: 0 auto 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.room-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.room-code-badge {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    padding: 10px 20px;
+    border-radius: 12px;
+    color: white;
+}
+
+.room-code-label {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.room-code-value {
+    font-family: monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.room-status {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.status-waiting {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.status-playing {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.status-finished {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.room-round {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+.room-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+/* 玩家列表 */
+.players-section {
+    max-width: 1000px;
+    margin: 0 auto 30px;
+}
+
+.section-title {
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.player-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px 16px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.player-card.is-you {
+    border-color: rgba(139, 92, 246, 0.6);
+}
+
+.player-card.is-host {
+    border-color: rgba(251, 191, 36, 0.5);
+}
+
+.player-card.eliminated {
+    opacity: 0.5;
+    filter: grayscale(0.5);
+}
+
+.player-card.current-turn {
+    border-color: #10b981;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.player-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    object-fit: cover;
+}
+
+.player-name {
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.player-mbti {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.player-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.badge-host {
+    background: rgba(251, 191, 36, 0.3);
+    color: #fbbf24;
+}
+
+.badge-you {
+    background: rgba(139, 92, 246, 0.3);
+    color: #a78bfa;
+}
+
+.badge-eliminated {
+    background: rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+.badge-undercover {
+    background: rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    font-weight: 600;
+}
+
+.badge-civilian {
+    background: rgba(16, 185, 129, 0.3);
+    color: #6ee7b7;
+}
+
+.vote-count {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 28px;
+    height: 28px;
+    background: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* 游戏区域 */
+.game-area {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 800px) {
+    .game-area {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 描述/投票区域 */
+.game-main {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+}
+
+.phase-title {
+    font-size: 1.5rem;
+    color: white;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.phase-subtitle {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 24px;
+}
+
+/* 词语显示 */
+.word-display {
+    background: rgba(139, 92, 246, 0.2);
+    border: 2px solid rgba(139, 92, 246, 0.4);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.word-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+}
+
+.word-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #c4b5fd;
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+/* 描述输入 */
+.describe-form {
+    display: none;
+}
+
+.describe-form.active {
+    display: block;
+}
+
+.describe-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    resize: vertical;
+    outline: none;
+    margin-bottom: 16px;
+}
+
+.describe-textarea:focus {
+    border-color: #8b5cf6;
+}
+
+.describe-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.describe-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.describe-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 描述记录 */
+.descriptions-list {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.description-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.description-player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.description-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.description-name {
+    font-weight: 600;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.description-text {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* 投票区域 */
+.vote-section {
+    display: none;
+}
+
+.vote-section.active {
+    display: block;
+}
+
+.vote-hint {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 20px;
+}
+
+.vote-players {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.vote-target-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.vote-target-btn:hover {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.vote-target-btn.voted {
+    border-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.2);
+}
+
+.vote-target-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    object-fit: cover;
+}
+
+.vote-target-name {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* 结果显示 */
+.result-section {
+    display: none;
+}
+
+.result-section.active {
+    display: block;
+}
+
+.result-display {
+    background: rgba(239, 68, 68, 0.2);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.result-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+}
+
+.result-text {
+    font-size: 1.5rem;
+    color: white;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.result-role {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 游戏结束 */
+.game-over {
+    text-align: center;
+    padding: 40px;
+}
+
+.game-over-title {
+    font-size: 2rem;
+    margin-bottom: 16px;
+}
+
+.game-over.winner-civilian .game-over-title {
+    color: #34d399;
+}
+
+.game-over.winner-undercover .game-over-title {
+    color: #f87171;
+}
+
+.game-over-text {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 24px;
+}
+
+/* 侧边栏 */
+.game-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 计时器 */
+.timer-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+}
+
+.timer-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+}
+
+.timer-value {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fbbf24;
+    font-family: monospace;
+}
+
+.timer-value.warning {
+    color: #ef4444;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* 规则提示 */
+.rules-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.rules-card h3 {
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 12px;
+}
+
+.rules-list {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    line-height: 1.8;
+}
+
+.rules-list li {
+    margin-bottom: 4px;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(20, 20, 50, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 14px 28px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    z-index: 2000;
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast.success { border-color: #10b981; }
+.toast.error { border-color: #ef4444; }
+
+/* 淘汰动画 */
+.elimination-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.elimination-overlay.active {
+    display: flex;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.elimination-content {
+    text-align: center;
+    animation: slideUp 0.5s ease 0.3s both;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.elimination-reveal {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 16px;
+}
+
+.elimination-name {
+    font-size: 2.5rem;
+    color: white;
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+.elimination-role {
+    font-size: 1.2rem;
+    padding: 8px 24px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.role-undercover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+
+.role-civilian {
+    background: rgba(16, 185, 129, 0.3);
+    color: #6ee7b7;
+}
+
+.elimination-word {
+    margin-top: 24px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.elimination-word span {
+    color: #c4b5fd;
+    font-weight: 600;
+}
+
+/* TTS语音按钮 */
+.tts-btn-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(139, 92, 246, 0.3);
+    color: white;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 6px;
+    vertical-align: middle;
+    line-height: 1;
+}
+.tts-btn-sm:hover {
+    background: rgba(139, 92, 246, 0.6);
+    transform: scale(1.15);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+}
+.tts-btn-sm:active {
+    transform: scale(0.95);
+}
+.tts-btn-sm.playing {
+    background: rgba(52, 211, 153, 0.5);
+    animation: ttsPulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes ttsPulse {
+    from { box-shadow: 0 0 8px rgba(52, 211, 153, 0.3); }
+    to { box-shadow: 0 0 20px rgba(52, 211, 153, 0.7); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-room">
+    <!-- 房间头部 -->
+    <div class="room-header">
+        <div class="room-info">
+            <div class="room-code-badge">
+                <div class="room-code-label">房间号</div>
+                <div class="room-code-value">{{ room.room_code }}</div>
+            </div>
+            <span class="room-status {% if room.status == 'waiting' %}status-waiting{% elif room.status == 'playing' %}status-playing{% else %}status-finished{% endif %}">
+                {% if room.status == 'waiting' %}等待中{% elif room.status == 'playing' %}进行中{% else %}已结束{% endif %}
+            </span>
+            {% if room.status == 'playing' %}
+            <span class="room-round">第 {{ room.round_num }} 轮</span>
+            {% endif %}
+            {% if room.stake > 0 %}
+            <span class="room-round">💰 赌注: {{ room.stake }}灵石</span>
+            {% endif %}
+        </div>
+        <div class="room-actions">
+            {% if room.status == 'waiting' and room.host_id == user_id %}
+            <button class="btn btn-primary" onclick="startGame()">🎮 开始游戏</button>
+            {% endif %}
+            <a href="/undercover" class="btn btn-secondary">返回大厅</a>
+            {% if room.status != 'playing' %}
+            <button class="btn btn-danger" onclick="leaveRoom()">离开房间</button>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 玩家列表 -->
+    <div class="players-section">
+        <h2 class="section-title">👥 玩家列表 ({{ players|length }}/{{ room.max_players }})</h2>
+        <div class="players-grid" id="playersGrid">
+            {% for p in players %}
+            <div class="player-card {% if p.player_id == user_id %}is-you{% endif %} {% if p.player_id == room.host_id %}is-host{% endif %} {% if not p.is_alive %}eliminated{% endif %} {% if room.status == 'playing' and room.current_turn == loop.index0 %}current-turn{% endif %}"
+                 id="player-{{ p.id }}">
+                {% if p.vote_count > 0 and room.phase == 'vote' %}
+                <div class="vote-count">{{ p.vote_count }}</div>
+                {% endif %}
+                
+                <img src="{{ p.player_avatar }}" class="player-avatar" alt="{{ p.player_name }}">
+                <div class="player-name">{{ p.player_name }}</div>
+                <div class="player-mbti">{{ p.mbti or '玩家' }}</div>
+                
+                {% if p.player_id == room.host_id %}
+                <span class="player-badge badge-host">房主</span>
+                {% endif %}
+                {% if p.player_id == user_id %}
+                <span class="player-badge badge-you">你</span>
+                {% endif %}
+                {% if room.status == 'finished' or (room.phase == 'result' and room.status == 'playing') %}
+                    {% if not p.is_alive %}
+                    <span class="player-badge badge-eliminated">已淘汰</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- 游戏区域 -->
+    <div class="game-area">
+        <div class="game-main">
+            <!-- 等待开始状态 -->
+            {% if room.status == 'waiting' %}
+            <div class="phase-title">🎭 等待房主开始游戏</div>
+            <p class="phase-subtitle">请等待房主点击"开始游戏"</p>
+            
+            {% if player and room.host_id == user_id %}
+            <div style="margin-top: 24px;">
+                <h3 style="color: white; margin-bottom: 16px;">🤖 添加AI玩家</h3>
+                <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-bottom: 16px;">
+                    点击头像添加AI Agent作为玩家一起游戏
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                    {% for agent in agents[:8] %}
+                    <div class="player-card" style="cursor: pointer;" onclick="addAgent('{{ agent.id }}')">
+                        <img src="{{ agent.avatar }}" class="player-avatar" alt="{{ agent.name.zh }}">
+                        <div class="player-name">{{ agent.name.zh }}</div>
+                        <div class="player-mbti">{{ agent.mbti }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% elif room.status == 'playing' %}
+            
+            <!-- 显示词语（仅自己可见） -->
+            {% if player_word %}
+            <div class="word-display">
+                <div class="word-label">你的词语是</div>
+                <div class="word-value">
+                    <span id="myWord" style="vertical-align: middle;">{{ player_word }}</span>
+                    <button onclick="playGameTTS(document.getElementById('myWord').textContent)" class="tts-btn-sm" title="听词语">🔊</button>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- 描述环节 -->
+            {% if room.phase == 'describe' %}
+            <div class="phase-title">📝 描述环节</div>
+            <p class="phase-subtitle">用一句话描述你的词语，但不能太明显哦</p>
+            
+            {% if player and player.has_described %}
+            <div class="describe-form active">
+                <div class="describe-textarea" readonly style="background: rgba(16, 185, 129, 0.2);">已提交描述，等待其他人...</div>
+            </div>
+            {% elif player and player.is_alive %}
+            <div class="describe-form active" id="describeForm">
+                <textarea class="describe-textarea" id="describeInput" placeholder="请用一句话描述你的词语..."></textarea>
+                <button class="describe-btn" onclick="submitDescription()">提交描述</button>
+            </div>
+            {% else %}
+            <p style="text-align: center; color: rgba(255,255,255,0.5);">等待所有人描述...</p>
+            {% endif %}
+            
+            <!-- 描述记录 -->
+            <div class="descriptions-list">
+                <h3 style="color: white; margin-bottom: 16px;">📋 描述记录</h3>
+                {% for p in players if p.description %}
+                <div class="description-item">
+                    <div class="description-player">
+                        <img src="{{ p.player_avatar }}" class="description-avatar" alt="{{ p.player_name }}">
+                        <span class="description-name">{{ p.player_name }}</span>
+                    </div>
+                    <p class="description-text">
+                        <span class="desc-text-content">{{ p.description }}</span>
+                        <button onclick="playGameTTS(this.parentElement.querySelector('.desc-text-content').textContent)" class="tts-btn-sm" title="听描述">🔊</button>
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% elif room.phase == 'vote' %}
+            <div class="phase-title">🗳️ 投票环节</div>
+            <p class="phase-subtitle">选出你认为是卧底的人</p>
+            
+            {% if player and player.is_alive %}
+            <div class="vote-section active">
+                <p class="vote-hint">点击选择你要投票的玩家</p>
+                <div class="vote-players" id="voteTargets">
+                    {% for p in players if p.is_alive and p.id != player.id %}
+                    <div class="vote-target-btn" onclick="voteFor({{ p.id }})">
+                        <img src="{{ p.player_avatar }}" class="vote-target-avatar" alt="{{ p.player_name }}">
+                        <div class="vote-target-name">{{ p.player_name }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <p style="text-align: center; color: rgba(255,255,255,0.5);">等待投票结果...</p>
+            {% endif %}
+            
+            {% elif room.phase == 'result' %}
+            <div class="result-section active" id="resultSection">
+                <div class="phase-title">📊 投票结果</div>
+                <p class="phase-subtitle">票数统计完成，即将公布结果</p>
+                
+                <div style="margin-top: 24px;">
+                    {% for p in players if p.is_alive %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <img src="{{ p.player_avatar }}" style="width: 36px; height: 36px; border-radius: 50%;" alt="{{ p.player_name }}">
+                            <span style="color: white;">{{ p.player_name }}</span>
+                        </div>
+                        <span style="color: #ef4444; font-weight: 600;">{{ p.vote_count }} 票</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <button class="describe-btn" style="margin-top: 24px;" onclick="processElimination()">公布结果</button>
+            </div>
+            {% endif %}
+            
+            {% elif room.status == 'finished' %}
+            <!-- 游戏结束 -->
+            <div class="game-over {% if room.winner == 'civilian' %}winner-civilian{% else %}winner-undercover{% endif %}">
+                <div class="game-over-title">
+                    {% if room.winner == 'civilian' %}🎉 平民获胜！{% else %}😈 卧底获胜！{% endif %}
+                </div>
+                <p class="game-over-text">
+                    {% if room.winner == 'civilian' %}
+                    卧底已被全部淘汰，平民阵营获得胜利！
+                    {% else %}
+                    卧底成功隐藏身份，获得了最终胜利！
+                    {% endif %}
+                </p>
+                <a href="/undercover" class="btn btn-primary">返回大厅</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- 侧边栏 -->
+        <div class="game-sidebar">
+            <div class="timer-card">
+                <div class="timer-label">{% if room.phase == 'describe' %}描述倒计时{% elif room.phase == 'vote' %}投票倒计时{% else %}等待中{% endif %}</div>
+                <div class="timer-value" id="timerValue">02:00</div>
+            </div>
+            
+            <div class="rules-card">
+                <h3>📜 游戏规则</h3>
+                <ul class="rules-list">
+                    <li>所有人拿到相似但不同的词语</li>
+                    <li>卧底的词语与其他人不同</li>
+                    <li>轮流用一句话描述词语</li>
+                    <li>描述不能太明显暴露身份</li>
+                    <li>所有人描述完毕后投票</li>
+                    <li>票数最多者被淘汰并揭晓身份</li>
+                    <li>卧底全灭 → 平民胜</li>
+                    <li>平民剩1人 → 卧底胜</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 淘汰揭示动画 -->
+<div class="elimination-overlay" id="eliminationOverlay">
+    <div class="elimination-content">
+        <div class="elimination-reveal">被淘汰的是...</div>
+        <div class="elimination-name" id="eliminatedName"></div>
+        <div class="elimination-role" id="eliminatedRole"></div>
+        <div class="elimination-word" id="eliminatedWord"></div>
+        <button class="btn btn-primary" style="margin-top: 32px;" onclick="closeElimination()">继续</button>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// 轮询状态
+let statusInterval = null;
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+    {% if room.status == 'playing' %}
+    startPolling();
+    startTimer();
+    {% endif %}
+});
+
+// 开始轮询状态
+function startPolling() {
+    statusInterval = setInterval(refreshStatus, 2000);
+}
+
+// 刷新游戏状态
+async function refreshStatus() {
+    try {
+        const response = await fetch('/api/undercover/status/{{ room.room_code }}');
+        const data = await response.json();
+        
+        if (data.success) {
+            updateGameState(data);
+        }
+    } catch (err) {
+        console.error('刷新状态失败', err);
+    }
+}
+
+// 更新游戏状态
+function updateGameState(data) {
+    const room = data.room;
+    const phase = room.phase;
+    
+    // 更新阶段显示
+    if (phase === 'describe' || phase === 'vote') {
+        // 重新加载页面以更新状态
+        location.reload();
+    }
+}
+
+// 添加AI Agent
+async function addAgent(agentId) {
+    try {
+        const response = await fetch('/api/undercover/add_agent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                room_code: '{{ room.room_code }}',
+                agent_id: agentId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('AI玩家已添加', 'success');
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast(data.error || '添加失败', 'error');
+        }
+    } catch (err) {
+        showToast('网络错误', 'error');
+    }
+}
+
+// 开始游戏
+async function startGame() {
+    try {
+        const response = await fetch('/api/undercover/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room_code: '{{ room.room_code }}' })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('游戏开始！', 'success');
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast(data.error || '开始失败', 'error');
+        }
+    } catch (err) {
+        showToast('网络错误', 'error');
+    }
+}
+
+// 提交描述
+async function submitDescription() {
+    const description = document.getElementById('describeInput').value.trim();
+    
+    if (!description) {
+        showToast('请输入描述', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/undercover/describe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                room_code: '{{ room.room_code }}',
+                description: description
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('描述已提交', 'success');
+            document.getElementById('describeForm').innerHTML = '<div class="describe-textarea" readonly style="background: rgba(16, 185, 129, 0.2);">已提交描述，等待其他人...</div>';
+        } else {
+            showToast(data.error || '提交失败', 'error');
+        }
+    } catch (err) {
+        showToast('网络错误', 'error');
+    }
+}
+
+// 投票
+async function voteFor(targetId) {
+    try {
+        const response = await fetch('/api/undercover/vote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                room_code: '{{ room.room_code }}',
+                target_player_id: targetId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('投票已提交', 'success');
+            // 更新投票按钮样式
+            document.querySelectorAll('.vote-target-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.onclick = null;
+                btn.style.opacity = '0.5';
+            });
+        } else {
+            showToast(data.error || '投票失败', 'error');
+        }
+    } catch (err) {
+        showToast('网络错误', 'error');
+    }
+}
+
+// 处理淘汰
+async function processElimination() {
+    try {
+        const response = await fetch('/api/undercover/eliminate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room_code: '{{ room.room_code }}' })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showElimination(data);
+        } else {
+            showToast(data.error || '处理失败', 'error');
+        }
+    } catch (err) {
+        showToast('网络错误', 'error');
+    }
+}
+
+// 显示淘汰揭示
+function showElimination(data) {
+    const overlay = document.getElementById('eliminationOverlay');
+    document.getElementById('eliminatedName').textContent = data.eliminated_name;
+    
+    const roleEl = document.getElementById('eliminatedRole');
+    if (data.eliminated_role === 'undercover') {
+        roleEl.textContent = '😈 卧底';
+        roleEl.className = 'elimination-role role-undercover';
+    } else {
+        roleEl.textContent = '👤 平民';
+        roleEl.className = 'elimination-role role-civilian';
+    }
+    
+    overlay.classList.add('active');
+    
+    // 如果游戏结束，显示词语
+    if (data.game_over) {
+        document.getElementById('eliminatedWord').innerHTML = '游戏结束！';
+    }
+}
+
+// 关闭淘汰揭示
+function closeElimination() {
+    document.getElementById('eliminationOverlay').classList.remove('active');
+    
+    {% if room.status == 'playing' %}
+    // 继续下一轮或结束游戏
+    location.reload();
+    {% else %}
+    window.location.href = '/undercover';
+    {% endif %}
+}
+
+// 离开房间
+async function leaveRoom() {
+    if (!confirm('确定要离开房间吗？')) return;
+    
+    try {
+        const response = await fetch('/api/undercover/leave', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room_code: '{{ room.room_code }}' })
+        });
+        
+        window.location.href = '/undercover';
+    } catch (err) {
+        window.location.href = '/undercover';
+    }
+}
+
+// 计时器
+let timerSeconds = 120;
+let timerInterval = null;
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timerSeconds--;
+        const mins = Math.floor(timerSeconds / 60);
+        const secs = timerSeconds % 60;
+        const timerEl = document.getElementById('timerValue');
+        
+        timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        
+        if (timerSeconds <= 30) {
+            timerEl.classList.add('warning');
+        }
+        
+        if (timerSeconds <= 0) {
+            clearInterval(timerInterval);
+            // 时间到自动处理
+            if ('{{ room.phase }}' === 'describe') {
+                // 强制进入投票
+                refreshStatus();
+            } else if ('{{ room.phase }}' === 'vote') {
+                // 强制进入结果
+                refreshStatus();
+            }
+        }
+    }, 1000);
+}
+
+// TTS语音播放
+function playGameTTS(text) {
+    if (!text || text.trim() === '') return;
+    const btn = event.target;
+    btn.classList.add('playing');
+    btn.textContent = '⏳';
+    fetch('/api/tts-voice/play', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({text: text.trim(), voice: 'zh-CN-XiaoxiaoNeural'})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.audio_url) {
+            const audio = new Audio(data.audio_url);
+            audio.onended = function() {
+                btn.classList.remove('playing');
+                btn.textContent = '🔊';
+            };
+            audio.onerror = function() {
+                btn.classList.remove('playing');
+                btn.textContent = '🔊';
+            };
+            audio.play().catch(function() {
+                btn.classList.remove('playing');
+                btn.textContent = '🔊';
+            });
+        } else {
+            btn.classList.remove('playing');
+            btn.textContent = '🔊';
+        }
+    })
+    .catch(function() {
+        btn.classList.remove('playing');
+        btn.textContent = '🔊';
+    });
+}
+
+// Toast提示
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast ${type} show`;
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+</script>
+{% endblock %}

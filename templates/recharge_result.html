@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}充值结果 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.result-page {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 80px 20px;
+    text-align: center;
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.result-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.result-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.result-message {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+.result-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.result-actions a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-back {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    box-shadow: 0 2px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="result-page">
+    {% if success %}
+    <div class="result-icon">✅</div>
+    <div class="result-title">充值成功！</div>
+    <div class="result-message">{{ message or '灵石已到账，祝您游戏愉快！' }}</div>
+    <div class="result-actions">
+        <a href="/recharge" class="btn-back">← 继续充值</a>
+        <a href="/wallet" class="btn-primary">💎 查看钱包</a>
+    </div>
+    {% else %}
+    <div class="result-icon">❌</div>
+    <div class="result-title">充值失败</div>
+    <div class="result-message">{{ message or '支付未完成，请重试' }}</div>
+    <div class="result-actions">
+        <a href="/recharge" class="btn-primary">← 返回重试</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

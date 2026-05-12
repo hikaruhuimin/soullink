@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block title %}聊天大厅 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.chat-home {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
+    min-height: 100vh;
+}
+
+.chat-home-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+}
+
+.chat-home-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #c4b5fd, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.chat-home-header p {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.room-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.room-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--room-color, #6B5B7B), rgba(167, 139, 250, 0.5));
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.room-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(167, 139, 250, 0.25);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.room-card:hover::before {
+    opacity: 1;
+}
+
+.room-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.room-icon-wrapper {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(167, 139, 250, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.room-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.room-name {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 2px;
+}
+
+.room-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.room-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.badge-vip {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(184, 160, 96, 0.15));
+    color: #d4af37;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.badge-large {
+    background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(139, 92, 246, 0.1));
+    color: #a78bfa;
+    border: 1px solid rgba(167, 139, 250, 0.25);
+}
+
+.badge-dark {
+    background: linear-gradient(135deg, rgba(50, 60, 80, 0.3), rgba(30, 40, 60, 0.2));
+    color: #8899bb;
+    border: 1px solid rgba(50, 60, 80, 0.3);
+}
+
+.room-description {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.room-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.room-agents-preview {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.agent-mini {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--agent-color, #6B5B7B), #8B7B9B);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    margin-left: -6px;
+    transition: transform 0.2s ease;
+}
+
+.agent-mini:first-child {
+    margin-left: 0;
+}
+
+.agent-mini:hover {
+    transform: translateY(-2px) scale(1.1);
+    z-index: 2;
+}
+
+.room-online {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.online-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.enter-room-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+
+.enter-room-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
+}
+
+/* VIP Room Highlight */
+.room-card.vip-card {
+    border-color: rgba(212, 175, 55, 0.2);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05), rgba(30, 30, 20, 0.2));
+}
+
+.room-card.vip-card .room-name {
+    background: linear-gradient(135deg, #d4af37, #f0d68a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Dark Room */
+.room-card.dark-card {
+    background: rgba(20, 25, 40, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chat-home-header {
+        padding: 28px 16px;
+        margin-bottom: 28px;
+    }
+
+    .chat-home-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .room-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .room-card {
+        padding: 18px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .room-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Empty state */
+.empty-rooms {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.empty-rooms-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-rooms-text {
+    font-size: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-home">
+    <div class="chat-home-header">
+        <h1>💫 聊天大厅</h1>
+        <p>选择你喜欢的聊天室，与AI Agent们畅所欲言</p>
+    </div>
+
+    {% if chat_rooms %}
+    <div class="room-grid">
+        {% for room_id, room in chat_rooms.items() %}
+        <a href="/chat/{{ room_id }}" class="room-card {% if room.is_vip %}vip-card{% endif %} {% if room.is_dark %}dark-card{% endif %}"
+           style="--room-color: {{ room.theme_color or '#6B5B7B' }};">
+            <div class="room-card-header">
+                <div class="room-icon-wrapper">{{ room.icon or '💬' }}</div>
+                <div class="room-meta">
+                    <div class="room-name">{{ room.name }}</div>
+                    <div class="room-badges">
+                        {% if room.is_vip %}
+                        <span class="room-badge badge-vip">👑 VIP</span>
+                        {% endif %}
+                        {% if room.is_large %}
+                        <span class="room-badge badge-large">🌟 热门</span>
+                        {% endif %}
+                        {% if room.is_dark %}
+                        <span class="room-badge badge-dark">🌙 深夜</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="room-description">{{ room.description }}</div>
+            <div class="room-card-footer">
+                <div class="room-agents-preview">
+                    {% if room.agents %}
+                        {% for agent_id in room.agents[:5] %}
+                        <div class="agent-mini" style="--agent-color: {{ room.theme_color or '#6B5B7B' }};">
+                            {{ agent_id[:2]|upper }}
+                        </div>
+                        {% endfor %}
+                        {% if room.agents|length > 5 %}
+                        <span style="font-size:0.7rem;color:rgba(255,255,255,0.3);margin-left:2px;">+{{ room.agents|length - 5 }}</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div class="room-online">
+                    <span class="online-dot"></span>
+                    <span>{{ room.agents|length }} Agent在线</span>
+                </div>
+                <div class="enter-room-btn">
+                    进入 →
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-rooms">
+        <div class="empty-rooms-icon">🏠</div>
+        <div class="empty-rooms-text">暂无可用聊天室</div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

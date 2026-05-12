@@ -1,0 +1,628 @@
+{% extends "base.html" %}
+
+{% block title %}おみくじ - SoulLink 灵犀{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="SoulLink灵犀おみくじ占卜 - 日本神社风格电子御神签，抽取你的运势签文。AI智能解读，指引你的未来方向。">
+<meta name="keywords" content="おみくじ,御神签,运势,抽签,占卜,日本占卜">
+{% endblock %}
+
+{% block og_tags %}
+<meta property="og:title" content="おみくじ - SoulLink 灵犀">
+<meta property="og:description" content="日本神社风格电子御神签，抽取你的运势签文。AI智能解读，指引你的未来方向。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://soullink.app/divination">
+<meta property="og:image" content="https://soullink.app/static/images/og-image.png">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* おみくじ专属样式 */
+.omikuji-page {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* 神社背景 */
+.shrine-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse at 50% 20%, rgba(220, 38, 38, 0.1) 0%, transparent 40%),
+        radial-gradient(ellipse at 30% 60%, rgba(251, 191, 36, 0.08) 0%, transparent 40%),
+        linear-gradient(180deg, #1a0a0a 0%, #2d1515 50%, #1a0a0a 100%);
+    z-index: 0;
+}
+
+/* 神社装饰 */
+.shrine-decor {
+    position: fixed;
+    font-size: 3rem;
+    opacity: 0.1;
+    z-index: 0;
+}
+
+.shrine-decor.top-left { top: 10%; left: 5%; }
+.shrine-decor.top-right { top: 15%; right: 8%; }
+.shrine-decor.bottom-left { bottom: 10%; left: 3%; }
+.shrine-decor.bottom-right { bottom: 15%; right: 5%; }
+
+/* 内容区域 */
+.omikuji-content {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--space-2xl);
+}
+
+/* 签筒容器 */
+.omikuji-container {
+    text-align: center;
+    padding: var(--space-3xl) var(--space-xl);
+}
+
+/* 神社标题 */
+.shrine-title {
+    font-family: 'Hiragino Mincho Pro', 'Noto Serif JP', serif;
+    font-size: 2.5rem;
+    color: #DC2626;
+    text-shadow: 0 2px 10px rgba(220, 38, 38, 0.3);
+    margin-bottom: var(--space-md);
+}
+
+.shrine-subtitle {
+    color: rgba(200, 180, 160, 0.8);
+    font-size: 1.1rem;
+    margin-bottom: var(--space-3xl);
+}
+
+/* 抽签按钮 */
+.draw-btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-xl) var(--space-3xl);
+    background: linear-gradient(135deg, #DC2626, #B91C1C);
+    border: 3px solid #FBBF24;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 10px 40px rgba(220, 38, 38, 0.4);
+}
+
+.draw-btn:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(220, 38, 38, 0.5);
+}
+
+.draw-btn-icon {
+    font-size: 4rem;
+}
+
+.draw-btn-text {
+    font-family: 'Hiragino Mincho Pro', 'Noto Serif JP', serif;
+    font-size: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* 签纸样式 */
+.fortune-paper {
+    display: none;
+    background: linear-gradient(180deg, #FFF8E7 0%, #FFFEF5 100%);
+    border-radius: 4px;
+    padding: var(--space-2xl);
+    margin-top: var(--space-2xl);
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.3),
+        inset 0 0 30px rgba(220, 38, 38, 0.05);
+    position: relative;
+    animation: unfoldPaper 0.6s ease;
+}
+
+.fortune-paper.show {
+    display: block;
+}
+
+@keyframes unfoldPaper {
+    from {
+        opacity: 0;
+        transform: scaleY(0.8) rotateX(10deg);
+    }
+    to {
+        opacity: 1;
+        transform: scaleY(1) rotateX(0);
+    }
+}
+
+/* 签纸装饰边框 */
+.fortune-border {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 2px solid rgba(220, 38, 38, 0.3);
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+.fortune-corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(220, 38, 38, 0.4);
+}
+
+.fortune-corner.tl { top: 15px; left: 15px; border-right: none; border-bottom: none; }
+.fortune-corner.tr { top: 15px; right: 15px; border-left: none; border-bottom: none; }
+.fortune-corner.bl { bottom: 15px; left: 15px; border-right: none; border-top: none; }
+.fortune-corner.br { bottom: 15px; right: 15px; border-left: none; border-top: none; }
+
+/* 签运标题 */
+.fortune-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.fortune-rank {
+    font-family: 'Hiragino Mincho Pro', 'Noto Serif JP', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #DC2626;
+    text-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+    margin-bottom: var(--space-sm);
+}
+
+.fortune-rank.凶 { color: #1F2937; }
+.fortune-rank.小凶 { color: #374151; }
+.fortune-rank.半凶 { color: #4B5563; }
+.fortune-rank.末凶 { color: #6B7280; }
+.fortune-rank.大凶 { color: #111827; }
+.fortune-rank.吉 { color: #059669; }
+.fortune-rank.小吉 { color: #10B981; }
+.fortune-rank.中吉 { color: #047857; }
+.fortune-rank.大吉 { color: #DC2626; }
+
+.fortune-emoji {
+    font-size: 2rem;
+    margin-top: var(--space-sm);
+}
+
+/* 运势内容 */
+.fortune-body {
+    color: #1F2937;
+    font-size: 0.95rem;
+    line-height: 2;
+}
+
+.fortune-section {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px dashed rgba(220, 38, 38, 0.2);
+}
+
+.fortune-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.fortune-label {
+    font-weight: 700;
+    color: #DC2626;
+    margin-bottom: var(--space-xs);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fortune-text {
+    color: #374151;
+    line-height: 1.8;
+}
+
+/* 问题表单 */
+.question-form {
+    margin-top: var(--space-2xl);
+    padding: var(--space-xl);
+    background: rgba(30, 20, 20, 0.8);
+    border-radius: 16px;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    display: none;
+}
+
+.question-form.show {
+    display: block;
+}
+
+.form-title {
+    color: rgba(200, 180, 160, 0.9);
+    text-align: center;
+    margin-bottom: var(--space-lg);
+    font-size: 1.2rem;
+}
+
+.form-group {
+    margin-bottom: var(--space-md);
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(15, 10, 10, 0.8);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: rgba(220, 38, 38, 0.6);
+}
+
+.form-input::placeholder {
+    color: rgba(200, 200, 220, 0.4);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #DC2626, #B91C1C);
+    border: 2px solid #FBBF24;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* AI解读结果 */
+.interpretation-result {
+    margin-top: var(--space-xl);
+    padding: var(--space-xl);
+    background: rgba(30, 20, 20, 0.9);
+    border-radius: 16px;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    color: rgba(220, 220, 240, 0.9);
+    line-height: 1.9;
+    display: none;
+}
+
+.interpretation-result.show {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 再次抽签按钮 */
+.redraw-btn {
+    display: block;
+    margin: var(--space-xl) auto 0;
+    padding: 12px 30px;
+    background: transparent;
+    border: 2px solid rgba(220, 38, 38, 0.5);
+    border-radius: 30px;
+    color: rgba(200, 180, 160, 0.8);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.redraw-btn:hover {
+    background: rgba(220, 38, 38, 0.2);
+    color: white;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="omikuji-page">
+    <!-- 背景 -->
+    <div class="shrine-bg"></div>
+    <div class="shrine-decor top-left">⛩️</div>
+    <div class="shrine-decor top-right">🎍</div>
+    <div class="shrine-decor bottom-left">🎐</div>
+    <div class="shrine-decor bottom-right">⛩️</div>
+    
+    <!-- 内容 -->
+    <div class="omikuji-content">
+        <!-- 返回按钮 -->
+        <a href="/divination" class="back-btn-enhanced" style="margin-bottom: var(--space-xl);">
+            ← {% if lang == 'en' %}Back to Divination{% elif lang == 'ja' %}占到に戻る{% else %}返回占卜大厅{% endif %}
+        </a>
+        
+        <!-- 神社区域 -->
+        <div class="omikuji-container">
+            <h1 class="shrine-title">おみくじ</h1>
+            <p class="shrine-subtitle">
+                {% if lang == 'en' %}Draw your fortune at the shrine
+                {% elif lang == 'ja' %}神社であなたの運勢を引いてください
+                {% else %}在神社抽取您的运势签{% endif %}
+            </p>
+            
+            <!-- 抽签按钮 -->
+            <button class="draw-btn" id="drawBtn">
+                <span class="draw-btn-icon">🎍</span>
+                <span class="draw-btn-text">
+                    {% if lang == 'en' %}Draw Omikuji
+                    {% elif lang == 'ja' %}おみくじを引く
+                    {% else %}抽一支签{% endif %}
+                </span>
+            </button>
+            
+            <!-- 签纸 -->
+            <div class="fortune-paper" id="fortunePaper">
+                <div class="fortune-border"></div>
+                <div class="fortune-corner tl"></div>
+                <div class="fortune-corner tr"></div>
+                <div class="fortune-corner bl"></div>
+                <div class="fortune-corner br"></div>
+                
+                <div class="fortune-header">
+                    <div class="fortune-rank" id="fortuneRank"></div>
+                    <div class="fortune-emoji" id="fortuneEmoji"></div>
+                </div>
+                
+                <div class="fortune-body" id="fortuneBody">
+                    <!-- 运势内容 -->
+                </div>
+            </div>
+            
+            <!-- 问题表单 -->
+            <div class="question-form" id="questionForm">
+                <h3 class="form-title">
+                    {% if lang == 'en' %}Ask a question for detailed interpretation
+                    {% elif lang == 'ja' %}詳細な解読のために質問を入力
+                    {% else %}输入问题获取详细解读{% endif %}
+                </h3>
+                <form id="omikujiForm">
+                    <div class="form-group">
+                        <textarea name="question" class="form-input" rows="3" placeholder="{% if lang == 'en' %}e.g., What should I be careful about in love?{% elif lang == 'ja' %}例：恋愛で注意すべきことは？{% else %}例如：我在恋爱中应该注意什么？{% endif %}"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn" id="interpretBtn">
+                        <span class="loading-spinner" style="display: none;"></span>
+                        <span id="btnText">{% if lang == 'en' %}Get Interpretation{% elif lang == 'ja' %}解読を受ける{% else %}获取详细解读{% endif %}</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- AI解读结果 -->
+            <div class="interpretation-result" id="interpretResult">
+                <h3 style="color: #DC2626; margin-bottom: var(--space-md);">
+                    {% if lang == 'en' %}AI Interpretation
+                    {% elif lang == 'ja' %}AI解読
+                    {% else %}AI详细解读{% endif %}
+                </h3>
+                <div id="interpretContent"></div>
+            </div>
+            
+            <!-- 分享按钮 -->
+            <div style="text-align: center; margin-top: 20px; display: none;" id="shareSection">
+                <button onclick="shareOmikujiResult()" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; background: rgba(220,38,38,0.15); border: 1px solid rgba(220,38,38,0.3); border-radius: 12px; color: rgba(255,255,255,0.9); font-size: 0.875rem; cursor: pointer; transition: all 0.25s ease;"
+                        onmouseover="this.style.background='rgba(220,38,38,0.25)'" onmouseout="this.style.background='rgba(220,38,38,0.15)'">
+                    <span>📋</span>
+                    <span>分享到社交媒体</span>
+                </button>
+            </div>
+            
+            <!-- 再次抽签 -->
+            <button class="redraw-btn" id="redrawBtn" style="display: none;">
+                {% if lang == 'en' %}Draw Again{% elif lang == 'ja' %}もう一度引く{% else %}再抽一次{% endif %}
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 当前签运数据
+let currentFortune = null;
+
+// 抽签功能
+document.getElementById('drawBtn').addEventListener('click', async function() {
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span>';
+    
+    try {
+        const response = await fetch('/api/divination/omikuji/draw', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ language: '{{ lang }}' })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            currentFortune = data;
+            showFortune(data);
+        }
+    } catch (error) {
+        console.error('Draw failed:', error);
+    }
+    
+    btn.disabled = false;
+    btn.innerHTML = '<span class="draw-btn-icon">🎍</span><span class="draw-btn-text">{% if lang == "en" %}Draw Omikuji{% elif lang == "ja" %}おみくじを引く{% else %}抽一支签{% endif %}</span>';
+});
+
+// 显示签运
+function showFortune(data) {
+    const paper = document.getElementById('fortunePaper');
+    const rank = document.getElementById('fortuneRank');
+    const emoji = document.getElementById('fortuneEmoji');
+    const body = document.getElementById('fortuneBody');
+    const questionForm = document.getElementById('questionForm');
+    const redrawBtn = document.getElementById('redrawBtn');
+    
+    rank.textContent = data.type;
+    rank.className = 'fortune-rank ' + data.type;
+    emoji.textContent = data.type_info.emoji;
+    
+    // 根据语言显示运势内容
+    const lang = '{{ lang }}';
+    const fortune = data['fortune_' + (lang === 'en' ? 'en' : lang === 'ja' ? 'ja' : 'zh')] || data.fortune_zh;
+    
+    let bodyHtml = '';
+    
+    if (fortune) {
+        // 整体运势
+        if (fortune.overall) {
+            bodyHtml += `
+                <div class="fortune-section">
+                    <div class="fortune-label">📜 {% if lang == 'en' %}Overall Fortune{% elif lang == 'ja' %}全体運{% else %}整体运势{% endif %}</div>
+                    <div class="fortune-text">${fortune.overall}</div>
+                </div>
+            `;
+        }
+        
+        // 其他运势
+        const items = [
+            { key: 'love', label: '💕', name: '{% if lang == "en" %}Love{% elif lang == "ja" %}恋愛運{% else %}恋爱运势{% endif %}' },
+            { key: 'study', label: '📚', name: '{% if lang == "en" %}Study{% elif lang == "ja" %}学業運{% else %}学业运势{% endif %}' },
+            { key: 'work', label: '💼', name: '{% if lang == "en" %}Work{% elif lang == "ja" %}仕事運{% else %}事业运势{% endif %}' },
+            { key: 'health', label: '💪', name: '{% if lang == "en" %}Health{% elif lang == "ja" %}健康運{% else %}健康运势{% endif %}' },
+            { key: 'money', label: '💰', name: '{% if lang == "en" %}Money{% elif lang == "ja" %}金運{% else %}金钱运势{% endif %}' },
+            { key: 'person', label: '👤', name: '{% if lang == "en" %}Person Awaited{% elif lang == "ja" %}待人{% else %}待人{% endif %}' },
+            { key: 'travel', label: '✈️', name: '{% if lang == "en" %}Travel{% elif lang == "ja" %}旅行運{% else %}旅行运势{% endif %}' },
+            { key: 'business', label: '🤝', name: '{% if lang == "en" %}Business{% elif lang == "ja" %}ビジネス{% else %}商务运势{% endif %}' },
+            { key: 'lost', label: '🔍', name: '{% if lang == "en" %}Lost Items{% elif lang == "ja" %}落し物{% else %}失物运势{% endif %}' },
+        ];
+        
+        items.forEach(item => {
+            if (fortune[item.key]) {
+                bodyHtml += `
+                    <div class="fortune-section">
+                        <div class="fortune-label">${item.label} ${item.name}</div>
+                        <div class="fortune-text">${fortune[item.key]}</div>
+                    </div>
+                `;
+            }
+        });
+    }
+    
+    body.innerHTML = bodyHtml;
+    paper.classList.add('show');
+    questionForm.classList.add('show');
+    redrawBtn.style.display = 'block';
+}
+
+// 获取详细解读
+document.getElementById('omikujiForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!currentFortune) return;
+    
+    const formData = new FormData(e.target);
+    const question = formData.get('question');
+    const btn = document.getElementById('interpretBtn');
+    const spinner = btn.querySelector('.loading-spinner');
+    const btnText = document.getElementById('btnText');
+    const resultDiv = document.getElementById('interpretResult');
+    const contentDiv = document.getElementById('interpretContent');
+    
+    btn.disabled = true;
+    spinner.style.display = 'inline-block';
+    btnText.textContent = '{% if lang == "en" %}Interpreting...{% elif lang == "ja" %}解読中...{% else %}解读中...{% endif %}';
+    
+    try {
+        const response = await fetch('/api/divination/omikuji/interpret', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: currentFortune.type,
+                fortune: currentFortune.fortune_zh,
+                question: question,
+                language: '{{ lang }}'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            contentDiv.innerHTML = data.interpretation;
+            resultDiv.classList.add('show');
+        } else {
+            contentDiv.innerHTML = '<p style="color: #f87171;">{% if lang == "en" %}Interpretation failed, please try again{% elif lang == "ja" %}解読に失敗しました{% else %}解读失败，请重试{% endif %}</p>';
+            resultDiv.classList.add('show');
+        }
+    } catch (error) {
+        contentDiv.innerHTML = '<p style="color: #f87171;">{% if lang == "en" %}Network error, please try again{% elif lang == "ja" %}ネットワークエラー{% else %}网络错误，请重试{% endif %}</p>';
+        resultDiv.classList.add('show');
+    }
+    
+    btn.disabled = false;
+    spinner.style.display = 'none';
+    btnText.textContent = '{% if lang == "en" %}Get Interpretation{% elif lang == "ja" %}解読を受ける{% else %}获取详细解读{% endif %}';
+});
+
+// 分享结果
+function shareOmikujiResult() {
+    if (!currentFortune) return;
+    const lang = '{{ lang }}';
+    const fortune = currentFortune['fortune_' + (lang === 'en' ? 'en' : lang === 'ja' ? 'ja' : 'zh')] || currentFortune.fortune_zh;
+    
+    let shareText = `🔮 SoulLink灵犀 · おみくじ占卜结果\n\n`;
+    shareText += `🏷️ 签运：${currentFortune.type} ${currentFortune.type_info.emoji}\n`;
+    if (fortune && fortune.overall) {
+        shareText += `📜 整体运势：${fortune.overall}\n`;
+    }
+    shareText += `\n✨ 来SoulLink灵犀探索你的命运吧！\n🔗 https://soullink.app/divination`;
+    
+    copyToClipboard(shareText);
+    document.getElementById('shareSection').style.display = 'block';
+}
+
+// 在显示结果时显示分享按钮
+const origShowFortune = showFortune;
+showFortune = function(data) {
+    origShowFortune(data);
+    document.getElementById('shareSection').style.display = 'block';
+};
+
+// 重新抽签
+document.getElementById('redrawBtn').addEventListener('click', function() {
+    document.getElementById('fortunePaper').classList.remove('show');
+    document.getElementById('questionForm').classList.remove('show');
+    document.getElementById('interpretResult').classList.remove('show');
+    this.style.display = 'none';
+    currentFortune = null;
+});
+</script>
+{% endblock %}

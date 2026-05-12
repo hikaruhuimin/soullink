@@ -1,0 +1,10 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg_yume" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#eff6ff"/>
+      <stop offset="100%" style="stop-color:#60a5fa"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="95" fill="url(#bg_yume)" stroke="#60a5fa" stroke-width="4"/>
+  <text x="100" y="100" font-size="80" text-anchor="middle" dominant-baseline="central">🌙</text>
+</svg>

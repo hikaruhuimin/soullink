@@ -1,0 +1,682 @@
+{% extends "base.html" %}
+
+{% block title %}故事接龙 - SoulLink 灵犀{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="SoulLink灵犀AI故事接龙 - 和AI一起创造属于你的奇幻故事！AI开头，你来续写，共同编织独一无二的冒险。">
+<meta name="keywords" content="故事接龙,AI故事,创意写作,互动故事,AI写作">
+{% endblock %}
+
+{% block og_tags %}
+<meta property="og:title" content="故事接龙 - SoulLink 灵犀">
+<meta property="og:description" content="和AI一起创造属于你的奇幻故事！AI开头，你来续写，共同编织独一无二的冒险。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://soullink.app/story-chain">
+<meta property="og:image" content="https://soullink.app/static/images/og-image.png">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.story-page {
+    min-height: 100vh;
+    padding: 100px 20px 40px;
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1145 50%, #0f0a2a 100%);
+    position: relative;
+}
+
+.story-page::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.story-container {
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* 标题 */
+.story-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.story-header h1 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.story-header h1 .highlight {
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.story-header p {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.9375rem;
+}
+
+/* 开始界面 */
+.start-screen {
+    text-align: center;
+    padding: 60px 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+}
+
+.start-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.start-screen h2 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+.start-screen p {
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 28px;
+    line-height: 1.6;
+}
+
+.start-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 36px;
+    background: linear-gradient(135deg, #8b5cf6, #60a5fa);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+}
+
+.start-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+}
+
+/* 故事界面 */
+.story-screen {
+    display: none;
+}
+
+.story-screen.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 故事内容 */
+.story-content {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 28px;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    line-height: 1.9;
+    color: rgba(255,255,255,0.85);
+    font-size: 1rem;
+}
+
+.story-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.story-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.story-content::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 2px;
+}
+
+.story-paragraph {
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    animation: fadeIn 0.4s ease;
+}
+
+.story-paragraph.ai {
+    background: rgba(139, 92, 246, 0.08);
+    border-left: 3px solid rgba(139, 92, 246, 0.4);
+}
+
+.story-paragraph.user {
+    background: rgba(59, 130, 246, 0.08);
+    border-left: 3px solid rgba(59, 130, 246, 0.4);
+}
+
+.story-paragraph .label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.story-paragraph .label.ai-label { color: #a78bfa; }
+.story-paragraph .label.user-label { color: #60a5fa; }
+
+/* 输入区 */
+.story-input-area {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.story-input-area textarea {
+    width: 100%;
+    min-height: 100px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 14px;
+    color: white;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.3s;
+    font-family: inherit;
+}
+
+.story-input-area textarea:focus {
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.story-input-area textarea::placeholder {
+    color: rgba(255,255,255,0.3);
+}
+
+.story-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+.continue-btn {
+    flex: 1;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    min-width: 120px;
+}
+
+.continue-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.continue-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.voice-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.voice-btn:hover {
+    background: rgba(255,255,255,0.15);
+    color: white;
+}
+
+.voice-btn.playing {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.4);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(139, 92, 246, 0); }
+}
+
+.end-btn {
+    padding: 12px 20px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    color: rgba(239, 68, 68, 0.8);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.end-btn:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+/* 统计 */
+.story-stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: rgba(255,255,255,0.4);
+    font-size: 0.8125rem;
+}
+
+.story-stats span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* 加载动画 */
+.loading-dots {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.loading-dots span {
+    width: 6px;
+    height: 6px;
+    background: #a78bfa;
+    border-radius: 50%;
+    animation: dotBounce 1.4s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotBounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 640px) {
+    .story-page {
+        padding: 80px 16px 40px;
+    }
+    .story-header h1 {
+        font-size: 1.6rem;
+    }
+    .story-content {
+        padding: 20px;
+        max-height: 300px;
+    }
+    .story-actions {
+        flex-direction: column;
+    }
+    .continue-btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="story-page">
+    <div class="story-container">
+        <!-- 标题 -->
+        <div class="story-header">
+            <h1>📖 故事接龙</h1>
+            <p>AI来开头，你来续写，一起编织独一无二的冒险故事</p>
+        </div>
+
+        <!-- 开始界面 -->
+        <div class="start-screen" id="startScreen">
+            <div class="start-icon">📚</div>
+            <h2>准备好开始一段冒险了吗？</h2>
+            <p>AI会给你一个故事的开头<br>你续写一段，AI再继续<br>一起创造属于你们的独特故事</p>
+            <button class="start-btn" onclick="startStory()">
+                <span>✨</span>
+                <span>开始新故事</span>
+            </button>
+        </div>
+
+        <!-- 故事界面 -->
+        <div class="story-screen" id="storyScreen">
+            <div class="story-stats">
+                <span id="turnCount">📝 第 1 轮</span>
+                <span id="wordCount">📊 0 字</span>
+            </div>
+
+            <!-- 故事内容 -->
+            <div class="story-content" id="storyContent">
+                <!-- 故事段落由JS动态渲染 -->
+            </div>
+
+            <!-- 输入区 -->
+            <div class="story-input-area">
+                <textarea id="userInput" placeholder="继续这个故事...写下你的下一段情节吧..." maxlength="500"></textarea>
+                <div class="story-actions">
+                    <button class="continue-btn" id="continueBtn" onclick="continueStory()">
+                        ✨ 继续故事
+                    </button>
+                    <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">
+                        <span>🔊</span>
+                        <span>朗读</span>
+                    </button>
+                    <button class="end-btn" onclick="endStory()">
+                        <span>结束</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结束界面 -->
+        <div class="start-screen" id="endScreen" style="display: none;">
+            <div class="start-icon">🏆</div>
+            <h2 id="endTitle">故事结束</h2>
+            <p id="endDesc">你们共同创作了一段精彩的故事！</p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <button class="start-btn" onclick="startStory()">
+                    <span>📖</span>
+                    <span>开始新故事</span>
+                </button>
+                <button class="voice-btn" onclick="shareStory()" style="padding: 16px 36px; font-size: 1.125rem;">
+                    <span>📋</span>
+                    <span>复制故事</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let storyData = {
+    id: null,
+    segments: [],
+    turn: 0,
+    isAiThinking: false
+};
+
+let audioPlayer = null;
+let isPlaying = false;
+
+async function startStory() {
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('endScreen').style.display = 'none';
+    document.getElementById('storyScreen').classList.add('active');
+    
+    // 重置
+    storyData = { id: null, segments: [], turn: 0, isAiThinking: false };
+    document.getElementById('storyContent').innerHTML = '';
+    document.getElementById('userInput').value = '';
+    document.getElementById('continueBtn').disabled = true;
+    updateStats();
+    
+    try {
+        const response = await fetch('/api/story-chain/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lang: '{{ lang }}' })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            storyData.id = data.story_id;
+            addStoryParagraph(data.opening, 'ai');
+            storyData.turn = 1;
+            document.getElementById('continueBtn').disabled = false;
+            updateStats();
+        }
+    } catch (error) {
+        showToast('故事开始失败，请重试', 'error');
+    }
+}
+
+async function continueStory() {
+    const input = document.getElementById('userInput');
+    const userText = input.value.trim();
+    
+    if (!userText && storyData.segments.length > 1) {
+        showToast('请先写下你的故事续写', 'info');
+        return;
+    }
+    
+    if (storyData.isAiThinking) return;
+    storyData.isAiThinking = true;
+    document.getElementById('continueBtn').disabled = true;
+    
+    // 添加用户段落
+    if (userText) {
+        addStoryParagraph(userText, 'user');
+        storyData.segments.push({ text: userText, type: 'user' });
+        input.value = '';
+    }
+    
+    // 显示AI思考中
+    const thinkingId = showThinking();
+    
+    try {
+        const fullStory = storyData.segments.map(s => s.text).join('\n\n');
+        const response = await fetch('/api/story-chain/continue', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                story: fullStory,
+                lang: '{{ lang }}'
+            })
+        });
+        
+        const data = await response.json();
+        
+        // 移除思考状态
+        removeThinking(thinkingId);
+        
+        if (data.success) {
+            addStoryParagraph(data.ai_response, 'ai');
+            storyData.segments.push({ text: data.ai_response, type: 'ai' });
+            storyData.turn++;
+            updateStats();
+        }
+    } catch (error) {
+        removeThinking(thinkingId);
+        showToast('AI响应失败，请重试', 'error');
+    }
+    
+    storyData.isAiThinking = false;
+    document.getElementById('continueBtn').disabled = false;
+    input.focus();
+}
+
+function addStoryParagraph(text, type) {
+    const container = document.getElementById('storyContent');
+    const para = document.createElement('div');
+    para.className = `story-paragraph ${type}`;
+    
+    const label = type === 'ai' ? '🤖 AI 续写' : '✍️ 你的续写';
+    const labelClass = type === 'ai' ? 'ai-label' : 'user-label';
+    
+    para.innerHTML = `
+        <div class="label ${labelClass}">${label}</div>
+        <div>${escapeHtml(text)}</div>
+    `;
+    
+    container.appendChild(para);
+    container.scrollTop = container.scrollHeight;
+}
+
+function showThinking() {
+    const container = document.getElementById('storyContent');
+    const para = document.createElement('div');
+    para.className = 'story-paragraph ai';
+    para.id = 'thinking-' + Date.now();
+    para.innerHTML = `
+        <div class="label ai-label">🤖 AI 思考中</div>
+        <div class="loading-dots">
+            <span></span><span></span><span></span>
+        </div>
+    `;
+    container.appendChild(para);
+    container.scrollTop = container.scrollHeight;
+    return para.id;
+}
+
+function removeThinking(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+}
+
+function updateStats() {
+    document.getElementById('turnCount').textContent = `📝 第 ${Math.ceil(storyData.turn)} 轮`;
+    const totalChars = storyData.segments.reduce((sum, s) => sum + s.text.length, 0);
+    document.getElementById('wordCount').textContent = `📊 ${totalChars} 字`;
+}
+
+async function toggleVoice() {
+    const btn = document.getElementById('voiceBtn');
+    
+    if (isPlaying) {
+        stopVoice();
+        return;
+    }
+    
+    // 获取最新的AI文段
+    const aiSegments = storyData.segments.filter(s => s.type === 'ai');
+    if (aiSegments.length === 0) {
+        showToast('还没有可朗读的内容', 'info');
+        return;
+    }
+    
+    const lastText = aiSegments[aiSegments.length - 1].text;
+    
+    btn.classList.add('playing');
+    
+    try {
+        const response = await fetch('/api/story-chain/voice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                text: lastText,
+                lang: '{{ lang }}'
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success && data.tts_url) {
+            isPlaying = true;
+            
+            // 使用现有的TTS播放
+            if (window.playTTS) {
+                window.playTTS(data.tts_url);
+            } else {
+                // 简单实现
+                const audio = new Audio(data.tts_url);
+                audioPlayer = audio;
+                audio.onended = function() {
+                    isPlaying = false;
+                    btn.classList.remove('playing');
+                };
+                audio.play().catch(() => {
+                    showToast('语音播放失败', 'error');
+                    btn.classList.remove('playing');
+                    isPlaying = false;
+                });
+            }
+        }
+    } catch (error) {
+        showToast('语音生成失败', 'error');
+        btn.classList.remove('playing');
+    }
+}
+
+function stopVoice() {
+    if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer = null;
+    }
+    isPlaying = false;
+    document.getElementById('voiceBtn').classList.remove('playing');
+}
+
+function endStory() {
+    stopVoice();
+    const totalRounds = Math.ceil(storyData.turn);
+    const totalChars = storyData.segments.reduce((sum, s) => sum + s.text.length, 0);
+    
+    document.getElementById('storyScreen').classList.remove('active');
+    document.getElementById('endScreen').style.display = 'block';
+    document.getElementById('endTitle').textContent = '🏆 故事完成！';
+    document.getElementById('endDesc').textContent = `你们共同完成了 ${totalRounds} 轮故事接龙，共创了 ${totalChars} 字的精彩冒险！`;
+}
+
+function shareStory() {
+    const fullText = storyData.segments.map(s => s.text).join('\n\n');
+    copyToClipboard(`📖 SoulLink灵犀故事接龙\n\n${fullText}\n\n✨ 一起来创造故事吧！\n🔗 https://soullink.app/story-chain`);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// 输入框自动调整高度
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('userInput');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+        
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('continueBtn').click();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

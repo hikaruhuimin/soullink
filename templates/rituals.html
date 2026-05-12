@@ -1,0 +1,627 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+.ritual-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.ritual-header {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #1a1025 0%, #2d1b4e 50%, #1a0a2e 100%);
+    border-radius: 24px;
+    color: white;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(180, 130, 255, 0.2);
+}
+
+.ritual-header::before {
+    content: '✨🌙⭐✨';
+    position: absolute;
+    font-size: 40px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.3;
+    letter-spacing: 20px;
+}
+
+.ritual-header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+/* Festival Calendar */
+.festival-calendar {
+    background: rgba(20, 10, 40, 0.9);
+    border: 1px solid rgba(180, 130, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+}
+.festival-calendar h2 {
+    text-align: center;
+    color: #e8dfff;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.festival-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+.festival-item {
+    background: rgba(40, 20, 70, 0.6);
+    border: 1px solid rgba(180, 130, 255, 0.15);
+    border-radius: 14px;
+    padding: 1.2rem;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.festival-item:hover {
+    border-color: rgba(180, 130, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+.festival-item .fi-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+.festival-item .fi-name {
+    color: #e8dfff;
+    font-size: 1rem;
+    font-weight: 500;
+}
+.festival-item .fi-date {
+    color: rgba(200, 180, 255, 0.5);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+.festival-item .fi-ritual {
+    display: inline-block;
+    background: rgba(124, 58, 237, 0.2);
+    color: #b482ff;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+.festival-item .fi-cost {
+    display: inline-block;
+    color: #fbbf24;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+.participate-btn {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.5rem;
+}
+.participate-btn:hover {
+    transform: scale(1.05);
+}
+
+.festival-banner {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.festival-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+.festival-name {
+    font-size: 1.8rem;
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.festival-desc {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* 仪式卡片 */
+.ritual-card {
+    background: linear-gradient(135deg, #f8f9ff 0%, #fff5f5 100%);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 2px solid #e0e0e0;
+}
+
+.ritual-title {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.wish-form {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.wish-input {
+    width: 100%;
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    min-height: 120px;
+    resize: vertical;
+    transition: all 0.3s;
+}
+
+.wish-input:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-wish {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: transform 0.2s;
+}
+
+.btn-wish:hover {
+    transform: translateY(-2px);
+}
+
+/* 愿望结果显示 */
+.wish-result {
+    display: none;
+    text-align: center;
+    padding: 30px;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.wish-blessing {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.wish-message {
+    font-size: 1.2rem;
+    color: #667eea;
+    margin-bottom: 20px;
+}
+
+.wish-energy {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.energy-title {
+    font-size: 1.1rem;
+    color: #764ba2;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.energy-content {
+    color: #666;
+    line-height: 1.8;
+}
+
+/* 抽签样式 */
+.fortune-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.btn-draw {
+    padding: 16px 40px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-draw:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+}
+
+.fortune-result {
+    display: none;
+    margin-top: 30px;
+    animation: fadeIn 0.5s ease;
+}
+
+.fortune-sign {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.fortune-name {
+    font-size: 1.5rem;
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.fortune-detail {
+    color: #666;
+    line-height: 1.8;
+}
+
+.fortune-lucky {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.lucky-item {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.lucky-label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+
+.lucky-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* 节日列表 */
+.festival-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.festival-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.festival-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.festival-item-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.festival-item-name {
+    color: #333;
+    font-weight: 600;
+}
+
+.festival-item-date {
+    color: #999;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.btn-download {
+    padding: 12px 25px;
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s;
+}
+
+.btn-download:hover {
+    background: #667eea;
+    color: white;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ritual-container">
+    <div class="ritual-header">
+        <h1>{{ t('rituals') or '节日仪式' }}</h1>
+        <p>{{ t('rituals_desc') or '专属占卜许愿仪式' }}</p>
+    </div>
+
+    <!-- Festival Calendar -->
+    <div class="festival-calendar">
+        <h2>📅 {{ t('rituals_calendar_title') or '节日日历' }}</h2>
+        <div class="festival-grid">
+            {% for f in festivals %}
+            <div class="festival-item">
+                <div class="fi-icon">{{ f.icon }}</div>
+                {% if lang == 'zh' %}
+                <div class="fi-name">{{ f.name_zh }}</div>
+                {% elif lang == 'en' %}
+                <div class="fi-name">{{ f.name_en }}</div>
+                {% else %}
+                <div class="fi-name">{{ f.name_ja }}</div>
+                {% endif %}
+                <div class="fi-date">{{ f.date }}</div>
+                <div class="fi-ritual">{{ f.ritual }}</div>
+                <div class="fi-cost">💎 {{ f.cost }}</div>
+                <br>
+                <button class="participate-btn" onclick="participateRitual('{{ f.date }}', '{{ f.ritual }}', {{ f.cost }})">
+                    ✨ {{ t('rituals_participate') or '参与仪式' }}
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="festival-banner" id="currentFestival">
+        <div class="festival-icon" id="festivalIcon">🌕</div>
+        <h2 class="festival-name" id="festivalName">{{ t('full_moon') or '满月' }}</h2>
+        <p class="festival-desc" id="festivalDesc">{{ t('wish_success') or '月光许愿，愿望将被月光守护' }}</p>
+    </div>
+
+    {% if current_festival == 'full_moon' %}
+    <div class="ritual-card" id="wishRitual">
+        <h3 class="ritual-title">🌕 {{ t('make_wish') or '满月许愿' }}</h3>
+        <div class="wish-form" id="wishForm">
+            <textarea class="wish-input" id="wishInput" placeholder="{{ t('wish_placeholder_ritual') or '在此写下你的愿望...' }}"></textarea>
+            <button class="btn-wish" onclick="submitWish()">
+                ✨ {{ t('submit_wish') or '提交愿望' }}
+            </button>
+        </div>
+        <div class="wish-result" id="wishResult">
+            <div class="wish-blessing">🌕✨</div>
+            <div class="wish-message">{{ t('wish_success') or '愿望已记录，月光会守护你的心愿' }}</div>
+            <div class="wish-energy">
+                <div class="energy-title">🔮 {{ t('wish_energy') or '愿望能量解读' }}</div>
+                <div class="energy-content" id="energyContent"></div>
+            </div>
+        </div>
+    </div>
+    {% elif current_festival == 'qixi' %}
+    <div class="ritual-card" id="loveRitual">
+        <h3 class="ritual-title">💕 {{ t('love_divination') or '姻缘占卜' }}</h3>
+        <div class="fortune-card" id="loveFortune">
+            <p style="color: #666; margin-bottom: 20px;">在七夕这个浪漫的日子里，织女会为你指引姻缘方向...</p>
+            <button class="btn-draw" onclick="drawLoveFortune()">
+                💘 {{ t('draw_fortune') or '抽取姻缘签' }}
+            </button>
+        </div>
+        <div class="fortune-result" id="loveResult">
+            <div class="fortune-sign">💕</div>
+            <div class="fortune-name" id="fortuneName"></div>
+            <div class="fortune-detail" id="fortuneDetail"></div>
+        </div>
+    </div>
+    {% elif current_festival == 'new_year' %}
+    <div class="ritual-card" id="newyearRitual">
+        <h3 class="ritual-title">🎋 {{ t('fortune_draw') or '新年运势签' }}</h3>
+        <div class="fortune-card">
+            <p style="color: #666; margin-bottom: 20px;">新年第一天，来抽一支运势签吧！</p>
+            <button class="btn-draw" onclick="drawNewYearFortune()">
+                🎋 {{ t('draw_fortune') or '抽签' }}
+            </button>
+        </div>
+        <div class="fortune-result" id="newyearResult">
+            <div class="fortune-sign" id="newyearSign"></div>
+            <div class="fortune-name" id="newyearName"></div>
+            <div class="fortune-lucky" id="fortuneLucky"></div>
+            <div class="fortune-detail" id="newyearDetail"></div>
+        </div>
+    </div>
+    {% else %}
+    <div class="ritual-card">
+        <h3 class="ritual-title">🎊 {{ t('next_festival') or '下一个节日' }}</h3>
+        <div class="festival-list" id="festivalList"></div>
+    </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="btn-download" onclick="shareRitual()">
+            📤 {{ t('share_card') or '分享仪式' }}
+        </button>
+    </div>
+</div>
+
+<script>
+const currentFestival = '{{ current_festival }}';
+
+async function submitWish() {
+    const wish = document.getElementById('wishInput').value;
+    if (!wish) {
+        alert('{{ t('please_fill_all') or '请写下你的愿望' }}');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/rituals/wish', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wish, festival: currentFestival })
+        });
+        
+        const data = await response.json();
+        
+        document.getElementById('wishForm').style.display = 'none';
+        document.getElementById('wishResult').style.display = 'block';
+        document.getElementById('energyContent').textContent = data.energy;
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('提交失败，请重试');
+    }
+}
+
+async function drawLoveFortune() {
+    try {
+        const response = await fetch('/api/rituals/love-divination', {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        document.getElementById('loveFortune').style.display = 'none';
+        document.getElementById('loveResult').style.display = 'block';
+        document.getElementById('fortuneName').textContent = data.name;
+        document.getElementById('fortuneDetail').textContent = data.detail;
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('抽签失败，请重试');
+    }
+}
+
+async function drawNewYearFortune() {
+    try {
+        const response = await fetch('/api/rituals/newyear-fortune', {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        document.getElementById('newyearSign').textContent = data.sign;
+        document.getElementById('newyearName').textContent = data.name;
+        document.getElementById('newyearDetail').textContent = data.detail;
+        
+        document.getElementById('fortuneLucky').innerHTML = `
+            <div class="lucky-item">
+                <div class="lucky-label">{{ t('lucky_color') or '幸运色' }}</div>
+                <div class="lucky-value">${data.lucky_color}</div>
+            </div>
+            <div class="lucky-item">
+                <div class="lucky-label">{{ t('lucky_number') or '幸运数字' }}</div>
+                <div class="lucky-value">${data.lucky_number}</div>
+            </div>
+            <div class="lucky-item">
+                <div class="lucky-label">{{ t('lucky_direction') or '幸运方位' }}</div>
+                <div class="lucky-value">${data.lucky_direction}</div>
+            </div>
+        `;
+        
+        document.getElementById('loveFortune').style.display = 'none';
+        document.getElementById('newyearResult').style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('抽签失败，请重试');
+    }
+}
+
+function shareRitual() {
+    const shareText = '{{ t('ritual_share_text') or '我在灵犀参与了满月许愿仪式✨' }}';
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ t('rituals') or '节日仪式' }}',
+            text: shareText,
+            url: window.location.href
+        });
+    } else {
+        alert(shareText);
+    }
+}
+
+// 初始化节日列表
+async function loadFestivalList() {
+    try {
+        const response = await fetch('/api/rituals/festivals');
+        const festivals = await response.json();
+        
+        const listEl = document.getElementById('festivalList');
+        if (listEl && festivals.length > 0) {
+            listEl.innerHTML = festivals.map(f => `
+                <div class="festival-item">
+                    <div class="festival-item-icon">${f.icon}</div>
+                    <div class="festival-item-name">${f.name}</div>
+                    <div class="festival-item-date">${f.days}天后</div>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Error loading festivals:', error);
+    }
+}
+
+if (currentFestival === 'none') {
+    loadFestivalList();
+}
+
+// Participate in paid ritual
+async function participateRitual(date, ritual, cost) {
+    if (!{{ 'true' if current_user.is_authenticated else 'false' }}) {
+        alert('{{ t("login_required") or "请先登录" }}');
+        window.location.href = '/login';
+        return;
+    }
+    
+    const confirmMsg = '{{ t("rituals_confirm") or "参与此仪式需要消耗" }}' + ' ' + cost + '💎，确认参与吗？';
+    if (!confirm(confirmMsg)) return;
+    
+    try {
+        const response = await fetch('/api/rituals/participate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({date: date, ritual: ritual, cost: cost})
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert('✨ ' + (data.message || '{{ t("rituals_success") or "仪式完成！" }}'));
+            location.reload();
+        } else {
+            alert(data.message || '{{ t("rituals_error") or "灵石不足" }}');
+        }
+    } catch (error) {
+        alert('{{ t("rituals_error") or "请求失败" }}');
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,533 @@
+{% extends "base.html" %}
+
+{% block title %}谁是卧底 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.undercover-lobby {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
+    min-height: 100vh;
+}
+
+/* Header */
+.lobby-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.lobby-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 70%, rgba(239, 68, 68, 0.06), transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.06), transparent 50%);
+    pointer-events: none;
+}
+
+.lobby-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #f87171, #ef4444, #dc2626);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.lobby-header p {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.95rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Game Rules */
+.rules-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 28px;
+}
+
+.rules-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rules-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.rule-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.rule-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #f87171;
+    flex-shrink: 0;
+}
+
+.rule-text {
+    flex: 1;
+}
+
+.rule-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 3px;
+}
+
+.rule-desc {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.45);
+    line-height: 1.5;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 28px 20px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.action-btn-primary {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.25);
+}
+
+.action-btn-primary:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(239, 68, 68, 0.35);
+}
+
+.action-btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.action-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(167, 139, 250, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn-icon {
+    font-size: 2.4rem;
+}
+
+.action-btn-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.action-btn-desc {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.55);
+    text-align: center;
+}
+
+.action-btn-secondary .action-btn-desc {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Active Rooms */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.active-rooms {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.active-room-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    color: inherit;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.active-room-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(167, 139, 250, 0.2);
+    transform: translateY(-2px);
+}
+
+.room-info-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.room-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-waiting {
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.status-playing {
+    background: #fbbf24;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+}
+
+.status-finished {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.room-name-display {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: white;
+}
+
+.room-meta-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.room-join-btn {
+    padding: 6px 16px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+
+.room-join-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* No rooms */
+.no-rooms {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.no-rooms-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .rules-content {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .active-room-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .room-info-left {
+        width: 100%;
+    }
+
+    .room-join-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .lobby-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .lobby-header {
+        padding: 28px 16px;
+    }
+
+    .rules-card {
+        padding: 20px;
+    }
+}
+
+/* Loading overlay for game creation */
+.loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-overlay.show {
+    display: flex;
+}
+
+.loading-spinner {
+    text-align: center;
+    color: white;
+}
+
+.spinner-icon {
+    font-size: 3rem;
+    animation: spin 1.5s linear infinite;
+    display: block;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="undercover-lobby">
+    <div class="lobby-header">
+        <h1>🕵️ 谁是卧底</h1>
+        <p>找出隐藏在人群中的卧底，考验你的观察力与推理能力</p>
+    </div>
+
+    <!-- Game Rules -->
+    <div class="rules-card">
+        <h3>📖 游戏规则</h3>
+        <div class="rules-content">
+            <div class="rule-item">
+                <div class="rule-number">1</div>
+                <div class="rule-text">
+                    <div class="rule-title">分发词语</div>
+                    <div class="rule-desc">每位玩家获得一个词语，卧底的词语与其他人不同但相近</div>
+                </div>
+            </div>
+            <div class="rule-item">
+                <div class="rule-number">2</div>
+                <div class="rule-text">
+                    <div class="rule-title">轮流描述</div>
+                    <div class="rule-desc">每人轮流用一句话描述自己的词语，不能直接说出词语本身</div>
+                </div>
+            </div>
+            <div class="rule-item">
+                <div class="rule-number">3</div>
+                <div class="rule-text">
+                    <div class="rule-title">投票淘汰</div>
+                    <div class="rule-desc">每轮描述结束后，投票选出最可疑的人淘汰出局</div>
+                </div>
+            </div>
+            <div class="rule-item">
+                <div class="rule-number">4</div>
+                <div class="rule-text">
+                    <div class="rule-title">胜负判定</div>
+                    <div class="rule-desc">卧底撑到最后获胜；平民找出卧底则平民获胜</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button class="action-btn action-btn-primary" onclick="startSoloGame()">
+            <span class="action-btn-icon">🤖</span>
+            <span class="action-btn-label">开始游戏</span>
+            <span class="action-btn-desc">与AI对手来一局单人游戏</span>
+        </button>
+        <button class="action-btn action-btn-secondary" onclick="createRoom()">
+            <span class="action-btn-icon">🏠</span>
+            <span class="action-btn-label">创建房间</span>
+            <span class="action-btn-desc">邀请好友一起玩</span>
+        </button>
+    </div>
+
+    <!-- Active Rooms -->
+    <div class="section-title">🟢 活跃房间</div>
+    {% if active_rooms and active_rooms|length > 0 %}
+    <div class="active-rooms">
+        {% for room in active_rooms %}
+        <a href="/undercover/room/{{ room.id }}" class="active-room-card">
+            <div class="room-info-left">
+                <div class="room-status-dot 
+                    {% if room.status == 'waiting' %}status-waiting
+                    {% elif room.status == 'playing' %}status-playing
+                    {% else %}status-finished{% endif %}">
+                </div>
+                <div>
+                    <div class="room-name-display">{{ room.name or '游戏房间' }}</div>
+                    <div class="room-meta-info">
+                        <span>👥 {{ room.players|length if room.players else 0 }} 人</span>
+                        <span>•</span>
+                        <span>
+                            {% if room.status == 'waiting' %}等待中
+                            {% elif room.status == 'playing' %}进行中
+                            {% else %}已结束{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <span class="room-join-btn">加入 →</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-rooms">
+        <div class="no-rooms-icon">🎮</div>
+        <p>暂无活跃房间，快来创建一个吧！</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <span class="spinner-icon">🎲</span>
+        <div class="loading-text">正在准备游戏...</div>
+    </div>
+</div>
+
+<script>
+function startSoloGame() {
+    document.getElementById('loadingOverlay').classList.add('show');
+
+    fetch('/api/undercover/solo/start', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/undercover/room/' + data.room_id;
+        } else {
+            alert(data.error || '创建游戏失败');
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+    })
+    .catch(err => {
+        alert('创建游戏失败，请重试');
+        document.getElementById('loadingOverlay').classList.remove('show');
+    });
+}
+
+function createRoom() {
+    document.getElementById('loadingOverlay').classList.add('show');
+
+    fetch('/api/undercover/room/create', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/undercover/room/' + data.room_id;
+        } else {
+            alert(data.error || '创建房间失败');
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+    })
+    .catch(err => {
+        alert('创建房间失败，请重试');
+        document.getElementById('loadingOverlay').classList.remove('show');
+    });
+}
+</script>
+{% endblock %}

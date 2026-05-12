@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+
+{% block title %}MBTI灵犀测试 - SoulLink 灵犀{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="SoulLink灵犀MBTI人格测试 - 12道专业题目，AI智能分析你的16型人格类型，找到与你最契合的AI灵魂伴侣。">
+<meta name="keywords" content="MBTI,人格测试,16型人格,性格测试,AI测试,灵魂伴侣">
+{% endblock %}
+
+{% block og_tags %}
+<meta property="og:title" content="MBTI灵犀测试 - SoulLink 灵犀">
+<meta property="og:description" content="12道专业题目，AI智能分析你的16型人格类型，找到与你最契合的AI灵魂伴侣。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://soullink.app/divination/mbti">
+<meta property="og:image" content="https://soullink.app/static/images/og-image.png">
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/starry.css?v=20260502">
+<style>
+body, .main-content { background: transparent !important; background-image: none !important; }
+body::before { display: none !important; }
+/* 确保星空背景不被覆盖 */
+body { background: transparent !important; }
+.mbti-test { background: transparent !important; }
+
+.mbti-test {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+    min-height: calc(100vh - 72px);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: #E8D5C4;
+    margin-bottom: var(--space-md);
+}
+
+.page-title span {
+    background: linear-gradient(135deg, #C4B5FD, #E8D5C4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-desc {
+    font-size: 1rem;
+    color: #C4D4E8;
+    line-height: 1.8;
+}
+
+.mbti-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-3xl);
+}
+
+.progress-bar {
+    width: 200px;
+    height: 6px;
+    background: rgba(100, 120, 180, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #C4B5FD);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    font-size: 0.875rem;
+    color: #A0A8C0;
+}
+
+.question-card {
+    background: rgba(15, 20, 50, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.5s ease;
+    border: 1px solid rgba(100, 120, 180, 0.2);
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.question-number {
+    font-size: 0.875rem;
+    color: #C4B5FD;
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+}
+
+.question-text {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #E8D5C4;
+    margin-bottom: var(--space-2xl);
+    line-height: 1.6;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+}
+
+@media (max-width: 640px) {
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.option-btn {
+    background: rgba(15, 20, 50, 0.6);
+    border: 2px solid rgba(100, 120, 180, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option-btn:hover {
+    border-color: rgba(139, 92, 246, 0.5);
+    background: rgba(107, 91, 149, 0.2);
+    transform: translateY(-2px);
+}
+
+.option-btn.selected {
+    border-color: #C4B5FD;
+    background: rgba(107, 91, 149, 0.25);
+}
+
+.option-text {
+    font-size: 1rem;
+    color: #C4D4E8;
+    line-height: 1.6;
+}
+
+/* 结果页 */
+.result-card {
+    background: rgba(15, 20, 50, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeInUp 0.6s ease;
+    border: 1px solid rgba(100, 120, 180, 0.2);
+}
+
+.mbti-type {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #C4B5FD, #E8D5C4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--space-md);
+}
+
+.mbti-name {
+    font-size: 1.5rem;
+    color: #E8D5C4;
+    margin-bottom: var(--space-xl);
+}
+
+.result-desc {
+    font-size: 1.125rem;
+    color: #C4D4E8;
+    line-height: 1.8;
+    margin-bottom: var(--space-3xl);
+    text-align: left;
+    padding: var(--space-xl);
+    background: rgba(15, 20, 50, 0.5);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(100, 120, 180, 0.15);
+}
+
+.match-section {
+    border-top: 1px solid rgba(100, 120, 180, 0.15);
+    padding-top: var(--space-2xl);
+    margin-top: var(--space-2xl;
+}
+
+.match-title {
+    font-size: 1rem;
+    color: #A0A8C0;
+    margin-bottom: var(--space-lg);
+}
+
+.match-agent {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+    background: rgba(15, 20, 50, 0.5);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(100, 120, 180, 0.15);
+}
+
+.match-agent:hover {
+    transform: translateY(-2px);
+    background: rgba(107, 91, 149, 0.2);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.match-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid rgba(196, 181, 253, 0.4);
+    object-fit: cover;
+}
+
+.match-info {
+    flex: 1;
+    text-align: left;
+}
+
+.match-name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: #E8D5C4;
+    margin-bottom: var(--space-xs);
+}
+
+.match-desc {
+    font-size: 0.875rem;
+    color: #A0A8C0;
+    line-height: 1.5;
+}
+
+.result-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    margin-top: var(--space-2xl);
+}
+
+.btn {
+    padding: 12px 28px;
+    border-radius: var(--radius-full);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, rgba(107, 91, 149, 0.9), rgba(139, 94, 131, 0.9));
+    color: white;
+    border: 1px solid rgba(196, 181, 253, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, rgba(127, 111, 169, 0.95), rgba(159, 114, 151, 0.95));
+    color: white;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #A0A8C0;
+    border: 1px solid rgba(100, 120, 180, 0.25);
+}
+
+.btn-secondary:hover {
+    border-color: rgba(139, 92, 246, 0.5);
+    color: #C4B5FD;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<canvas id="starry-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+<div class="mbti-test starry-bg" style="position:relative;z-index:1;">
+    <div class="page-header">
+        <h1 class="page-title">✨ MBTI 灵犀测试 ✨</h1>
+        <p class="page-desc">探索你的性格特质，找到最契合的AI灵魂伴侣</p>
+    </div>
+    
+    <div class="mbti-progress">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        <span class="progress-text" id="progressText">0/12</span>
+    </div>
+    
+    <div class="question-card" id="questionCard">
+        <!-- 问题将通过JS动态加载 -->
+    </div>
+    
+    <div class="result-card" id="resultCard" style="display: none;">
+        <!-- 结果将通过JS动态加载 -->
+    </div>
+</div>
+
+<script>
+const lang = '{{ lang }}';
+let currentQuestion = 1;
+const answers = {};
+const totalQuestions = 12;
+
+// 加载问题
+async function loadQuestion(qid) {
+    const res = await fetch(`/divination/mbti/question/${qid}`);
+    const data = await res.json();
+    
+    const progress = ((qid - 1) / totalQuestions) * 100;
+    document.getElementById('progressFill').style.width = progress + '%';
+    document.getElementById('progressText').textContent = `${qid - 1}/${totalQuestions}`;
+    
+    const card = document.getElementById('questionCard');
+    card.innerHTML = `
+        <div class="question-number">问题 ${data.id}</div>
+        <div class="question-text">${data.question}</div>
+        <div class="options-grid">
+            ${data.options.map(opt => `
+                <button class="option-btn" onclick="selectOption(${data.id}, '${opt.key}')">
+                    <div class="option-text">${opt.text}</div>
+                </button>
+            `).join('')}
+        </div>
+    `;
+    card.style.animation = 'none';
+    card.offsetHeight;
+    card.style.animation = 'fadeInUp 0.5s ease';
+}
+
+// 选择选项
+function selectOption(qid, key) {
+    answers[qid] = key;
+    
+    // 高亮选中项
+    const buttons = document.querySelectorAll('.option-btn');
+    buttons.forEach(btn => btn.classList.remove('selected'));
+    event.target.closest('.option-btn').classList.add('selected');
+    
+    // 延迟进入下一题
+    setTimeout(() => {
+        if (currentQuestion < totalQuestions) {
+            currentQuestion++;
+            loadQuestion(currentQuestion);
+        } else {
+            showResult();
+        }
+    }, 400);
+}
+
+// 显示结果
+async function showResult() {
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressText').textContent = '完成！';
+    
+    const res = await fetch('/api/mbti/result', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({answers, lang})
+    });
+    const data = await res.json();
+    
+    document.getElementById('questionCard').style.display = 'none';
+    const resultCard = document.getElementById('resultCard');
+    resultCard.style.display = 'block';
+    
+    const matchSection = data.match ? `
+        <div class="match-section">
+            <div class="match-title">💜 与你最契合的灵犀伙伴</div>
+            <a href="/agent/${data.match.id}" class="match-agent">
+                <img src="${data.match.avatar}" alt="${data.match.name}" class="match-avatar">
+                <div class="match-info">
+                    <div class="match-name">${data.match.name}</div>
+                    <div class="match-desc">${data.match.desc}</div>
+                </div>
+            </a>
+        </div>
+    ` : '';
+    
+    resultCard.innerHTML = `
+        <div class="mbti-type">${data.mbti}</div>
+        <div class="mbti-name">${data.name}</div>
+        <div class="result-desc">${data.desc}</div>
+        ${matchSection}
+        <div class="result-actions">
+            <a href="/chat/dm/${data.match?.id || 'lumi'}" class="btn btn-primary">开始聊天</a>
+            <button onclick="shareMbtiResult('${data.mbti}', '${data.name}')" class="btn btn-secondary">📋 分享结果</button>
+            <button onclick="location.reload()" class="btn btn-secondary">重新测试</button>
+        </div>
+        <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #ffecd2 100%); border-radius: 16px; text-align: center;">
+            <p style="color: #666; margin-bottom: 12px;">想知道谁最适合你？</p>
+            <a href="/match/matchmaker" style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #ff6b9d, #ff8a9d); color: white; border-radius: 50px; text-decoration: none; font-weight: 600;">→ AI红娘匹配</a>
+        </div>
+    `;
+}
+
+// 初始化
+loadQuestion(1);
+
+// 分享MBTI结果
+function shareMbtiResult(mbti, name) {
+    const shareText = `🧠 SoulLink灵犀MBTI测试结果\n\n我的类型：${mbti} - ${name}\n\n✨ 来SoulLink灵犀发现你的人格类型，找到专属AI灵魂伴侣吧！\n🔗 https://soullink.app/divination/mbti`;
+    copyToClipboard(shareText);
+}
+</script>
+<script src="/static/js/starry.js"></script>
+
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+// SoulLink 星象图系统 - 内联版
+(function(){let canvas,ctx,W,H,stars=[],meteors=[],rotation=0;var CONSTELLATIONS=[{name:'猎户座',stars:[{x:.35,y:.12},{x:.65,y:.12},{x:.42,y:.45},{x:.50,y:.47},{x:.58,y:.49},{x:.30,y:.82},{x:.70,y:.85}],lines:[[0,2],[1,4],[2,3],[3,4],[2,5],[4,6]],cx:.15,cy:.20},{name:'北斗七星',stars:[{x:.2,y:.3},{x:.3,y:.25},{x:.42,y:.22},{x:.55,y:.25},{x:.6,y:.35},{x:.72,y:.38},{x:.78,y:.30}],lines:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]],cx:.82,cy:.12},{name:'仙后座',stars:[{x:.2,y:.5},{x:.35,y:.3},{x:.5,y:.55},{x:.65,y:.25},{x:.8,y:.5}],lines:[[0,1],[1,2],[2,3],[3,4]],cx:.50,cy:.08},{name:'天蝎座',stars:[{x:.3,y:.1},{x:.35,y:.2},{x:.4,y:.35},{x:.45,y:.5},{x:.5,y:.6},{x:.6,y:.7},{x:.7,y:.75},{x:.8,y:.7}],lines:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7]],cx:.25,cy:.55},{name:'仙女座',stars:[{x:.5,y:.2},{x:.4,y:.35},{x:.3,y:.5},{x:.6,y:.35},{x:.7,y:.5}],lines:[[2,1],[1,0],[0,3],[3,4]],cx:.75,cy:.30},{name:'狮子座',stars:[{x:.3,y:.2},{x:.2,y:.35},{x:.35,y:.45},{x:.55,y:.45},{x:.7,y:.35},{x:.65,y:.55}],lines:[[0,1],[1,2],[2,3],[3,4],[4,5],[3,5]],cx:.40,cy:.72},{name:'天鹅座',stars:[{x:.5,y:.1},{x:.5,y:.35},{x:.5,y:.6},{x:.3,y:.4},{x:.7,y:.4}],lines:[[0,1],[1,2],[3,1],[1,4]],cx:.88,cy:.50},{name:'双子座',stars:[{x:.35,y:.1},{x:.55,y:.1},{x:.3,y:.4},{x:.6,y:.4},{x:.25,y:.7},{x:.65,y:.7}],lines:[[0,2],[2,4],[1,3],[3,5],[0,1]],cx:.12,cy:.75},{name:'天琴座',stars:[{x:.5,y:.1},{x:.35,y:.35},{x:.65,y:.35},{x:.4,y:.6},{x:.6,y:.6}],lines:[[0,1],[0,2],[1,3],[2,4],[3,4]],cx:.60,cy:.65},{name:'金牛座',stars:[{x:.3,y:.2},{x:.45,y:.3},{x:.6,y:.25},{x:.55,y:.45},{x:.35,y:.55}],lines:[[0,1],[1,2],[1,3],[3,4]],cx:.90,cy:.75},{name:'射手座',stars:[{x:.4,y:.2},{x:.5,y:.3},{x:.45,y:.45},{x:.55,y:.45},{x:.5,y:.6},{x:.6,y:.7}],lines:[[0,1],[1,2],[1,3],[2,4],[3,4],[4,5]],cx:.30,cy:.85},{name:'英仙座',stars:[{x:.5,y:.1},{x:.45,y:.3},{x:.55,y:.3},{x:.5,y:.5},{x:.4,y:.7}],lines:[[0,1],[0,2],[1,3],[2,3],[3,4]],cx:.70,cy:.88}];function init(){if(!document.querySelector('.starry-bg'))return;canvas=document.getElementById('starry-canvas');if(!canvas){canvas=document.createElement('canvas');canvas.id='starry-canvas';canvas.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';document.body.insertBefore(canvas,document.body.firstChild);}ctx=canvas.getContext('2d');resize();genStars();window.addEventListener('resize',resize);animate();}function resize(){W=window.innerWidth;H=window.innerHeight;canvas.width=W;canvas.height=H;}function genStars(){stars=[];for(let i=0;i<200;i++)stars.push({x:Math.random(),y:Math.random(),s:0.5+Math.random()*0.8,a:0.15+Math.random()*0.35,tw:0.5+Math.random()*2,ph:Math.random()*6.28,l:0});for(let i=0;i<100;i++)stars.push({x:Math.random(),y:Math.random(),s:1+Math.random()*1.5,a:0.3+Math.random()*0.4,tw:0.8+Math.random()*1.5,ph:Math.random()*6.28,l:1});for(let i=0;i<40;i++)stars.push({x:Math.random(),y:Math.random(),s:2+Math.random()*2,a:0.6+Math.random()*0.4,tw:1+Math.random(),ph:Math.random()*6.28,l:2});}function draw(time){ctx.clearRect(0,0,W,H);rotation+=0.00003;var colors=[function(a){return'rgba(160,180,240,'+a+')'},function(a){return'rgba(200,215,255,'+a+')'},function(a){return'rgba(255,255,245,'+a+')'}];for(var i=0;i<stars.length;i++){var s=stars[i];var tw=time*0.001*s.tw+s.ph;var a=s.a*(0.6+0.4*Math.sin(tw));var dx=(s.x-0.5)*Math.cos(rotation)-(s.y-0.5)*Math.sin(rotation)+0.5;var dy=(s.x-0.5)*Math.sin(rotation)+(s.y-0.5)*Math.cos(rotation)+0.5;var sx=dx*W,sy=dy*H;ctx.beginPath();ctx.arc(sx,sy,s.s,0,6.28);ctx.fillStyle=colors[s.l](a);ctx.fill();if(s.s>2.5){var g=ctx.createRadialGradient(sx,sy,0,sx,sy,s.s*5);g.addColorStop(0,'rgba(255,255,255,'+a*0.25+')');g.addColorStop(1,'rgba(255,255,255,0)');ctx.beginPath();ctx.arc(sx,sy,s.s*5,0,6.28);ctx.fillStyle=g;ctx.fill();}}for(var ci=0;ci<CONSTELLATIONS.length;ci++){var c=CONSTELLATIONS[ci];var drift=Math.sin(time*0.00005+ci)*0.01;var cx2=c.cx+drift,cy2=c.cy+Math.cos(time*0.00004+ci*0.7)*0.008;ctx.strokeStyle='rgba(140,160,220,0.25)';ctx.lineWidth=0.8;for(var li=0;li<c.lines.length;li++){var s1=c.stars[c.lines[li][0]],s2=c.stars[c.lines[li][1]];var x1=(cx2+(s1.x-0.5)*0.12)*W,y1=(cy2+(s1.y-0.5)*0.15)*H;var x2=(cx2+(s2.x-0.5)*0.12)*W,y2=(cy2+(s2.y-0.5)*0.15)*H;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}for(var si=0;si<c.stars.length;si++){var st=c.stars[si];var sx3=(cx2+(st.x-0.5)*0.12)*W,sy3=(cy2+(st.y-0.5)*0.15)*H;var br=0.5+0.3*Math.sin(time*0.001+si);ctx.beginPath();ctx.arc(sx3,sy3,1.8,0,6.28);ctx.fillStyle='rgba(200,210,255,'+br+')';ctx.fill();var g2=ctx.createRadialGradient(sx3,sy3,0,sx3,sy3,5);g2.addColorStop(0,'rgba(180,200,255,'+br*0.3+')');g2.addColorStop(1,'rgba(180,200,255,0)');ctx.beginPath();ctx.arc(sx3,sy3,5,0,6.28);ctx.fillStyle=g2;ctx.fill();}ctx.font='11px "Noto Sans SC",sans-serif';ctx.fillStyle='rgba(200,190,160,0.4)';ctx.textAlign='center';ctx.fillText(c.name,cx2*W,(cy2+0.09)*H);}if(Math.random()<0.003)meteors.push({x:Math.random()*W*0.8+W*0.1,y:0,sp:5+Math.random()*10,an:0.63+Math.random()*0.15,ln:60+Math.random()*140,lf:1,fb:Math.random()<0.1});var nm=[];for(var mi=0;mi<meteors.length;mi++){var m=meteors[mi];m.x+=Math.cos(m.an)*m.sp;m.y+=Math.sin(m.an)*m.sp;m.lf-=0.012;if(m.lf<=0||m.x>W||m.y>H)continue;var tx=m.x-Math.cos(m.an)*m.ln,ty=m.y-Math.sin(m.an)*m.ln;var mg=ctx.createLinearGradient(tx,ty,m.x,m.y);mg.addColorStop(0,'rgba(255,255,255,0)');mg.addColorStop(0.7,'rgba(200,220,255,'+m.lf*0.5+')');mg.addColorStop(1,'rgba(255,255,255,'+m.lf*0.9+')');ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(m.x,m.y);ctx.strokeStyle=mg;ctx.lineWidth=m.fb?2.5:1.2;ctx.stroke();var hg=ctx.createRadialGradient(m.x,m.y,0,m.x,m.y,m.fb?12:6);hg.addColorStop(0,'rgba(255,255,255,'+m.lf*0.8+')');hg.addColorStop(1,'rgba(255,255,255,0)');ctx.beginPath();ctx.arc(m.x,m.y,m.fb?12:6,0,6.28);ctx.fillStyle=hg;ctx.fill();nm.push(m);}meteors=nm;}function animate(){draw(performance.now());requestAnimationFrame(animate);}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();})();
+</script>
+{% endblock %}

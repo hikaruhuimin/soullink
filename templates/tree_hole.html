@@ -1,0 +1,561 @@
+{% extends "base.html" %}
+
+{% block title %}树洞 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.tree-hole-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
+    min-height: 100vh;
+}
+
+/* Header */
+.tree-hole-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 36px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+}
+
+.tree-hole-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6ee7b7, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.tree-hole-header p {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.95rem;
+}
+
+/* New Post Form */
+.new-post-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 28px;
+}
+
+.new-post-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-form-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    color: white;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.25s ease;
+    box-sizing: border-box;
+}
+
+.post-form-textarea:focus {
+    outline: none;
+    border-color: rgba(167, 139, 250, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.post-form-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.post-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.post-form-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.mood-select {
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.25s ease;
+}
+
+.mood-select:focus {
+    outline: none;
+    border-color: rgba(167, 139, 250, 0.4);
+}
+
+.mood-select option {
+    background: #1a1a2e;
+    color: white;
+}
+
+.char-counter {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.post-submit-btn {
+    padding: 10px 28px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.post-submit-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+}
+
+.post-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Posts Feed */
+.posts-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.post-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 18px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.post-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.post-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(167, 139, 250, 0.2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+}
+
+.post-anon-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.post-mood {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.post-time {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.post-content {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.7;
+    margin-bottom: 16px;
+    word-break: break-word;
+}
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+}
+
+.like-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.like-btn.liked {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #f87171;
+}
+
+.like-count {
+    font-weight: 600;
+}
+
+/* AI Reply */
+.ai-reply {
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: rgba(167, 139, 250, 0.06);
+    border: 1px solid rgba(167, 139, 250, 0.12);
+    border-radius: 14px;
+    border-left: 3px solid rgba(167, 139, 250, 0.3);
+}
+
+.ai-reply-label {
+    font-size: 0.75rem;
+    color: #a78bfa;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ai-reply-text {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+    padding: 16px 0;
+}
+
+.page-btn {
+    padding: 8px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.page-btn:hover:not(:disabled):not(.active) {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(167, 139, 250, 0.3);
+    color: white;
+}
+
+.page-btn.active {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border-color: transparent;
+    color: white;
+}
+
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.page-info {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Empty state */
+.empty-posts {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-posts-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.4;
+}
+
+.empty-posts-text {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1rem;
+}
+
+/* Anonymous Notice */
+.anon-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(251, 191, 36, 0.06);
+    border: 1px solid rgba(251, 191, 36, 0.15);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    color: rgba(251, 191, 36, 0.7);
+    margin-bottom: 14px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .post-form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .post-form-meta {
+        justify-content: space-between;
+    }
+
+    .post-submit-btn {
+        width: 100%;
+    }
+
+    .tree-hole-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .post-card {
+        padding: 16px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tree-hole-page">
+    <div class="tree-hole-header">
+        <h1>🌳 树洞</h1>
+        <p>匿名倾诉你的心事，释放内心的秘密</p>
+    </div>
+
+    <!-- New Post Form -->
+    <div class="new-post-card">
+        <h3>✍️ 写下你的心事</h3>
+        <div class="anon-notice">
+            🔒 你的身份将保持匿名，没有人知道你是谁
+        </div>
+        <form id="postForm" onsubmit="submitPost(event)">
+            <textarea class="post-form-textarea" id="postContent" 
+                      placeholder="在这里写下你想说的话……&#10;可以是你的一天、你的烦恼、你的秘密……"
+                      maxlength="500" required></textarea>
+            <div class="post-form-actions">
+                <div class="post-form-meta">
+                    <select class="mood-select" id="postMood">
+                        <option value="neutral">😐 平静</option>
+                        <option value="happy">😊 开心</option>
+                        <option value="sad">😢 难过</option>
+                        <option value="angry">😠 生气</option>
+                        <option value="anxious">😰 焦虑</option>
+                        <option value="lonely">😔 孤独</option>
+                        <option value="excited">🤩 兴奋</option>
+                        <option value="confused">😕 困惑</option>
+                    </select>
+                    <span class="char-counter"><span id="charCount">0</span>/500</span>
+                </div>
+                <button type="submit" class="post-submit-btn" id="submitBtn">
+                    🌱 发布到树洞
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Posts Feed -->
+    <div class="posts-feed">
+        {% if posts and posts.items %}
+            {% for post in posts.items %}
+            <div class="post-card" id="post-{{ post.id }}">
+                <div class="post-header">
+                    <div class="post-author">
+                        <div class="post-avatar">🌱</div>
+                        <span class="post-anon-name">{{ post.anonymous_name or '匿名树友' }}</span>
+                        <span class="post-mood">
+                            {% if post.mood == 'happy' %}😊
+                            {% elif post.mood == 'sad' %}😢
+                            {% elif post.mood == 'angry' %}😠
+                            {% elif post.mood == 'anxious' %}😰
+                            {% elif post.mood == 'lonely' %}😔
+                            {% elif post.mood == 'excited' %}🤩
+                            {% elif post.mood == 'confused' %}😕
+                            {% else %}😐
+                            {% endif %}
+                        </span>
+                    </div>
+                    <span class="post-time">{{ post.created_at.strftime('%Y-%m-%d %H:%M') if post.created_at else '' }}</span>
+                </div>
+                <div class="post-content">{{ post.content }}</div>
+
+                {% if post.ai_reply %}
+                <div class="ai-reply">
+                    <div class="ai-reply-label">🤖 树洞AI回复</div>
+                    <div class="ai-reply-text">{{ post.ai_reply }}</div>
+                </div>
+                {% endif %}
+
+                <div class="post-actions">
+                    {% set liked_users = post.get_liked_users_list() if post.liked_users else [] %}
+                    <button class="like-btn {% if current_user_id and current_user_id in liked_users %}liked{% endif %}"
+                            onclick="likePost({{ post.id }})"
+                            id="like-btn-{{ post.id }}">
+                        <span>❤️</span>
+                        <span class="like-count" id="like-count-{{ post.id }}">{{ post.likes or 0 }}</span>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-posts">
+            <div class="empty-posts-icon">🌿</div>
+            <div class="empty-posts-text">还没有人倾诉心事……<br>来做第一个吧</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if posts and posts.pages > 1 %}
+    <div class="pagination">
+        {% if posts.has_prev %}
+        <a href="?page={{ posts.prev_num }}" class="page-btn">← 上一页</a>
+        {% else %}
+        <button class="page-btn" disabled>← 上一页</button>
+        {% endif %}
+
+        <span class="page-info">{{ posts.page }} / {{ posts.pages }}</span>
+
+        {% if posts.has_next %}
+        <a href="?page={{ posts.next_num }}" class="page-btn">下一页 →</a>
+        {% else %}
+        <button class="page-btn" disabled>下一页 →</button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Character counter
+document.getElementById('postContent').addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length;
+});
+
+function submitPost(event) {
+    event.preventDefault();
+    const content = document.getElementById('postContent').value.trim();
+    const mood = document.getElementById('postMood').value;
+    const btn = document.getElementById('submitBtn');
+
+    if (!content) {
+        alert('请写下你的心事');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '发布中...';
+
+    fetch('/api/treehole/post', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({content: content, mood: mood})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.error || '发布失败，请重试');
+            btn.disabled = false;
+            btn.textContent = '🌱 发布到树洞';
+        }
+    })
+    .catch(err => {
+        alert('发布失败，请稍后重试');
+        btn.disabled = false;
+        btn.textContent = '🌱 发布到树洞';
+    });
+}
+
+function likePost(postId) {
+    const btn = document.getElementById('like-btn-' + postId);
+    const countEl = document.getElementById('like-count-' + postId);
+
+    fetch('/api/treehole/like', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({post_id: postId})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            btn.classList.toggle('liked', data.liked);
+            countEl.textContent = data.likes;
+        }
+    })
+    .catch(err => {
+        // silent fail
+    });
+}
+</script>
+{% endblock %}

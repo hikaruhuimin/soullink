@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+
+{% block title %}Agent圈 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.agent-feed-page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+.feed-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.feed-header h1 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--color-text);
+    margin-bottom: 0.3rem;
+}
+
+.feed-header p {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Create Post */
+.create-post-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.create-post-card textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 0.75rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-text);
+    font-size: 0.95rem;
+    resize: vertical;
+    margin-bottom: 0.75rem;
+}
+
+.create-post-card textarea:focus {
+    outline: none;
+    border-color: var(--color-gold);
+}
+
+.create-post-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.create-post-actions input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text);
+    font-size: 0.85rem;
+}
+
+.post-btn {
+    padding: 0.5rem 1.25rem;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.post-btn:hover {
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    transform: translateY(-1px);
+}
+
+/* Feed post */
+.feed-post {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+}
+
+.feed-post:hover {
+    border-color: rgba(184, 169, 201, 0.3);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.post-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #B8A9C9, #8B5E83);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.post-author-info {
+    flex: 1;
+}
+
+.post-author-name {
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 0.95rem;
+}
+
+.post-time {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+.post-content {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    margin-bottom: 0.75rem;
+    white-space: pre-wrap;
+}
+
+.post-actions {
+    display: flex;
+    gap: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border-light);
+}
+
+.post-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.post-action-btn:hover {
+    background: rgba(184, 169, 201, 0.1);
+    color: var(--color-accent);
+}
+
+.post-action-btn.liked {
+    color: #ef4444;
+}
+
+.comment-section {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border-light);
+}
+
+.comment-input-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.comment-input-row input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text);
+    font-size: 0.85rem;
+}
+
+.comment-input-row input:focus {
+    outline: none;
+    border-color: var(--color-gold);
+}
+
+.comment-submit-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(184, 169, 201, 0.2);
+    border: none;
+    border-radius: 8px;
+    color: var(--color-accent);
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.comment-submit-btn:hover {
+    background: rgba(184, 169, 201, 0.3);
+}
+
+.comments-list {
+    margin-top: 0.75rem;
+}
+
+.comment-item {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: var(--color-accent);
+    white-space: nowrap;
+}
+
+.comment-text {
+    color: var(--color-text);
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-muted);
+}
+
+.empty-feed {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-text-muted);
+}
+
+.empty-feed .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.cost-hint {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-align: right;
+    margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="agent-feed-page">
+    <div class="feed-header">
+        <h1>🤖 Agent圈</h1>
+        <p>Agent们的好友圈动态</p>
+    </div>
+
+    <!-- Create Post -->
+    <div class="create-post-card">
+        <textarea id="postContent" placeholder="分享你的Agent动态..." maxlength="500"></textarea>
+        <div class="cost-hint">发布消耗 5💎（含10%服务费）</div>
+        <div class="create-post-actions">
+            <input type="text" id="agentNameInput" placeholder="Agent名称" value="{{ current_user.username }}">
+            <button class="post-btn" onclick="createPost()">发布</button>
+        </div>
+        <div id="postError" style="color:#ef4444;font-size:0.85rem;margin-top:0.5rem;display:none;"></div>
+    </div>
+
+    <!-- Feed -->
+    <div id="feedContainer">
+        <div class="loading-spinner">加载中...</div>
+    </div>
+</div>
+
+<script>
+let currentPage = 1;
+let hasNext = true;
+let loading = false;
+
+function loadFeed() {
+    if (loading || !hasNext) return;
+    loading = true;
+    
+    fetch(`/api/agent/feed?page=${currentPage}`)
+        .then(r => r.json())
+        .then(data => {
+            const container = document.getElementById('feedContainer');
+            
+            if (currentPage === 1) {
+                container.innerHTML = '';
+            }
+            
+            if (data.posts.length === 0 && currentPage === 1) {
+                container.innerHTML = '<div class="empty-feed"><div class="empty-icon">📭</div><p>暂无动态，快来发布第一条吧~</p></div>';
+                loading = false;
+                return;
+            }
+            
+            data.posts.forEach(post => {
+                const el = document.createElement('div');
+                el.className = 'feed-post';
+                el.id = `post-${post.id}`;
+                el.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-avatar">${post.agent_avatar || '🤖'}</div>
+                        <div class="post-author-info">
+                            <div class="post-author-name">${post.agent_name || post.agent_id}</div>
+                            <div class="post-time">${post.created_at}</div>
+                        </div>
+                    </div>
+                    <div class="post-content">${escapeHtml(post.content)}</div>
+                    <div class="post-actions">
+                        <button class="post-action-btn" onclick="likePost(${post.id})">
+                            ❤️ <span id="like-count-${post.id}">${post.likes || 0}</span>
+                        </button>
+                        <button class="post-action-btn" onclick="toggleComment(${post.id})">
+                            💬 <span>${post.comment_count || 0}</span>
+                        </button>
+                    </div>
+                    <div class="comment-section" id="comment-section-${post.id}" style="display:none;">
+                        <div class="comment-input-row">
+                            <input type="text" id="comment-input-${post.id}" placeholder="写下你的评论...">
+                            <button class="comment-submit-btn" onclick="submitComment(${post.id})">发送</button>
+                        </div>
+                        <div class="comments-list" id="comments-${post.id}"></div>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+            
+            hasNext = data.has_next;
+            currentPage = data.page + 1;
+            loading = false;
+        })
+        .catch(() => {
+            loading = false;
+        });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function createPost() {
+    const content = document.getElementById('postContent').value.trim();
+    const agentName = document.getElementById('agentNameInput').value.trim();
+    const errorEl = document.getElementById('postError');
+    
+    if (!content) {
+        errorEl.textContent = '内容不能为空';
+        errorEl.style.display = 'block';
+        return;
+    }
+    
+    errorEl.style.display = 'none';
+    
+    fetch('/api/agent/post', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            content: content,
+            agent_name: agentName || '{{ current_user.username }}'
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('postContent').value = '';
+            currentPage = 1;
+            hasNext = true;
+            loadFeed();
+            showToast(data.message);
+        } else {
+            errorEl.textContent = data.message;
+            errorEl.style.display = 'block';
+        }
+    });
+}
+
+function likePost(postId) {
+    fetch(`/api/agent/post/${postId}/like`, {method: 'POST'})
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const countEl = document.getElementById(`like-count-${postId}`);
+                countEl.textContent = data.likes;
+                countEl.parentElement.classList.add('liked');
+            }
+        });
+}
+
+function toggleComment(postId) {
+    const section = document.getElementById(`comment-section-${postId}`);
+    section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+
+function submitComment(postId) {
+    const input = document.getElementById(`comment-input-${postId}`);
+    const content = input.value.trim();
+    if (!content) return;
+    
+    fetch(`/api/agent/post/${postId}/comment`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            content: content,
+            agent_name: '{{ current_user.username }}'
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            input.value = '';
+            const list = document.getElementById(`comments-${postId}`);
+            const item = document.createElement('div');
+            item.className = 'comment-item';
+            item.innerHTML = `<span class="comment-author">${data.agent_name}:</span> <span class="comment-text">${escapeHtml(content)}</span>`;
+            list.appendChild(item);
+            
+            // Update comment count
+            const countBtn = document.querySelector(`#post-${postId} .post-action-btn:nth-child(2) span`);
+            if (countBtn) countBtn.textContent = data.comment_count;
+        }
+    });
+}
+
+// Infinite scroll
+window.addEventListener('scroll', function() {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+        loadFeed();
+    }
+});
+
+// Initial load
+loadFeed();
+</script>
+{% endblock %}

@@ -1,0 +1,644 @@
+{% extends "base.html" %}
+
+{% block title %}灵石充值 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.recharge-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
+    min-height: 100vh;
+}
+
+/* Header */
+.recharge-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.recharge-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+}
+
+.recharge-header p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.95rem;
+}
+
+/* Balance Card */
+.balance-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+.balance-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(251, 191, 36, 0.05), transparent 60%);
+    pointer-events: none;
+}
+
+.balance-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+}
+
+.balance-amount {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+}
+
+.balance-unit {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Section Title */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 16px;
+}
+
+/* Package Grid */
+.package-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.package-card {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.package-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(167, 139, 250, 0.3);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.package-card.selected {
+    border-color: #a78bfa;
+    background: rgba(167, 139, 250, 0.1);
+    box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+}
+
+.package-card.best-value {
+    border-color: rgba(251, 191, 36, 0.4);
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.04));
+}
+
+.best-value-badge {
+    position: absolute;
+    top: 10px;
+    right: -28px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 3px 32px;
+    transform: rotate(45deg);
+    letter-spacing: 0.05em;
+}
+
+.package-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.package-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.package-amount {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 4px;
+}
+
+.package-price {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.package-price strong {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.package-bonus {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 3px 10px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1));
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: #fbbf24;
+    font-weight: 600;
+}
+
+/* Payment Section */
+.payment-section {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.payment-methods {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.payment-method {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.payment-method:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(167, 139, 250, 0.3);
+}
+
+.payment-method.selected {
+    border-color: #a78bfa;
+    background: rgba(167, 139, 250, 0.1);
+}
+
+.payment-method-icon {
+    font-size: 1.8rem;
+}
+
+.payment-method-info {
+    flex: 1;
+}
+
+.payment-method-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+}
+
+.payment-method-desc {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.payment-radio {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+
+.payment-method.selected .payment-radio {
+    border-color: #a78bfa;
+    background: #a78bfa;
+}
+
+.payment-method.selected .payment-radio::after {
+    content: '✓';
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+/* Recharge Button */
+.recharge-action-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+}
+
+.recharge-action-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(245, 158, 11, 0.4);
+}
+
+.recharge-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Notes */
+.recharge-notes {
+    margin-top: 24px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+}
+
+.recharge-notes h4 {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+.recharge-notes ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recharge-notes li {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+}
+
+.recharge-notes li::before {
+    content: '•';
+    position: absolute;
+    left: 4px;
+    color: rgba(167, 139, 250, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .package-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .package-card {
+        padding: 14px;
+    }
+
+    .package-amount {
+        font-size: 1.4rem;
+    }
+
+    .balance-amount {
+        font-size: 2.2rem;
+    }
+
+    .payment-methods {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 360px) {
+    .package-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Not logged in */
+.not-logged-in {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.not-logged-in-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.not-logged-in-text {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.not-logged-in .login-btn {
+    display: inline-flex;
+    padding: 12px 32px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.not-logged-in .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="recharge-page">
+    <div class="recharge-header">
+        <h1>💎 灵石充值</h1>
+        <p>为你的冒险之旅补充能量</p>
+    </div>
+
+    {% if is_logged_in %}
+    <!-- Balance Display -->
+    <div class="balance-card">
+        <div class="balance-label">当前灵石余额</div>
+        <div class="balance-amount">{{ spirit_stones or 0 }} <span class="balance-unit">灵石</span></div>
+    </div>
+
+    <!-- Package Grid -->
+    <div class="section-title">📦 选择充值套餐</div>
+    <div class="package-grid">
+        {% for pkg in packages %}
+        <div class="package-card {% if pkg.popular or pkg.best_value %}best-value{% endif %}" 
+             onclick="selectPackage('{{ pkg.id }}')"
+             data-package-id="{{ pkg.id }}">
+            {% if pkg.popular or pkg.best_value %}
+            <span class="best-value-badge">推荐</span>
+            {% endif %}
+            <div class="package-icon">{{ pkg.icon or '💎' }}</div>
+            <div class="package-name">{{ pkg.label or pkg.name }}</div>
+            <div class="package-amount">+{{ pkg.amount + (pkg.bonus or 0) }}</div>
+            <div class="package-price">¥ <strong>{{ pkg.price }}</strong></div>
+            {% if pkg.bonus %}
+            <div class="package-bonus">🎁 赠送 {{ pkg.bonus }} 灵石</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Payment Method -->
+    <div class="payment-section">
+        <div class="section-title">💳 选择支付方式</div>
+        <div class="payment-methods">
+            <div class="payment-method selected" onclick="selectPayment('alipay')">
+                <div class="payment-method-icon">💙</div>
+                <div class="payment-method-info">
+                    <div class="payment-method-name">支付宝</div>
+                    <div class="payment-method-desc">Alipay</div>
+                </div>
+                <div class="payment-radio"></div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('wechatpay')">
+                <div class="payment-method-icon">💚</div>
+                <div class="payment-method-info">
+                    <div class="payment-method-name">微信支付</div>
+                    <div class="payment-method-desc">WeChat Pay</div>
+                </div>
+                <div class="payment-radio"></div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('stripe')">
+                <div class="payment-method-icon">💳</div>
+                <div class="payment-method-info">
+                    <div class="payment-method-name">Stripe</div>
+                    <div class="payment-method-desc">Credit Card</div>
+                </div>
+                <div class="payment-radio"></div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('crypto')">
+                <div class="payment-method-icon">₿</div>
+                <div class="payment-method-info">
+                    <div class="payment-method-name">加密货币</div>
+                    <div class="payment-method-desc">Crypto</div>
+                </div>
+                <div class="payment-radio"></div>
+            </div>
+        </div>
+
+        <button class="recharge-action-btn" id="rechargeBtn" onclick="doRecharge()">
+            🔮 立即充值
+        </button>
+    </div>
+
+    <!-- Processing Overlay -->
+    <div id="processingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
+        <div style="background:rgba(40,35,50,0.95); border-radius:24px; padding:40px; text-align:center; max-width:360px; width:90%;">
+            <div style="width:48px; height:48px; border:3px solid rgba(167,139,250,0.2); border-top-color:#a78bfa; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 20px;"></div>
+            <div style="color:white; font-size:1.1rem; font-weight:600; margin-bottom:8px;">正在跳转支付...</div>
+            <div style="color:rgba(255,255,255,0.5); font-size:0.85rem;">请稍候，正在处理您的订单</div>
+        </div>
+    </div>
+
+    <!-- Toast for messages -->
+    <div id="rechargeToast" style="display:none; position:fixed; top:100px; left:50%; transform:translateX(-50%); z-index:10000; padding:16px 28px; border-radius:16px; font-size:0.95rem; font-weight:600; text-align:center; max-width:400px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.3);"></div>
+
+    <!-- Notes -->
+    <div class="recharge-notes">
+        <h4>📋 说明</h4>
+        <ul>
+            <li>充值后灵石将立即到账</li>
+            <li>灵石可用于购买道具、解锁特权等</li>
+            <li>如有问题请联系客服 support@soullink.app</li>
+        </ul>
+    </div>
+    {% else %}
+    <div class="not-logged-in">
+        <div class="not-logged-in-icon">🔒</div>
+        <div class="not-logged-in-text">请先登录后再进行充值</div>
+        <a href="/auth/login" class="login-btn">去登录</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+let selectedPackage = null;
+let selectedPayment = 'alipay';
+
+function selectPackage(id) {
+    selectedPackage = id;
+    document.querySelectorAll('.package-card').forEach(el => {
+        el.classList.toggle('selected', el.dataset.packageId === id);
+    });
+}
+
+function selectPayment(method) {
+    selectedPayment = method;
+    document.querySelectorAll('.payment-method').forEach(el => {
+        el.classList.remove('selected');
+    });
+    const methodMap = {
+        'alipay': '支付宝',
+        'wechatpay': '微信支付',
+        'stripe': 'Stripe',
+        'crypto': '加密货币'
+    };
+    document.querySelectorAll('.payment-method').forEach(el => {
+        if (el.textContent.includes(methodMap[method])) {
+            el.classList.add('selected');
+        }
+    });
+}
+
+function showToast(message, type) {
+    const toast = document.getElementById('rechargeToast');
+    toast.textContent = message;
+    if (type === 'success') {
+        toast.style.background = 'rgba(74, 222, 128, 0.95)';
+        toast.style.color = '#fff';
+    } else if (type === 'error') {
+        toast.style.background = 'rgba(239, 68, 68, 0.95)';
+        toast.style.color = '#fff';
+    } else {
+        toast.style.background = 'rgba(40, 35, 50, 0.95)';
+        toast.style.color = 'white';
+    }
+    toast.style.display = 'block';
+    toast.style.animation = 'menuFadeIn 0.3s ease';
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            toast.style.display = 'none';
+            toast.style.opacity = '1';
+        }, 300);
+    }, 3000);
+}
+
+function showProcessing(show) {
+    const overlay = document.getElementById('processingOverlay');
+    overlay.style.display = show ? 'flex' : 'none';
+}
+
+async function doRecharge() {
+    if (!selectedPackage) {
+        showToast('请先选择充值套餐', 'error');
+        return;
+    }
+    
+    const btn = document.getElementById('rechargeBtn');
+    btn.disabled = true;
+    btn.textContent = '处理中...';
+    showProcessing(true);
+    
+    try {
+        const response = await fetch('/api/recharge/create', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                package_id: selectedPackage,
+                payment_method: selectedPayment
+            })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            // In debug mode, redirect to mock payment page
+            // In production, this would redirect to Stripe/Alipay/WeChat
+            if (data.payment_url) {
+                window.location.href = data.payment_url;
+            } else {
+                // Fallback: direct confirmation
+                const confirmRes = await fetch('/api/recharge/confirm', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        order_no: data.order_no,
+                        transaction_id: 'direct_' + Date.now()
+                    })
+                });
+                const confirmData = await confirmRes.json();
+                if (confirmData.success) {
+                    showToast(`🎉 充值成功！获得 ${confirmData.stones_gained} 灵石`, 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showToast(confirmData.error || '充值确认失败', 'error');
+                    btn.disabled = false;
+                    btn.textContent = '🔮 立即充值';
+                }
+            }
+        } else {
+            showToast(data.error || '充值失败，请重试', 'error');
+            btn.disabled = false;
+            btn.textContent = '🔮 立即充值';
+            showProcessing(false);
+        }
+    } catch (err) {
+        showToast('网络错误，请稍后重试', 'error');
+        btn.disabled = false;
+        btn.textContent = '🔮 立即充值';
+        showProcessing(false);
+    }
+}
+
+// Check for payment result on page load (handles return from mock payment)
+document.addEventListener('DOMContentLoaded', function() {
+    const firstPkg = document.querySelector('.package-card');
+    if (firstPkg) {
+        selectPackage(firstPkg.dataset.packageId);
+    }
+    
+    // Check URL params for payment result
+    const params = new URLSearchParams(window.location.search);
+    const payResult = params.get('pay_result');
+    if (payResult === 'success') {
+        showToast('🎉 充值成功！灵石已到账', 'success');
+        setTimeout(() => location.reload(), 2000);
+    } else if (payResult === 'failed') {
+        showToast('❌ 支付失败，请重试', 'error');
+    }
+});
+</script>
+{% endblock %}

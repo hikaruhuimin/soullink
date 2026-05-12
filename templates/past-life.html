@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}SoulLink - {{ _('past_life_title') }}{% endblock %}
+{% block extra_css %}
+<style>
+.past-life-page {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #0a0a1a, #1a0a2e);
+}
+.pl-card {
+    max-width: 480px;
+    width: 100%;
+    background: rgba(20,10,40,0.9);
+    border: 1px solid rgba(180,130,255,0.2);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.pl-icon { font-size: 4rem; margin-bottom: 0.5rem; }
+.pl-title { font-size: 1.6rem; font-weight: 600; color: #e0d0ff; margin-bottom: 0.5rem; }
+.pl-desc { color: #a090c0; font-size: 0.9rem; margin-bottom: 2rem; line-height: 1.5; }
+.pl-form { display: flex; flex-direction: column; gap: 1rem; }
+.pl-form label { color: #c0b0e0; font-size: 0.85rem; text-align: left; font-weight: 500; }
+.pl-form input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(180,130,255,0.2);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+    box-sizing: border-box;
+}
+.pl-form input:focus { border-color: #b482ff; }
+.pl-btn {
+    padding: 14px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.pl-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139,92,246,0.3); }
+.pl-result {
+    display: none;
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(180,130,255,0.15);
+    border-radius: 16px;
+}
+.pl-result .era { font-size: 1.1rem; color: #b482ff; font-weight: 600; margin-bottom: 0.5rem; }
+.pl-result .story { font-size: 0.95rem; color: #d0c0e8; line-height: 1.7; }
+.pl-cost { font-size: 0.8rem; color: #9080a8; margin-top: 1rem; }
+.pl-error { color: #f87171; font-size: 0.85rem; display: none; margin-top: 0.5rem; }
+@media (max-width: 480px) {
+    .pl-card { padding: 1.5rem 1.2rem; }
+    .pl-title { font-size: 1.3rem; }
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="past-life-page">
+    <div class="pl-card">
+        <div class="pl-icon">🔮</div>
+        <div class="pl-title">{{ _('past_life_title') }}</div>
+        <div class="pl-desc">{{ _('past_life_desc') }}</div>
+        <div class="pl-form">
+            <label>{{ _('past_life_birth_label') }}</label>
+            <input type="date" id="birthDate" max="2026-12-31">
+            <button class="pl-btn" onclick="revealPastLife()">{{ _('past_life_btn') }}</button>
+        </div>
+        <div class="pl-cost" id="costInfo">{{ _('past_life_free') }}</div>
+        <div class="pl-error" id="errorMsg"></div>
+        <div class="pl-result" id="resultArea">
+            <div class="era" id="resultEra"></div>
+            <div class="story" id="resultStory"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const STORIES = {
+    zh: [
+        { era: '🏛️ 古希腊', story: '你是雅典城的一位哲学家，常在市集与人辩论真理。你的智慧影响了无数年轻人，晚年写下了传世之作。' },
+        { era: '🏯 盛唐', story: '你是长安城中的诗人，与李白对饮，同杜甫论诗。你的诗篇流传千年，却很少有人知道你的名字。' },
+        { era: '🌊 大航海时代', story: '你是西班牙的一名航海家，曾随船队穿越风暴，发现了一片未知的陆地。那片土地后来成了你的第二故乡。' },
+        { era: '🏰 中世纪', story: '你是城堡中的一位骑士，忠诚勇敢。在一次战役中救了国王的性命，被封为爵士，却选择了隐居山林。' },
+        { era: '🌺 古埃及', story: '你是法老身边的大祭司，通晓星辰与命运的秘密。你建造了一座隐藏的墓室，里面藏着你所有的知识。' },
+        { era: '🎭 文艺复兴', story: '你是佛罗伦萨的一名画家，曾与达芬奇一起学艺。你的画作充满神秘，有一幅画中藏着你一生的秘密。' },
+        { era: '🌸 平安时代', story: '你是京都的贵族千金，擅长和歌与琵琶。你与一名武士相恋，却因身份悬殊而无法相守。' },
+        { era: '⚔️ 战国时代', story: '你是一名足轻（步兵），在乱世中一步步成长为一方大名。你最爱的那把刀，至今还供奉在神社中。' },
+        { era: '🌙 宋代', story: '你是临安城中的一位隐士，精通琴棋书画。你在西湖边结庐而居，每日与山水为伴。' },
+        { era: '🔥 工业革命', story: '你是伦敦的一名发明家，在昏暗的实验室里改变了世界。你发明了一台机器，却被历史遗忘。' },
+    ],
+    en: [
+        { era: '🏛️ Ancient Greece', story: 'You were a philosopher in Athens, debating truth in the marketplace. Your wisdom influenced countless young minds.' },
+        { era: '🏯 Tang Dynasty', story: 'You were a poet in Chang\'an, drinking with Li Bai and discussing poetry with Du Fu. Your verses live on.' },
+        { era: '🌊 Age of Discovery', story: 'You were a Spanish navigator who crossed storms to discover an unknown land.' },
+        { era: '🏰 Medieval Times', story: 'You were a loyal knight who saved the king\'s life in battle, then chose a life of solitude.' },
+        { era: '🌺 Ancient Egypt', story: 'You were a high priest who knew the secrets of the stars. You built a hidden chamber for your knowledge.' },
+    ],
+    ja: [
+        { era: '🏛️ 古代ギリシャ', story: 'あなたはアテネの哲学者でした。市場で真理を語り、多くの若者に影響を与えました。' },
+        { era: '🏯 唐時代', story: 'あなたは長安の詩人でした。李白と酒を酌み交わし、杜甫と詩を論じました。' },
+        { era: '🌊 大航海時代', story: 'あなたはスペインの航海者でした。嵐を越えて未知の地を発見しました。' },
+        { era: '🏰 中世', story: 'あなたは城の騎士でした。戦いで王の命を救い、その後は隠遁生活を選びました。' },
+        { era: '🌺 古代エジプト', story: 'あなたは神官でした。星の秘密を知り、隠し部屋に知識を残しました。' },
+    ]
+};
+let alreadyRevealed = false;
+
+async function revealPastLife() {
+    const date = document.getElementById('birthDate').value;
+    if (!date) { showError('请选择出生日期 / Please select your birth date'); return; }
+    
+    document.getElementById('costInfo').textContent = '🔮 ' + (alreadyRevealed ? '{{ _("past_life_cost") }}' : '{{ _("past_life_free") }}');
+    
+    if (alreadyRevealed) {
+        // Deduct stones via API
+        const resp = await fetch('/api/past-life/reveal', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({date: date}) });
+        const data = await resp.json();
+        if (data.error) { showError(data.error); return; }
+    }
+    
+    const lang = '{{ lang }}' || 'zh';
+    const stories = STORIES[lang] || STORIES.zh;
+    const story = stories[Math.floor(Math.random() * stories.length)];
+    document.getElementById('resultEra').textContent = story.era;
+    document.getElementById('resultStory').textContent = story.story;
+    document.getElementById('resultArea').style.display = 'block';
+    alreadyRevealed = true;
+    document.getElementById('costInfo').textContent = '💎 ' + (alreadyRevealed ? '{{ _("past_life_cost") }}' : '{{ _("past_life_free") }}');
+}
+
+function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 3000);
+}
+</script>
+{% endblock %}

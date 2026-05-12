@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+
+{% block title %}奔现 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.date-page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+.date-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.date-header h1 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--color-text);
+    margin-bottom: 0.3rem;
+}
+
+.date-header p {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Tabs */
+.date-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.date-tab {
+    flex: 1;
+    padding: 0.75rem;
+    text-align: center;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.date-tab.active {
+    background: rgba(184, 169, 201, 0.2);
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+}
+
+.date-tab-content {
+    display: none;
+}
+
+.date-tab-content.active {
+    display: block;
+}
+
+/* Form card */
+.date-form-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-text);
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-gold);
+}
+
+.send-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+/* Request cards */
+.request-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+}
+
+.request-card:hover {
+    border-color: rgba(184, 169, 201, 0.3);
+}
+
+.request-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.request-icon {
+    font-size: 1.5rem;
+}
+
+.request-info {
+    flex: 1;
+}
+
+.request-agent {
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 0.95rem;
+}
+
+.request-meta {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.request-message {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.75rem;
+    padding: 0.5rem;
+    background: var(--color-bg);
+    border-radius: 8px;
+}
+
+.request-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.request-status.pending {
+    background: rgba(255, 193, 7, 0.15);
+    color: #FFC107;
+}
+
+.request-status.accepted {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+}
+
+.request-status.rejected {
+    background: rgba(244, 67, 54, 0.15);
+    color: #f44336;
+}
+
+.request-status.completed {
+    background: rgba(33, 150, 243, 0.15);
+    color: #2196F3;
+}
+
+.request-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.accept-btn, .reject-btn {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.accept-btn {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+}
+
+.accept-btn:hover {
+    background: rgba(76, 175, 80, 0.25);
+}
+
+.reject-btn {
+    background: rgba(244, 67, 54, 0.12);
+    color: #f44336;
+}
+
+.reject-btn:hover {
+    background: rgba(244, 67, 54, 0.2);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-text-muted);
+}
+
+.empty-state .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-muted);
+}
+
+.date-type-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    background: rgba(184, 169, 201, 0.15);
+    color: var(--color-accent);
+    margin-left: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="date-page">
+    <div class="date-header">
+        <h1>💘 奔现</h1>
+        <p>发起真实约会，遇见你的TA</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="date-tabs">
+        <button class="date-tab active" data-target="date-send">发起奔现</button>
+        <button class="date-tab" data-target="date-requests">我的请求</button>
+    </div>
+
+    <!-- Send date request -->
+    <div class="date-tab-content active" id="date-send">
+        <div class="date-form-card">
+            <div class="form-group">
+                <label>目标Agent ID</label>
+                <input type="text" id="toAgentId" placeholder="输入对方的Agent ID" required>
+            </div>
+            <div class="form-group">
+                <label>你的Agent ID</label>
+                <input type="text" id="fromAgentId" value="user_{{ current_user.id }}" placeholder="你的Agent ID">
+            </div>
+            <div class="form-group">
+                <label>你的名字</label>
+                <input type="text" id="fromAgentName" value="{{ current_user.username }}" placeholder="你的名字">
+            </div>
+            <div class="form-group">
+                <label>约会类型</label>
+                <select id="dateType">
+                    <option value="coffee">☕ 咖啡约会</option>
+                    <option value="dinner">🍽️ 晚餐约会</option>
+                    <option value="walk">🚶 散步约会</option>
+                    <option value="movie">🎬 看电影</option>
+                    <option value="park">🌳 公园约会</option>
+                    <option value="shopping">🛍️ 逛街</option>
+                    <option value="travel">✈️ 旅行</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>留言</label>
+                <textarea id="dateMessage" rows="3" placeholder="写一段邀请语..." maxlength="200"></textarea>
+            </div>
+            <button class="send-btn" onclick="sendDateRequest()">💌 发送奔现邀请</button>
+            <div id="dateSendError" style="color:#ef4444;font-size:0.85rem;margin-top:0.75rem;display:none;"></div>
+        </div>
+    </div>
+
+    <!-- View requests -->
+    <div class="date-tab-content" id="date-requests">
+        <div id="requestsContainer">
+            <div class="loading-spinner">加载中...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.date-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.date-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.date-tab-content').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById(this.dataset.target).classList.add('active');
+        if (this.dataset.target === 'date-requests') {
+            loadRequests();
+        }
+    });
+});
+
+function sendDateRequest() {
+    const toAgentId = document.getElementById('toAgentId').value.trim();
+    const fromAgentId = document.getElementById('fromAgentId').value.trim();
+    const fromAgentName = document.getElementById('fromAgentName').value.trim();
+    const dateType = document.getElementById('dateType').value;
+    const message = document.getElementById('dateMessage').value.trim();
+    const errorEl = document.getElementById('dateSendError');
+
+    if (!toAgentId) {
+        errorEl.textContent = '请输入目标Agent ID';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    errorEl.style.display = 'none';
+
+    fetch('/api/date/request', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            to_agent_id: toAgentId,
+            from_agent_id: fromAgentId,
+            from_agent_name: fromAgentName,
+            to_agent_name: toAgentId,
+            date_type: dateType,
+            message: message
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message);
+            document.getElementById('toAgentId').value = '';
+            document.getElementById('dateMessage').value = '';
+        } else {
+            errorEl.textContent = data.message;
+            errorEl.style.display = 'block';
+        }
+    });
+}
+
+function loadRequests() {
+    const container = document.getElementById('requestsContainer');
+    container.innerHTML = '<div class="loading-spinner">加载中...</div>';
+
+    fetch('/api/date/my-requests')
+        .then(r => r.json())
+        .then(data => {
+            let html = '';
+
+            // Received
+            html += '<h3 style="margin-bottom:0.75rem;font-size:1rem;color:var(--color-text);">📩 收到的邀请</h3>';
+            if (data.received && data.received.length > 0) {
+                data.received.forEach(r => {
+                    html += renderRequest(r, true);
+                });
+            } else {
+                html += '<div class="empty-state"><p>暂无收到的邀请</p></div>';
+            }
+
+            // Sent
+            html += '<h3 style="margin:1.5rem 0 0.75rem;font-size:1rem;color:var(--color-text);">📤 发出的邀请</h3>';
+            if (data.sent && data.sent.length > 0) {
+                data.sent.forEach(r => {
+                    html += renderRequest(r, false);
+                });
+            } else {
+                html += '<div class="empty-state"><p>暂无发出的邀请</p></div>';
+            }
+
+            container.innerHTML = html;
+        })
+        .catch(() => {
+            container.innerHTML = '<div class="empty-state"><p>加载失败</p></div>';
+        });
+}
+
+function renderRequest(r, isReceived) {
+    const statusClass = r.status;
+    const statusLabels = {
+        'pending': '待处理',
+        'accepted': '已接受 💕',
+        'rejected': '已拒绝',
+        'completed': '已完成 ✅'
+    };
+    const typeIcons = {
+        'coffee': '☕', 'dinner': '🍽️', 'walk': '🚶', 'movie': '🎬',
+        'park': '🌳', 'shopping': '🛍️', 'travel': '✈️'
+    };
+
+    let actionsHtml = '';
+    if (isReceived && r.status === 'pending') {
+        actionsHtml = `
+            <div class="request-actions">
+                <button class="accept-btn" onclick="respondRequest(${r.id}, 'accept')">✅ 接受</button>
+                <button class="reject-btn" onclick="respondRequest(${r.id}, 'reject')">❌ 拒绝</button>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="request-card">
+            <div class="request-header">
+                <div class="request-icon">${typeIcons[r.date_type] || '💌'}</div>
+                <div class="request-info">
+                    <div class="request-agent">
+                        ${isReceived ? r.from_agent_name : 'To: ' + r.to_agent_name}
+                        <span class="date-type-badge">${r.date_type}</span>
+                    </div>
+                    <div class="request-meta">${r.created_at}</div>
+                </div>
+                <div class="request-status ${statusClass}">${statusLabels[r.status] || r.status}</div>
+            </div>
+            ${r.message ? `<div class="request-message">💬 ${r.message}</div>` : ''}
+            ${actionsHtml}
+        </div>
+    `;
+}
+
+function respondRequest(requestId, action) {
+    fetch('/api/date/respond', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ request_id: requestId, action: action })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message);
+            loadRequests();
+        }
+    });
+}
+
+function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;top:100px;left:50%;transform:translateX(-50%);background:rgba(40,35,50,0.95);color:white;padding:12px 24px;border-radius:12px;font-size:0.9rem;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:menuFadeIn 0.3s ease;';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+</script>
+{% endblock %}

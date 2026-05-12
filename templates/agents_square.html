@@ -1,0 +1,846 @@
+{% extends "base.html" %}
+
+{% block title %}灵犀广场 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.soulsquare {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-2xl) var(--space-xl);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+}
+
+/* Tab切换 */
+.square-tabs {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-2xl);
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 10px 24px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.tab-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-accent);
+}
+
+.tab-btn.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+.tab-btn .tab-icon {
+    font-size: 1.125rem;
+}
+
+.tab-btn .tab-count {
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+}
+
+.tab-btn.active .tab-count {
+    background: rgba(255,255,255,0.3);
+}
+
+/* 卡片通用样式 */
+.square-section {
+    margin-bottom: var(--space-3xl);
+}
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+}
+
+.section-badge {
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-official {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #8B4513;
+}
+
+.badge-community {
+    background: linear-gradient(135deg, #4A90E2, #357ABD);
+    color: white;
+}
+
+.badge-online {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: white;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+/* Agent卡片 */
+.square-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    text-decoration: none;
+    color: inherit;
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+    position: relative;
+}
+
+.square-card:nth-child(1) { animation-delay: 0.1s; }
+.square-card:nth-child(2) { animation-delay: 0.15s; }
+.square-card:nth-child(3) { animation-delay: 0.2s; }
+.square-card:nth-child(4) { animation-delay: 0.25s; }
+.square-card:nth-child(5) { animation-delay: 0.3s; }
+.square-card:nth-child(6) { animation-delay: 0.35s; }
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.square-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.card-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid #B8A9C9;
+    object-fit: cover;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.agent-card .card-avatar {
+    animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+.online-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #4CAF50;
+    border: 2px solid var(--color-bg-card);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(76, 175, 80, 0); }
+}
+
+.voice-badge {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6B5B95, #8B5E83);
+    border: 2px solid var(--color-bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+    box-shadow: 0 2px 6px rgba(107, 91, 149, 0.4);
+}
+
+.card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.card-name {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.card-personality {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+}
+
+.card-desc {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--space-md);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.tag {
+    padding: 4px 10px;
+    background: var(--color-bg-cream);
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    border-radius: var(--radius-full);
+}
+
+.tag-mbti {
+    background: rgba(184, 169, 201, 0.15);
+    color: var(--color-accent);
+}
+
+.tag-voice {
+    background: rgba(107, 91, 149, 0.1);
+    color: #8B5E83;
+}
+
+.card-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.btn {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--color-accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--color-accent-light);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-accent);
+}
+
+.btn-friend {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-friend:hover {
+    background: #43a047;
+}
+
+.btn-friend-pending {
+    background: #FF9800;
+    color: white;
+}
+
+.btn-friend-pending:hover {
+    background: #FB8C00;
+}
+
+.btn-friend-added {
+    background: var(--color-bg-cream);
+    color: var(--color-text-muted);
+    cursor: default;
+}
+
+/* 情绪标签 */
+.mood-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.mood-icons {
+    'happy': '😊',
+    'sassy': '😏',
+    'mysterious': '🌙',
+    'excited': '✨',
+    'commanding': '👑',
+    'laughing': '😄',
+    'energetic': '☀️',
+    'calm': '🌊'
+}
+
+.mood-colors {
+    'happy': 'rgba(255, 200, 100, 0.3)',
+    'sassy': 'rgba(255, 150, 200, 0.3)',
+    'mysterious': 'rgba(150, 100, 200, 0.3)',
+    'excited': 'rgba(200, 150, 255, 0.3)',
+    'commanding': 'rgba(255, 215, 0, 0.3)',
+    'laughing': 'rgba(255, 180, 100, 0.3)',
+    'energetic': 'rgba(255, 220, 100, 0.3)',
+    'calm': 'rgba(100, 180, 220, 0.3)'
+}
+
+/* 用户卡片（人类） */
+.user-card .card-avatar {
+    animation: none;
+}
+
+.user-card .card-desc {
+    -webkit-line-clamp: 1;
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: var(--space-3xl);
+    color: var(--color-text-muted);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-lg);
+    opacity: 0.5;
+}
+
+/* Tab内容隐藏 */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* 动画肖像 */
+.agent-card .agent-portrait {
+    flex-shrink: 0;
+}
+
+.agent-card .portrait-frame {
+    width: 64px;
+    height: 64px;
+}
+
+@media (max-width: 768px) {
+    .square-tabs {
+        gap: var(--space-xs);
+    }
+    
+    .tab-btn {
+        padding: 8px 16px;
+        font-size: 0.875rem;
+    }
+    
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{# 心情图标和颜色映射 - 如果后端没有传递则使用默认值 #}
+{% if not mood_icons %}
+{% set mood_icons = {
+    'happy': '😊',
+    'sassy': '😏',
+    'mysterious': '🌙',
+    'excited': '✨',
+    'commanding': '👑',
+    'laughing': '😄',
+    'energetic': '☀️',
+    'calm': '🌊'
+} %}
+{% endif %}
+{% if not mood_colors %}
+{% set mood_colors = {
+    'happy': 'rgba(255, 200, 100, 0.3)',
+    'sassy': 'rgba(255, 150, 200, 0.3)',
+    'mysterious': 'rgba(150, 100, 200, 0.3)',
+    'excited': 'rgba(200, 150, 255, 0.3)',
+    'commanding': 'rgba(255, 215, 0, 0.3)',
+    'laughing': 'rgba(255, 180, 100, 0.3)',
+    'energetic': 'rgba(255, 220, 100, 0.3)',
+    'calm': 'rgba(100, 180, 220, 0.3)'
+} %}
+{% endif %}
+{# Agent占位数据 #}
+{% if not user_agents %}
+{% set user_agents = [] %}
+{% endif %}
+{# 在线用户占位数据 #}
+{% if not online_users %}
+{% set online_users = [] %}
+{% endif %}
+<div class="soulsquare">
+    <div class="page-header">
+        <h1 class="page-title">✨ 灵犀广场 ✨</h1>
+        <p class="page-desc" style="color: var(--color-text-secondary);">探索灵犀世界，与AI伙伴和有趣的人类相遇</p>
+    </div>
+    
+    <!-- Tab切换 -->
+    <div class="square-tabs">
+        <button class="tab-btn active" data-tab="all">
+            <span class="tab-icon">🌟</span>
+            <span>全部</span>
+            <span class="tab-count" id="allCount">{{ system_agents|length + user_agents|length + online_users|length }}</span>
+        </button>
+        <button class="tab-btn" data-tab="agents">
+            <span class="tab-icon">🤖</span>
+            <span>Agent</span>
+            <span class="tab-count">{{ system_agents|length }}</span>
+        </button>
+        
+        <button class="tab-btn" data-tab="humans">
+            <span class="tab-icon">👤</span>
+            <span>人类</span>
+            <span class="tab-count" id="humansCount">{{ online_users|length }}</span>
+        </button>
+    </div>
+    
+    <!-- 全部 -->
+    <div class="tab-content active" id="allTab">
+        {% if system_agents %}
+        <div class="square-section">
+            <div class="section-label">
+                <span>🤖 Agent</span>
+                
+            </div>
+            <div class="cards-grid">
+                {% for agent in system_agents %}
+                <div class="square-card agent-card" data-agent-id="{{ agent.id }}" data-agent-type="system">
+                    <div class="card-header">
+                        <div class="card-avatar-wrapper">
+                            <div class="agent-portrait size-small animated" data-agent-portrait data-agent-id="{{ agent.id }}" data-avatar="{{ agent.avatar }}" data-mood="{{ agent.mood if agent.mood else 'happy' }}">
+                                <div class="portrait-frame">
+                                    <img src="{{ agent.avatar }}" alt="{{ agent.name.zh }}" class="portrait-img" onerror="this.onerror=null; this.src='/static/agents/default_avatar.svg';">
+                                </div>
+                            </div>
+                            {% if agent.voice %}
+                            <span class="voice-badge">🔊</span>
+                            {% endif %}
+                        </div>
+                        <div class="card-info">
+                            <div class="card-name">
+                                {{ agent.name.zh }}
+                                
+                            </div>
+                            <div class="card-personality">{{ agent.personality.zh }}</div>
+                        </div>
+                    </div>
+                    <p class="card-desc">{{ agent.description.zh }}</p>
+                    <div class="card-tags">
+                        <span class="tag mood-tag" style="background: {{ mood_colors.get(agent.mood, 'rgba(255,200,100,0.3)') }}">
+                            {{ mood_icons.get(agent.mood, '😊') }} {{ agent.mood_zh if agent.mood_zh else '开心' }}
+                        </span>
+                        <span class="tag tag-mbti">{{ agent.mbti }}</span>
+                        {% if agent.voice %}
+                        <span class="tag tag-voice">🔊 语音</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-actions">
+                        <a href="/agent/{{ agent.id }}" class="btn btn-primary">开始聊天</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if user_agents %}
+        <div class="square-section">
+            <div class="section-label">
+                <span>🎨 用户Agent</span>
+                <span class="section-badge badge-community">用户创建</span>
+            </div>
+            <div class="cards-grid">
+                {% for agent in user_agents %}
+                <div class="square-card agent-card" data-agent-id="{{ agent.id }}" data-agent-type="user">
+                    <div class="card-header">
+                        <div class="card-avatar-wrapper">
+                            <div class="card-avatar" style="display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--color-bg-cream);">
+                                {% if agent.avatar and (agent.avatar.startswith('data:') or agent.avatar.startswith('http')) %}
+                                <img src="{{ agent.avatar }}" alt="{{ agent.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
+                                <span>{{ agent.avatar or '🤖' }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-name">
+                                {{ agent.name }}
+                                <span style="font-size: 0.75rem; color: #8B5E83; font-weight: normal;">👤 {{ agent.owner_name }}</span>
+                            </div>
+                            <div class="card-personality">{{ agent.personality or '等待探索...' }}</div>
+                        </div>
+                    </div>
+                    <p class="card-desc">{{ agent.greeting or '快来和我聊天吧~' }}</p>
+                    <div class="card-tags">
+                        {% if agent.mbti %}<span class="tag tag-mbti">{{ agent.mbti }}</span>{% endif %}
+                        {% if agent.specialty %}
+                            {% for tag in agent.specialty[:3] %}
+                            <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="card-actions">
+                        <a href="/agent/user/{{ agent.id }}" class="btn btn-primary">开始聊天</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if online_users %}
+        <div class="square-section">
+            <div class="section-label">
+                <span>👤 人类</span>
+                <span class="section-badge badge-online">在线</span>
+            </div>
+            <div class="cards-grid">
+                {% for user in online_users %}
+                <div class="square-card user-card" data-user-id="{{ user.id }}">
+                    <div class="card-header">
+                        <img src="{{ user.avatar }}" alt="{{ user.username }}" class="card-avatar">
+                        <div class="online-indicator"></div>
+                        <div class="card-info">
+                            <div class="card-name">{{ user.username }}</div>
+                            <div class="card-personality">{{ user.bio[:20] if user.bio else '灵犀用户' }}</div>
+                        </div>
+                    </div>
+                    <p class="card-desc">{{ user.bio if user.bio else '这个人很懒，什么都没写' }}</p>
+                    <div class="card-actions">
+                        <button class="btn btn-primary btn-add-friend" data-user-id="{{ user.id }}" onclick="handleFriendAction(this)">加好友</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Agent -->
+    <div class="tab-content" id="agentsTab">
+        <div class="square-section">
+            <div class="section-label">
+                <span>🤖 Agent</span>
+                
+            </div>
+            <div class="cards-grid" id="agentsGrid">
+                <!-- 由JS动态渲染或静态包含 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Agent -->
+    <div class="tab-content" id="user-agentsTab">
+        <div class="square-section">
+            <div class="section-label">
+                <span>🤖 Agent</span>
+                
+            </div>
+            <div class="cards-grid" id="userAgentsGrid">
+                {% if user_agents %}
+                    {% for agent in user_agents %}
+                    <div class="square-card agent-card" data-agent-id="{{ agent.id }}" data-agent-type="user">
+                        <div class="card-header">
+                            <img src="{{ agent.avatar }}" alt="{{ agent.name }}" class="card-avatar">
+                            <div class="card-info">
+                                <div class="card-name">
+                                    {{ agent.name }}
+                                    
+                                </div>
+                                <div class="card-personality">{{ agent.personality }}</div>
+                            </div>
+                        </div>
+                        <p class="card-desc">{{ agent.description }}</p>
+                        <div class="card-tags">
+                            <span class="tag tag-mbti">{{ agent.mbti }}</span>
+                        </div>
+                        <div class="card-actions">
+                            <a href="/agent/{{ agent.id }}" class="btn btn-primary">开始聊天</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-state-icon">🎨</div>
+                    <p>暂无Agent</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 人类 -->
+    <div class="tab-content" id="humansTab">
+        <div class="square-section">
+            <div class="section-label">
+                <span>👤 人类</span>
+                <span class="section-badge badge-online">在线</span>
+            </div>
+            <div class="cards-grid" id="humansGrid">
+                {% if online_users %}
+                    {% for user in online_users %}
+                    <div class="square-card user-card" data-user-id="{{ user.id }}">
+                        <div class="card-header">
+                            <img src="{{ user.avatar }}" alt="{{ user.username }}" class="card-avatar">
+                            <div class="online-indicator"></div>
+                            <div class="card-info">
+                                <div class="card-name">{{ user.username }}</div>
+                                <div class="card-personality">{{ user.bio[:20] if user.bio else '灵犀用户' }}</div>
+                            </div>
+                        </div>
+                        <p class="card-desc">{{ user.bio if user.bio else '这个人很懒，什么都没写' }}</p>
+                        <div class="card-actions">
+                            <button class="btn btn-primary btn-add-friend" data-user-id="{{ user.id }}" onclick="handleFriendAction(this)">加好友</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-state-icon">👥</div>
+                    <p>暂无在线用户</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Tab切换
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tab = this.dataset.tab;
+        
+        // 切换按钮状态
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // 切换内容
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(tab + 'Tab').classList.add('active');
+        
+        // 如果切换到人类标签，刷新在线用户列表
+        if (tab === 'humans') {
+            fetchOnlineUsers();
+        }
+    });
+});
+
+// 获取在线用户
+async function fetchOnlineUsers() {
+    try {
+        const response = await fetch('/api/online/users');
+        const data = await response.json();
+        
+        if (data.success && data.users.length > 0) {
+            updateHumansGrid(data.users);
+            document.getElementById('humansCount').textContent = data.users.length;
+        }
+    } catch (err) {
+        console.error('Fetch online users error:', err);
+    }
+}
+
+// 更新人类网格
+function updateHumansGrid(users) {
+    const grid = document.getElementById('humansGrid');
+    const allGrid = document.querySelector('#allTab .square-section:last-child .cards-grid');
+    
+    let html = '';
+    users.forEach(user => {
+        html += `
+            <div class="square-card user-card" data-user-id="${user.id}">
+                <div class="card-header">
+                    <img src="${user.avatar}" alt="${user.username}" class="card-avatar">
+                    <div class="online-indicator"></div>
+                    <div class="card-info">
+                        <div class="card-name">${user.username}</div>
+                        <div class="card-personality">${user.bio ? user.bio.substring(0, 20) : '灵犀用户'}</div>
+                    </div>
+                </div>
+                <p class="card-desc">${user.bio || '这个人很懒，什么都没写'}</p>
+                <div class="card-actions">
+                    <button class="btn btn-primary btn-add-friend" data-user-id="${user.id}" onclick="handleFriendAction(this)">加好友</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    grid.innerHTML = html;
+    if (allGrid) {
+        allGrid.innerHTML = html;
+    }
+}
+
+// 处理好友按钮
+async function handleFriendAction(btn) {
+    const userId = btn.dataset.userId;
+    
+    // 检查是否已登录
+    {% if not current_user.is_authenticated %}
+    showToast('请先登录');
+    setTimeout(() => window.location.href = '/auth/login', 1000);
+    return;
+    {% endif %}
+    
+    try {
+        const response = await fetch(`/api/friend/status/${userId}`);
+        const data = await response.json();
+        
+        if (data.is_friend) {
+            showToast('你们已经是好友了');
+            btn.className = 'btn btn-friend-added';
+            btn.textContent = '已好友';
+            btn.disabled = true;
+        } else if (data.has_pending_sent) {
+            showToast('已发送请求，等待确认');
+            btn.className = 'btn btn-friend-pending';
+            btn.textContent = '等待确认';
+        } else if (data.has_pending_received) {
+            // 有收到请求，自动接受
+            const acceptBtn = btn;
+            acceptBtn.textContent = '接受请求';
+            acceptBtn.className = 'btn btn-friend';
+            acceptBtn.onclick = async function() {
+                await fetch('/api/friend/accept', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({request_id: data.received_request_id})
+                });
+                showToast('已添加好友');
+                btn.className = 'btn btn-friend-added';
+                btn.textContent = '已好友';
+                btn.disabled = true;
+            };
+        } else {
+            // 发送好友请求
+            const resp = await fetch('/api/friend/request', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({receiver_id: userId})
+            });
+            const result = await resp.json();
+            
+            if (result.success) {
+                showToast('好友请求已发送');
+                btn.className = 'btn btn-friend-pending';
+                btn.textContent = '等待确认';
+            } else {
+                showToast(result.error || '操作失败');
+            }
+        }
+    } catch (err) {
+        showToast('网络错误');
+    }
+}
+
+// Toast提示
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 24px;
+        font-size: 0.875rem;
+        z-index: 10000;
+        animation: fadeIn 0.3s ease;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+// 初始化：渲染Agent到对应Tab
+document.addEventListener('DOMContentLoaded', function() {
+    // AgentPortrait动画已在agent-portrait.js中自动绑定
+    // 刷新在线用户
+    fetchOnlineUsers();
+});
+</script>
+{% endblock %}

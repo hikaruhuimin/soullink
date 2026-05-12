@@ -1,0 +1,1014 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'register' %}{{ _('register') }}{% else %}{{ _('login') }}{% endif %} - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-page {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    padding: 2rem;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-logo {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.auth-title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.5rem;
+    color: var(--color-gold);
+    margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 0.75rem;
+    text-align: center;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.auth-tab.active {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    color: var(--color-bg);
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+/* 注册方式的tab切换 */
+.register-method-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.register-method-tab {
+    flex: 1;
+    padding: 0.625rem;
+    text-align: center;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.register-method-tab.active {
+    background: rgba(184, 169, 201, 0.2);
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+}
+
+.register-method-tab:hover {
+    border-color: var(--color-gold);
+}
+
+.register-method-content {
+    display: none;
+}
+
+.register-method-content.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-text);
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-gold);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--color-text-secondary);
+}
+
+/* 输入框验证状态 */
+.form-group input.valid {
+    border-color: #4CAF50;
+}
+
+.form-group input.invalid {
+    border-color: #f44336;
+}
+
+.verification-hint {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-top: 0.25rem;
+}
+
+/* 头像上传样式 */
+.avatar-upload-section {
+    margin-bottom: 1.25rem;
+}
+
+.avatar-upload-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-size: 0.875rem;
+}
+
+.avatar-preview-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.current-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #B8A9C9, #A090B5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border: 3px solid var(--color-gold);
+    overflow: hidden;
+}
+
+.current-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-btn {
+    padding: 8px 16px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upload-btn:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+}
+
+.hidden-input {
+    display: none;
+}
+
+.preset-avatars {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.preset-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-bg);
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.preset-avatar:hover {
+    transform: scale(1.1);
+    border-color: var(--color-gold);
+}
+
+.preset-avatar.selected {
+    border-color: var(--color-gold);
+    background: rgba(184, 169, 201, 0.2);
+}
+
+.form-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.forgot-link {
+    color: var(--color-gold);
+    font-size: 0.875rem;
+    text-decoration: none;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+}
+
+.auth-divider span {
+    padding: 0 1rem;
+}
+
+.social-login {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all 0.3s;
+}
+
+.social-btn:hover {
+    border-color: var(--color-gold);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+.auth-footer a {
+    color: var(--color-gold);
+    text-decoration: none;
+}
+
+/* 登录方式的切换 */
+.login-method-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.login-method-tab {
+    flex: 1;
+    padding: 0.625rem;
+    text-align: center;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.login-method-tab.active {
+    background: rgba(184, 169, 201, 0.2);
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+}
+
+.login-method-tab:hover {
+    border-color: var(--color-gold);
+}
+
+.login-method-content {
+    display: none;
+}
+
+.login-method-content.active {
+    display: block;
+}
+
+/* ========== Desktop Responsive (min-width: 768px) ========== */
+@media (min-width: 768px) {
+    .auth-page {
+        padding: 3rem 2rem;
+        min-height: calc(100vh - 100px);
+    }
+    
+    .auth-card {
+        max-width: 480px;
+        padding: 2.5rem;
+        border-radius: 28px;
+        box-shadow: 0 10px 60px rgba(0,0,0,0.3);
+    }
+    
+    .auth-logo {
+        font-size: 4rem;
+    }
+    
+    .auth-title {
+        font-size: 2rem;
+    }
+    
+    .auth-subtitle {
+        font-size: 1rem;
+    }
+    
+    .auth-tabs {
+        gap: 1.5rem;
+    }
+    
+    .auth-tab {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+    
+    .social-login {
+        gap: 1.5rem;
+    }
+    
+    .social-btn {
+        padding: 1rem;
+    }
+}
+
+/* 验证码样式 */
+.captcha-section {
+    margin-bottom: 1.25rem;
+}
+
+/* 统一输入框样式 */
+.auth-input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-text);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border 0.2s;
+    box-sizing: border-box;
+}
+.auth-input:focus {
+    border-color: var(--color-accent);
+}
+
+/* 手机号输入组 */
+.phone-group {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+.phone-group .auth-input {
+    flex: 1;
+}
+
+/* 国家码下拉 */
+.country-select {
+    width: 110px;
+    flex-shrink: 0;
+    padding: 0.85rem 0.5rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-text);
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+.country-select:focus {
+    border-color: var(--color-accent);
+}
+
+.captcha-wrapper {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.captcha-image {
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    transition: transform 0.2s;
+}
+
+.captcha-image:hover {
+    transform: scale(1.05);
+}
+
+.captcha-input {
+    flex: 1;
+}
+
+.refresh-captcha {
+    background: none;
+    border: none;
+    color: var(--color-gold);
+    cursor: pointer;
+    font-size: 0.875rem;
+    padding: 0.25rem;
+}
+
+.refresh-captcha:hover {
+    text-decoration: underline;
+}
+
+.captcha-error {
+    color: #f44336;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* 修复按钮样式 - 确保按钮可见 */
+.auth-submit-btn {
+    display: block !important;
+    width: 100% !important;
+    padding: 0.875rem 1.5rem !important;
+    background: linear-gradient(135deg, #B8A9C9, #9B8BB8) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(184, 169, 201, 0.4) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.auth-submit-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(184, 169, 201, 0.5) !important;
+    background: linear-gradient(135deg, #C4B5D4, #A89CC3) !important;
+}
+
+.auth-submit-btn:active {
+    transform: translateY(0) !important;
+}
+
+/* 确保原始按钮隐藏或覆盖 */
+.btn.btn-primary.btn-block {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">🔮</div>
+            <h1 class="auth-title">{{ _('app_name') }}</h1>
+            <p class="auth-subtitle">{{ _('app_slogan') }}</p>
+        </div>
+        
+        <div class="auth-tabs">
+            <a href="/auth/login" class="auth-tab {% if mode == 'login' %}active{% endif %}">{{ _('login') }}</a>
+            <a href="/auth/register" class="auth-tab {% if mode == 'register' %}active{% endif %}">{{ _('register') }}</a>
+        </div>
+        
+        {% if mode == 'login' %}
+        <!-- 登录表单 -->
+        <form class="auth-form active" method="POST" action="/auth/login">
+            <!-- 登录方式切换 -->
+            <div class="login-method-tabs">
+                <button type="button" class="login-method-tab active" data-target="login-email">{{ _('email_login') }}</button>
+                <button type="button" class="login-method-tab" data-target="login-phone">{{ _('phone_login') }}</button>
+            </div>
+            
+            <!-- 邮箱登录 -->
+            <div class="login-method-content active" id="login-email">
+                <div class="form-group">
+                    <label>{{ _('email') if 'email' in TRANSLATIONS[lang] else 'Email' }}</label>
+                    <input type="email" name="email" placeholder="{{ _('enter_email') }}" required>
+                </div>
+            </div>
+            
+            <!-- 手机号登录 -->
+            <div class="login-method-content" id="login-phone">
+                <div class="form-group">
+                    <label>{{ _('phone_number') }}</label>
+                    <input type="tel" name="phone" placeholder="{{ _('enter_phone') }}" id="loginPhoneInput">
+                </div>
+            </div>
+            
+            <!-- 隐藏字段用于传递登录方式 -->
+            <input type="hidden" name="login_method" id="loginMethod" value="email">
+            
+            <div class="form-group">
+                <label>{{ _('password') }}</label>
+                <input type="password" name="password" required placeholder="{{ _('enter_password') }}">
+            </div>
+            
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember" value="1">
+                    {{ _('remember_me') }}
+                </label>
+                <a href="/auth/forgot" class="forgot-link">{{ _('forgot_password') }}</a>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block auth-submit-btn">{{ _('login') }}</button>
+            
+            {# 登录验证码（失败3次后显示） #}
+            {% if require_captcha %}
+            <div class="captcha-section" style="margin-top: 1rem;">
+                <div class="captcha-wrapper">
+                    <img src="/captcha" alt="captcha" class="captcha-image" id="loginCaptchaImg" onclick="this.src='/captcha?'+Math.random()">
+                    <input type="text" name="captcha_answer" placeholder="{{ _('enter_captcha') }}" required style="width: 100%; padding: 0.75rem; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 10px; color: var(--color-text); font-size: 1rem;">
+                </div>
+                <p class="verification-hint">{{ _('math_captcha_hint') }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="auth-footer">
+                {{ _('no_account') }}<a href="/auth/register">{{ _('register_now') }}</a>
+            </div>
+        </form>
+        {% else %}
+        <!-- 注册表单 - 统一注册方式 -->
+        <form class="auth-form active" method="POST" action="/auth/register" enctype="multipart/form-data" id="registerForm">
+            <div class="avatar-upload-section">
+                <label>{{ _('choose_avatar') }}</label>
+                <div class="avatar-preview-area">
+                    <div class="current-avatar" id="avatarPreview">🌟</div>
+                    <label class="upload-btn">
+                        <span>{{ _('upload_avatar') }}</span>
+                        <input type="file" name="avatar" id="avatarInput" class="hidden-input" accept="image/jpeg,image/png,image/gif,image/webp">
+                    </label>
+                </div>
+                <div class="preset-avatars">
+                    <div class="preset-avatar selected" data-avatar="🌟">🌟</div>
+                    <div class="preset-avatar" data-avatar="🌸">🌸</div>
+                    <div class="preset-avatar" data-avatar="🌙">🌙</div>
+                    <div class="preset-avatar" data-avatar="⭐">⭐</div>
+                    <div class="preset-avatar" data-avatar="🔮">🔮</div>
+                    <div class="preset-avatar" data-avatar="🎀">🎀</div>
+                    <div class="preset-avatar" data-avatar="🦋">🦋</div>
+                    <div class="preset-avatar" data-avatar="🍀">🍀</div>
+                    <div class="preset-avatar" data-avatar="🌈">🌈</div>
+                    <div class="preset-avatar" data-avatar="💎">💎</div>
+                </div>
+                <input type="hidden" name="selected_avatar" id="selectedAvatar" value="🌟">
+            </div>
+            
+            <div class="form-group">
+                <label>{{ _('nickname') if 'nickname' in TRANSLATIONS[lang] else 'Username' }}</label>
+                <input type="text" name="username" required placeholder="{{ _('enter_username') }}" minlength="2" maxlength="20">
+            </div>
+            
+            <!-- 统一注册方式切换：邮箱/手机 二选一 -->
+            <div class="register-method-tabs">
+                <button type="button" class="register-method-tab active" data-target="register-email">{{ _('email_register') }}</button>
+                <button type="button" class="register-method-tab" data-target="register-phone">{{ _('phone_register') }}</button>
+            </div>
+            
+            <!-- 邮箱注册（默认显示） -->
+            <div class="register-method-content active" id="register-email">
+                <div class="form-group">
+                    <label>{{ _('email') if 'email' in TRANSLATIONS[lang] else 'Email' }}</label>
+                    <input type="email" name="email" id="emailInput" placeholder="{{ _('email_desc') }}" class="auth-input">
+                    <p class="verification-hint">{{ _('valid_email_hint') }}</p>
+                </div>
+            </div>
+            
+            <!-- 手机号注册（含国家码下拉 + 短信验证） -->
+            <div class="register-method-content" id="register-phone">
+                <div class="form-group">
+                    <label>{{ _('phone_number') }}</label>
+                    <div class="phone-group">
+                        <select name="country_code" id="countryCode" class="country-select">
+                            <option value="+86">🇨🇳 +86</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+82">🇰🇷 +82</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+852">🇭🇰 +852</option>
+                            <option value="+886">🇹🇼 +886</option>
+                            <option value="+65">🇸🇬 +65</option>
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+49">🇩🇪 +49</option>
+                        </select>
+                        <input type="tel" name="phone" id="phoneInput" placeholder="{{ _('phone_desc') }}" maxlength="20" class="auth-input">
+                    </div>
+                    <p class="verification-hint">{{ _('phone_format_hint') }}</p>
+                </div>
+                <!-- 短信验证码 -->
+                <div class="form-group" style="margin-top:12px;">
+                    <label>验证码</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" name="sms_code" id="smsCodeInput" placeholder="输入6位验证码" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="flex:1;padding:0.75rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:10px;color:var(--color-text);font-size:1rem;text-align:center;letter-spacing:4px;">
+                        <button type="button" id="sendSmsBtn" onclick="sendSmsCode()" style="white-space:nowrap;padding:0.75rem 1rem;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s;">发送验证码</button>
+                    </div>
+                    <p class="verification-hint" id="smsStatus" style="margin-top:6px;font-size:0.8rem;"></p>
+                </div>
+            </div>
+            
+            <!-- 隐藏字段用于传递注册方式 -->
+            <input type="hidden" name="register_method" id="registerMethod" value="email">
+            
+            <div class="form-group">
+                <label>{{ _('password') }}</label>
+                <input type="password" name="password" required placeholder="{{ _('password_min') }}" minlength="6" id="passwordInput">
+            </div>
+            
+            <div class="form-group">
+                <label>{{ _('confirm_password') }}</label>
+                <input type="password" name="confirm_password" required placeholder="{{ _('enter_password_again') }}" minlength="6" id="confirmPasswordInput">
+            </div>
+            
+            <!-- 邀请码（选填）- 默认隐藏，点击链接展开 -->
+            <div class="form-group" id="refCodeGroup" style="display:none;">
+                <label>邀请码</label>
+                <input type="text" name="ref_code" placeholder="输入邀请码（选填）" class="auth-input">
+            </div>
+            <div class="form-group" style="margin-top:-0.75rem;margin-bottom:1.25rem;">
+                <a href="javascript:void(0)" id="showRefCodeLink" style="color:var(--color-gold);font-size:0.8rem;text-decoration:none;">有邀请码？</a>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block auth-submit-btn">{{ _('register') }}</button>
+            
+            {# 注册验证码 #}
+            <div class="captcha-section" style="margin-top: 1rem;">
+                <div class="captcha-wrapper">
+                    <img src="/captcha" alt="captcha" class="captcha-image" id="registerCaptchaImg" onclick="this.src='/captcha?'+Math.random()">
+                    <input type="text" name="captcha_answer" placeholder="{{ _('enter_captcha') }}" required style="width: 100%; padding: 0.75rem; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 10px; color: var(--color-text); font-size: 1rem;">
+                </div>
+                <p class="verification-hint">{{ _('math_captcha_hint') }}</p>
+            </div>
+            
+            <p class="auth-footer">
+                {{ _('agree_terms') }}<a href="/terms">{{ _('terms_link') }}</a>{{ ' ' + _('and' if 'and' in TRANSLATIONS[lang] else '和') + ' ' }}<a href="/privacy">{{ _('privacy_link') }}</a>
+            </p>
+            
+            <div class="auth-footer" style="margin-top: 1rem;">
+                {{ _('have_account') }}<a href="/auth/login">{{ _('login_now') }}</a>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// i18n translation data
+const i18n = {
+    imgSizeExceed: "{{ _('img_size_exceed') }}",
+    enterEmailAddr: "{{ _('enter_email_addr') }}",
+    enterValidPhone: "{{ _('enter_valid_phone') }}",
+    passwordMismatch: "{{ _('password_mismatch') }}"
+};
+
+// 头像上传预览
+document.getElementById('avatarInput')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        if (file.size > 2 * 1024 * 1024) {
+            alert(i18n.imgSizeExceed);
+            e.target.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const preview = document.getElementById('avatarPreview');
+            preview.innerHTML = '<img src="' + event.target.result + '" alt="avatar preview">';
+            document.querySelectorAll('.preset-avatar').forEach(el => el.classList.remove('selected'));
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// 预设头像选择
+document.querySelectorAll('.preset-avatar').forEach(el => {
+    el.addEventListener('click', function() {
+        document.querySelectorAll('.preset-avatar').forEach(e => e.classList.remove('selected'));
+        this.classList.add('selected');
+        const avatar = this.dataset.avatar;
+        document.getElementById('selectedAvatar').value = avatar;
+        document.getElementById('avatarPreview').innerHTML = '<span>' + avatar + '</span>';
+        document.getElementById('avatarInput').value = '';
+    });
+});
+
+// 注册方式切换
+document.querySelectorAll('.register-method-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        const target = this.dataset.target;
+        
+        // 更新tab状态
+        document.querySelectorAll('.register-method-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // 更新内容显示
+        document.querySelectorAll('.register-method-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(target).classList.add('active');
+        
+        // 更新隐藏字段
+        document.getElementById('registerMethod').value = target === 'register-email' ? 'email' : 'phone';
+        
+        // 切换必填属性
+        const emailInput = document.getElementById('emailInput');
+        const phoneInput = document.getElementById('phoneInput');
+        
+        if (target === 'register-email') {
+            emailInput.required = true;
+            phoneInput.required = false;
+            emailInput.classList.add('email-only');
+            phoneInput.classList.remove('phone-only');
+        } else {
+            emailInput.required = false;
+            phoneInput.required = true;
+            emailInput.classList.remove('email-only');
+            phoneInput.classList.add('phone-only');
+        }
+    });
+});
+
+// 登录方式切换
+document.querySelectorAll('.login-method-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        const target = this.dataset.target;
+        
+        // 更新tab状态
+        document.querySelectorAll('.login-method-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // 更新内容显示
+        document.querySelectorAll('.login-method-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(target).classList.add('active');
+        
+        // 更新隐藏字段
+        document.getElementById('loginMethod').value = target === 'login-email' ? 'email' : 'phone';
+        
+        // 切换必填属性
+        const emailInput = document.querySelector('input[name="email"]');
+        const phoneInput = document.getElementById('loginPhoneInput');
+        
+        if (target === 'login-email') {
+            emailInput.required = true;
+            phoneInput.required = false;
+        } else {
+            emailInput.required = false;
+            phoneInput.required = true;
+        }
+    });
+});
+
+// 手机号格式验证
+document.getElementById('phoneInput')?.addEventListener('input', function(e) {
+    this.value = this.value.replace(/\D/g, ''); // 只允许数字
+    if (this.value.length === 11) {
+        if (/^1[3-9]\d{9}$/.test(this.value)) {
+            this.classList.remove('invalid');
+            this.classList.add('valid');
+        } else {
+            this.classList.remove('valid');
+            this.classList.add('invalid');
+        }
+    } else {
+        this.classList.remove('valid', 'invalid');
+    }
+});
+
+document.getElementById('loginPhoneInput')?.addEventListener('input', function(e) {
+    this.value = this.value.replace(/\D/g, ''); // 只允许数字
+    if (this.value.length === 11) {
+        if (/^1[3-9]\d{9}$/.test(this.value)) {
+            this.classList.remove('invalid');
+            this.classList.add('valid');
+        } else {
+            this.classList.remove('valid');
+            this.classList.add('invalid');
+        }
+    } else {
+        this.classList.remove('valid', 'invalid');
+    }
+});
+
+// 注册表单验证
+document.getElementById('registerForm')?.addEventListener('submit', function(e) {
+    const registerMethod = document.getElementById('registerMethod').value;
+    const password = document.getElementById('passwordInput').value;
+    const confirmPassword = document.getElementById('confirmPasswordInput').value;
+    
+    if (registerMethod === 'email') {
+        const email = document.getElementById('emailInput').value;
+        if (!email) {
+            alert(i18n.enterEmailAddr);
+            e.preventDefault();
+            return;
+        }
+    } else {
+        const phone = document.getElementById('phoneInput').value.trim();
+        const countryCode = document.getElementById('countryCode').value;
+        const cleanPhone = phone.replace(/-/g, '').replace(/ /g, '');
+        let phoneValid = false;
+        if (countryCode === '+86') phoneValid = /^1[3-9]\d{9}$/.test(cleanPhone);
+        else if (countryCode === '+1') phoneValid = /^\d{10}$/.test(cleanPhone);
+        else if (countryCode === '+81') phoneValid = /^0?\d{9,10}$/.test(cleanPhone);
+        else phoneValid = /^\d{5,15}$/.test(cleanPhone);
+        if (!phone || !phoneValid) {
+            alert(i18n.enterValidPhone);
+            e.preventDefault();
+            return;
+        }
+    }
+    
+    if (password !== confirmPassword) {
+        alert(i18n.passwordMismatch);
+        e.preventDefault();
+        return;
+    }
+    
+    // 手机注册需验证短信验证码
+    if (registerMethod === 'phone') {
+        const smsCode = document.getElementById('smsCodeInput').value;
+        if (!smsCode || smsCode.length !== 6) {
+            alert('请输入6位短信验证码');
+            e.preventDefault();
+            return;
+        }
+    }
+});
+
+// 邀请码显示切换
+document.getElementById('showRefCodeLink')?.addEventListener('click', function() {
+    const group = document.getElementById('refCodeGroup');
+    if (group.style.display === 'none') {
+        group.style.display = 'block';
+        this.textContent = '隐藏邀请码';
+    } else {
+        group.style.display = 'none';
+        this.textContent = '有邀请码？';
+    }
+});
+
+// ── 短信验证码 ──
+let smsTimer = null;
+let smsCountdown = 0;
+
+function sendSmsCode() {
+    const btn = document.getElementById('sendSmsBtn');
+    const phone = document.getElementById('phoneInput').value.trim();
+    const countryCode = document.getElementById('countryCode').value;
+    const status = document.getElementById('smsStatus');
+    
+    // 前端校验手机号
+    let phoneValid = false;
+    const cleanPhone = phone.replace(/-/g, '').replace(/ /g, '');
+    if (countryCode === '+86') {
+        phoneValid = /^1[3-9]\d{9}$/.test(cleanPhone);
+    } else if (countryCode === '+1') {
+        phoneValid = /^\d{10}$/.test(cleanPhone);
+    } else if (countryCode === '+81') {
+        phoneValid = /^0?\d{9,10}$/.test(cleanPhone);
+    } else {
+        phoneValid = /^\d{5,15}$/.test(cleanPhone);
+    }
+    
+    if (!phone || !phoneValid) {
+        status.textContent = '请输入正确的手机号';
+        status.style.color = '#ef4444';
+        return;
+    }
+    
+    // 开始倒计时
+    btn.disabled = true;
+    smsCountdown = 60;
+    btn.textContent = smsCountdown + 's';
+    smsTimer = setInterval(() => {
+        smsCountdown--;
+        btn.textContent = smsCountdown + 's';
+        if (smsCountdown <= 0) {
+            clearInterval(smsTimer);
+            btn.disabled = false;
+            btn.textContent = '重新发送';
+        }
+    }, 1000);
+    
+    status.textContent = '发送中...';
+    status.style.color = '#8b5cf6';
+    
+    fetch('/api/sms/send', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            country_code: countryCode,
+            phone: cleanPhone,
+            purpose: 'register'
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            status.textContent = data.debug_code ? '验证码已发送（调试模式: ' + data.debug_code + '）' : '验证码已发送';
+            status.style.color = '#10b981';
+        } else {
+            status.textContent = data.message || '发送失败';
+            status.style.color = '#ef4444';
+            clearInterval(smsTimer);
+            btn.disabled = false;
+            btn.textContent = '重新发送';
+        }
+    })
+    .catch(err => {
+        status.textContent = '网络错误，请重试';
+        status.style.color = '#ef4444';
+        clearInterval(smsTimer);
+        btn.disabled = false;
+        btn.textContent = '重新发送';
+    });
+}
+</script>
+{% endblock %}
+

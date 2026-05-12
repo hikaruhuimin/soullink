@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+
+{% block title %}SoulLink - {{ t.title }}{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <h1>{{ t.title }}</h1>
+        <div class="header-actions">
+            <a href="/creator" class="btn btn-secondary">创作者中心</a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card primary">
+            <div class="stat-icon">💰</div>
+            <div class="stat-content">
+                <span class="stat-label">{{ t.total_earnings }}</span>
+                <span class="stat-value">{{ total_earnings|default(0)|round|int }}</span>
+            </div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-icon">✨</div>
+            <div class="stat-content">
+                <span class="stat-label">{{ t.withdrawable }}</span>
+                <span class="stat-value">{{ withdrawable|default(0)|round|int }}</span>
+            </div>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-icon">🏛️</div>
+            <div class="stat-content">
+                <span class="stat-label">{{ t.platform_fees_taken }}</span>
+                <span class="stat-value">{{ platform_fees|default(0)|round|int }}</span>
+            </div>
+        </div>
+        <div class="stat-card muted">
+            <div class="stat-icon">📤</div>
+            <div class="stat-content">
+                <span class="stat-label">{{ t.withdrawn }}</span>
+                <span class="stat-value">{{ withdrawn|default(0)|round|int }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if not user_agents %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-icon">🤖</div>
+        <h3>{{ t.no_agents }}</h3>
+        <p>开始创建你的第一个AI Agent，开启赚钱之旅</p>
+        <a href="/creator/create" class="btn btn-primary">{{ t.create_now }}</a>
+    </div>
+    {% else %}
+    
+    <!-- Earnings Chart -->
+    <div class="chart-section">
+        <h2>{{ t.earnings_chart }}</h2>
+        <div class="chart-container">
+            <div class="chart-bars">
+                {% for day in last_7_days %}
+                <div class="bar-wrapper">
+                    <div class="bar" style="height: {{ (day.earnings / 300 * 100)|round }}%"></div>
+                    <span class="bar-value">{{ day.earnings }}</span>
+                    <span class="bar-label">{{ day.day_name }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Earnings Table -->
+    <div class="table-section">
+        <h2>{{ t.recent_earnings }}</h2>
+        <div class="table-wrapper">
+            <table class="earnings-table">
+                <thead>
+                    <tr>
+                        <th>{{ t.table.time }}</th>
+                        <th>{{ t.table.source }}</th>
+                        <th>{{ t.table.amount }}</th>
+                        <th>{{ t.table.status }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in recent_earnings %}
+                    <tr>
+                        <td>{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <span class="source-badge">{{ record.source_type }}</span>
+                        </td>
+                        <td class="amount">+{{ record.net_amount }}</td>
+                        <td><span class="status-badge {{ record.status }}">{{ record.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="empty-row">暂无收益记录</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Monthly Breakdown -->
+    <div class="monthly-breakdown-section">
+        <h2>{{ t.monthly_breakdown }}</h2>
+        <div class="monthly-grid">
+            {% for month in monthly_breakdown %}
+            <div class="month-card">
+                <div class="month-header">
+                    <span class="month-name">{{ month.month }}</span>
+                    <span class="month-total">{{ month.total }}</span>
+                </div>
+                <div class="month-details">
+                    <div class="month-detail-item">
+                        <span class="detail-label">{{ t.gross_earnings }}</span>
+                        <span class="detail-value">{{ month.gross }}</span>
+                    </div>
+                    <div class="month-detail-item">
+                        <span class="detail-label">{{ t.platform_fee_deducted }}</span>
+                        <span class="detail-value fee">{{ month.fee }}</span>
+                    </div>
+                    <div class="month-detail-item">
+                        <span class="detail-label">{{ t.net_earnings_label }}</span>
+                        <span class="detail-value net">{{ month.net }}</span>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-month">暂无月度数据</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Withdraw Section -->
+    <div class="withdraw-section">
+        <div class="withdraw-info">
+            <h2>{{ t.withdraw }}</h2>
+            <p>{{ t.withdrawable_balance }}: <strong>{{ withdrawable|default(0)|round|int }}</strong> {{ t.lingxi_currency }}</p>
+            <p class="withdraw-note">{{ t.withdraw_fee_note }}: 10% {{ t.platform_fee_desc }} | {{ t.min_withdraw }}: 1000 {{ t.lingxi_currency }}</p>
+            <p class="withdraw-note" style="margin-top:5px;color:#666;">{{ t.platform_fee_explain }}</p>
+        </div>
+        <div class="withdraw-actions">
+            <a href="/withdraw" class="btn btn-primary btn-lg">{{ t.withdraw }}</a>
+            <a href="/withdraw/history" class="btn btn-secondary">{{ t.withdraw_history }}</a>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+
+<style>
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.stat-card.primary {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.stat-card.success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.stat-card.muted {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+}
+.stat-card.warning {
+    background: linear-gradient(135deg, #fef9c3 0%, #fde047 100%);
+}
+
+.monthly-breakdown-section {
+    margin: 2rem 0;
+}
+.monthly-breakdown-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+}
+.monthly-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+.month-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    border: 1px solid #eee;
+}
+.month-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+.month-name {
+    font-weight: 600;
+    color: #333;
+}
+.month-total {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #22c55e;
+}
+.month-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.month-detail-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+.detail-label {
+    color: #888;
+}
+.detail-value {
+    font-weight: 500;
+}
+.detail-value.fee {
+    color: #ef4444;
+}
+.detail-value.net {
+    color: #22c55e;
+}
+.empty-month {
+    text-align: center;
+    padding: 2rem;
+    color: #aaa;
+    grid-column: 1/-1;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    background: white;
+    border-radius: 16px;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: var(--color-text-secondary);
+    margin-bottom: 24px;
+}
+
+.chart-section,
+.table-section {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.chart-section h2,
+.table-section h2 {
+    font-size: 1.125rem;
+    margin-bottom: 24px;
+}
+
+.chart-container {
+    height: 200px;
+}
+
+.chart-bars {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 100%;
+    padding-top: 40px;
+}
+
+.bar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 60px;
+}
+
+.bar {
+    width: 40px;
+    background: linear-gradient(180deg, #B8A9C9 0%, #8B7BA3 100%);
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: height 0.3s ease;
+}
+
+.bar-value {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-top: 4px;
+}
+
+.bar-label {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-top: 2px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.earnings-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.earnings-table th,
+.earnings-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.earnings-table th {
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+.earnings-table td {
+    font-size: 0.9375rem;
+}
+
+.source-badge {
+    background: var(--color-bg-secondary);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.amount {
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.status-badge.settled {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.status-badge.pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.status-badge.withdrawn {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
+.empty-row {
+    text-align: center;
+    color: var(--color-text-secondary);
+    padding: 40px !important;
+}
+
+.withdraw-section {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.withdraw-info h2 {
+    font-size: 1.125rem;
+    margin-bottom: 8px;
+}
+
+.withdraw-info p {
+    margin-bottom: 4px;
+}
+
+.withdraw-info strong {
+    color: var(--color-primary);
+    font-size: 1.25rem;
+}
+
+.withdraw-note {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.withdraw-actions {
+    display: flex;
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .withdraw-section {
+        flex-direction: column;
+        gap: 24px;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}

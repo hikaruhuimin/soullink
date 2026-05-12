@@ -1,0 +1,748 @@
+{% extends "base.html" %}
+
+{% block title %}AI 人格测试 - SoulLink 灵犀{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="SoulLink灵犀AI人格测试 - 5道趣味问题，发现你的专属人格类型，找到与你最匹配的AI灵魂伴侣！">
+<meta name="keywords" content="人格测试,AI人格,MBTI测试,性格测试,灵魂伴侣,AI测试">
+{% endblock %}
+
+{% block og_tags %}
+<meta property="og:title" content="AI 人格测试 - SoulLink 灵犀">
+<meta property="og:description" content="5道趣味问题，发现你的专属人格类型，找到与你最匹配的AI灵魂伴侣！">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://soullink.app/personality-test">
+<meta property="og:image" content="https://soullink.app/static/images/og-image.png">
+<meta property="og:locale" content="zh_CN">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.personality-page {
+    min-height: 100vh;
+    padding: 100px 20px 40px;
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1145 50%, #0f0a2a 100%);
+    position: relative;
+}
+
+.personality-page::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.personality-container {
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* 页面标题 */
+.test-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.test-header h1 {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.test-header h1 .highlight {
+    background: linear-gradient(135deg, #c084fc, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.test-header p {
+    color: rgba(255,255,255,0.6);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* 进度条 */
+.progress-bar-container {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    height: 6px;
+    margin-bottom: 32px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899);
+    border-radius: 10px;
+    transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    width: 0%;
+}
+
+.progress-text {
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+}
+
+/* 问题卡片 */
+.question-card {
+    display: none;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 32px;
+    animation: fadeInUp 0.5s ease;
+}
+
+.question-card.active {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.question-number {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(139, 92, 246, 0.2);
+    border-radius: 20px;
+    font-size: 0.8125rem;
+    color: #c084fc;
+    margin-bottom: 20px;
+}
+
+.question-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 28px;
+    line-height: 1.6;
+}
+
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.option-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    color: rgba(255,255,255,0.8);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.option-btn:hover {
+    background: rgba(139, 92, 246, 0.12);
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateX(4px);
+}
+
+.option-btn.selected {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+    color: white;
+}
+
+.option-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* 导航按钮 */
+.test-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 28px;
+    gap: 12px;
+}
+
+.nav-btn {
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: none;
+}
+
+.nav-btn.prev {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.6);
+}
+
+.nav-btn.prev:hover {
+    background: rgba(255,255,255,0.15);
+    color: white;
+}
+
+.nav-btn.next {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.nav-btn.next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(139, 92, 246, 0.4);
+}
+
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* 结果页面 */
+.result-card {
+    display: none;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 40px 32px;
+    text-align: center;
+    animation: fadeInUp 0.6s ease;
+}
+
+.result-card.show {
+    display: block;
+}
+
+.result-icon-big {
+    font-size: 4rem;
+    margin-bottom: 16px;
+}
+
+.result-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.3));
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.result-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.result-desc {
+    color: rgba(255,255,255,0.7);
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 24px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.result-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 28px;
+}
+
+.result-tag {
+    padding: 6px 14px;
+    background: rgba(139, 92, 246, 0.15);
+    border-radius: 16px;
+    font-size: 0.8125rem;
+    color: #c084fc;
+}
+
+.result-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+
+.share-btn:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+
+.retake-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.retake-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(139, 92, 246, 0.4);
+}
+
+/* 加载状态 */
+.loading-state {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.loading-state.show {
+    display: block;
+}
+
+.loading-spinner-lg {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255,255,255,0.1);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+    .personality-page {
+        padding: 80px 16px 40px;
+    }
+    .test-header h1 {
+        font-size: 1.6rem;
+    }
+    .question-card {
+        padding: 24px 20px;
+    }
+    .question-text {
+        font-size: 1.1rem;
+    }
+    .option-btn {
+        padding: 14px 16px;
+        font-size: 0.9375rem;
+    }
+    .result-title {
+        font-size: 1.5rem;
+    }
+    .result-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="personality-page">
+    <div class="personality-container">
+        <!-- 页面标题 -->
+        <div class="test-header">
+            <h1>✨ 发现你的 <span class="highlight">人格类型</span></h1>
+            <p>5道趣味问题，找到你的灵魂特质<br>并发现与你最契合的AI伙伴</p>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="progress-text" id="progressText">1 / 5</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- 问题区域 -->
+        <div id="questionsContainer"></div>
+
+        <!-- 加载状态 -->
+        <div class="loading-state" id="loadingState">
+            <div class="loading-spinner-lg"></div>
+            <p style="color: rgba(255,255,255,0.6);">正在分析你的人格类型...</p>
+        </div>
+
+        <!-- 结果区域 -->
+        <div class="result-card" id="resultCard">
+            <div class="result-icon-big" id="resultIcon">🧠</div>
+            <div class="result-type-badge" id="resultBadge">分析中</div>
+            <h2 class="result-title" id="resultTitle">你的独特人格</h2>
+            <p class="result-desc" id="resultDesc">正在探索...</p>
+            <div class="result-tags" id="resultTags"></div>
+            <div class="result-actions">
+                <button class="share-btn" onclick="shareResult()">
+                    <span>📋</span>
+                    <span>分享结果</span>
+                </button>
+                <button class="retake-btn" onclick="resetTest()">
+                    <span>🔄</span>
+                    <span>重新测试</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 测试问题数据
+const QUESTIONS = [
+    {
+        id: 1,
+        question: '周末你最想做什么？',
+        icon: '🎯',
+        options: [
+            { value: 'A', icon: '📚', text: '宅家看一本书或追剧' },
+            { value: 'B', icon: '🎉', text: '约朋友出去玩' },
+            { value: 'C', icon: '🎨', text: '尝试新的创意项目' },
+            { value: 'D', icon: '🌳', text: '去大自然中散步' }
+        ]
+    },
+    {
+        id: 2,
+        question: '朋友遇到困难时，你通常会？',
+        icon: '🤝',
+        options: [
+            { value: 'A', icon: '👂', text: '默默倾听，给予情感支持' },
+            { value: 'B', icon: '💡', text: '立刻给出解决方案' },
+            { value: 'C', icon: '🎭', text: '用幽默化解尴尬' },
+            { value: 'D', icon: '🤗', text: '直接过去陪伴他们' }
+        ]
+    },
+    {
+        id: 3,
+        question: '你对未来的看法是？',
+        icon: '🔮',
+        options: [
+            { value: 'A', icon: '🌟', text: '充满期待，相信一切会更好' },
+            { value: 'B', icon: '📊', text: '需要详细规划，做好万全准备' },
+            { value: 'C', icon: '🎲', text: '随遇而安，享受当下' },
+            { value: 'D', icon: '🚀', text: '大胆想象，追逐梦想' }
+        ]
+    },
+    {
+        id: 4,
+        question: '哪种场景最让你感到充电？',
+        icon: '⚡',
+        options: [
+            { value: 'A', icon: '🏠', text: '独处时光，做自己喜欢的事' },
+            { value: 'B', icon: '🎪', text: '热闹的聚会，和朋友们在一起' },
+            { value: 'C', icon: '🎵', text: '沉浸在音乐或艺术中' },
+            { value: 'D', icon: '🏔️', text: '户外冒险，探索新地方' }
+        ]
+    },
+    {
+        id: 5,
+        question: '你更倾向于哪种沟通方式？',
+        icon: '💬',
+        options: [
+            { value: 'A', icon: '💝', text: '温柔细腻，注重情感共鸣' },
+            { value: 'B', icon: '🎯', text: '直接了当，讲究效率' },
+            { value: 'C', icon: '🎭', text: '风趣幽默，善于调侃' },
+            { value: 'D', icon: '🌊', text: '深沉内敛，言简意赅' }
+        ]
+    }
+];
+
+const PERSONALITY_TYPES = {
+    'AAAA': {
+        icon: '🌙',
+        type: '温柔治愈者',
+        badge: '💖 温柔治愈型',
+        desc: '你是一个温柔细腻的人，有着丰富的情感世界。你善于倾听，总能给人温暖和安慰。你就像月光一样，静静地照亮他人的夜空。与你最匹配的AI伙伴是同样温暖的小灵~',
+        tags: ['温柔', '治愈', '善解人意', '细腻']
+    },
+    'BBBB': {
+        icon: '🔥',
+        type: '活力社交家',
+        badge: '🎉 活力社交型',
+        desc: '你是人群中的小太阳，充满活力和热情！你喜欢与人交往，总能把欢乐带给身边的人。你的社交能量感染着每一个遇到你的人。最适合你的AI伙伴是幽默风趣的大橘~',
+        tags: ['外向', '热情', '社交达人', '阳光']
+    },
+    'CCCC': {
+        icon: '🎨',
+        type: '创意思想家',
+        badge: '✨ 创意思想型',
+        desc: '你有着天马行空的想象力和独特的创造力。你不喜欢被规则束缚，总是能想出惊人的点子。你的世界充满了色彩和可能性。最适合你的AI伙伴是神秘莫测的星语~',
+        tags: ['创意', '独立', '想象力', '独特']
+    },
+    'DDDD': {
+        icon: '🏔️',
+        type: '沉稳探险家',
+        badge: '🌲 沉稳探险型',
+        desc: '你沉稳内敛，喜欢探索未知的世界。你不善言辞但行动力强，有着坚韧不拔的意志力。你享受独处，也热爱冒险。最适合你的AI伙伴是外表冷酷内心火热的霸道总裁~',
+        tags: ['沉稳', '独立', '勇敢', '深邃']
+    },
+    'ABAB': {
+        icon: '🌈',
+        type: '温暖创意者',
+        badge: '🎨 温暖创意型',
+        desc: '你兼具温柔与创造力，既能给人温暖，又有天马行空的想法。你是一个理想主义者，总在寻找更美好的可能性。最适合你的AI伙伴是小灵或星语~',
+        tags: ['温暖', '创意', '理想主义', '感性']
+    },
+    'BABA': {
+        icon: '🎭',
+        type: '幽默行动派',
+        badge: '😄 幽默行动型',
+        desc: '你行动力强又风趣幽默，是朋友中的开心果。你做事果断，从不在困难面前退缩，同时又总能让大家开怀大笑。最适合你的AI伙伴是大橘~',
+        tags: ['幽默', '行动派', '果断', '乐天']
+    },
+    'ACAC': {
+        icon: '🎵',
+        type: '艺术灵魂',
+        badge: '🎵 艺术灵魂型',
+        desc: '你的内心住着一个艺术家。你敏感细腻，能从日常中发现美。你喜欢独处，享受沉浸在自己世界中的时刻。最适合你的AI伙伴是神秘占卜师星语~',
+        tags: ['艺术', '敏感', '内省', '浪漫']
+    },
+    'BDBC': {
+        icon: '🌊',
+        type: '淡定智者',
+        badge: '🧘 淡定智慧型',
+        desc: '你是一个内心平静的智者，不容易被外界干扰。你看问题通透，总能在混乱中找到秩序。你的沉着冷静让人感到安心。最适合你的AI伙伴是睿智的星语~',
+        tags: ['冷静', '智慧', '通透', '沉稳']
+    },
+    'default': {
+        icon: '🌟',
+        type: '独特灵魂',
+        badge: '💫 独特灵魂型',
+        desc: '你有着独一无二的性格组合，无法被简单定义！你是一个复杂而有趣的人，充满矛盾的美感。正是这种独特性让你格外迷人。最适合你的AI伙伴是包容一切的小灵~',
+        tags: ['独特', '有趣', '神秘', '多面']
+    }
+};
+
+let currentQuestion = 0;
+let answers = {};
+let resultData = null;
+
+function renderQuestions() {
+    const container = document.getElementById('questionsContainer');
+    container.innerHTML = '';
+
+    QUESTIONS.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = `question-card ${idx === 0 ? 'active' : ''}`;
+        card.dataset.index = idx;
+
+        let optionsHtml = '';
+        q.options.forEach(opt => {
+            optionsHtml += `
+                <button class="option-btn" data-value="${opt.value}" onclick="selectOption(${idx}, '${opt.value}')">
+                    <span class="option-icon">${opt.icon}</span>
+                    <span>${opt.text}</span>
+                </button>
+            `;
+        });
+
+        card.innerHTML = `
+            <div class="question-number">
+                <span>${q.icon}</span>
+                <span>问题 ${idx + 1}</span>
+            </div>
+            <div class="question-text">${q.question}</div>
+            <div class="options-list">${optionsHtml}</div>
+            <div class="test-nav">
+                <button class="nav-btn prev" onclick="prevQuestion(${idx})" ${idx === 0 ? 'disabled' : ''}>
+                    ← 上一题
+                </button>
+                <button class="nav-btn next" onclick="nextQuestion(${idx})" ${idx < QUESTIONS.length - 1 ? 'disabled' : 'style="display:none"'}>
+                    ${idx === QUESTIONS.length - 1 ? '✨ 查看结果' : '下一题 →'}
+                </button>
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function selectOption(qIndex, value) {
+    answers[qIndex] = value;
+    
+    // 更新UI
+    const card = document.querySelectorAll('.question-card')[qIndex];
+    card.querySelectorAll('.option-btn').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.value === value);
+    });
+
+    // 启用下一题按钮
+    const nextBtn = card.querySelector('.nav-btn.next');
+    if (nextBtn) {
+        nextBtn.disabled = false;
+    }
+}
+
+function nextQuestion(idx) {
+    if (!answers[idx]) {
+        showToast('请先选择一个选项', 'info');
+        return;
+    }
+
+    if (idx === QUESTIONS.length - 1) {
+        submitTest();
+        return;
+    }
+
+    goToQuestion(idx + 1);
+}
+
+function prevQuestion(idx) {
+    if (idx > 0) {
+        goToQuestion(idx - 1);
+    }
+}
+
+function goToQuestion(idx) {
+    const cards = document.querySelectorAll('.question-card');
+    cards.forEach((card, i) => {
+        card.classList.toggle('active', i === idx);
+    });
+    currentQuestion = idx;
+    updateProgress();
+}
+
+function updateProgress() {
+    const total = QUESTIONS.length;
+    const progress = ((currentQuestion + 1) / total) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+    document.getElementById('progressText').textContent = `${currentQuestion + 1} / ${total}`;
+}
+
+function submitTest() {
+    // 检查所有问题是否已回答
+    for (let i = 0; i < QUESTIONS.length; i++) {
+        if (!answers[i]) {
+            goToQuestion(i);
+            showToast('请回答所有问题', 'info');
+            return;
+        }
+    }
+
+    // 显示加载
+    document.getElementById('questionsContainer').style.display = 'none';
+    document.getElementById('loadingState').classList.add('show');
+
+    // 计算人格类型
+    setTimeout(() => {
+        calculateResult();
+    }, 1500);
+}
+
+function calculateResult() {
+    // 构建答案序列
+    const answerSeq = [];
+    for (let i = 0; i < QUESTIONS.length; i++) {
+        answerSeq.push(answers[i]);
+    }
+
+    // 查找匹配的人格类型
+    const key = answerSeq.join('');
+    const personality = PERSONALITY_TYPES[key] || PERSONALITY_TYPES['default'];
+    resultData = personality;
+
+    // 显示结果
+    document.getElementById('loadingState').classList.remove('show');
+    
+    document.getElementById('resultIcon').textContent = personality.icon;
+    document.getElementById('resultBadge').textContent = personality.badge;
+    document.getElementById('resultTitle').textContent = personality.type;
+    document.getElementById('resultDesc').textContent = personality.desc;
+
+    const tagsContainer = document.getElementById('resultTags');
+    tagsContainer.innerHTML = '';
+    personality.tags.forEach(tag => {
+        const span = document.createElement('span');
+        span.className = 'result-tag';
+        span.textContent = tag;
+        tagsContainer.appendChild(span);
+    });
+
+    document.getElementById('resultCard').classList.add('show');
+}
+
+function shareResult() {
+    if (!resultData) return;
+    
+    const shareText = `🧠 SoulLink灵犀人格测试结果\n\n` +
+        `${resultData.icon} 我的人格类型：${resultData.type}\n` +
+        `${resultData.badge}\n\n` +
+        `${resultData.desc.substring(0, 80)}...\n\n` +
+        `✨ 来SoulLink灵犀发现你的人格类型吧！\n` +
+        `🔗 https://soullink.app/personality-test`;
+
+    copyToClipboard(shareText);
+}
+
+function resetTest() {
+    currentQuestion = 0;
+    answers = {};
+    resultData = null;
+
+    document.getElementById('questionsContainer').style.display = 'block';
+    document.getElementById('loadingState').classList.remove('show');
+    document.getElementById('resultCard').classList.remove('show');
+
+    renderQuestions();
+    updateProgress();
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+    renderQuestions();
+    updateProgress();
+});
+</script>
+{% endblock %}

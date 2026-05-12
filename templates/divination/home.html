@@ -1,0 +1,2495 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('divination') }} - 灵犀{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="SoulLink灵犀AI占卜平台 - 提供塔罗占卜、星座分析、八字命理、紫微斗数、易经六爻、おみくじ、MBTI测试等多种占卜服务。AI智能解读，探索你的命运密码。">
+<meta name="keywords" content="AI占卜,塔罗牌,星座,八字,命理,紫微斗数,易经,占卜,灵犀">
+{% endblock %}
+
+{% block og_tags %}
+<meta property="og:title" content="AI占卜 - SoulLink 灵犀">
+<meta property="og:description" content="AI智能占卜平台，提供塔罗、星座、八字、紫微斗数等多种占卜服务，探索你的命运密码。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://soullink.app/divination">
+<meta property="og:image" content="https://soullink.app/static/images/og-image.png">
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/starry.css?v=20260502">
+<style>
+/* 确保星空背景不被覆盖 */
+body {
+    background: transparent !important;
+}
+
+.divination-page { padding-bottom: 100px; }
+
+/* 强制星空背景 - 覆盖base.html白色背景 */
+body, .main-content {
+    background: transparent !important;
+    background-image: none !important;
+}
+
+body::before {
+    display: none !important;
+}
+
+/* ========== 深色背景 ========== */
+.starry-bg {
+    position: relative;
+    min-height: 100vh;
+    background: linear-gradient(180deg, rgba(5, 5, 30, 0.85) 0%, rgba(10, 5, 40, 0.7) 50%, rgba(5, 10, 30, 0.85) 100%),
+                url("https://raw.githubusercontent.com/hikaruhuimin/soullink/main/static/images/divination-bg.jpg") center/cover no-repeat fixed;
+    background-blend-mode: overlay;
+    overflow: hidden;
+    animation: bgBreath 25s ease-in-out infinite alternate;
+}
+
+@keyframes bgBreath {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.03); }
+}
+
+/* 浮动光点 */
+.floating-particles {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.1);
+    animation: particleFloat linear infinite;
+}
+
+.particle:nth-child(odd) { width: 3px; height: 3px; animation-duration: 12s; animation-delay: -3s; }
+.particle:nth-child(3n) { width: 5px; height: 5px; background: rgba(196, 181, 253, 0.25); animation-duration: 18s; animation-delay: -7s; }
+.particle:nth-child(5n+2) { animation-duration: 15s; animation-delay: -5s; }
+
+@keyframes particleFloat {
+    0% { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translateY(50vh) translateX(30px) scale(1.2); }
+    90% { opacity: 0.8; }
+    100% { transform: translateY(-10vh) translateX(60px) scale(0); opacity: 0; }
+}
+
+
+
+
+
+/* 闪烁星星容器 */
+.stars-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* 闪烁星星样式 */
+.twinkle-star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+    box-shadow: 0 0 4px 2px rgba(255, 255, 255, 0.5);
+}
+
+.twinkle-star.small {
+    width: 2px;
+    height: 2px;
+    box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.4);
+}
+
+.twinkle-star.large {
+    width: 4px;
+    height: 4px;
+    box-shadow: 0 0 6px 3px rgba(255, 255, 255, 0.6), 0 0 12px 6px rgba(196, 181, 253, 0.4);
+}
+
+@keyframes twinkle {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    10% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+    20% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    40% {
+        opacity: 0.8;
+        transform: scale(1.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+    60% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    80% {
+        opacity: 0.9;
+        transform: scale(1.2);
+    }
+}
+
+/* ========== 流星雨特效 ========== */
+/* 多层流星雨同时划过 */
+
+.meteor-shower {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.meteor {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.6),
+                0 0 12px 4px rgba(196, 181, 253, 0.3);
+    animation: meteorFall linear infinite;
+}
+
+.meteor::before {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 1.5px;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.9),
+        rgba(196, 181, 253, 0.4),
+        transparent
+    );
+    transform: translateX(-100%) translateY(-50%);
+    top: 50%;
+    right: 0;
+}
+
+/* 不同大小的流星 */
+.meteor.small {
+    width: 1px;
+    height: 1px;
+    box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.4);
+}
+.meteor.small::before {
+    width: 40px;
+    height: 1px;
+    opacity: 0.6;
+}
+
+.meteor.large {
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 8px 3px rgba(255, 255, 255, 0.8),
+                0 0 16px 6px rgba(196, 181, 253, 0.4);
+}
+.meteor.large::before {
+    width: 120px;
+    height: 2px;
+}
+
+/* 流星轨迹动画 - 从右上向左下滑落 */
+@keyframes meteorFall {
+    0% {
+        transform: translateX(0) translateY(0) rotate(-35deg);
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-300px) translateY(400px) rotate(-35deg);
+        opacity: 0;
+    }
+}
+
+/* 不同的坠落角度 */
+.meteor.angle-1 { animation: meteorFallAngle1 linear infinite; }
+.meteor.angle-2 { animation: meteorFallAngle2 linear infinite; }
+
+@keyframes meteorFallAngle1 {
+    0% { transform: translateX(0) translateY(0) rotate(-25deg); opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateX(-400px) translateY(350px) rotate(-25deg); opacity: 0; }
+}
+
+@keyframes meteorFallAngle2 {
+    0% { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateX(-250px) translateY(450px) rotate(-45deg); opacity: 0; }
+}
+
+/* 内容区域毛玻璃效果增强 */
+.divination-hero {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.6) 0%, rgba(22, 33, 62, 0.6) 50%, rgba(15, 52, 96, 0.6) 100%),
+                url("https://raw.githubusercontent.com/hikaruhuimin/soullink/main/static/images/divination-bg.jpg") center/cover no-repeat;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 80px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 40px 40px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    min-height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: 150% auto;
+    animation: galaxyDrift 80s ease-in-out infinite;
+}
+
+.divination-hero {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.5) 0%, rgba(22, 33, 62, 0.5) 50%, rgba(15, 52, 96, 0.5) 100%),
+                url("https://raw.githubusercontent.com/hikaruhuimin/soullink/main/static/images/divination-bg.jpg") center/cover no-repeat;
+    padding: 80px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 40px 40px;
+    margin-bottom: 20px;
+    min-height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: 150% auto;
+    animation: galaxyDrift 80s ease-in-out infinite;
+}
+
+.divination-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.hero-content { position: relative; z-index: 1; }
+
+.hero-icon {
+    font-size: 96px;
+    display: block;
+    margin-bottom: 16px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.hero-content h1 {
+    margin: 0 0 12px 0;
+    font-size: 48px;
+    color: #f0e6d3;
+    text-shadow: 0 0 30px rgba(139, 92, 246, 0.5), 0 0 60px rgba(139, 92, 246, 0.3), 0 4px 15px rgba(0,0,0,0.5);
+    letter-spacing: 4px;
+    font-weight: 700;
+}
+
+.hero-content p { margin: 0; font-size: 18px; color: rgba(196, 212, 232, 0.95); text-shadow: 0 2px 10px rgba(0,0,0,0.5); letter-spacing: 2px; }
+
+.hero-decoration {
+    position: absolute;
+    top: 20px;
+    left: 0; right: 0;
+    animation: galaxyRotate 60s ease-in-out infinite;
+    display: flex;
+    justify-content: space-around;
+    pointer-events: none;
+}
+
+.deco-star, .deco-moon { font-size: 28px; opacity: 0.4; animation: twinkle 2s infinite; }
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.2); }
+}
+
+.divination-types, .popular-section, .history-section, .fortune-tellers, .knowledge-section { padding: 16px; }
+
+.section-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 18px; margin: 0 0 16px 0; color: #E8D5C4;
+}
+
+.section-title .icon { font-size: 22px; }
+
+.type-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+.type-card {
+    background: rgba(15, 20, 50, 0.65);
+    border-radius: 20px;
+    padding: 20px 16px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(100, 120, 180, 0.2);
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px;
+    display: flex; flex-direction: column; justify-content: center;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+.type-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa, #c4b5fd);
+    opacity: 0; transition: opacity 0.3s;
+}
+
+.type-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(139, 92, 246, 0.3); border-color: rgba(139, 157, 212, 0.4); }
+.type-card:hover::before { opacity: 1; }
+.type-card:active, .type-card.touched { transform: scale(0.98); }
+
+.type-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+.type-card h4 { margin: 0 0 6px 0; font-size: 15px; font-weight: 700; color: #E8D5C4; }
+.type-card p { margin: 0 0 10px 0; font-size: 12px; color: #C4D4E8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; }
+
+.type-price {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 13px; color: #A78BFA; font-weight: 600;
+    background: rgba(139, 92, 246, 0.2); padding: 4px 10px; border-radius: 12px; align-self: center;
+}
+
+.popular-list, .history-list { display: flex; flex-direction: column; gap: 12px; }
+
+.popular-item, .history-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px; background: rgba(15, 20, 50, 0.65); border-radius: 16px;
+    cursor: pointer; box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+    transition: all 0.2s; -webkit-tap-highlight-color: transparent; min-height: 44px;
+    border: 1px solid rgba(100, 120, 180, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+.popular-item:hover, .history-item:hover { background: rgba(20, 25, 60, 0.85); transform: translateX(4px); }
+.popular-item:active, .history-item:active { transform: scale(0.98); }
+
+.popular-icon {
+    width: 50px; height: 50px; background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0;
+}
+
+.popular-info, .history-content { flex: 1; min-width: 0; }
+.popular-info h4, .history-content h4 { margin: 0 0 4px 0; font-size: 15px; font-weight: 600; color: #E8D5C4; }
+.popular-info p, .history-question { margin: 0; font-size: 13px; color: #C4D4E8; }
+.history-question { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
+.history-date { font-size: 11px; color: #A0A8C0; }
+.popular-responses { font-size: 12px; color: #C4A0E0; font-weight: 500; white-space: nowrap; }
+
+.history-icon {
+    width: 50px; height: 50px; background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+}
+
+.result-indicator { display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+.result-indicator.good { background: rgba(209, 250, 229, 0.2); color: #6EE7B7; border: 1px solid rgba(110, 231, 183, 0.3); }
+.result-indicator.bad { background: rgba(254, 226, 226, 0.2); color: #FCA5A5; border: 1px solid rgba(252, 165, 165, 0.3); }
+.result-indicator.neutral { background: rgba(254, 243, 199, 0.2); color: #FDE68A; border: 1px solid rgba(253, 230, 138, 0.3); }
+
+.tellers-scroll { display: flex; gap: 14px; overflow-x: auto; padding: 4px 0 12px; -webkit-overflow-scrolling: touch; }
+.tellers-scroll::-webkit-scrollbar { display: none; }
+
+.teller-card {
+    display: flex; flex-direction: column; align-items: center; min-width: 90px;
+    padding: 16px 12px; background: rgba(15, 20, 50, 0.65); border-radius: 16px;
+    cursor: pointer; box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+    transition: all 0.2s; -webkit-tap-highlight-color: transparent; min-height: 44px;
+    border: 1px solid rgba(100, 120, 180, 0.15);
+    outline: none; font-family: inherit; -webkit-appearance: none; appearance: none;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+.teller-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25); border-color: rgba(139, 157, 212, 0.3); }
+.teller-card:active { transform: scale(0.95); }
+
+.teller-avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin-bottom: 8px;
+    background: linear-gradient(135deg, rgba(196, 181, 253, 0.4), rgba(167, 139, 250, 0.4));
+    border: 2px solid rgba(196, 181, 253, 0.3);
+}
+
+.teller-name { font-size: 14px; font-weight: 600; color: #E8D5C4; margin-bottom: 2px; }
+.teller-specialty { font-size: 11px; color: #A0A8C0; }
+
+.knowledge-cards { display: flex; flex-direction: column; gap: 12px; }
+.knowledge-card { display: flex; gap: 14px; padding: 16px; background: rgba(15, 20, 50, 0.65); border-radius: 16px; box-shadow: 0 2px 15px rgba(0,0,0,0.2); border: 1px solid rgba(100, 120, 180, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+.tip-icon { font-size: 32px; flex-shrink: 0; }
+.knowledge-card h4 { margin: 0 0 6px 0; font-size: 15px; font-weight: 600; color: #E8D5C4; }
+.knowledge-card p { margin: 0; font-size: 13px; color: #C4D4E8; line-height: 1.6; }
+
+/* 占卜历史文化版块 */
+.culture-section { padding: 16px; }
+
+.culture-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.culture-card {
+    background: rgba(15, 20, 50, 0.65);
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid rgba(100, 120, 180, 0.2);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.culture-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.culture-icon { font-size: 28px; margin-bottom: 8px; }
+.culture-card h4 { margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #E8D5C4; }
+.culture-card p { margin: 0; font-size: 11px; color: #C4D4E8; line-height: 1.5; }
+
+.culture-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(2, 5, 21, 0.9); display: none; align-items: center;
+    z-index: 1002; backdrop-filter: blur(10px);
+}
+.culture-modal.active { display: flex; }
+
+.culture-modal-content {
+    background: rgba(15, 20, 50, 0.98); border-radius: 20px; width: 90%; max-width: 500px;
+    max-height: 85vh; overflow-y: auto; margin: 0 auto; padding: 24px;
+    border: 1px solid rgba(100, 120, 180, 0.3);
+}
+.culture-modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.culture-modal-icon { font-size: 36px; }
+.culture-modal-title { font-size: 18px; font-weight: 600; color: #E8D5C4; }
+.culture-modal-body { color: #C4D4E8; font-size: 14px; line-height: 1.8; }
+.culture-modal-body p { margin-bottom: 12px; }
+.culture-modal-body strong { color: #C4B5FD; }
+.culture-close {
+    width: 32px; height: 32px; border: none; background: rgba(60, 70, 100, 0.5);
+    border-radius: 50%; font-size: 18px; cursor: pointer; margin-left: auto;
+    display: flex; align-items: center; justify-content: center; color: #C4D4E8;
+}
+
+
+.type-card-mystic-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(139, 92, 246, 0.3); border: none;
+    border-radius: 8px; padding: 4px 8px; font-size: 10px;
+    color: #C4B5FD; cursor: pointer; transition: all 0.2s;
+    opacity: 0; z-index: 2;
+}
+.type-card:hover .type-card-mystic-btn { opacity: 1; }
+.type-card-mystic-btn:hover {
+    background: rgba(139, 92, 246, 0.5); transform: scale(1.05);
+}
+
+
+.type-card-mystic-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(139, 92, 246, 0.3); border: none;
+    border-radius: 8px; padding: 4px 8px; font-size: 10px;
+    color: #C4B5FD; cursor: pointer; transition: all 0.2s;
+    opacity: 0; z-index: 2;
+}
+.type-card:hover .type-card-mystic-btn { opacity: 1; }
+.type-card-mystic-btn:hover {
+    background: rgba(139, 92, 246, 0.5); transform: scale(1.05);
+}
+
+@media (min-width: 768px) {
+    .culture-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+    .culture-card {
+        padding: 20px;
+    }
+}
+
+/* Modal Styles */
+.divination-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(2, 5, 21, 0.85); display: none; align-items: flex-end;
+    z-index: 1000; backdrop-filter: blur(8px);
+}
+.divination-modal.active { display: flex; }
+
+.modal-content {
+    background: rgba(15, 20, 50, 0.95); border-radius: 24px 24px 0 0; width: 100%;
+    max-height: 92vh; overflow-y: auto; animation: slideUp 0.3s ease;
+    border: 1px solid rgba(100, 120, 180, 0.2);
+    backdrop-filter: blur(20px);
+}
+
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 20px; border-bottom: 1px solid rgba(100, 120, 180, 0.15);
+    position: sticky; top: 0; background: rgba(15, 20, 50, 0.95); z-index: 10;
+}
+
+.modal-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: #E8D5C4; }
+
+.modal-close {
+    width: 32px; height: 32px; border: none; background: rgba(60, 70, 100, 0.5);
+    border-radius: 50%; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #C4D4E8;
+}
+
+.modal-body { padding: 20px; }
+
+/* Step Indicator */
+.step-indicator { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
+.step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(100, 120, 180, 0.3); transition: all 0.3s; }
+.step-dot.active { width: 24px; border-radius: 4px; background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+/* Step Content */
+.step-content { display: none; }
+.step-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Type Info Display */
+.type-info-display {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px; background: linear-gradient(135deg, rgba(107, 91, 149, 0.3), rgba(139, 92, 246, 0.2));
+    border-radius: 16px; margin-bottom: 20px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+.type-info-display .icon { font-size: 36px; }
+.type-info-display h4 { margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #E8D5C4; }
+.type-info-display p { margin: 0; font-size: 13px; color: #C4D4E8; }
+
+/* Type Selector */
+.type-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+.type-option {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 14px 8px; background: rgba(15, 20, 50, 0.6); border: 2px solid rgba(100, 120, 180, 0.2);
+    border-radius: 12px; cursor: pointer; transition: all 0.2s;
+    min-height: 44px; justify-content: center;
+}
+.type-option.selected { background: rgba(139, 92, 246, 0.2); border-color: #8b5cf6; }
+.type-option .icon { font-size: 20px; }
+.type-option .name { font-size: 12px; color: #C4D4E8; }
+.type-option.selected .name { color: #C4B5FD; font-weight: 600; }
+
+/* Zodiac Grid */
+.zodiac-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+.zodiac-option {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 12px 4px; background: rgba(15, 20, 50, 0.6); border: 2px solid rgba(100, 120, 180, 0.2);
+    border-radius: 12px; cursor: pointer; transition: all 0.2s;
+    min-height: 44px; justify-content: center;
+}
+.zodiac-option.selected { background: rgba(254, 243, 199, 0.15); border-color: #F59E0B; }
+.zodiac-option .icon { font-size: 24px; }
+.zodiac-option .name { font-size: 10px; color: #C4D4E8; }
+
+/* Question Input */
+.question-input {
+    width: 100%; padding: 14px; border: 1px solid rgba(100, 120, 180, 0.25);
+    border-radius: 12px; font-size: 15px; resize: none; font-family: inherit; margin-bottom: 16px;
+    background: rgba(10, 15, 40, 0.6); color: #E8E0F0;
+}
+.question-input:focus { outline: none; border-color: rgba(139, 92, 246, 0.5); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15); }
+
+.question-tips { background: rgba(254, 243, 199, 0.1); border-radius: 12px; padding: 14px; margin-bottom: 20px; border: 1px solid rgba(254, 243, 199, 0.15); }
+.tip-header { font-size: 13px; font-weight: 600; color: #FDE68A; margin-bottom: 6px; }
+.question-tips p { margin: 0; font-size: 13px; color: #E8D5C4; font-style: italic; }
+
+/* Start Button */
+.start-btn {
+    width: 100%; padding: 16px; background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 8px; transition: all 0.3s; min-height: 48px;
+}
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
+.start-btn:active { transform: scale(0.98); }
+
+/* ========================================
+   ADVANCED CRYSTAL BALL - Premium Version
+   ======================================== */
+
+/* Main Container */
+.divination-animation { text-align: center; padding: 40px 0; }
+
+.crystal-ball-container { 
+    position: relative; 
+    width: 140px; 
+    height: 160px; 
+    margin: 0 auto 30px; 
+}
+
+/* Outer Glow Effect */
+.crystal-glow {
+    position: absolute; 
+    top: 0; 
+    left: 50%; 
+    transform: translateX(-50%);
+    width: 160px; 
+    height: 160px; 
+    background: radial-gradient(ellipse at center, 
+        rgba(168, 85, 247, 0.4) 0%, 
+        rgba(139, 92, 246, 0.2) 30%, 
+        rgba(236, 72, 153, 0.1) 60%,
+        transparent 80%);
+    filter: blur(10px);
+    animation: glowPulse 2s ease-in-out infinite;
+    z-index: 0;
+}
+
+@keyframes glowPulse { 
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 1; } 
+    50% { transform: translateX(-50%) scale(1.15); opacity: 0.7; } 
+}
+
+/* Crystal Sphere */
+.crystal-sphere {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: 
+        radial-gradient(ellipse at 30% 30%, 
+            rgba(192, 132, 252, 0.6) 0%, 
+            rgba(168, 85, 247, 0.4) 20%,
+            transparent 50%),
+        radial-gradient(ellipse at 50% 50%,
+            rgba(30, 20, 60, 0.9) 0%,
+            rgba(60, 40, 100, 0.7) 30%,
+            rgba(100, 70, 160, 0.5) 60%,
+            rgba(139, 92, 246, 0.3) 80%,
+            rgba(168, 85, 247, 0.2) 100%);
+    box-shadow: 
+        0 0 30px rgba(168, 85, 247, 0.5),
+        inset 0 0 20px rgba(192, 132, 252, 0.3),
+        inset 0 -20px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: sphereFloat 3s ease-in-out infinite;
+    z-index: 1;
+}
+
+@keyframes sphereFloat {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* Glass Reflection / Highlight */
+.crystal-sphere::before {
+    content: '';
+    position: absolute;
+    top: 12%;
+    left: 15%;
+    width: 35%;
+    height: 25%;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.6) 0%, 
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%);
+    border-radius: 50%;
+    filter: blur(2px);
+}
+
+/* Secondary highlight */
+.crystal-sphere::after {
+    content: '';
+    position: absolute;
+    top: 20%;
+    right: 20%;
+    width: 15%;
+    height: 10%;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    filter: blur(1px);
+}
+
+/* Mystical particles inside sphere */
+.sphere-particles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    animation: rotateParticle 4s linear infinite;
+    z-index: 1;
+}
+
+.sphere-particles::before {
+    content: '✦';
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: rgba(255, 215, 0, 0.8);
+    animation: twinkle 1.5s ease-in-out infinite;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.sphere-particles::after {
+    content: '✧';
+    position: absolute;
+    bottom: 15%;
+    right: 20%;
+    font-size: 6px;
+    color: rgba(192, 132, 252, 0.8);
+    animation: twinkle 1.8s ease-in-out infinite reverse;
+    text-shadow: 0 0 5px rgba(192, 132, 252, 0.5);
+}
+
+@keyframes rotateParticle {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+}
+
+/* Premium Stand */
+.crystal-stand {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 45px;
+    z-index: 2;
+}
+
+/* Stand top ring */
+.stand-ring {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 15px;
+    background: linear-gradient(180deg, 
+        #D4AF37 0%, 
+        #FFD700 20%,
+        #B8860B 60%,
+        #8B7355 100%);
+    border-radius: 50%;
+    box-shadow: 
+        0 2px 5px rgba(0, 0, 0, 0.3),
+        inset 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Stand neck */
+.stand-neck {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(90deg,
+        #8B7355 0%,
+        #D4AF37 30%,
+        #FFD700 50%,
+        #D4AF37 70%,
+        #8B7355 100%);
+    clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+}
+
+/* Stand base */
+.stand-base {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 18px;
+    background: linear-gradient(180deg,
+        #FFD700 0%,
+        #D4AF37 20%,
+        #B8860B 60%,
+        #8B7355 100%);
+    border-radius: 50%;
+    box-shadow: 
+        0 3px 8px rgba(0, 0, 0, 0.4),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+/* Base decorative gem */
+.stand-gem {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle at 30% 30%,
+        #E066FF 0%,
+        #9932CC 50%,
+        #4B0082 100%);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 8px rgba(153, 50, 204, 0.6),
+        inset 0 0 4px rgba(255, 255, 255, 0.3);
+    animation: gemGlow 2s ease-in-out infinite;
+}
+
+@keyframes gemGlow {
+    0%, 100% { box-shadow: 0 0 8px rgba(153, 50, 204, 0.6), inset 0 0 4px rgba(255, 255, 255, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(153, 50, 204, 0.8), inset 0 0 6px rgba(255, 255, 255, 0.5); }
+}
+
+/* Ambient sparkles around the ball */
+.crystal-sparkles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.sparkle {
+    position: absolute;
+    font-size: 10px;
+    animation: sparkleFloat 3s ease-in-out infinite;
+}
+
+.sparkle:nth-child(1) { top: 15%; left: 5%; animation-delay: 0s; }
+.sparkle:nth-child(2) { top: 25%; right: 8%; animation-delay: 0.5s; }
+.sparkle:nth-child(3) { top: 60%; left: 3%; animation-delay: 1s; }
+.sparkle:nth-child(4) { top: 70%; right: 5%; animation-delay: 1.5s; }
+
+.sparkle::before {
+    content: '✦';
+    color: rgba(255, 215, 0, 0.8);
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes sparkleFloat {
+    0%, 100% { opacity: 0.3; transform: translateY(0) scale(1); }
+    50% { opacity: 1; transform: translateY(-8px) scale(1.3); }
+}
+
+.tarot-cards { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+
+.tarot-card-anim { font-size: 32px; animation: floatCard 2s ease-in-out infinite; }
+.tarot-card-anim:nth-child(2) { animation-delay: 0.3s; }
+.tarot-card-anim:nth-child(3) { animation-delay: 0.6s; }
+
+@keyframes floatCard { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+
+.loading-text { font-size: 16px; color: #A0A8C0; }
+.loading-dots span { animation: blink 1.4s infinite both; }
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
+
+/* Result Display */
+.result-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+
+.result-icon {
+    width: 64px; height: 64px; background: linear-gradient(135deg, rgba(254, 243, 199, 0.3), rgba(253, 230, 138, 0.3));
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px;
+    border: 2px solid rgba(253, 230, 138, 0.3);
+}
+
+.result-title { flex: 1; }
+.result-title h4 { margin: 0 0 6px 0; font-size: 20px; font-weight: 700; color: #E8D5C4; }
+
+.result-label { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; }
+.result-label.good { background: rgba(209, 250, 229, 0.2); color: #6EE7B7; border: 1px solid rgba(110, 231, 183, 0.3); }
+.result-label.neutral { background: rgba(254, 243, 199, 0.2); color: #FDE68A; border: 1px solid rgba(253, 230, 138, 0.3); }
+.result-label.bad { background: rgba(254, 226, 226, 0.2); color: #FCA5A5; border: 1px solid rgba(252, 165, 165, 0.3); }
+
+.result-main { background: rgba(15, 20, 50, 0.6); border-radius: 16px; padding: 18px; margin-bottom: 16px; border: 1px solid rgba(100, 120, 180, 0.15); }
+.result-main h5 { margin: 0 0 10px 0; font-size: 14px; color: #A0A8C0; }
+.result-main p { margin: 0; font-size: 15px; color: #C4D4E8; line-height: 1.7; }
+
+.result-cards { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+
+.result-card {
+    flex: 1; min-width: 80px; display: flex; flex-direction: column;
+    align-items: center; padding: 12px; background: linear-gradient(135deg, rgba(107, 91, 149, 0.3), rgba(139, 92, 246, 0.2)); border-radius: 12px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+.result-card .card-icon { font-size: 28px; margin-bottom: 4px; }
+.result-card .card-name { font-size: 13px; font-weight: 600; color: #C4B5FD; text-align: center; }
+
+.result-advice { background: rgba(254, 243, 199, 0.1); border-radius: 16px; padding: 18px; margin-bottom: 20px; border: 1px solid rgba(254, 243, 199, 0.15); }
+.result-advice h5 { margin: 0 0 8px 0; font-size: 14px; color: #FDE68A; }
+.result-advice p { margin: 0; font-size: 14px; color: #E8D5C4; line-height: 1.6; }
+
+.result-actions { display: flex; gap: 12px; }
+
+.action-btn {
+    flex: 1; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 6px; transition: all 0.2s; min-height: 48px;
+}
+.action-btn:active { transform: scale(0.98); }
+.action-btn.primary { background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; }
+.action-btn.secondary { background: rgba(60, 70, 100, 0.5); color: #C4D4E8; border: 1px solid rgba(100, 120, 180, 0.2); }
+
+/* Teller Modal */
+.teller-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(2, 5, 21, 0.85); display: none; align-items: flex-end;
+    z-index: 1001; backdrop-filter: blur(8px);
+}
+.teller-modal.active { display: flex; }
+
+.teller-modal-content {
+    background: rgba(15, 20, 50, 0.95); border-radius: 24px 24px 0 0; width: 100%; padding: 24px; animation: slideUp 0.3s ease;
+    border: 1px solid rgba(100, 120, 180, 0.2);
+    backdrop-filter: blur(20px);
+}
+
+.teller-modal-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+
+.teller-modal-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 36px;
+}
+
+.teller-modal-info h3 { margin: 0 0 6px 0; font-size: 20px; font-weight: 700; color: #E8D5C4; }
+
+.teller-modal-specialty {
+    display: inline-block; padding: 4px 10px; background: rgba(139, 92, 246, 0.2);
+    color: #C4B5FD; border-radius: 10px; font-size: 12px; font-weight: 600;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.teller-modal-desc { margin-bottom: 20px; }
+.teller-modal-desc h4 { margin: 0 0 8px 0; font-size: 15px; color: #E8D5C4; }
+.teller-modal-desc p { margin: 0; font-size: 14px; color: #C4D4E8; line-height: 1.6; }
+
+.teller-modal-btn {
+    width: 100%; padding: 16px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(251, 146, 60, 0.9));
+    color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 8px; min-height: 48px;
+}
+.teller-modal-btn:active { transform: scale(0.98); }
+
+/* Toast */
+.toast {
+    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: rgba(15, 20, 50, 0.95); color: #C4D4E8; padding: 14px 24px; border-radius: 12px;
+    font-size: 14px; z-index: 2000; opacity: 0; transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3); text-align: center; max-width: 80%;
+    border: 1px solid rgba(100, 120, 180, 0.2);
+    backdrop-filter: blur(10px);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.hidden { display: none !important; }
+
+/* ========== Desktop Responsive (min-width: 768px) ========== */
+@media (min-width: 768px) {
+    .divination-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-bottom: 40px;
+    }
+    
+    .divination-hero {
+        padding: 80px 40px;
+        border-radius: 0 0 40px 40px;
+    }
+    
+    .hero-icon {
+        font-size: 96px;
+    }
+    
+    .hero-content h1 {
+        font-size: 48px;
+    }
+    
+    .hero-content p {
+        font-size: 20px;
+    }
+    
+    .divination-types, .popular-section, .history-section, .fortune-tellers, .knowledge-section {
+        padding: 32px 40px;
+    }
+    
+    .section-title {
+        font-size: 24px;
+        margin-bottom: 24px;
+    }
+    
+    /* 占卜类型改为3列 */
+    .type-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    
+    .type-card {
+        padding: 28px 20px;
+    }
+    
+    .type-icon {
+        font-size: 52px;
+    }
+    
+    .type-card h4 {
+        font-size: 18px;
+    }
+    
+    /* 热门占卜改为2列 */
+    .popular-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .popular-item {
+        padding: 20px;
+    }
+    
+    /* 占卜师横向展示加大间距 */
+    .tellers-scroll {
+        gap: 20px;
+        padding: 12px 0 20px;
+    }
+    
+    .teller-card {
+        min-width: 120px;
+        padding: 20px 16px;
+    }
+    
+    .teller-avatar {
+        width: 72px;
+        height: 72px;
+        font-size: 36px;
+    }
+    
+    /* 弹窗居中 */
+    .divination-modal {
+        align-items: center;
+    }
+    
+    .modal-content {
+        border-radius: 24px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .teller-modal {
+        align-items: center;
+    }
+    
+    .teller-modal-content {
+        border-radius: 24px;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+    
+    .toast {
+        bottom: auto;
+        top: 100px;
+        transform: translateX(-50%) translateY(-100px);
+    }
+    
+    .toast.show {
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+
+/* 神秘历史弹窗样式 */
+.mystical-history-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(2, 5, 21, 0.95); display: none; align-items: flex-end;
+    z-index: 1003; backdrop-filter: blur(10px);
+}
+.mystical-history-modal.active { display: flex; }
+
+.mystical-history-content {
+    background: linear-gradient(145deg, rgba(15, 12, 35, 0.98), rgba(8, 5, 25, 0.99));
+    border-radius: 24px 24px 0 0; width: 100%; max-height: 90vh; overflow-y: auto;
+    padding: 0; border: 1px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 0 -10px 40px rgba(139, 92, 246, 0.2);
+    animation: slideUp 0.4s ease;
+}
+
+.mystical-history-header-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+    position: sticky; top: 0; background: rgba(15, 12, 35, 0.98); z-index: 10;
+}
+
+.mystical-history-icon { font-size: 28px; }
+.mystical-history-title { font-size: 18px; font-weight: 700; color: #C4B5FD; flex: 1; }
+.mystical-history-close {
+    width: 32px; height: 32px; border: none; background: rgba(139, 92, 246, 0.2);
+    border-radius: 50%; font-size: 18px; cursor: pointer; color: #C4B5FD;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.mystical-history-body { padding: 20px; }
+
+.mystical-history-container {
+    font-family: 'Noto Serif SC', 'SimSun', serif;
+}
+
+.mystical-history-header {
+    text-align: center; margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.mystical-history-header .mystical-icon {
+    font-size: 48px; display: block; margin-bottom: 12px;
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5)); }
+    50% { filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.8)); }
+}
+
+.mystical-history-header h3 {
+    font-size: 22px; color: #E8D5C4; margin: 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.mystical-section {
+    background: rgba(30, 25, 60, 0.5);
+    border-radius: 16px; padding: 18px; margin-bottom: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    position: relative; overflow: hidden;
+}
+
+.mystical-section::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, #8b5cf6, #c4b5fd, #8b5cf6);
+}
+
+.mystical-subtitle {
+    font-size: 15px; color: #C4B5FD; margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+.mystical-text {
+    font-size: 14px; color: #C4D4E8; line-height: 1.9; margin: 0;
+    text-align: justify;
+}
+
+@media (min-width: 768px) {
+    .mystical-history-modal { align-items: center; }
+    .mystical-history-content {
+        border-radius: 24px; max-width: 600px; margin: 0 auto;
+    }
+    .mystical-section { padding: 24px; }
+}
+
+
+
+/* 神秘历史弹窗样式 */
+.mystical-history-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(2, 5, 21, 0.95); display: none; align-items: flex-end;
+    z-index: 1003; backdrop-filter: blur(10px);
+}
+.mystical-history-modal.active { display: flex; }
+
+.mystical-history-content {
+    background: linear-gradient(145deg, rgba(15, 12, 35, 0.98), rgba(8, 5, 25, 0.99));
+    border-radius: 24px 24px 0 0; width: 100%; max-height: 90vh; overflow-y: auto;
+    padding: 0; border: 1px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 0 -10px 40px rgba(139, 92, 246, 0.2);
+    animation: slideUp 0.4s ease;
+}
+
+.mystical-history-header-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+    position: sticky; top: 0; background: rgba(15, 12, 35, 0.98); z-index: 10;
+}
+
+.mystical-history-icon { font-size: 28px; }
+.mystical-history-title { font-size: 18px; font-weight: 700; color: #C4B5FD; flex: 1; }
+.mystical-history-close {
+    width: 32px; height: 32px; border: none; background: rgba(139, 92, 246, 0.2);
+    border-radius: 50%; font-size: 18px; cursor: pointer; color: #C4B5FD;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.mystical-history-body { padding: 20px; }
+
+.mystical-history-container {
+    font-family: 'Noto Serif SC', 'SimSun', serif;
+}
+
+.mystical-history-header {
+    text-align: center; margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.mystical-history-header .mystical-icon {
+    font-size: 48px; display: block; margin-bottom: 12px;
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5)); }
+    50% { filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.8)); }
+}
+
+.mystical-history-header h3 {
+    font-size: 22px; color: #E8D5C4; margin: 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.mystical-section {
+    background: rgba(30, 25, 60, 0.5);
+    border-radius: 16px; padding: 18px; margin-bottom: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    position: relative; overflow: hidden;
+}
+
+.mystical-section::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, #8b5cf6, #c4b5fd, #8b5cf6);
+}
+
+.mystical-subtitle {
+    font-size: 15px; color: #C4B5FD; margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+.mystical-text {
+    font-size: 14px; color: #C4D4E8; line-height: 1.9; margin: 0;
+    text-align: justify;
+}
+
+@media (min-width: 768px) {
+    .mystical-history-modal { align-items: center; }
+    .mystical-history-content {
+        border-radius: 24px; max-width: 600px; margin: 0 auto;
+    }
+    .mystical-section { padding: 24px; }
+}
+
+
+@keyframes galaxyDrift {
+    0% { 
+        background-position: 0% 50%;
+        transform: perspective(1000px) rotateY(0deg) rotateX(5deg) scale(1.2);
+    }
+    25% { 
+        background-position: 30% 30%;
+        transform: perspective(1000px) rotateY(3deg) rotateX(0deg) scale(1.3);
+    }
+    50% { 
+        background-position: 70% 60%;
+        transform: perspective(1000px) rotateY(-2deg) rotateX(-3deg) scale(1.25);
+    }
+    75% { 
+        background-position: 50% 40%;
+        transform: perspective(1000px) rotateY(2deg) rotateX(2deg) scale(1.35);
+    }
+    100% { 
+        background-position: 100% 50%;
+        transform: perspective(1000px) rotateY(0deg) rotateX(5deg) scale(1.2);
+    }
+}
+    25% { background-position: 50% 20%; }
+    50% { background-position: 100% 40%; }
+    75% { background-position: 60% 60%; }
+    100% { background-position: 20% 30%; }
+}
+
+@keyframes galaxyRotate {
+    0% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+    33% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+    66% { transform: scale(0.98) rotate(-1deg); opacity: 0.95; }
+    100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+}
+    50% { transform: scale(1.1) rotate(1deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.divination-hero::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+    animation: galaxyGlow 8s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes galaxyGlow {
+    0% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
+    100% { opacity: 0.3; transform: scale(1); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 闪烁星星容器 -->
+<div class="stars-container" id="starsContainer"></div>
+
+<!-- 流星雨容器 -->
+<div class="meteor-shower" id="meteorShower"></div>
+
+<!-- 浮动光点 -->
+<div class="floating-particles">
+    <div class="particle" style="left:5%"></div><div class="particle" style="left:15%;animation-delay:-4s"></div>
+    <div class="particle" style="left:25%;animation-delay:-8s"></div><div class="particle" style="left:35%"></div>
+    <div class="particle" style="left:45%;animation-delay:-6s"></div><div class="particle" style="left:55%"></div>
+    <div class="particle" style="left:65%;animation-delay:-10s"></div><div class="particle" style="left:75%"></div>
+    <div class="particle" style="left:85%;animation-delay:-3s"></div><div class="particle" style="left:92%"></div>
+</div>
+
+<!-- 流星容器 -->
+<div class="divination-page starry-bg" style="position:relative;z-index:1;">
+    <div class="divination-hero">
+        <div class="hero-decoration">
+            <span class="deco-star">✨</span>
+            <span class="deco-moon">🌙</span>
+            <span class="deco-star">⭐</span>
+        </div>
+        <div class="hero-content">
+            <span class="hero-icon">
+    <svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: float 3s ease-in-out infinite;">
+        <!-- Glow effect -->
+        <defs>
+            <radialGradient id="sphereGrad" cx="35%" cy="35%" r="60%" fx="25%" fy="25%">
+                <stop offset="0%" stop-color="#E0B0FF" stop-opacity="0.8"/>
+                <stop offset="40%" stop-color="#9966CC" stop-opacity="0.6"/>
+                <stop offset="100%" stop-color="#4B0082" stop-opacity="0.9"/>
+            </radialGradient>
+            <radialGradient id="innerGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#DDA0DD" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#8A2BE2" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="standGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#FFD700"/>
+                <stop offset="50%" stop-color="#DAA520"/>
+                <stop offset="100%" stop-color="#B8860B"/>
+            </linearGradient>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+        
+        <!-- Outer glow -->
+        <ellipse cx="48" cy="40" rx="32" ry="32" fill="url(#innerGlow)" opacity="0.5"/>
+        
+        <!-- Crystal sphere -->
+        <circle cx="48" cy="38" r="28" fill="url(#sphereGrad)" filter="url(#glow)"/>
+        
+        <!-- Glass highlights -->
+        <ellipse cx="38" cy="28" rx="10" ry="7" fill="white" opacity="0.4" transform="rotate(-30 38 28)"/>
+        <circle cx="56" cy="32" r="4" fill="white" opacity="0.25"/>
+        
+        <!-- Inner mystical particles -->
+        <circle cx="42" cy="42" r="2" fill="#FFD700" opacity="0.8"/>
+        <circle cx="52" cy="48" r="1.5" fill="#E0B0FF" opacity="0.7"/>
+        <circle cx="46" cy="50" r="1" fill="#FFD700" opacity="0.6"/>
+        
+        <!-- Premium Stand -->
+        <ellipse cx="48" cy="68" rx="18" ry="5" fill="url(#standGrad)"/>
+        <rect x="42" y="62" width="12" height="8" fill="url(#standGrad)"/>
+        <ellipse cx="48" cy="62" rx="16" ry="4" fill="#FFD700"/>
+        
+        <!-- Stand gem -->
+        <circle cx="48" cy="69" r="4" fill="#9932CC"/>
+        <circle cx="47" cy="68" r="1.5" fill="white" opacity="0.4"/>
+    </svg>
+</span>
+            <h1>AI智能占卜</h1>
+            <p>探索你的命运，解锁未来秘密</p>
+        </div>
+    </div>
+
+    <div class="divination-types">
+        <h3 class="section-title"><span class="icon">🎴</span>选择占卜类型</h3>
+        <div class="type-grid">
+            {% for type in divination_types %}
+            <div class="type-card" ontouchend="event.preventDefault();selectType('{{ type.id }}')" onclick="selectType('{{ type.id }}')" data-type="{{ type.id }}">
+                <span class="type-icon">{{ type.icon }}</span>
+                <h4>{{ type.name }}</h4>
+                <p>{{ type.description }}</p>
+                <span class="type-price">{% if type.cost > 0 %}{{ type.cost }}💎{% else %}免费{% endif %}</span>
+                <button class="type-card-mystic-btn" onclick="event.stopPropagation();event.preventDefault();showMysticalHistory('{{ type.id }}')">📜千年秘辛</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="popular-section">
+        <h3 class="section-title"><span class="icon">🔥</span>热门占卜</h3>
+        <div class="popular-list">
+            {% for item in popular_divinations %}
+            <div class="popular-item" ontouchend="event.preventDefault();quickDivination('{{ item.id }}', '{{ item.type }}')" onclick="quickDivination('{{ item.id }}', '{{ item.type }}')" data-type="{{ item.type }}">
+                <div class="popular-icon">{{ item.icon }}</div>
+                <div class="popular-info">
+                    <h4>{{ item.name }}</h4>
+                    <p>{{ item.desc }}</p>
+                </div>
+                <span class="popular-responses">{{ item.responses }}人测过</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if recent_divinations %}
+    <div class="history-section">
+        <h3 class="section-title"><span class="icon">📜</span>最近占卜</h3>
+        <div class="history-list">
+            {% for div in recent_divinations %}
+            <div class="history-item" onclick="viewDivination({{ div.id }})">
+                <div class="history-icon">{{ div.icon }}</div>
+                <div class="history-content">
+                    <h4>{{ div.type_name }}</h4>
+                    <p class="history-question">{{ div.question }}</p>
+                    <span class="history-date">{{ div.date_ago }}</span>
+                </div>
+                <div class="result-indicator {{ div.result }}">{{ div.result_text }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 占卜历史文化版块 -->
+    <div class="culture-section">
+        <h3 class="section-title"><span class="icon">📜</span>占卜的历史与文化</h3>
+        <div class="culture-grid">
+            <div class="culture-card" onclick="showCultureModal(0)">
+                <div class="culture-icon">🏛️</div>
+                <h4>古埃及占卜</h4>
+                <p>公元前3000年，祭司通过天象梦境预测未来</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(1)">
+                <div class="culture-icon">⚡</div>
+                <h4>古希腊神谕</h4>
+                <p>德尔斐神谕，古希腊最重要的占卜中心</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(2)">
+                <div class="culture-icon">☯️</div>
+                <h4>中国易经</h4>
+                <p>群经之首，5000年智慧结晶</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(3)">
+                <div class="culture-icon">🃏</div>
+                <h4>塔罗牌起源</h4>
+                <p>15世纪意大利，18世纪被赋予神秘意义</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(4)">
+                <div class="culture-icon">⭐</div>
+                <h4>星相学传统</h4>
+                <p>巴比伦人最早系统记录星象</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(5)">
+                <div class="culture-icon">🌸</div>
+                <h4>日本阴阳道</h4>
+                <p>平安时代传入，安倍晴明最著名</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(6)">
+                <div class="culture-icon">🌿</div>
+                <h4>凯尔特符文</h4>
+                <p>北欧维京时代的古老占卜系统</p>
+            </div>
+            <div class="culture-card" onclick="showCultureModal(7)">
+                <div class="culture-icon">🕉️</div>
+                <h4>印度占星术</h4>
+                <p>吠陀占星术超过5000年历史</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="fortune-tellers">
+        <h3 class="section-title"><span class="icon">👤</span>AI占卜师</h3>
+        <div class="tellers-scroll">
+            {% for teller in fortune_tellers %}
+            <button class="teller-card" type="button" ontouchend="event.preventDefault();selectTeller('{{ teller.id }}')" onclick="selectTeller('{{ teller.id }}')" data-teller="{{ teller.id }}">
+                <div class="teller-avatar">{{ teller.icon }}</div>
+                <span class="teller-name">{{ teller.name }}</span>
+                <span class="teller-specialty">{{ teller.desc }}</span>
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="knowledge-section">
+        <h3 class="section-title"><span class="icon">📚</span>占卜小知识</h3>
+        <div class="knowledge-cards">
+            {% for tip in knowledge_tips %}
+            <div class="knowledge-card">
+                <span class="tip-icon">{{ tip.icon }}</span>
+                <div class="tip-content">
+                    <h4>{{ tip.title }}</h4>
+                    <p>{{ tip.summary }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- 占卜弹窗 -->
+<div class="divination-modal" id="divinationModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">开始占卜</h3>
+            <button class="modal-close" ontouchend="event.preventDefault();closeDivination()" onclick="closeDivination()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="step-indicator">
+                <div class="step-dot active" data-step="1"></div>
+                <div class="step-dot" data-step="2"></div>
+                <div class="step-dot" data-step="3"></div>
+            </div>
+            
+            <div class="step-content active" id="step1">
+                <div class="type-info-display">
+                    <span class="icon" id="selectedTypeIcon">🔮</span>
+                    <div>
+                        <h4 id="selectedTypeName">塔罗占卜</h4>
+                        <p id="selectedTypeDesc">78张塔罗牌，解读过去现在未来</p>
+                    </div>
+                </div>
+                
+                <div class="type-selector hidden" id="spreadSelector">
+                    <div class="type-option selected" onclick="selectSpread(this, 'single')">
+                        <span class="icon">🃏</span><span class="name">单牌</span>
+                    </div>
+                    <div class="type-option" onclick="selectSpread(this, 'three')">
+                        <span class="icon">🃏🃏</span><span class="name">三牌</span>
+                    </div>
+                    <div class="type-option" onclick="selectSpread(this, 'celtic')">
+                        <span class="icon">🔟</span><span class="name">凯尔特十字</span>
+                    </div>
+                </div>
+                
+                <div class="zodiac-grid hidden" id="zodiacSelector"></div>
+                
+                <textarea class="question-input" id="questionInput" placeholder="请输入你想问的问题，例如：我和他/她未来的关系发展如何？" rows="4"></textarea>
+                
+                <div class="question-tips">
+                    <div class="tip-header">💡 建议</div>
+                    <p id="questionTip">闭上眼睛，深呼吸，让心灵与塔罗牌共鸣...</p>
+                </div>
+                
+                <button class="start-btn" id="startBtn" ontouchend="event.preventDefault();beginDivination()" onclick="beginDivination()">
+                    <span>🔮</span><span>开始占卜</span>
+                </button>
+            </div>
+            
+            <div class="step-content" id="step2">
+                <div class="divination-animation">
+                    <div class="crystal-ball-container">
+                        <div class="crystal-glow"></div>
+                        <div class="crystal-sphere">
+                            <div class="sphere-particles"></div>
+                        </div>
+                        <div class="crystal-stand">
+                            <div class="stand-ring"></div>
+                            <div class="stand-neck"></div>
+                            <div class="stand-base">
+                                <div class="stand-gem"></div>
+                            </div>
+                        </div>
+                        <div class="crystal-sparkles">
+                            <span class="sparkle"></span>
+                            <span class="sparkle"></span>
+                            <span class="sparkle"></span>
+                            <span class="sparkle"></span>
+                        </div>
+                    </div>
+                    <div class="tarot-cards">
+                        <div class="tarot-card-anim">🃏</div>
+                        <div class="tarot-card-anim">🃏</div>
+                        <div class="tarot-card-anim">🃏</div>
+                    </div>
+                    <p class="loading-text">解读中<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></p>
+                </div>
+            </div>
+            
+            <div class="step-content" id="step3">
+                <div class="result-header">
+                    <div class="result-icon" id="resultIcon">🌟</div>
+                    <div class="result-title">
+                        <h4 id="resultTitle">占卜结果</h4>
+                        <span class="result-label good" id="resultLabel">大吉</span>
+                    </div>
+                </div>
+                
+                <div class="result-main">
+                    <h5>📖 解读</h5>
+                    <p id="resultContent">命运之轮正在转动...</p>
+                </div>
+                
+                <div class="result-cards" id="resultCards"></div>
+                
+                <div class="result-advice">
+                    <h5>💡 建议</h5>
+                    <p id="resultAdvice">相信自己的直觉，命运掌握在你手中。</p>
+                </div>
+                
+                <div class="result-actions">
+                    <button class="action-btn secondary" onclick="restartDivination()">
+                        <span>🔄</span><span>再占一次</span>
+                    </button>
+                    <button class="action-btn primary" onclick="shareResult()">
+                        <span>📤</span><span>分享结果</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 占卜师介绍弹窗 -->
+<div class="teller-modal" id="tellerModal">
+    <div class="teller-modal-content">
+        <div class="modal-header" style="border:none;padding:0;margin-bottom:16px;">
+            <button class="modal-close" ontouchend="event.preventDefault();closeTellerModal()" onclick="closeTellerModal()" style="margin-left:auto;">×</button>
+        </div>
+        <div class="teller-modal-header">
+            <div class="teller-modal-avatar" id="tellerModalAvatar">🔮</div>
+            <div class="teller-modal-info">
+                <h3 id="tellerModalName">神秘学家</h3>
+                <span class="teller-modal-specialty" id="tellerModalSpecialty">塔罗牌解读</span>
+            </div>
+        </div>
+        <div class="teller-modal-desc">
+            <h4>💫 关于TA</h4>
+            <p id="tellerModalDesc">一位深谙塔罗奥秘的神秘学家...</p>
+        </div>
+        <div class="teller-modal-desc">
+            <h4>🎯 擅长领域</h4>
+            <p id="tellerModalSkills">塔罗牌、爱情占卜</p>
+        </div>
+        <div class="teller-modal-desc">
+            <h4>✨ 风格特点</h4>
+            <p id="tellerModalStyle">温柔细腻，解读深入</p>
+        </div>
+        <button class="teller-modal-btn" ontouchend="event.preventDefault();startWithTeller()" onclick="startWithTeller()">
+            <span>💕</span><span>找TA占卜</span>
+        </button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 占卜文化详情弹窗 -->
+<!-- 神秘历史详情弹窗 -->
+<div class="mystical-history-modal" id="mysticalHistoryModal">
+    <div class="mystical-history-content">
+        <div class="mystical-history-header-bar">
+            <span class="mystical-history-icon" id="mysticalHistoryIcon">📚</span>
+            <span class="mystical-history-title">千年秘辛</span>
+            <button class="mystical-history-close" onclick="closeMysticalHistory()">×</button>
+        </div>
+        <div class="mystical-history-body" id="mysticalHistoryBody"></div>
+    </div>
+</div>
+
+<!-- 神秘历史详情弹窗 -->
+<div class="mystical-history-modal" id="mysticalHistoryModal">
+    <div class="mystical-history-content">
+        <div class="mystical-history-header-bar">
+            <span class="mystical-history-icon" id="mysticalHistoryIcon">📚</span>
+            <span class="mystical-history-title">千年秘辛</span>
+            <button class="mystical-history-close" onclick="closeMysticalHistory()">×</button>
+        </div>
+        <div class="mystical-history-body" id="mysticalHistoryBody"></div>
+    </div>
+</div>
+
+<div class="culture-modal" id="cultureModal">
+    <div class="culture-modal-content">
+        <div class="culture-modal-header">
+            <span class="culture-modal-icon" id="cultureModalIcon">🏛️</span>
+            <span class="culture-modal-title" id="cultureModalTitle">古埃及占卜</span>
+            <button class="culture-close" onclick="closeCultureModal()">×</button>
+        </div>
+        <div class="culture-modal-body" id="cultureModalBody"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+
+
+<script>
+const typeData = {{ type_data | tojson }};
+
+const tarotCards = [
+    { name: '愚者', meaning: '新的开始、自由、纯真' },
+    { name: '魔术师', meaning: '创造力、意志力、技能' },
+    { name: '女祭司', meaning: '直觉、神秘、智慧' },
+    { name: '女皇', meaning: '丰盛、温柔、母性' },
+    { name: '皇帝', meaning: '权威、秩序、控制' },
+    { name: '教皇', meaning: '信仰、精神指导、传统' },
+    { name: '恋人', meaning: '爱情、选择、和谐' },
+    { name: '战车', meaning: '意志力、胜利、决心' },
+    { name: '命运之轮', meaning: '命运、转变、周期' },
+    { name: '星星', meaning: '希望、灵感、宁静' },
+    { name: '太阳', meaning: '快乐、成功、活力' },
+    { name: '世界', meaning: '完成、成就、整合' }
+];
+
+const zodiacSigns = [
+    { id: 'aries', name: '白羊座', icon: '♈' },
+    { id: 'taurus', name: '金牛座', icon: '♉' },
+    { id: 'gemini', name: '双子座', icon: '♊' },
+    { id: 'cancer', name: '巨蟹座', icon: '♋' },
+    { id: 'leo', name: '狮子座', icon: '♌' },
+    { id: 'virgo', name: '处女座', icon: '♍' },
+    { id: 'libra', name: '天秤座', icon: '♎' },
+    { id: 'scorpio', name: '天蝎座', icon: '♏' },
+    { id: 'sagittarius', name: '射手座', icon: '♐' },
+    { id: 'capricorn', name: '摩羯座', icon: '♑' },
+    { id: 'aquarius', name: '水瓶座', icon: '♒' },
+    { id: 'pisces', name: '双鱼座', icon: '♓' }
+];
+
+const tellerData = {
+    'mystic': { name: '神秘学家', icon: '🔮', specialty: '塔罗解读', gradient: 'linear-gradient(135deg, #667eea, #764ba2)', description: '一位深谙塔罗奥秘的神秘学家，擅长通过塔罗牌解读命运的走向。每一张牌都是命运的低语，让我为你倾听。', skills: '塔罗牌、牌阵解读、命运指引', style: '温柔细腻，解读深入' },
+    'empath': { name: '情感导师', icon: '💝', specialty: '情感分析', gradient: 'linear-gradient(135deg, #f093fb, #f5576c)', description: '专注于情感领域的占卜师，无论是暗恋、恋爱还是婚姻问题，都能给你温暖的指引。你的心，我懂。', skills: '恋爱占卜、暗恋解析、复合指引', style: '温暖治愈，洞察人心' },
+    'astro': { name: '星象师', icon: '⭐', specialty: '星座星盘', gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)', description: '精通星座与星象的占卜师，通过星辰的语言为你解读人生的每一个重要时刻。星辰为你闪耀。', skills: '星座运势、星盘分析、流年运势', style: '浪漫诗意，宏观视角' },
+    'oracle': { name: '命理师', icon: '📜', specialty: '八字命理', gradient: 'linear-gradient(135deg, #fa709a, #fee140)', description: '精通中国传统命理的占卜师，结合八字五行为你分析命运的起伏与机遇。千年智慧，为你指路。', skills: '八字命理、五行分析、运势预测', style: '稳重踏实，实事求是' }
+};
+
+const popularTypeMap = {
+    'reunion': { baseType: 'love', title: '复合占卜', placeholder: '请输入你们的情况，例如：我们分手三个月了，还能复合吗？' },
+    'crush': { baseType: 'love', title: '暗恋占卜', placeholder: '请描述你的暗恋对象，例如：我暗恋的TA对我有感觉吗？' },
+    'fortune': { baseType: 'fortune', title: '每日运势', placeholder: '' },
+    'tarot': { baseType: 'tarot', title: '塔罗占卜', placeholder: '请输入你想问的问题' },
+    'love': { baseType: 'love', title: '恋爱占卜', placeholder: '请描述你的感情困惑' }
+};
+
+const divinationResults = {
+    'tarot': {
+        titles: ['命运之轮转动', '塔罗揭示真相', '牌面显示...'],
+        contents: [
+            '在塔罗的神秘指引下，命运之轮正在为你转动。这是一张充满力量的牌，预示着你即将迎来重要的转折点。过去的努力即将开花结果，保持开放的心态，接纳即将到来的变化。✨',
+            '牌面中出现了一个意想不到的信号。这是一张象征着内心力量的牌，暗示你拥有克服一切困难的能力。无论前方有多少挑战，你都有足够的力量去面对。💪',
+            '塔罗的光芒照亮了你的道路。这段时期，你会遇到能够理解你、支持你的人。他们将成为你生命中重要的存在，带来温暖和希望。🌟'
+        ],
+        advices: ['给自己一些时间和空间来思考，不要急于做决定。', '相信直觉，它会指引你找到正确的方向。', '保持积极的心态，机遇正在向你招手。']
+    },
+    'love': {
+        titles: ['爱神的眷顾', '情感运势解读', '缘分配对中...'],
+        contents: [
+            '爱的能量正在你的生活中涌动。这是一段充满可能性的时期，无论你是单身还是有伴。宇宙正在为你安排最合适的相遇。💕',
+            '牌面显示你正在经历一段深刻的情感旅程。无论当前状况如何，这都是成长和学习的机会。爱不仅仅是拥有，更是理解、包容和支持。🌹',
+            '在感情的世界里，耐心是关键。牌面提示你不要急于求成，真正的缘分需要时间来培养。💝'
+        ],
+        advices: ['敞开心扉，让爱流进来。', '不要害怕表达真实的感受。', '对的人会在对的时间出现。']
+    },
+    'horoscope': {
+        titles: ['星盘解读', '星座运势分析', '星辰的指引...'],
+        contents: [
+            '根据你的星盘分析，太阳、月亮和上升星座共同塑造了今天的你。在这一天，你将感受到来自宇宙的强大能量支持。⭐',
+            '今日的星象对你的影响尤为明显。木星与你的命宫形成良好相位，带来好运和机遇。🌟',
+            '星象显示这是一个充满可能性的时期。月亮的位置为你带来情感上的细腻感受，适合处理感情相关的事务。✨'
+        ],
+        advices: ['顺应星象的指引，把握当下的能量。', '今天适合处理财务事务。', '多与他人交流，会有意外收获。']
+    },
+    'bazi': {
+        titles: ['八字命理', '命盘解析', '命运启示...'],
+        contents: [
+            '根据您的生辰八字，今日天干地支与您命格相合，整体运势较为平稳。事业上有贵人相助，若能把握机会，可有突破。📜',
+            '今日五行之气流通顺畅，运势呈现上升趋势。八字中的用神得位，预示着这一天诸事顺遂。🧘',
+            '命盘显示今日是一个适合沉淀的日子。五行中的水元素能量较强，带来思考和反省的能量。☯️'
+        ],
+        advices: ['今日宜静心养性，不宜急躁。', '注意脾胃健康，饮食规律。', '有意外之财的机会，但不可贪心。']
+    },
+    'fortune': { titles: ['今日运势', '每日星语'], contents: [], advices: [] }
+};
+
+const fortuneData = {
+    'aries': { name: '白羊座', luck: '★★★★☆', love: '今日桃花运不错，单身者有机会遇到心动的对象。', career: '工作上会有新的想法，不妨大胆尝试。', money: '有偏财运，可以关注一下投资机会。', health: '注意休息，避免过度劳累。', color: '红色', number: '7' },
+    'taurus': { name: '金牛座', luck: '★★★☆☆', love: '感情稳定，已有伴侣者适合计划小旅行。', career: '稳扎稳打，不宜冒进。', money: '财务状况良好，适合储蓄。', health: '注意肝脏保养，少熬夜。', color: '绿色', number: '4' },
+    'gemini': { name: '双子座', luck: '★★★★☆', love: '社交运旺盛，容易遇到聊得来的新朋友。', career: '创意十足，适合做策划类工作。', money: '有意外支出，提前做好预算。', health: '心情愉悦，身体状态良好。', color: '黄色', number: '3' },
+    'cancer': { name: '巨蟹座', luck: '★★★★★', love: '家庭运强，与亲人共度美好时光。', career: '得到上级认可，有晋升机会。', money: '正财稳定，偏财一般。', health: '注意保暖，预防感冒。', color: '白色', number: '2' },
+    'leo': { name: '狮子座', luck: '★★★★☆', love: '魅力四射，吸引众人目光。', career: '领导能力得到发挥，适合带领团队。', money: '开销较大，需要控制消费。', health: '精力充沛，但注意不要暴饮暴食。', color: '金色', number: '8' },
+    'virgo': { name: '处女座', luck: '★★★☆☆', love: '感情细腻，注意表达方式。', career: '注重细节，适合技术类工作。', money: '财务精打细算，积少成多。', health: '注意肠胃健康。', color: '棕色', number: '5' },
+    'libra': { name: '天秤座', luck: '★★★★☆', love: '人际和谐，适合处理感情问题。', career: '合作运好，适合谈合作。', money: '有贵人相助，财运上升。', health: '保持平衡，避免极端。', color: '粉色', number: '6' },
+    'scorpio': { name: '天蝎座', luck: '★★★★★', love: '深层情感交流，与伴侣更加亲密。', career: '洞察力强，适合做分析类工作。', money: '投资眼光准确，收益可观。', health: '情绪波动大，需要放松。', color: '黑色', number: '9' },
+    'sagittarius': { name: '射手座', luck: '★★★☆☆', love: '向往自由，可能会有短暂的异地缘分。', career: '有出差或旅行的机会。', money: '消费欲强，需要节制。', health: '户外活动增多，身体更健康。', color: '紫色', number: '1' },
+    'capricorn': { name: '摩羯座', luck: '★★★★☆', love: '感情务实，日久见真情。', career: '事业心强，步步高升。', money: '正财稳定，适合长期投资。', health: '注意颈椎健康，久坐要活动。', color: '灰色', number: '10' },
+    'aquarius': { name: '水瓶座', luck: '★★★★☆', love: '独特的魅力吸引特别的人。', career: '创新思维得到认可。', money: '知识变现的机会增多。', health: '思维活跃，注意休息。', color: '蓝色', number: '11' },
+    'pisces': { name: '双鱼座', luck: '★★★★★', love: '浪漫指数爆表，桃花运旺盛。', career: '艺术灵感爆发，适合创作。', money: '小赌怡情，不要贪心。', health: '容易敏感，注意情绪管理。', color: '海蓝色', number: '12' }
+};
+
+let currentType = null;
+let currentSpread = 'single';
+let currentZodiac = null;
+let selectedTellerId = null;
+let currentQuestion = '';
+
+function selectType(typeId) {
+    // MBTI和解梦跳转到独立页面
+    if (typeId === 'mbti') { window.location.href = '/divination/mbti'; return; }
+    if (typeId === 'dream') { window.location.href = '/divination/dream'; return; }
+    
+    currentType = typeId;
+    const type = typeData.find(t => t.id === typeId);
+    if (!type) { showToast('未知的占卜类型'); return; }
+    
+    document.getElementById('modalTitle').textContent = type.name;
+    document.getElementById('selectedTypeIcon').textContent = type.icon;
+    document.getElementById('selectedTypeName').textContent = type.name;
+    document.getElementById('selectedTypeDesc').textContent = type.description;
+    document.getElementById('questionTip').textContent = getTip(typeId);
+    document.getElementById('questionInput').value = '';
+    
+    document.getElementById('spreadSelector').classList.add('hidden');
+    document.getElementById('zodiacSelector').classList.add('hidden');
+    document.getElementById('questionInput').classList.remove('hidden');
+    document.getElementById('startBtn').classList.remove('hidden');
+    
+    if (typeId === 'tarot') {
+        document.getElementById('spreadSelector').classList.remove('hidden');
+        document.getElementById('questionInput').placeholder = '请输入你想问的问题，例如：我和他/她未来的关系发展如何？';
+    } else if (typeId === 'fortune') {
+        document.getElementById('zodiacSelector').classList.remove('hidden');
+        document.getElementById('questionInput').classList.add('hidden');
+        document.getElementById('startBtn').classList.add('hidden');
+        renderZodiacSelector();
+    } else if (typeId === 'love') {
+        document.getElementById('questionInput').placeholder = '请输入你的感情困惑，例如：我暗恋的人会喜欢我吗？';
+    } else if (typeId === 'horoscope') {
+        document.getElementById('questionInput').placeholder = '请输入你想了解的事情，例如：我的事业发展方向如何？';
+    } else if (typeId === 'bazi') {
+        document.getElementById('questionInput').placeholder = '请描述你的困惑，例如：我今年的运势如何？';
+    }
+    
+    showStep(1);
+    document.getElementById('divinationModal').classList.add('active');
+}
+
+function renderZodiacSelector() {
+    const container = document.getElementById('zodiacSelector');
+    container.innerHTML = zodiacSigns.map(z => 
+        '<div class="zodiac-option" onclick="selectZodiac(\'' + z.id + '\')"><span class="icon">' + z.icon + '</span><span class="name">' + z.name + '</span></div>'
+    ).join('');
+}
+
+function selectZodiac(zodiacId) {
+    currentZodiac = zodiacId;
+    document.querySelectorAll('.zodiac-option').forEach(el => el.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    document.getElementById('startBtn').classList.remove('hidden');
+}
+
+function selectSpread(el, spread) {
+    currentSpread = spread;
+    document.querySelectorAll('#spreadSelector .type-option').forEach(opt => opt.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+function getTip(typeId) {
+    const tips = { 'tarot': '闭上眼睛，深呼吸，让心灵与塔罗牌共鸣...', 'love': '想着那个人的脸庞，感受你内心的声音...', 'horoscope': '回忆你的出生时刻，命运正在书写...', 'bazi': '静心凝神，让古老的智慧为你指引...', 'fortune': '选择一个星座，看看今日运势如何...' };
+    return tips[typeId] || '静心凝神，感受命运的指引...';
+}
+
+function quickDivination(id, type) {
+    const mapped = popularTypeMap[type];
+    if (!mapped) { showToast('未知的占卜类型'); return; }
+    
+    currentType = mapped.baseType;
+    const typeDataItem = typeData.find(t => t.id === mapped.baseType);
+    if (!typeDataItem) { showToast('占卜类型不存在'); return; }
+    
+    document.getElementById('modalTitle').textContent = mapped.title;
+    document.getElementById('selectedTypeIcon').textContent = typeDataItem.icon;
+    document.getElementById('selectedTypeName').textContent = mapped.title;
+    document.getElementById('selectedTypeDesc').textContent = typeDataItem.description;
+    document.getElementById('questionTip').textContent = getTip(mapped.baseType);
+    
+    document.getElementById('spreadSelector').classList.add('hidden');
+    document.getElementById('zodiacSelector').classList.add('hidden');
+    document.getElementById('questionInput').classList.remove('hidden');
+    document.getElementById('startBtn').classList.remove('hidden');
+    
+    if (mapped.baseType === 'fortune') {
+        document.getElementById('zodiacSelector').classList.remove('hidden');
+        document.getElementById('questionInput').classList.add('hidden');
+        document.getElementById('startBtn').classList.add('hidden');
+        renderZodiacSelector();
+    } else if (mapped.baseType === 'tarot') {
+        document.getElementById('spreadSelector').classList.remove('hidden');
+        document.getElementById('questionInput').placeholder = mapped.placeholder || '请输入你想问的问题';
+    } else {
+        document.getElementById('questionInput').placeholder = mapped.placeholder || '请输入你想问的问题';
+    }
+    
+    showStep(1);
+    document.getElementById('divinationModal').classList.add('active');
+}
+
+function selectTeller(tellerId) {
+    selectedTellerId = tellerId;
+    const teller = tellerData[tellerId];
+    if (!teller) { showToast('占卜师不存在'); return; }
+    
+    var avatarEl = document.getElementById('tellerModalAvatar');
+    avatarEl.textContent = teller.icon;
+    avatarEl.style.background = teller.gradient || 'linear-gradient(135deg, #667eea, #764ba2)';
+    document.getElementById('tellerModalName').textContent = teller.name;
+    document.getElementById('tellerModalSpecialty').textContent = teller.specialty;
+    document.getElementById('tellerModalDesc').textContent = teller.description;
+    document.getElementById('tellerModalSkills').textContent = teller.skills;
+    document.getElementById('tellerModalStyle').textContent = teller.style;
+    
+    document.getElementById('tellerModal').classList.add('active');
+    showToast('已选择' + teller.name);
+}
+
+function closeTellerModal() { document.getElementById('tellerModal').classList.remove('active'); }
+
+function startWithTeller() {
+    closeTellerModal();
+    if (selectedTellerId === 'mystic') selectType('tarot');
+    else if (selectedTellerId === 'empath') selectType('love');
+    else if (selectedTellerId === 'astro') selectType('horoscope');
+    else if (selectedTellerId === 'oracle') selectType('bazi');
+}
+
+function beginDivination() {
+    if (currentType === 'fortune' && !currentZodiac) { showToast('请先选择你的星座'); return; }
+    
+    const question = document.getElementById('questionInput').value.trim();
+    if (currentType !== 'fortune' && !question) { showToast('请输入你想问的问题'); return; }
+    
+    currentQuestion = question;
+    showStep(2);
+    
+    const animIcon = document.getElementById('animIcon');
+    if (currentType === 'love') animIcon.textContent = '💕';
+    else if (currentType === 'fortune' || currentType === 'horoscope') animIcon.textContent = '⭐';
+    else if (currentType === 'bazi') animIcon.textContent = '📜';
+    else animIcon.textContent = '🔮';
+    
+    setTimeout(() => { showResult(currentQuestion); }, 3000);
+}
+
+function showStep(step) {
+    document.querySelectorAll('.step-dot').forEach(dot => { dot.classList.toggle('active', parseInt(dot.dataset.step) === step); });
+    document.querySelectorAll('.step-content').forEach(content => { content.classList.remove('active'); });
+    document.getElementById('step' + step).classList.add('active');
+}
+
+function showResult(question) {
+    showStep(3);
+    if (currentType === 'fortune') showFortuneResult();
+    else showGeneralResult();
+}
+
+function showGeneralResult() {
+    const results = divinationResults[currentType] || divinationResults['tarot'];
+    const randomIndex = Math.floor(Math.random() * results.titles.length);
+    const icons = { 'tarot': ['🃏', '🎴', '🔮'], 'love': ['💕', '❤️', '💘'], 'horoscope': ['⭐', '🌟', '✨'], 'bazi': ['📜', '🔢', '🧘'] };
+    const icons_arr = icons[currentType] || ['🌟'];
+    
+    let cardsHtml = '';
+    if (currentType === 'tarot') {
+        const cardCount = currentSpread === 'single' ? 1 : currentSpread === 'three' ? 3 : 5;
+        for (let i = 0; i < cardCount; i++) {
+            const card = tarotCards[Math.floor(Math.random() * tarotCards.length)];
+            const isReversed = Math.random() > 0.7;
+            cardsHtml += '<div class="result-card"><span class="card-icon">' + (isReversed ? '🔄' : '🃏') + '</span><span class="card-name">' + card.name + (isReversed ? ' (逆位)' : '') + '</span></div>';
+        }
+    }
+    
+    document.getElementById('resultIcon').textContent = icons_arr[Math.floor(Math.random() * icons_arr.length)];
+    document.getElementById('resultTitle').textContent = results.titles[randomIndex];
+    
+    const labels = ['大吉 ✨', '中吉 🌟', '小吉 🌸', '吉 ☀️'];
+    const labelClass = randomIndex < 2 ? 'good' : randomIndex < 4 ? 'neutral' : 'good';
+    document.getElementById('resultLabel').textContent = labels[Math.floor(Math.random() * labels.length)];
+    document.getElementById('resultLabel').className = 'result-label ' + labelClass;
+    
+    document.getElementById('resultContent').textContent = results.contents[randomIndex];
+    document.getElementById('resultCards').innerHTML = cardsHtml;
+    document.getElementById('resultAdvice').textContent = '💡 ' + results.advices[randomIndex];
+}
+
+function showFortuneResult() {
+    const fortune = fortuneData[currentZodiac];
+    if (!fortune) { showToast('运势数据加载失败'); return; }
+    
+    document.getElementById('resultIcon').textContent = zodiacSigns.find(z => z.id === currentZodiac).icon;
+    document.getElementById('resultTitle').textContent = fortune.name + ' 今日运势';
+    document.getElementById('resultLabel').textContent = '综合指数: ' + fortune.luck;
+    document.getElementById('resultLabel').className = 'result-label good';
+    
+    const content = '💕 爱情运势: ' + fortune.love + '\n\n💼 事业运势: ' + fortune.career + '\n\n💰 财富运势: ' + fortune.money + '\n\n💪 健康运势: ' + fortune.health + '\n\n🌈 幸运颜色: ' + fortune.color + '\n🔢 幸运数字: ' + fortune.number;
+    
+    document.getElementById('resultContent').textContent = content;
+    document.getElementById('resultCards').innerHTML = '';
+    document.getElementById('resultAdvice').textContent = '✨ 今天的你运势不错！记得保持积极乐观的心态，把握身边的机遇。';
+}
+
+function closeDivination() {
+    document.getElementById('divinationModal').classList.remove('active');
+    currentType = null; currentZodiac = null; currentQuestion = '';
+}
+
+function restartDivination() {
+    document.getElementById('questionInput').value = '';
+    showStep(1);
+}
+
+function shareResult() {
+    const resultContent = document.getElementById('resultContent').textContent;
+    const resultTitle = document.getElementById('resultTitle').textContent;
+    const shareText = '🔮 我的占卜结果\n\n【' + resultTitle + '】\n\n' + resultContent + '\n\n——\n来自 SoulLink 灵犀\n命运的指引，源于心与心的连接 ✨';
+    
+    if (navigator.share) {
+        navigator.share({ title: '我的占卜结果 - SoulLink灵犀', text: shareText }).catch(() => { copyToClipboard(shareText); });
+    } else { copyToClipboard(shareText); }
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => { showToast('结果已复制到剪贴板 ✨'); }).catch(() => { showToast('分享功能暂时不可用'); });
+}
+
+function viewDivination(id) { showToast('正在加载历史记录...'); }
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); }, 2500);
+}
+
+// 占卜历史文化数据
+const cultureData = [
+    {
+        icon: '🏛️',
+        title: '古埃及占卜',
+        content: `<p>古埃及占卜术是人类历史上最古老的预言形式之一，起源于<strong>公元前3000年</strong>的法老时代。</p>
+<p><strong>核心特点：</strong></p>
+<p>• <strong>天象观测</strong>：祭司们通过观察太阳、月亮、星辰的位置和运动来预测未来</p>
+<p>• <strong>梦之仪式</strong>：求卜者在伊西斯神殿中入睡，期望神明在梦中给予指引</p>
+<p>• <strong>动物内脏占卜</strong>（Hepatoscopy）：观察动物肝脏的形状和纹理来判断凶吉</p>
+<p>• <strong>纸莎草占卜</strong>：使用特殊的草纸和神秘符号进行占卜</p>
+<p><strong>历史地位：</strong></p>
+<p>伊西斯神殿被誉为最著名的占卜圣地，吸引来自地中海各地的求卜者。这种神秘的传统深刻影响了后来的希腊罗马占卜术。</p>`
+    },
+    {
+        icon: '⚡',
+        title: '古希腊神谕',
+        content: `<p>古希腊神谕是西方文明中最重要的占卜传统，<strong>德尔斐神谕</strong>被认为是古希腊最重要的占卜中心。</p>
+<p><strong>德尔斐神谕的运作：</strong></p>
+<p>• <strong>皮提亚</strong>（Pythia）是德尔斐神庙的女祭司，她被认为能传递阿波罗神的神谕</p>
+<p>• 她会吸入地裂中逸出的神秘气体，进入通灵状态</p>
+<p>• 祭司们将她的呓语翻译成诗句，这就是著名的德尔斐预言</p>
+<p><strong>历史影响：</strong></p>
+<p>苏格拉底曾说<strong>"认识你自己"</strong>——这句铭刻在德尔斐神庙上的箴言，正是神谕核心理念的体现。亚历山大大帝每次出征前都会亲赴德尔斐求取神谕。</p>
+<p>神谕存在了超过800年，直到公元390年才被罗马皇帝关闭。</p>`
+    },
+    {
+        icon: '☯️',
+        title: '中国易经',
+        content: `<p>《易经》是中华文化的智慧源头，距今已有<strong>超过5000年</strong>的历史，被誉为<strong>"群经之首，大道之源"</strong>。</p>
+<p><strong>历史传承：</strong></p>
+<p>• <strong>伏羲画八卦</strong>：传说伏羲观察天地万物，画出八个基本卦象</p>
+<p>• <strong>文王演周易</strong>：周文王被囚禁时推演六十四卦，赋予卦辞和爻辞</p>
+<p>• <strong>孔子作传</strong>：孔子晚年喜读《易经》，<strong>"韦编三绝"</strong>的典故流传至今</p>
+<p><strong>世界影响：</strong></p>
+<p>德国哲学家<strong>莱布尼茨</strong>受易经八卦启发，发明了二进制数学，这成为现代计算机的基础。荣格称易经是<strong>"共时性原理"</strong>的完美体现。</p>`
+    },
+    {
+        icon: '🃏',
+        title: '塔罗牌起源',
+        content: `<p>塔罗牌起源于<strong>15世纪的意大利</strong>，最初只是贵族间流行的娱乐纸牌游戏。</p>
+<p><strong>发展历程：</strong></p>
+<p>• <strong>15世纪</strong>：作为一种名为"Triumphs"的纸牌游戏在意大利贵族中流行</p>
+<p>• <strong>18世纪</strong>：法国神秘学家<strong>安托万·库尔·德·热贝林</strong>首次赋予塔罗牌占卜意义</p>
+<p>• <strong>19-20世纪</strong>：金色黎明等神秘主义组织发展出完整的塔罗理论体系</p>
+<p><strong>牌卡结构：</strong></p>
+<p>• <strong>78张牌</strong>：22张大阿卡纳（Major Arcana）+ 56张小阿卡纳（Minor Arcana）</p>
+<p>• <strong>大阿卡纳</strong>代表人生重大主题：从"愚者"的纯真到"世界"的完成</p>
+<p>• <strong>"愚者之旅"</strong>象征灵魂在物质世界的成长与觉醒</p>`
+    },
+    {
+        icon: '⭐',
+        title: '星相学传统',
+        content: `<p>星相学（占星术）是人类最古老的预言系统之一，<strong>巴比伦人</strong>最早在公元前2000年开始系统记录星象。</p>
+<p><strong>东西方星象发展：</strong></p>
+<p>• <strong>巴比伦</strong>：建立黄道十二宫雏形，发展出系统的星象观测</p>
+<p>• <strong>希腊罗马</strong>：托勒密的《占星四书》奠定了西方占星术的理论基础</p>
+<p>• <strong>中国</strong>：发展出独特的<strong>"二十八宿"</strong>体系，与西方黄道十二宫殊途同归</p>
+<p><strong>科学史上的占星：</strong></p>
+<p>开普勒既是天文学家也是占星师，他说：<strong>"占星学是女儿，天文学是母亲"</strong>。牛顿在研究炼金术和神学的时间远多于研究物理学和数学。</p>
+<p>今天的西方占星术使用的回归黄道系统，与天文学的黄道十二宫有微小差异。</p>`
+    },
+    {
+        icon: '🌸',
+        title: '日本阴阳道',
+        content: `<p>阴阳道是日本平安时代从中国传入的神秘学体系，融合了中国阴阳五行学说与日本本土神道教。</p>
+<p><strong>历史渊源：</strong></p>
+<p>• <strong>飞鸟时代</strong>：通过遣唐使从中国引入阴阳五行思想</p>
+<p>• <strong>平安时代</strong>：阴阳道成为日本贵族社会的必修学问</p>
+<p>• <strong>镰仓室町</strong>：与佛教融合，形成独特的日本密教体系</p>
+<p><strong>核心人物：</strong></p>
+<p><strong>安倍晴明</strong>（921-1005）是最著名的阴阳师，他活跃于平安贵族社会，据传能操控式神、占卜吉凶。他的故事被大量文学、影视作品改编，至今仍是日本文化的重要符号。</p>
+<p><strong>现代传承：</strong></p>
+<p>阴阳道对日本文化影响深远：占卜、驱邪、历法制定等职能延续至今。</p>`
+    },
+    {
+        icon: '🌿',
+        title: '凯尔特符文',
+        content: `<p>凯尔特符文是北欧维京时代的古老占卜系统，由<strong>24个符文</strong>组成，每个符文都有独特的含义和能量。</p>
+<p><strong>神话起源：</strong></p>
+<p>根据北欧神话，<strong>奥丁</strong>为获得符文的智慧，将自己<strong>倒吊在世界树上九天九夜</strong>，献祭自己的一只眼睛，终于领悟了卢恩文字的奥秘。</p>
+<p><strong>符文特点：</strong></p>
+<p>• 每个符文都有名字：Fehu（财富）、Uruz（力量）、Ansuz（智慧）...</p>
+<p>• 不仅用于占卜，也用于书写、魔法和祝福</p>
+<p>• 刻在石头、木材、金属上，具有神圣力量</p>
+<p><strong>现代应用：</strong></p>
+<p>现代符文被广泛应用于<strong>冥想、疗愈和自我探索</strong>。许多北欧后裔会在纹身中使用符文作为精神象征。</p>`
+    },
+    {
+        icon: '🕉️',
+        title: '印度占星术',
+        content: `<p>印度占星术（<strong>Jyotish</strong>，音译"尤尤提须"）拥有超过<strong>5000年</strong>的历史，是印度传统文化的重要组成部分。</p>
+<p><strong>与西方占星的区别：</strong></p>
+<p>• <strong>恒星黄道 vs 回归黄道</strong>：印度占星使用恒星黄道，考虑岁差修正</p>
+<p>• <strong>达夏系统</strong>（Dasha）：将人一生分为不同行星统治期，预测各阶段的运势</p>
+<p>• <strong>27 Nakshatra</strong>：月宿系统，比西方的星座更加精细</p>
+<p><strong>文化地位：</strong></p>
+<p>在印度，<strong>婚礼日期、乔迁新居、商业开业</strong>等重大决策都要请教占星师。虽然现代科学无法证实其准确性，但占星文化已深深融入印度人的日常生活。</p>
+<p>许多宝莱坞电影中的经典台词都引用占星术语，显示出其文化影响力。</p>`
+    }
+];
+
+// 每种占卜类型的神秘历史知识
+const mysticalHistoryData = {
+    'tarot': {
+        icon: '🃏',
+        title: '塔罗牌的千年秘辛',
+        sections: [
+            {
+                subtitle: '📜 起源之谜：埃及还是吉普赛？',
+                content: '关于塔罗牌的真正起源，至今仍是学界争论的焦点。传统观点认为，塔罗牌源自古埃及的"透特之书"（The Book of Thoth），由逃亡的埃及祭司在15世纪带入欧洲。然而，18世纪法国学者安托万·库尔·德·热贝林提出了另一种可能：塔罗牌可能源自更古老的神秘传统，与卡巴拉生命之树有着隐秘的联系。\n\n据说，在意大利文艺复兴时期，米兰公爵菲利普·玛丽亚·维斯康蒂是第一个将塔罗牌用于占卜的人。而现在我们熟知的78张塔罗牌结构，则要到18世纪末才完全定型。'
+            },
+            {
+                subtitle: '⚗️ 炼金术与塔罗的隐秘关联',
+                content: '塔罗牌与西方炼金术有着千丝万缕的联系。大阿卡纳的22张牌对应着灵魂觉醒的22个阶段，这与炼金术的"伟大工作"（Opus Magnum）惊人地吻合。\n\n金色黎明（Hermetic Order of the Golden Dawn）是19世纪末最具影响力的神秘主义组织，他们发展出了完整的塔罗理论体系，赋予每张牌以占星、数字和卡巴拉的多重含义。传说中，成员必须经过严格的仪式才能接触塔罗的秘密。'
+            },
+            {
+                subtitle: '👤 传奇占卜师：艾蒂安·罗宾逊',
+                content: '20世纪最著名的塔罗占卜师之一是艾蒂安·罗宾逊，他以精准的预测闻名于世。据说他能在牌阵中"看到"过去、现在和未来的交织画面。\n\n另一位传奇人物是帕梅拉·格林曼·史密斯，她将塔罗牌引入主流文化，著有《塔罗牌图解》一书，使塔罗从神秘主义的秘室走向了大众书店的货架。'
+            },
+            {
+                subtitle: '🔮 牌阵的奥秘：为何是78张？',
+                content: '塔罗牌的78张牌中，22张大阿卡纳代表灵魂的旅程，从"愚者"的纯真到"世界"的完成，象征着人生从无知的起点到智慧圆满的终点。56张小阿卡纳则分为四组：权杖（火）、圣杯（水）、宝剑（风）、星币（土），对应四种生命元素。\n\n据说，78这个数字本身就有神秘力量：7+8=15，而15世纪的塔罗牌最初只有15张用于游戏，后来才发展成完整的78张体系。'
+            }
+        ]
+    },
+    'horoscope': {
+        icon: '⭐',
+        title: '星象学的亘古奥秘',
+        sections: [
+            {
+                subtitle: '🏛️ 巴比伦：星象学的摇篮',
+                content: '人类最早的星象记录来自美索不达米亚平原上的巴比伦人。公元前2000年左右，巴比伦祭司开始系统观测天体运行，发现行星运行与人间大事之间存在神秘关联。\n\n据说，巴比伦国王尼布甲尼撒曾建造"空中花园"，但更重要的是，他们建立了黄道十二宫的雏形——将天空划分为12个区域，每个区域以一种星座命名。这一系统深刻影响了后来古希腊、罗马乃至整个西方的占星传统。'
+            },
+            {
+                subtitle: '📚 托勒密的《占星四书》',
+                content: '公元150年左右，天文学家托勒密完成了《占星四书》（Tetrabiblos），这部著作奠定了西方占星术的理论基础。托勒密认为，天上的星辰确实会影响地上的人类命运，尽管他也承认预测的准确性有限。\n\n有趣的是，托勒密同时也是地心说的集大成者，他的宇宙模型统治西方天文学长达1400年。直到哥白尼革命，人们才逐渐意识到地球并非宇宙的中心。'
+            },
+            {
+                subtitle: '🔭 开普勒：既是天文学家也是占星师',
+                content: '约翰内斯·开普勒发现了行星运动三大定律，被誉为"天空立法者"。然而，这位伟大的天文学家同时也是虔诚的占星师，他为神圣罗马帝国皇帝鲁道夫二世绘制星盘。\n\n开普勒曾说："占星学是女儿，天文学是母亲。如果女儿犯了错，母亲也不应过于苛责。"他相信行星的相位确实会对地球上的事件产生影响，尽管这种影响是通过某种微妙的方式传递的。'
+            },
+            {
+                subtitle: '🔄 行星逆行：古人的误解还是真相？',
+                content: '在古代占星术中，行星逆行被认为是最具影响力的天象之一。当火星逆行时，古代占星师会警告人们避免开始新事业或签订合同。\n\n现代天文学告诉我们，逆行不过是地球与行星相对位置变化造成的视觉现象。然而，许多占星师仍然认为，即使从物理上可以解释，逆行的"能量"仍然具有特殊意义。这或许是古人对宇宙统一性的直觉把握？'
+            }
+        ]
+    },
+    'bazi': {
+        icon: '📜',
+        title: '八字命理的千年传承',
+        sections: [
+            {
+                subtitle: '👤 李虚中：三命术的开创者',
+                content: '八字命理的源头可以追溯到唐代。相传有一位名叫李虚中的术士，他创立了"三命术"，以年柱、月柱、日柱三柱推算命运，开创了中国命理学的先河。\n\n据说李虚中能通过一个人的出生年月日推算其一生的吉凶祸福，准确程度令人惊叹。然而，他的方法还不完善，直到五代宋初的徐子平出现，八字命理才真正成熟。'
+            },
+            {
+                subtitle: '🔢 徐子平：四柱神数的创立',
+                content: '徐子平，五代宋初著名的命理学家，相传隐居于华山之巅，精通易学与星象之学。他在李虚中三命术的基础上，增加了时柱，形成了完整的"四柱八字"体系。\n\n据民间传说，徐子平的预测极为精准，曾为多位皇帝推算过国运。然而，他淡泊名利，只将毕生所学传授给了少数几个弟子，其中就包括后来编写《渊海子平》的徐升。'
+            },
+            {
+                subtitle: '📖 《渊海子平》：命理学的圣经',
+                content: '《渊海子平》是宋代徐升编撰的命理学著作，被誉为"八字命理学的圣经"。这部书系统总结了唐宋以来八字推命的理论和方法，奠定了四柱八字的基本框架。\n\n书中记载了大量推命口诀和实战案例，据说每一个口诀都是经过无数次验证才确定下来的。许多命理师将《渊海子平》奉为圭臬，研读终生而不倦。'
+            },
+            {
+                subtitle: '🗝️ 《滴天髓》：命理的巅峰之作',
+                content: '《滴天髓》是明代刘伯温所著，被誉为八字命理的最高典籍。相传刘伯温辅佐朱元璋建立明朝，功成名就后退隐山林，将毕生所学编撰成此书。\n\n《滴天髓》的理论精深玄妙，讲究"五行平衡流通"和"气势格局"。据说读懂此书的人少之又少，能运用自如者更是凤毛麟角。清代命理大师任铁樵曾为《滴天髓》作注，使这部奇书得以流传至今。'
+            }
+        ]
+    },
+    'dream': {
+        icon: '💭',
+        title: '解梦术的心灵密码',
+        sections: [
+            {
+                subtitle: '📜 周公解梦：中华梦文化之源',
+                content: '在中国文化中，周公旦被尊为梦学的鼻祖。相传周公是西周初年的政治家、谋略家，他辅佐年幼的成王，制礼作乐，天下大治。而他创立的"周公解梦"体系，则成为中国数千年梦占文化的源头。\n\n据说，周公解梦最初是周王室收藏的占梦之书，专门记录各种梦象与吉凶的对应关系。后来辗转流传，形成了今天我们熟知的《周公解梦》一书。然而，学者考证，现存版本是后人托名之作，真正的周公解梦可能早已失传。'
+            },
+            {
+                subtitle: '🛏️ 弗洛伊德：梦是欲望的伪装',
+                content: '1900年，西格蒙德·弗洛伊德出版了《梦的解析》，开创了现代精神分析学派。弗洛伊德认为，梦是潜意识欲望的伪装表达，通过分析梦境可以揭示被压抑的心理冲突。\n\n据说，弗洛伊德在研究梦之前，曾花费多年时间分析自己的梦。他声称，梦中出现的事物往往带有象征意义：尖锐物品代表男性，水代表女性，飞行象征追求自由......这些理论虽然争议不断，却深刻影响了20世纪的文化与艺术。'
+            },
+            {
+                subtitle: '🧠 荣格：梦是集体潜意识的语言',
+                content: '卡尔·荣格曾是弗洛伊德的得意门生，后来因观点分歧而分道扬镳。荣格提出了"集体无意识"的概念，认为人类的梦境中包含着跨越文化的原型意象。\n\n据荣格研究，世界上许多古老的文化都有相似的梦境象征：英雄、母亲、阴影、智慧老人......这些"原型"是人类世代相传的心理遗产。荣格还提出"共时性原理"：某些梦与现实事件之间存在神秘的对应关系，这超出了因果律的解释范畴。'
+            },
+            {
+                subtitle: '🌙 清明梦：梦中知梦的奥秘',
+                content: '清明梦（Lucid Dream）是指在梦中保持清醒意识的状态，梦中人可以意识到自己在做梦，甚至可以控制梦境的内容。这一现象在古代文献中就有记载。\n\n藏传佛教的"睡瑜伽"传统认为，通过训练可以在梦中修行，达到更高的精神境界。据说，著名探险家卡洛斯·卡斯塔尼达曾向巫师唐望学习清明梦技术，用于探索现实的本质。现代科学研究表明，清明梦时大脑的前额叶皮层活跃度显著提高。'
+            }
+        ]
+    },
+    'love': {
+        icon: '💕',
+        title: '爱情占卜的浪漫传说',
+        sections: [
+            {
+                subtitle: '💘 维纳斯：爱神之眼',
+                content: '古罗马神话中，维纳斯是爱与美的女神。据说，她能从星辰间俯视人间，看到每一颗坠入爱河的心。古代占星师认为，当金星运行到特定位置时，便是表白或求婚的最佳时机。\n\n据说，在古希腊德尔斐神庙，求爱者会向女祭司询问心上人是否也爱着自己。女祭司会通过观察火焰的形状和颜色给出预示，而那些模糊暧昧的预言，往往比任何明确的答案都更能触动人心。'
+            },
+            {
+                subtitle: '🌹 玫瑰花语的占卜起源',
+                content: '你知道吗？玫瑰花语的由来与占卜有关。中世纪的欧洲贵族相信，不同颜色的玫瑰蕴含不同的神秘力量。红色玫瑰代表热烈的爱，粉色玫瑰象征甜蜜的暗恋，白色玫瑰则寓意纯洁的思念。\n\n据说，每一朵玫瑰都有属于自己的守护精灵，她们会在夜深人静时，向心诚之人传递爱意。至今，仍有许多人在约会时手捧玫瑰，期待这份古老的魔法能为自己带来好运。'
+            },
+            {
+                subtitle: '🔮 塔罗中的爱情秘密',
+                content: '在塔罗牌中，有几张牌与爱情缘分最深。"恋人"牌象征着人生中的重大抉择，往往与感情关系有关；"月亮"牌则暗示情感的迷茫与不确定性；"太阳"牌预示着圆满与幸福。\n\n据说，在18世纪的欧洲，年轻女子会用塔罗牌占卜自己的真命天子。她们会虔诚地洗牌、切牌，然后翻开最上面的那张——那张牌的颜色和图案，据说能预示未来丈夫的某些特征。'
+            },
+            {
+                subtitle: '💍 月老红线：缘定三生的传说',
+                content: '在中国的传说中，月下老人是掌管人间姻缘的神仙。他有一本记录天下男女姻缘的册子，还有一根红线。只要这根红线系在两个人的脚踝上，他们便会相识、相爱、相守一生。\n\n据说，月老的红线具有神奇的魔力：即使两人相隔千里、地位悬殊、甚至是仇人，只要红线相连，命运就会让他们相遇。这或许解释了为何有些人初次相见，便有似曾相识的感觉。'
+            }
+        ]
+    },
+    'fortune': {
+        icon: '🔮',
+        title: '每日运势的神秘解读',
+        sections: [
+            {
+                subtitle: '🌟 星象与命运的古老联结',
+                content: '人类很早就发现，日月星辰的运行与地上万物的变化有着神秘的呼应。春天星空中，木星高悬，预示着万物生长、事业兴旺；秋冬时节，火星渐隐，暗示着收敛与内省。\n\n据说，古巴比伦的占星师会每天黎明时分登上神庙的尖顶，观察东方地平线上最先升起的是哪颗星，以此判断当日的吉凶。这种"日占"传统延续了数千年，直到今天仍有人相信星辰的指引。'
+            },
+            {
+                subtitle: '📅 黄道吉日：传统择日智慧',
+                content: '在中国传统文化中，选择良辰吉日是行事之前的重要准备。古人认为，天地之间存在着气的流动，某些日子气场和谐，适合婚嫁、开业、动土；某些日子则气场紊乱，需要避开。\n\n据说，皇帝祭天、选妃都要请钦天监推算吉日。民间百姓虽没有这样的条件，也会参照老黄历选择重要日子。这种"天人合一"的观念深刻影响了中华文明的各个方面。'
+            },
+            {
+                subtitle: '🔢 数字与命运的奇妙关联',
+                content: '数字占卜是人类最古老的占卜形式之一。毕达哥拉斯学派认为，"万物皆数"，数字是宇宙的本质。现代占星术中，幸运数字被认为与个人星盘有关：太阳星座代表第一个幸运数，月亮星座代表第二个。\n\n据说，每个人的生日数字都隐藏着命运的密码。将出生日期的各位数字相加，得到的数（再反复相加直到个位数）被称为"生命灵数"，据说能揭示一个人的性格特点与人生使命。'
+            },
+            {
+                subtitle: '🎨 颜色与运势的能量学',
+                content: '色彩占卜学认为，不同颜色蕴含不同的能量，可以影响人的运势。红色代表热情与行动力，适合需要突破的时刻；蓝色象征平静与沟通，适合需要理性思考的场合；紫色则与灵性成长相关。\n\n据说，在古埃及，神庙中的祭司会根据求卜者衣着的颜色来解读其命运。如果某人穿着黄色来占卜，祭司会认为他近期将有智慧的增长；如果是绿色，则预示着财运亨通。'
+            }
+        ]
+    },
+    'mbti': {
+        icon: '🧠',
+        title: 'MBTI背后的性格奥秘',
+        sections: [
+            {
+                subtitle: '🔬 荣格：性格类型的先驱',
+                content: 'MBTI的理论基础来自瑞士心理学家卡尔·荣格。1921年，荣格出版了《心理类型学》一书，首次系统阐述了人的心理类型理论。他提出，人格可以分为外向/内向、感觉/直觉、思考/情感等维度。\n\n据说，荣格本人性格内向，对人际交往感到困难。他研究人格类型，部分原因是为了理解自己与世界的关系。荣格认为，每个人都应该发展自己性格中的劣势功能，才能达到人格的完整。'
+            },
+            {
+                subtitle: '👩‍🔬 布里格斯母女：MBTI的诞生',
+                content: 'MBTI的正式诞生要归功于凯瑟琳·布里格斯和她的女儿伊莎贝尔·布里格斯·迈尔斯。20世纪40年代，母女二人基于荣格的理论，开发出了这套性格测试问卷。\n\n据说，伊莎贝尔在婚礼当天第一次接触荣格的著作，从此一发不可收拾。她和母亲花费数十年时间，收集了成千上万的问卷数据，不断完善问卷的题目和计分方式。MBTI于1962年正式公开发布，至今已帮助数亿人了解自己。'
+            },
+            {
+                subtitle: '🌐 16型人格：命运的十六种可能',
+                content: 'MBTI将人格分为16种类型，每个类型由四个字母组成：E/I（外向/内向）、S/N（感觉/直觉）、T/F（思考/情感）、J/P（判断/知觉）。这16种人格组合，据说揭示了人与人之间差异的密码。\n\n有趣的是，统计数据表明，INFJ是最稀有的人格类型，约占总人口的1-2%；而ESFJ则是最常见的类型之一。某些职业与特定人格类型存在显著关联：INTJ多出现在科学家和工程师中，ENFP则常成为艺术家和创业者。'
+            },
+            {
+                subtitle: '🤖 AI与性格分析的未来',
+                content: '传统MBTI需要受试者回答数十道选择题，而AI可以通过分析一个人的语言模式、社交媒体动态、甚至打字速度来推断其性格特征。\n\n据说，心理学家已经开始使用机器学习算法来提高性格预测的准确性。未来的AI占卜师或许能通过你与它的对话，瞬间"看透"你的性格特点，给你量身定制的人生建议。但问题是：性格是固定的吗？还是会随着时间和经历而改变？'
+            }
+        ]
+    }
+};
+
+// 显示神秘历史面板
+function showMysticalHistory(typeId) {
+    const data = mysticalHistoryData[typeId];
+    if (!data) {
+        // 如果没有对应数据，尝试使用默认数据
+        showToast('正在加载神秘知识...');
+        return;
+    }
+    
+    // 构建神秘历史内容
+    let content = '<div class="mystical-history-container">';
+    content += '<div class="mystical-history-header"><span class="mystical-icon">' + data.icon + '</span><h3>' + data.title + '</h3></div>';
+    
+    for (let section of data.sections) {
+        content += '<div class="mystical-section">';
+        content += '<h4 class="mystical-subtitle">' + section.subtitle + '</h4>';
+        content += '<p class="mystical-text">' + section.content.replace(/\n/g, '<br>') + '</p>';
+        content += '</div>';
+    }
+    
+    content += '</div>';
+    
+    document.getElementById('mysticalHistoryBody').innerHTML = content;
+    document.getElementById('mysticalHistoryModal').classList.add('active');
+}
+
+function closeMysticalHistory() {
+    document.getElementById('mysticalHistoryModal').classList.remove('active');
+}
+
+
+function showCultureModal(index) {
+    const culture = cultureData[index];
+    if (!culture) return;
+    
+    document.getElementById('cultureModalIcon').textContent = culture.icon;
+    document.getElementById('cultureModalTitle').textContent = culture.title;
+    document.getElementById('cultureModalBody').innerHTML = culture.content;
+    document.getElementById('cultureModal').classList.add('active');
+}
+
+function closeCultureModal() {
+    document.getElementById('cultureModal').classList.remove('active');
+}
+
+document.getElementById('cultureModal').addEventListener('click', function(e) { 
+    if (e.target === this) closeCultureModal(); 
+});
+
+document.getElementById('divinationModal').addEventListener('click', function(e) { if (e.target === this) closeDivination(); });
+document.getElementById('tellerModal').addEventListener('click', function(e) { if (e.target === this) closeTellerModal(); });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const clickables = document.querySelectorAll('.type-card, .popular-item, .teller-card, .zodiac-option, .type-option, .history-item');
+    clickables.forEach(function(el) {
+        el.addEventListener('touchstart', function(e) { this.classList.add('touched'); }, { passive: true });
+        el.addEventListener('touchend', function(e) { setTimeout(() => { this.classList.remove('touched'); }, 150); }, { passive: true });
+    });
+});
+
+document.getElementById('mysticalHistoryModal').addEventListener('click', function(e) { 
+    if (e.target === this) closeMysticalHistory(); 
+});
+
+// ============ 流星雨特效 ============
+(function createMeteorShower() {
+    const container = document.getElementById('meteorShower');
+    if (!container) return;
+    
+    const sizes = ['small', '', 'large'];
+    const angles = ['', 'angle-1', 'angle-2'];
+    const durations = [1.2, 1.5, 1.8, 2.0, 2.5];
+    
+    function createMeteor() {
+        const meteor = document.createElement('div');
+        meteor.className = 'meteor ' + 
+            sizes[Math.floor(Math.random() * sizes.length)] + ' ' +
+            angles[Math.floor(Math.random() * angles.length)];
+        
+        // Random starting position (top-right area)
+        meteor.style.left = (60 + Math.random() * 40) + '%';
+        meteor.style.top = (Math.random() * 30) + '%';
+        meteor.style.animationDuration = durations[Math.floor(Math.random() * durations.length)] + 's';
+        meteor.style.animationDelay = '0s';
+        
+        container.appendChild(meteor);
+        
+        // Remove after animation completes
+        setTimeout(() => {
+            if (meteor.parentNode) meteor.remove();
+        }, 3000);
+    }
+    
+    // Initial burst - create several meteors at once
+    for (let i = 0; i < 8; i++) {
+        setTimeout(createMeteor, i * 200);
+    }
+    
+    // Continuous generation
+    setInterval(createMeteor, 400);
+    
+    // Every few seconds, create a wave of meteors (meteor shower burst)
+    setInterval(() => {
+        for (let i = 0; i < 5; i++) {
+            setTimeout(createMeteor, i * 100);
+        }
+    }, 5000);
+})();
+
+</script>
+{% endblock %}

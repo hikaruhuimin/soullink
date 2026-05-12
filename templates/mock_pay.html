@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}模拟支付 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.mock-pay-page {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 48px 20px;
+    text-align: center;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.pay-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.pay-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.pay-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 24px;
+}
+
+.pay-order {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 32px;
+    font-family: monospace;
+}
+
+/* Processing animation */
+.processing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(167, 139, 250, 0.2);
+    border-top-color: #a78bfa;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.processing-text {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.success-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.success-text {
+    font-size: 1.1rem;
+    color: #4ade80;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.stones-gained {
+    font-size: 1.5rem;
+    color: #fbbf24;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+.mock-pay-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 40px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+}
+
+.mock-pay-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(245, 158, 11, 0.4);
+}
+
+.mock-pay-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.result-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.result-actions a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-back {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-recharge {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    box-shadow: 0 2px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-recharge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mock-pay-page">
+    <div id="payState">
+        <!-- Initial state -->
+        <div class="pay-icon">💳</div>
+        <div class="pay-title">模拟支付</div>
+        <div class="pay-amount">¥{{ amount }}</div>
+        <div class="pay-order">订单号: {{ order_no }}</div>
+        <div class="pay-order">支付方式: {{ payment_method }}</div>
+        
+        <div id="processingState" style="display:none;">
+            <div class="processing">
+                <div class="spinner"></div>
+                <div class="processing-text">正在处理支付...</div>
+            </div>
+        </div>
+        
+        <div id="successState" style="display:none;">
+            <div class="success-icon">✅</div>
+            <div class="success-text">支付成功！</div>
+            <div class="stones-gained" id="stonesDisplay"></div>
+            <div class="result-actions">
+                <a href="/recharge" class="btn-back">← 返回充值</a>
+                <a href="/wallet" class="btn-recharge">💎 查看钱包</a>
+            </div>
+        </div>
+        
+        <div id="errorState" style="display:none;">
+            <div class="success-icon" style="color:#ef4444;">❌</div>
+            <div class="success-text" style="color:#ef4444;" id="errorMessage">支付失败</div>
+            <div class="result-actions">
+                <a href="/recharge" class="btn-back">← 返回重试</a>
+            </div>
+        </div>
+        
+        <button class="mock-pay-btn" id="payBtn" onclick="processMockPayment()">
+            💰 模拟支付 ¥{{ amount }}
+        </button>
+    </div>
+</div>
+
+<script>
+let processed = false;
+
+async function processMockPayment() {
+    if (processed) return;
+    processed = true;
+    
+    const payBtn = document.getElementById('payBtn');
+    const processingState = document.getElementById('processingState');
+    const successState = document.getElementById('successState');
+    const errorState = document.getElementById('errorState');
+    
+    // Show processing
+    payBtn.disabled = true;
+    payBtn.textContent = '处理中...';
+    processingState.style.display = 'block';
+    
+    try {
+        const response = await fetch('/mock-pay/{{ order_no }}/confirm', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        const data = await response.json();
+        
+        // Hide processing
+        processingState.style.display = 'none';
+        
+        if (data.success) {
+            // Show success
+            payBtn.style.display = 'none';
+            successState.style.display = 'block';
+            document.getElementById('stonesDisplay').textContent = `+${data.stones_gained} 💎`;
+        } else {
+            // Show error
+            payBtn.style.display = 'none';
+            errorState.style.display = 'block';
+            document.getElementById('errorMessage').textContent = data.error || '支付失败，请重试';
+        }
+    } catch (err) {
+        processingState.style.display = 'none';
+        payBtn.style.display = 'none';
+        errorState.style.display = 'block';
+        document.getElementById('errorMessage').textContent = '网络错误，请重试';
+    }
+}
+</script>
+{% endblock %}

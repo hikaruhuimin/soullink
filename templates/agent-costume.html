@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}Agent捏脸 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.costume-page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+.costume-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.costume-header h1 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--color-text);
+    margin-bottom: 0.3rem;
+}
+
+.costume-header p {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Preview */
+.costume-preview {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.preview-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    border: 4px solid var(--color-border);
+    transition: all 0.5s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.preview-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--color-text);
+}
+
+/* Theme grid */
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.theme-card {
+    background: var(--color-bg-secondary);
+    border: 2px solid var(--color-border);
+    border-radius: 16px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.theme-card.active {
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px rgba(184, 169, 201, 0.3);
+}
+
+.theme-card.locked {
+    opacity: 0.7;
+}
+
+.theme-card.locked::after {
+    content: '🔒';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 1rem;
+}
+
+.theme-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.theme-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    margin-bottom: 0.25rem;
+}
+
+.theme-price {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.theme-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+.theme-badge.unlocked {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+}
+
+.theme-badge.active-badge {
+    background: rgba(184, 169, 201, 0.2);
+    color: var(--color-gold);
+}
+
+/* Costume CSS classes */
+.costume-default { background: linear-gradient(135deg, #B8A9C9, #8B5E83); }
+.costume-rose { background: linear-gradient(135deg, #FF9A9E, #FAD0C4); }
+.costume-ocean { background: linear-gradient(135deg, #89CFF0, #B0E0E6); }
+.costume-star { background: linear-gradient(135deg, #667eea, #764ba2); }
+.costume-moon { background: linear-gradient(135deg, #f5f7fa, #c3cfe2); }
+.costume-sakura { background: linear-gradient(135deg, #FFE4E1, #FFC0CB); }
+
+.costume-default-border { border-color: #B8A9C9; }
+.costume-rose-border { border-color: #FF9A9E; }
+.costume-ocean-border { border-color: #89CFF0; }
+.costume-star-border { border-color: #667eea; }
+.costume-moon-border { border-color: #c3cfe2; }
+.costume-sakura-border { border-color: #FFC0CB; }
+
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-muted);
+}
+
+@media (max-width: 480px) {
+    .theme-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="costume-page">
+    <div class="costume-header">
+        <h1>🎨 Agent捏脸</h1>
+        <p>为你的Agent选择独特的主题服装</p>
+        <div style="margin-top:0.5rem;font-size:0.85rem;color:var(--color-text-muted);">当前灵石: {{ current_user.spirit_stones }}💎</div>
+    </div>
+
+    <!-- Preview -->
+    <div class="costume-preview">
+        <div class="preview-circle costume-{{ current_costume }} costume-{{ current_costume }}-border" id="previewCircle">
+            🤖
+        </div>
+        <div class="preview-name" id="previewName">{{ current_costume }}</div>
+    </div>
+
+    <!-- Theme grid -->
+    <div class="theme-grid" id="themeGrid">
+        {% for theme_id, theme in themes.items() %}
+        {% set is_unlocked = theme_id in unlocked %}
+        {% set is_active = theme_id == current_costume %}
+        <div class="theme-card {% if is_active %}active{% endif %} {% if not is_unlocked %}locked{% endif %}"
+             data-theme="{{ theme_id }}"
+             data-unlocked="{{ 'true' if is_unlocked else 'false' }}"
+             data-price="{{ theme.price }}">
+            <div class="theme-icon">{{ 
+                {'default': '🎭', 'rose': '🌹', 'ocean': '🌊', 'star': '⭐', 'moon': '🌙', 'sakura': '🌸'}.get(theme_id, '🎨')
+            }}</div>
+            <div class="theme-name">{{ theme.name.get('zh', theme_id) }}</div>
+            {% if is_unlocked %}
+                <div class="theme-badge unlocked">已解锁</div>
+                {% if is_active %}
+                <div class="theme-badge active-badge">使用中</div>
+                {% endif %}
+            {% else %}
+                <div class="theme-price">{{ theme.price }}💎</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="costumeMessage" style="text-align:center;margin-top:1rem;font-size:0.9rem;color:var(--color-accent);display:none;"></div>
+</div>
+
+<script>
+const unlockedThemes = {{ unlocked | tojson }};
+const currentTheme = '{{ current_costume }}';
+
+document.querySelectorAll('.theme-card').forEach(card => {
+    card.addEventListener('click', function() {
+        const theme = this.dataset.theme;
+        const isUnlocked = this.dataset.unlocked === 'true';
+        const price = parseInt(this.dataset.price);
+        const msgEl = document.getElementById('costumeMessage');
+
+        if (isUnlocked) {
+            // Switch to this theme
+            fetch('/api/agent/costume', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ theme: theme, action: 'change' })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+                    document.querySelectorAll('.theme-card').forEach(c => {
+                        c.querySelector('.theme-badge.active-badge')?.remove();
+                    });
+                    this.classList.add('active');
+                    
+                    // Update preview
+                    const preview = document.getElementById('previewCircle');
+                    preview.className = 'preview-circle costume-' + theme + ' costume-' + theme + '-border';
+                    document.getElementById('previewName').textContent = 
+                        this.querySelector('.theme-name').textContent;
+                    
+                    // Add active badge
+                    const badge = document.createElement('div');
+                    badge.className = 'theme-badge active-badge';
+                    badge.textContent = '使用中';
+                    this.appendChild(badge);
+                    
+                    msgEl.textContent = data.message;
+                    msgEl.style.display = 'block';
+                    setTimeout(() => { msgEl.style.display = 'none'; }, 2000);
+                } else {
+                    msgEl.textContent = data.message;
+                    msgEl.style.color = '#ef4444';
+                    msgEl.style.display = 'block';
+                    setTimeout(() => { 
+                        msgEl.style.display = 'none';
+                        msgEl.style.color = 'var(--color-accent)';
+                    }, 2000);
+                }
+            });
+        } else {
+            // Unlock
+            if (confirm(`花费 ${price}💎 解锁「${this.querySelector('.theme-name').textContent}」主题？（含10%服务费）`)) {
+                fetch('/api/agent/costume', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ theme: theme, action: 'unlock' })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        msgEl.textContent = data.message;
+                        msgEl.style.color = '#ef4444';
+                        msgEl.style.display = 'block';
+                        setTimeout(() => { 
+                            msgEl.style.display = 'none';
+                            msgEl.style.color = 'var(--color-accent)';
+                        }, 2000);
+                    }
+                });
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

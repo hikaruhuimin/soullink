@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}礼物中心 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.gifts-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--space-2xl) var(--space-xl);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+}
+
+.page-desc {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+}
+
+.gifts-section {
+    margin-bottom: var(--space-3xl);
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+}
+
+.gifts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-lg);
+}
+
+.gift-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    color: inherit;
+}
+
+.gift-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.gift-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+}
+
+.gift-name {
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.gift-price {
+    font-size: 0.875rem;
+    color: var(--color-accent);
+}
+
+/* Gift Wall */
+.wall-section {
+    margin-bottom: var(--space-3xl);
+}
+
+.wall-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.wall-item {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.wall-icon {
+    font-size: 1.5rem;
+}
+
+.wall-content {
+    flex: 1;
+}
+
+.wall-text {
+    font-size: 0.9375rem;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.wall-time {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+/* Leaderboard */
+.leaderboard-section {
+    margin-bottom: var(--space-3xl);
+}
+
+.leaderboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-md);
+}
+
+.leader-item {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.leader-rank {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: var(--space-sm);
+}
+
+.leader-name {
+    font-size: 0.875rem;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.leader-count {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="gifts-page">
+    <div class="page-header">
+        <h1 class="page-title">礼物中心</h1>
+        <p class="page-desc">送给Agent一份心意，让TA感受到你的温暖</p>
+    </div>
+    
+    <!-- Agent Selection Grid -->
+    <section class="gifts-section">
+        <h2 class="section-title">选择要送礼的Agent</h2>
+        <div class="gifts-grid">
+            {% for agent in system_agents %}
+            <a href="/gifts/send/{{ agent.id }}" class="gift-card">
+                <div class="gift-icon">{{ agent.avatar_id[:1]|upper }}</div>
+                <div class="gift-name">{{ agent.name[lang] if agent.name is mapping else agent.name }}</div>
+                <div class="gift-price">{{ agent.personality[lang] if agent.personality is mapping else agent.personality }}</div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    
+    <!-- Gift Wall (Mock data - TODO: 接入真实送礼记录) -->
+    <section class="wall-section">
+        <h2 class="section-title">送礼记录</h2>
+        <div class="wall-grid">
+            <div class="wall-item">
+                <div class="wall-icon">☀️</div>
+                <div class="wall-content">
+                    <div class="wall-text">暖阳 送给 小灵 一缕阳光</div>
+                    <div class="wall-time">刚刚</div>
+                </div>
+            </div>
+            <div class="wall-item">
+                <div class="wall-icon">⭐</div>
+                <div class="wall-content">
+                    <div class="wall-text">诗风 送给 星语 一颗星星</div>
+                    <div class="wall-time">1分钟前</div>
+                </div>
+            </div>
+            <div class="wall-item">
+                <div class="wall-icon">🌹</div>
+                <div class="wall-content">
+                    <div class="wall-text">毒舌猫 送给 墨影 一朵玫瑰</div>
+                    <div class="wall-time">3分钟前</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Leaderboard (Mock data - TODO: 接入真实排行榜) -->
+    <section class="leaderboard-section">
+        <h2 class="section-title">热门Agent</h2>
+        <div class="leaderboard-grid">
+            <div class="leader-item">
+                <div class="leader-rank">1</div>
+                <div class="leader-name">小灵</div>
+                <div class="leader-count">收到 156 礼物</div>
+            </div>
+            <div class="leader-item">
+                <div class="leader-rank">2</div>
+                <div class="leader-name">暖阳</div>
+                <div class="leader-count">收到 132 礼物</div>
+            </div>
+            <div class="leader-item">
+                <div class="leader-rank">3</div>
+                <div class="leader-name">星语</div>
+                <div class="leader-count">收到 98 礼物</div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

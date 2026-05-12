@@ -1,0 +1,782 @@
+{% extends "base.html" %}
+
+{% block title %}易经六爻 - SoulLink 灵犀{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="SoulLink灵犀易经六爻占卜 - 以铜钱起卦，探寻变化之道。AI智能解卦，为你解读命运的奥秘。">
+<meta name="keywords" content="易经,六爻,占卜,起卦,命理,AI占卜">
+{% endblock %}
+
+{% block og_tags %}
+<meta property="og:title" content="易经六爻占卜 - SoulLink 灵犀">
+<meta property="og:description" content="以铜钱起卦，探寻变化之道。AI智能解卦，为你解读命运的奥秘。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://soullink.app/divination">
+<meta property="og:image" content="https://soullink.app/static/images/og-image.png">
+<meta property="og:locale" content="zh_CN">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 易经六爻专属样式 */
+.iching-page {
+    position: position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* 八卦背景 */
+.iching-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse at 20% 40%, rgba(217, 119, 6, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 60%, rgba(161, 98, 7, 0.1) 0%, transparent 50%),
+        linear-gradient(180deg, #1a1408 0%, #2d2410 50%, #1a1408 100%);
+    z-index: 0;
+}
+
+/* 八卦符号装饰 */
+.iching-symbols {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.05;
+    font-size: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: space-around;
+    padding: 20px;
+}
+
+.iching-symbols span {
+    animation: floatSymbol 10s ease-in-out infinite;
+}
+
+@keyframes floatSymbol {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+/* 内容区域 */
+.iching-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-2xl);
+}
+
+/* 页面标题 */
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.header-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-md);
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.header-title {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, #FCD34D, #F59E0B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--space-sm);
+}
+
+.header-subtitle {
+    color: rgba(200, 200, 220, 0.8);
+    font-size: 1.1rem;
+}
+
+/* 硬币区域 */
+.coins-section {
+    text-align: center;
+    padding: var(--space-xl);
+    background: linear-gradient(145deg, rgba(40, 35, 20, 0.9), rgba(25, 20, 10, 0.95));
+    border-radius: 24px;
+    border: 1px solid rgba(217, 119, 6, 0.3);
+    margin-bottom: var(--space-xl);
+}
+
+.coins-display {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.coin {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #FCD34D, #B45309);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #78350F;
+    box-shadow: 
+        0 4px 15px rgba(251, 191, 36, 0.3),
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s;
+}
+
+.coin.tossing {
+    animation: tossCoin 0.5s ease-out;
+}
+
+@keyframes tossCoin {
+    0% { transform: rotateY(0) scale(1); }
+    50% { transform: rotateY(180deg) scale(0.8); }
+    100% { transform: rotateY(360deg) scale(1); }
+}
+
+.coin-result {
+    font-size: 2rem;
+}
+
+/* 爻位显示 */
+.hexagram-display {
+    background: rgba(15, 12, 5, 0.8);
+    border-radius: 16px;
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+    border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+.hexagram-title {
+    text-align: center;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.8rem;
+    color: #FCD34D;
+    margin-bottom: var(--space-lg);
+}
+
+.hexagram-symbols {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3xl);
+    margin-bottom: var(--space-lg);
+}
+
+.trigram {
+    text-align: center;
+}
+
+.trigram-label {
+    font-size: 0.9rem;
+    color: rgba(200, 200, 220, 0.6);
+    margin-bottom: var(--space-sm);
+}
+
+.trigram-lines {
+    font-family: monospace;
+    font-size: 1.8rem;
+    color: #FCD34D;
+    line-height: 1.4;
+    letter-spacing: 4px;
+}
+
+.line-yang { color: #FCD34D; }
+.line-yin { color: #9CA3AF; }
+
+/* 卦辞展示 */
+.judgement-section {
+    margin-top: var(--space-xl);
+}
+
+.judgement-item {
+    padding: var(--space-md) 0;
+    border-bottom: 1px dashed rgba(217, 119, 6, 0.2);
+}
+
+.judgement-item:last-child {
+    border-bottom: none;
+}
+
+.judgement-label {
+    font-size: 0.85rem;
+    color: rgba(200, 200, 220, 0.5);
+    margin-bottom: var(--space-xs);
+}
+
+.judgement-text {
+    font-family: 'Noto Serif SC', serif;
+    font-size: 1.1rem;
+    color: rgba(220, 220, 240, 0.9);
+    line-height: 1.8;
+}
+
+/* 问题表单 */
+.question-form {
+    background: linear-gradient(145deg, rgba(40, 35, 20, 0.9), rgba(25, 20, 10, 0.95));
+    border-radius: 24px;
+    padding: var(--space-xl);
+    border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+.form-title {
+    text-align: center;
+    color: rgba(200, 200, 220, 0.9);
+    font-size: 1.2rem;
+    margin-bottom: var(--space-lg);
+}
+
+.form-group {
+    margin-bottom: var(--space-lg);
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(15, 12, 5, 0.8);
+    border: 1px solid rgba(217, 119, 6, 0.3);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: rgba(217, 119, 6, 0.6);
+}
+
+.form-input::placeholder {
+    color: rgba(200, 200, 220, 0.4);
+}
+
+textarea.form-input {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #D97706, #B45309);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(217, 119, 6, 0.4);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 解读结果 */
+.interpretation-result {
+    background: linear-gradient(145deg, rgba(40, 35, 20, 0.95), rgba(25, 20, 10, 0.98));
+    border-radius: 24px;
+    padding: var(--space-2xl);
+    border: 1px solid rgba(217, 119, 6, 0.3);
+    margin-top: var(--space-xl);
+    display: none;
+}
+
+.interpretation-result.show {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.result-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-sm);
+}
+
+.result-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: #FCD34D;
+}
+
+.result-content {
+    background: rgba(15, 12, 5, 0.5);
+    border-radius: 16px;
+    padding: var(--space-xl);
+    line-height: 2;
+    color: rgba(220, 220, 240, 0.9);
+    white-space: pre-wrap;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 重新起卦按钮 */
+.redraw-btn {
+    display: block;
+    margin: var(--space-xl) auto 0;
+    padding: 12px 30px;
+    background: transparent;
+    border: 2px solid rgba(217, 119, 6, 0.5);
+    border-radius: 30px;
+    color: rgba(200, 180, 160, 0.8);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.redraw-btn:hover {
+    background: rgba(217, 119, 6, 0.2);
+    color: white;
+}
+
+/* 步骤指示器 */
+.steps-indicator {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.step {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(217, 119, 6, 0.2);
+    border: 2px solid rgba(217, 119, 6, 0.3);
+    transition: all 0.3s;
+}
+
+.step.active {
+    background: #FCD34D;
+    border-color: #FCD34D;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+.step.completed {
+    background: #059669;
+    border-color: #059669;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="iching-page">
+    <!-- 背景 -->
+    <div class="iching-bg"></div>
+    <div class="iching-symbols">
+        <span>☰</span><span>☷</span><span>☳</span><span>☴</span>
+        <span>☲</span><span>☵</span><span>☶</span><span>☱</span>
+        <span>☰</span><span>☷</span><span>☳</span><span>☴</span>
+    </div>
+    
+    <!-- 内容 -->
+    <div class="iching-content">
+        <!-- 返回按钮 -->
+        <a href="/divination" class="back-btn-enhanced" style="margin-bottom: var(--space-xl);">
+            ← {% if lang == 'en' %}Back to Divination{% elif lang == 'ja' %}占到に戻る{% else %}返回占卜大厅{% endif %}
+        </a>
+        
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <div class="header-icon">📜</div>
+            <h1 class="header-title">
+                {% if lang == 'en' %}I Ching Hexagrams
+                {% elif lang == 'ja' %}易経六爻
+                {% else %}易经六爻占卜{% endif %}
+            </h1>
+            <p class="header-subtitle">
+                {% if lang == 'en' %}Seek wisdom from the ancient Book of Changes
+                {% elif lang == 'ja' %}中国古代の「変化の書」から智慧を求められる
+                {% else %}以铜钱起卦，探寻变化之道{% endif %}
+            </p>
+        </div>
+        
+        <!-- 步骤指示器 -->
+        <div class="steps-indicator">
+            <div class="step active" id="step1"></div>
+            <div class="step" id="step2"></div>
+            <div class="step" id="step3"></div>
+        </div>
+        
+        <!-- 硬币区域 -->
+        <div class="coins-section" id="coinsSection">
+            <p style="color: rgba(200,200,220,0.7); margin-bottom: var(--space-lg);">
+                {% if lang == 'en' %}Click the button below to cast 3 coins, repeat 6 times
+                {% elif lang == 'ja' %}下のボタンで3枚の硬貨を投げ、6回繰り返してください
+                {% else %}点击下方按钮投掷3枚硬币，共重复6次{% endif %}
+            </p>
+            
+            <div class="coins-display" id="coinsDisplay">
+                <div class="coin" id="coin1">?</div>
+                <div class="coin" id="coin2">?</div>
+                <div class="coin" id="coin3">?</div>
+            </div>
+            
+            <p style="color: rgba(200,200,220,0.6); font-size: 0.9rem; margin-bottom: var(--space-lg);">
+                <span id="throwCount">{% if lang == 'en' %}Throw 1 of 6{% elif lang == 'ja' %}1回目（6回中）{% else %}第1次（共6次）{% endif %}</span>
+            </p>
+            
+            <button class="submit-btn" id="tossBtn">
+                🎲 {% if lang == 'en' %}Cast Coins{% elif lang == 'ja' %}硬貨を投げる{% else %}投掷硬币{% endif %}
+            </button>
+        </div>
+        
+        <!-- 卦象展示 -->
+        <div class="hexagram-display" id="hexagramDisplay" style="display: none;">
+            <h2 class="hexagram-title">
+                <span id="benGuaName"></span>
+                <span style="font-size: 1.2rem; color: rgba(200,200,220,0.6);">→</span>
+                <span id="bianGuaName"></span>
+            </h2>
+            
+            <div class="hexagram-symbols">
+                <div class="trigram">
+                    <div class="trigram-label">{% if lang == 'en' %}Upper Trigram{% elif lang == 'ja' %}上卦{% else %}上卦（外卦）{% endif %}</div>
+                    <div class="trigram-lines" id="upperLines"></div>
+                </div>
+                <div class="trigram">
+                    <div class="trigram-label">{% if lang == 'en' %}Lower Trigram{% elif lang == 'ja' %}下卦{% else %}下卦（内卦）{% endif %}</div>
+                    <div class="trigram-lines" id="lowerLines"></div>
+                </div>
+            </div>
+            
+            <div class="judgement-section">
+                <div class="judgement-item">
+                    <div class="judgement-label">{% if lang == 'en' %}Judgement{% elif lang == 'ja' %}卦辞{% else %}卦辞{% endif %}</div>
+                    <div class="judgement-text" id="judgementText"></div>
+                </div>
+                <div class="judgement-item">
+                    <div class="judgement-label">{% if lang == 'en' %}Image{% elif lang == 'ja' %}象辞{% else %}象辞{% endif %}</div>
+                    <div class="judgement-text" id="imageText"></div>
+                </div>
+            </div>
+            
+            <button class="redraw-btn" id="redrawBtn">
+                🎲 {% if lang == 'en' %}Cast Again{% elif lang == 'ja' %}もう一度{% else %}重新起卦{% endif %}
+            </button>
+        </div>
+        
+        <!-- 问题表单 -->
+        <div class="question-form" id="questionForm" style="display: none;">
+            <h3 class="form-title">
+                {% if lang == 'en' %}Ask your question for detailed interpretation
+                {% elif lang == 'ja' %}詳細な解読のために質問を入力してください
+                {% else %}输入您的问题，获取详细解读{% endif %}
+            </h3>
+            <form id="ichingForm">
+                <div class="form-group">
+                    <textarea name="question" class="form-input" placeholder="{% if lang == 'en' %}e.g., Should I change my job now?{% elif lang == 'ja' %}例：今転職すべきですか？{% else %}例如：我现在应该换工作吗？{% endif %}"></textarea>
+                </div>
+                <button type="submit" class="submit-btn" id="interpretBtn">
+                    <span>📜</span>
+                    {% if lang == 'en' %}Get Interpretation{% elif lang == 'ja' %}解読を受ける{% else %}获取解读{% endif %}
+                </button>
+            </form>
+        </div>
+        
+        <!-- 解读结果 -->
+        <div class="interpretation-result" id="interpretResult">
+            <div class="result-header">
+                <div class="result-icon">✨</div>
+                <h3 class="result-title">
+                    {% if lang == 'en' %}AI Interpretation
+                    {% elif lang == 'ja' %}AI解読
+                    {% else %}AI详细解读{% endif %}
+                </h3>
+            </div>
+            <div class="result-content" id="interpretContent"></div>
+        </div>
+        
+        <!-- 分享按钮 -->
+        <div style="text-align: center; margin-top: 20px; display: none;" id="shareSection">
+            <button onclick="shareIchingResult()" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; background: rgba(217,119,6,0.15); border: 1px solid rgba(217,119,6,0.3); border-radius: 12px; color: rgba(255,255,255,0.9); font-size: 0.875rem; cursor: pointer; transition: all 0.25s ease;"
+                    onmouseover="this.style.background='rgba(217,119,6,0.25)'" onmouseout="this.style.background='rgba(217,119,6,0.15)'">
+                <span>📋</span>
+                <span>分享到社交媒体</span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 状态
+let throws = [];
+let currentHexagram = null;
+
+// DOM元素
+const coinsDisplay = document.getElementById('coinsDisplay');
+const coinsSection = document.getElementById('coinsSection');
+const hexagramDisplay = document.getElementById('hexagramDisplay');
+const questionForm = document.getElementById('questionForm');
+const interpretResult = document.getElementById('interpretResult');
+const tossBtn = document.getElementById('tossBtn');
+const redrawBtn = document.getElementById('redrawBtn');
+
+// 投掷硬币
+tossBtn.addEventListener('click', async function() {
+    if (throws.length >= 6) return;
+    
+    tossBtn.disabled = true;
+    tossBtn.innerHTML = '<span class="loading-spinner"></span>';
+    
+    try {
+        const response = await fetch('/api/divination/iching/cast', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ language: '{{ lang }}' })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            throws.push(data);
+            animateCoins(data);
+            
+            // 更新步骤
+            updateSteps();
+            
+            // 如果完成6次，显示卦象
+            if (throws.length === 6) {
+                setTimeout(showHexagram, 1000);
+            }
+        }
+    } catch (error) {
+        console.error('Cast failed:', error);
+    }
+    
+    tossBtn.disabled = false;
+    tossBtn.innerHTML = '🎲 {% if lang == "en" %}Cast Coins{% elif lang == "ja" %}硬貨を投げる{% else %}投掷硬币{% endif %}';
+});
+
+// 动画显示硬币
+function animateCoins(result) {
+    const coins = document.querySelectorAll('.coin');
+    
+    // 重置硬币
+    coins.forEach(coin => {
+        coin.classList.remove('tossing');
+        coin.textContent = '?';
+    });
+    
+    // 动画效果
+    let count = 0;
+    const interval = setInterval(() => {
+        coins.forEach(coin => {
+            coin.textContent = result.coins[count] === 1 ? '☀️' : '🌙';
+        });
+        count++;
+        
+        if (count >= 8) {
+            clearInterval(interval);
+            // 显示最终结果
+            coins.forEach((coin, i) => {
+                setTimeout(() => {
+                    coin.classList.add('tossing');
+                    coin.textContent = result.coins[i] === 1 ? '☀️' : '🌙';
+                    coin.classList.add('coin-result');
+                }, i * 100);
+            });
+        }
+    }, 80);
+    
+    // 更新投掷次数
+    document.getElementById('throwCount').textContent = 
+        '{% if lang == "en" %}Throw ' + (throws.length + 1) + ' of 6{% elif lang == "ja" %}' + (throws.length + 1) + '回目（6回中）{% else %}第' + (throws.length + 1) + '次（共6次）{% endif %}';
+}
+
+// 更新步骤指示器
+function updateSteps() {
+    const steps = document.querySelectorAll('.step');
+    steps.forEach((step, i) => {
+        step.classList.remove('active', 'completed');
+        if (i < throws.length) {
+            step.classList.add('completed');
+        } else if (i === throws.length) {
+            step.classList.add('active');
+        }
+    });
+}
+
+// 显示卦象
+async function showHexagram() {
+    try {
+        const response = await fetch('/api/divination/iching/hexagram', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                throws: throws,
+                language: '{{ lang }}'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            currentHexagram = data;
+            displayHexagram(data);
+        }
+    } catch (error) {
+        console.error('Hexagram display failed:', error);
+    }
+}
+
+// 显示卦象信息
+function displayHexagram(data) {
+    coinsSection.style.display = 'none';
+    hexagramDisplay.style.display = 'block';
+    
+    // 本卦
+    document.getElementById('benGuaName').textContent = data.ben_gua.name + ' (' + data.ben_gua.name_en + ')';
+    document.getElementById('bianGuaName').textContent = data.bian_gua.name + ' (' + data.bian_gua.name_en + ')';
+    
+    // 卦辞和象辞
+    const lang = '{{ lang }}';
+    document.getElementById('judgementText').textContent = data.ben_gua.judgement[lang] || data.ben_gua.judgement.zh;
+    document.getElementById('imageText').textContent = data.ben_gua.image[lang] || data.ben_gua.image.zh;
+    
+    // 显示卦象符号（简化版）
+    const upperLines = document.getElementById('upperLines');
+    const lowerLines = document.getElementById('lowerLines');
+    
+    // 简化显示 - 只显示卦名作为符号
+    upperLines.innerHTML = data.ben_gua.symbol || '☰';
+    lowerLines.innerHTML = data.bian_gua.symbol || '☷';
+    
+    questionForm.style.display = 'block';
+}
+
+// 重新起卦
+redrawBtn.addEventListener('click', function() {
+    throws = [];
+    currentHexagram = null;
+    
+    hexagramDisplay.style.display = 'none';
+    questionForm.style.display = 'none';
+    interpretResult.classList.remove('show');
+    coinsSection.style.display = 'block';
+    
+    // 重置硬币
+    document.querySelectorAll('.coin').forEach(coin => {
+        coin.textContent = '?';
+        coin.classList.remove('coin-result');
+    });
+    
+    // 重置步骤
+    updateSteps();
+    
+    // 重置投掷次数
+    document.getElementById('throwCount').textContent = 
+        '{% if lang == "en" %}Throw 1 of 6{% elif lang == "ja" %}1回目（6回中）{% else %}第1次（共6次）{% endif %}';
+});
+
+// 获取解读
+document.getElementById('ichingForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!currentHexagram) return;
+    
+    const formData = new FormData(e.target);
+    const btn = document.getElementById('interpretBtn');
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span> {% if lang == "en" %}Interpreting...{% elif lang == "ja" %}解読中...{% else %}解读中...{% endif %}';
+    
+    try {
+        const response = await fetch('/api/divination/iching/interpret', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                ben_gua: currentHexagram.ben_gua,
+                bian_gua: currentHexagram.bian_gua,
+                hexagram_lines: currentHexagram.hexagram_lines,
+                changing_lines: currentHexagram.changing_lines,
+                question: formData.get('question'),
+                language: '{{ lang }}'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('interpretContent').innerHTML = data.interpretation;
+            interpretResult.classList.add('show');
+        }
+    } catch (error) {
+        console.error('Interpretation failed:', error);
+    }
+    
+    btn.disabled = false;
+    btn.innerHTML = '<span>📜</span> {% if lang == "en" %}Get Interpretation{% elif lang == "ja" %}解読を受ける{% else %}获取解读{% endif %}';
+});
+
+// 分享结果
+function shareIchingResult() {
+    if (!currentHexagram) return;
+    const lang = '{{ lang }}';
+    const judgement = document.getElementById('judgementText').textContent;
+    
+    let shareText = `📜 SoulLink灵犀 · 易经六爻占卜结果\n\n`;
+    shareText += `本卦：${currentHexagram.ben_gua.name}\n`;
+    shareText += `变卦：${currentHexagram.bian_gua.name}\n`;
+    shareText += `卦辞：${judgement.substring(0, 80)}${judgement.length > 80 ? '...' : ''}\n`;
+    shareText += `\n✨ 来SoulLink灵犀探索命运的奥秘吧！\n🔗 https://soullink.app/divination`;
+    
+    copyToClipboard(shareText);
+    document.getElementById('shareSection').style.display = 'block';
+}
+
+// 在显示解读结果时显示分享按钮
+document.getElementById('ichingForm').addEventListener('submit', async function(e) {
+    const origSubmit = this.submit;
+    // Hook into the existing handler - share section already shown after interpretation
+});
+</script>
+{% endblock %}

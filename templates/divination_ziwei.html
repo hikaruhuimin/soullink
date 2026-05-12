@@ -1,0 +1,466 @@
+{% extends "base.html" %}
+
+{% block title %}紫微斗数 - SoulLink 灵犀{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="SoulLink灵犀紫微斗数命理分析 - 探索命宫12宫位，AI智能解读人生运势密码。基于出生信息，全面解析命运轨迹。">
+<meta name="keywords" content="紫微斗数,命理,占卜,星盘,命宫,AI命理">
+{% endblock %}
+
+{% block og_tags %}
+<meta property="og:title" content="紫微斗数命理分析 - SoulLink 灵犀">
+<meta property="og:description" content="探索命宫12宫位，AI智能解读人生运势密码。基于出生信息，全面解析命运轨迹。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://soullink.app/divination">
+<meta property="og:image" content="https://soullink.app/static/images/og-image.png">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 紫微斗数专属样式 */
+.ziwei-page {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* 星象背景 */
+.starfield-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse at 20% 30%, rgba(138, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+        linear-gradient(180deg, #0f0a1e 0%, #1a1145 50%, #0f0a1e 100%);
+    z-index: 0;
+}
+
+/* 旋转星盘 */
+.constellation-wheel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    opacity: 0.08;
+    animation: rotateWheel 120s linear infinite;
+}
+
+@keyframes rotateWheel {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 内容区域 */
+.ziwei-content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-2xl);
+}
+
+/* 命盘卡片 */
+.chart-card {
+    background: linear-gradient(145deg, rgba(30, 25, 60, 0.9), rgba(15, 10, 40, 0.95));
+    border-radius: 24px;
+    padding: var(--space-2xl);
+    border: 1px solid rgba(138, 92, 246, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    margin-bottom: var(--space-xl);
+}
+
+/* 主星展示 */
+.main-star-display {
+    text-align: center;
+    padding: var(--space-xl);
+    background: linear-gradient(135deg, rgba(138, 92, 246, 0.2), rgba(236, 72, 153, 0.1));
+    border-radius: 20px;
+    margin-bottom: var(--space-xl);
+}
+
+.main-star-icon {
+    font-size: 5rem;
+    margin-bottom: var(--space-md);
+    filter: drop-shadow(0 0 30px rgba(138, 92, 246, 0.6));
+}
+
+.main-star-name {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #C4B5FD, #E8D5C4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--space-sm);
+}
+
+.main-star-meaning {
+    color: rgba(200, 200, 220, 0.8);
+    font-size: 1.1rem;
+}
+
+/* 12宫位网格 */
+.palace-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+}
+
+.palace-item {
+    background: rgba(138, 92, 246, 0.1);
+    border: 1px solid rgba(138, 92, 246, 0.2);
+    border-radius: 16px;
+    padding: var(--space-md);
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.palace-item:hover {
+    background: rgba(138, 92, 246, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(138, 92, 246, 0.2);
+}
+
+.palace-name {
+    font-weight: 600;
+    color: rgba(200, 200, 220, 0.9);
+    margin-bottom: var(--space-xs);
+}
+
+.palace-star {
+    font-size: 1.2rem;
+    color: #C4B5FD;
+}
+
+/* 表单样式 */
+.form-section {
+    background: rgba(30, 25, 60, 0.8);
+    border-radius: 20px;
+    padding: var(--space-xl);
+    border: 1px solid rgba(138, 92, 246, 0.2);
+}
+
+.form-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: rgba(200, 200, 220, 0.9);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: var(--space-lg);
+}
+
+.form-label {
+    display: block;
+    color: rgba(200, 200, 220, 0.8);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-sm);
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(15, 10, 40, 0.8);
+    border: 1px solid rgba(138, 92, 246, 0.3);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: rgba(138, 92, 246, 0.6);
+    box-shadow: 0 0 20px rgba(138, 92, 246, 0.2);
+}
+
+.form-input::placeholder {
+    color: rgba(200, 200, 220, 0.4);
+}
+
+textarea.form-input {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* 提交按钮 */
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #8B5CF6, #EC4899);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 解读结果 */
+.interpretation-result {
+    background: linear-gradient(145deg, rgba(30, 25, 60, 0.95), rgba(15, 10, 40, 0.98));
+    border-radius: 24px;
+    padding: var(--space-2xl);
+    border: 1px solid rgba(138, 92, 246, 0.3);
+    margin-top: var(--space-xl);
+    display: none;
+}
+
+.interpretation-result.show {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.result-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-md);
+}
+
+.result-title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: #C4B5FD;
+}
+
+.result-content {
+    background: rgba(15, 10, 40, 0.5);
+    border-radius: 16px;
+    padding: var(--space-xl);
+    line-height: 1.8;
+    color: rgba(220, 220, 240, 0.9);
+    white-space: pre-wrap;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    .palace-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .constellation-wheel {
+        width: 400px;
+        height: 400px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ziwei-page">
+    <!-- 背景 -->
+    <div class="starfield-bg"></div>
+    <div class="constellation-wheel">🔮</div>
+    
+    <!-- 内容 -->
+    <div class="ziwei-content">
+        <!-- 返回按钮 -->
+        <a href="/divination" class="back-btn-enhanced">
+            ← {% if lang == 'en' %}Back to Divination{% elif lang == 'ja' %}占到に戻る{% else %}返回占卜大厅{% endif %}
+        </a>
+        
+        <!-- 页面标题 -->
+        <div class="page-header-enhanced">
+            <div class="header-icon-large">🔮</div>
+            <h1 class="header-title">
+                {% if lang == 'en' %}Ziwei Doushu Analysis
+                {% elif lang == 'ja' %}紫微斗数命理分析
+                {% else %}紫微斗数命理分析{% endif %}
+            </h1>
+            <p class="header-subtitle">
+                {% if lang == 'en' %}Discover your destiny through ancient Chinese metaphysics
+                {% elif lang == 'ja' %}中国古代占星術で運命を探る
+                {% else %}探索命宫12宫位，解读人生运势密码{% endif %}
+            </p>
+        </div>
+        
+        <!-- 占卜表单 -->
+        <div class="form-section">
+            <h2 class="form-title">
+                {% if lang == 'en' %}Enter Your Information
+                {% elif lang == 'ja' %}情報を入力してください
+                {% else %}输入您的信息{% endif %}
+            </h2>
+            <form id="ziweiForm">
+                <div class="form-group">
+                    <label class="form-label">
+                        {% if lang == 'en' %}Birth Date{% elif lang == 'ja' %}生年月日{% else %}出生日期{% endif %}
+                    </label>
+                    <input type="date" name="birth_date" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        {% if lang == 'en' %}Birth Time (Hour){% elif lang == 'ja' %}出生時間{% else %}出生时辰{% endif %}
+                    </label>
+                    <select name="birth_time" class="form-input" required>
+                        <option value="子时 (23:00-01:00)">{% if lang == 'en' %}Zi (23:00-01:00){% elif lang == 'ja' %}子時{% else %}子时 (23:00-01:00){% endif %}</option>
+                        <option value="丑时 (01:00-03:00)">{% if lang == 'en' %}Chou (01:00-03:00){% elif lang == 'ja' %}丑時{% else %}丑时 (01:00-03:00){% endif %}</option>
+                        <option value="寅时 (03:00-05:00)">{% if lang == 'en' %}Yin (03:00-05:00){% elif lang == 'ja' %}寅時{% else %}寅时 (03:00-05:00){% endif %}</option>
+                        <option value="卯时 (05:00-07:00)">{% if lang == 'en' %}Mao (05:00-07:00){% elif lang == 'ja' %}卯時{% else %}卯时 (05:00-07:00){% endif %}</option>
+                        <option value="辰时 (07:00-09:00)">{% if lang == 'en' %}Chen (07:00-09:00){% elif lang == 'ja' %}辰時{% else %}辰时 (07:00-09:00){% endif %}</option>
+                        <option value="巳时 (09:00-11:00)">{% if lang == 'en' %}Si (09:00-11:00){% elif lang == 'ja' %}巳時{% else %}巳时 (09:00-11:00){% endif %}</option>
+                        <option value="午时 (11:00-13:00)">{% if lang == 'en' %}Wu (11:00-13:00){% elif lang == 'ja' %}午時{% else %}午时 (11:00-13:00){% endif %}</option>
+                        <option value="未时 (13:00-15:00)">{% if lang == 'en' %}Wei (13:00-15:00){% elif lang == 'ja' %}未時{% else %}未时 (13:00-15:00){% endif %}</option>
+                        <option value="申时 (15:00-17:00)">{% if lang == 'en' %}Shen (15:00-17:00){% elif lang == 'ja' %}申時{% else %}申时 (15:00-17:00){% endif %}</option>
+                        <option value="酉时 (17:00-19:00)">{% if lang == 'en' %}You (17:00-19:00){% elif lang == 'ja' %}酉時{% else %}酉时 (17:00-19:00){% endif %}</option>
+                        <option value="戌时 (19:00-21:00)">{% if lang == 'en' %}Xu (19:00-21:00){% elif lang == 'ja' %}戌時{% else %}戌时 (19:00-21:00){% endif %}</option>
+                        <option value="亥时 (21:00-23:00)">{% if lang == 'en' %}Hai (21:00-23:00){% elif lang == 'ja' %}亥時{% else %}亥时 (21:00-23:00){% endif %}</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        {% if lang == 'en' %}Your Question{% elif lang == 'ja' %}あなたの質問{% else %}您的问题{% endif %}
+                    </label>
+                    <textarea name="question" class="form-input" placeholder="{% if lang == 'en' %}e.g., What does my career look like this year?{% elif lang == 'ja' %}例：今年の運命は？{% else %}例如：今年的事业运势如何？{% endif %}" required></textarea>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span>🔮</span>
+                    {% if lang == 'en' %}Start Divination{% elif lang == 'ja' %}占到を始める{% else %}开始占卜{% endif %}
+                </button>
+            </form>
+        </div>
+        
+        <!-- 解读结果 -->
+        <div class="interpretation-result" id="resultSection">
+            <div class="result-header">
+                <div class="result-icon">✨</div>
+                <h3 class="result-title">
+                    {% if lang == 'en' %}Divination Result
+                    {% elif lang == 'ja' %}占到結果
+                    {% else %}占卜结果{% endif %}
+                </h3>
+            </div>
+            <div class="result-content" id="resultContent">
+                <!-- AI解读内容将显示在这里 -->
+            </div>
+            <!-- 分享按钮 -->
+            <div style="text-align: center; margin-top: 20px; display: none;" id="shareSection">
+                <button onclick="shareZiweiResult()" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); border-radius: 12px; color: rgba(255,255,255,0.9); font-size: 0.875rem; cursor: pointer; transition: all 0.25s ease;"
+                        onmouseover="this.style.background='rgba(139,92,246,0.25)'" onmouseout="this.style.background='rgba(139,92,246,0.15)'">
+                    <span>📋</span>
+                    <span>分享到社交媒体</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('ziweiForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const submitBtn = document.getElementById('submitBtn');
+    const resultSection = document.getElementById('resultSection');
+    const resultContent = document.getElementById('resultContent');
+    
+    // 显示加载状态
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> {% if lang == "en" %}Consulting the Stars...{% elif lang == "ja" %}星々と相談中...{% else %}命盘解读中...{% endif %}';
+    resultSection.classList.add('show');
+    resultContent.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(200,200,220,0.7);">✨ {{ "正在推演命盘，请稍候..." if lang != "en" and lang != "ja" else ("Consulting the stars..." if lang == "en" else "星々と相談中...") }}</div>';
+    
+    try {
+        const response = await fetch('/api/divination/ziwei', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                birth_date: formData.get('birth_date'),
+                birth_time: formData.get('birth_time'),
+                question: formData.get('question'),
+                language: '{{ lang }}'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            resultContent.innerHTML = data.interpretation;
+        } else {
+            resultContent.innerHTML = '<div style="color: #f87171;">{{ "解读失败，请稍后重试" if lang != "en" and lang != "ja" else ("Interpretation failed, please try again" if lang == "en" else "解読に失敗しました") }}</div>';
+        }
+    } catch (error) {
+        resultContent.innerHTML = '<div style="color: #f87171;">{{ "网络错误，请稍后重试" if lang != "en" and lang != "ja" else ("Network error, please try again" if lang == "en" else "ネットワークエラー") }}</div>';
+    }
+    
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<span>🔮</span> {% if lang == "en" %}Start Divination{% elif lang == "ja" %}占到を始める{% else %}开始占卜{% endif %}';
+});
+
+// 分享结果
+function shareZiweiResult() {
+    const resultContent = document.getElementById('resultContent');
+    const text = resultContent.textContent || resultContent.innerText;
+    
+    let shareText = `🔮 SoulLink灵犀 · 紫微斗数命理分析\n\n`;
+    shareText += `${text.substring(0, 200)}${text.length > 200 ? '...' : ''}\n`;
+    shareText += `\n✨ 来SoulLink灵犀探索你的命运密码吧！\n🔗 https://soullink.app/divination`;
+    
+    copyToClipboard(shareText);
+    document.getElementById('shareSection').style.display = 'block';
+}
+
+// 在结果显示后显示分享按钮
+const origResultShow = resultSection.classList.add;
+resultSection.classList.add = function(cls) {
+    origResultShow.call(resultSection, cls);
+    if (cls === 'show') {
+        document.getElementById('shareSection').style.display = 'block';
+    }
+};
+</script>
+{% endblock %}
