@@ -1367,7 +1367,7 @@ def paypal_create_order():
         return jsonify({"success": False, "error": "无效的套餐"})
 
     price = package["price"]
-    currency = "USD"
+    currency = "CNY"  # 价格是人民币
 
     token = _get_paypal_token()
     if not token:
