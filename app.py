@@ -1367,7 +1367,10 @@ def paypal_create_order():
         return jsonify({"success": False, "error": "无效的套餐"})
 
     price = package["price"]
-    currency = "CNY"  # 价格是人民币
+    currency = "USD"
+    # 人民币转美元定价（4档：$5/$10/$25/$60）
+    usd_prices = {'starter': 5, 'standard': 10, 'premium': 25, 'ultimate': 60}
+    usd_amount = usd_prices.get(package_id, price // 7)
 
     token = _get_paypal_token()
     if not token:
@@ -1383,7 +1386,7 @@ def paypal_create_order():
             "purchase_units": [{
                 "reference_id": order_no,
                 "description": f"SoulLink灵石充值 - {package['name']}",
-                "amount": {"currency_code": currency, "value": str(price)}
+                "amount": {"currency_code": currency, "value": str(usd_amount)}
             }]
         }, timeout=15)
 
