@@ -1323,7 +1323,7 @@ def recharge():
 
 # ============ Mock Payment (debug) ============
 @app.route('/mock-pay/<order_no>')
-def mock_payment_page(order_no):
+def mock_pay_page(order_no):
     """模拟支付页面"""
     from models import LingStoneRecharge
     recharge = LingStoneRecharge.query.filter_by(order_no=order_no).first()
@@ -1340,7 +1340,7 @@ def mock_payment_page(order_no):
 <button class="btn" type="submit">✅ 模拟支付成功</button></form></div></body></html>'''
 
 @app.route('/mock-pay/<order_no>/confirm', methods=['POST'])
-def mock_payment_confirm(order_no):
+def mock_pay_confirm(order_no):
     """模拟支付确认"""
     import uuid
     from models import LingStoneRecharge, LingStoneTransaction
