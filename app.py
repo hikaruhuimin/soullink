@@ -126,6 +126,23 @@ def create_app():
 
 
 app = create_app()
+
+# === 数据库迁移：新增字段自动补充 ===
+with app.app_context():
+    try:
+        from sqlalchemy import inspect, text
+        inspector = inspect(db.engine)
+        cols = [c['name'] for c in inspector.get_columns('users')]
+        if 'country_code' not in cols:
+            db.session.execute(text("ALTER TABLE users ADD COLUMN country_code TEXT DEFAULT '+86'"))
+            print('✓ Added country_code column')
+        if 'referred_by' not in cols:
+            db.session.execute(text("ALTER TABLE users ADD COLUMN referred_by INTEGER REFERENCES users(id)"))
+            print('✓ Added referred_by column')
+        db.session.commit()
+    except Exception as e:
+        print(f'Note: Migration skipped ({e})')
+# =================================
 # Health check endpoint
 @app.route("/health")
 def health():
