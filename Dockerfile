@@ -15,3 +15,4 @@ EXPOSE 8080
 
 CMD ["gunicorn", "wsgi:app", "--bind", "0.0.0.0:8080", "--workers", "1", "--threads", "2", "--timeout", "60"]
 # Rebuild 2026年 5月 11日 21:20 JST - force fresh deploy with new templates
+# Force rebuild 2026年 5月12日 星期二 23时48分22秒 JST
