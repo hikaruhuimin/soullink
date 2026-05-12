@@ -55,7 +55,8 @@ class Config:
         # 只有 PostgreSQL 支持 connect_timeout
         db_uri = Config._get_database_uri()
         if db_uri.startswith('postgresql'):
-            options['connect_args'] = {'connect_timeout': 10}
+            # 在连接URL中加connect_timeout参数
+            options['connect_args'] = {}
         return options
     
     SQLALCHEMY_ENGINE_OPTIONS = property(lambda self: self._get_engine_options())
