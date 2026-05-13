@@ -656,6 +656,27 @@ async function doRecharge() {
     showProcessing(true);
     
     try {
+        // Alipay / WeChat Pay: use dedicated API endpoints
+        if (selectedPayment === 'alipay' || selectedPayment === 'wechatpay') {
+            const endpoint = selectedPayment === 'alipay' ? '/api/alipay/create-order' : '/api/wechat/create-order';
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ package_id: selectedPackage })
+            });
+            const data = await response.json();
+            if (data.success && data.payment_url) {
+                window.location.href = data.payment_url;
+            } else {
+                showToast(data.error || '创建订单失败', 'error');
+                btn.disabled = false;
+                btn.textContent = '🔮 立即充值';
+                showProcessing(false);
+            }
+            return;
+        }
+        
+        // Stripe / Crypto: use generic recharge endpoint
         const response = await fetch('/api/recharge/create', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -667,12 +688,9 @@ async function doRecharge() {
         const data = await response.json();
         
         if (data.success) {
-            // In debug mode, redirect to mock payment page
-            // In production, this would redirect to Stripe/Alipay/WeChat
             if (data.payment_url) {
                 window.location.href = data.payment_url;
             } else {
-                // Fallback: direct confirmation
                 const confirmRes = await fetch('/api/recharge/confirm', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -717,7 +735,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const payResult = params.get('pay_result');
     if (payResult === 'success') {
         showToast('🎉 充值成功！灵石已到账', 'success');
-    setTimeout(() => location.reload(), 2000);
+        setTimeout(() => location.reload(), 2000);
     } else if (payResult === 'failed') {
         showToast('❌ 支付失败，请重试', 'error');
     }

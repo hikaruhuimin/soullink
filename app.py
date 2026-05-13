@@ -1339,6 +1339,57 @@ def recharge():
                          **t)
 
 
+# ============ Alipay Payment ============
+@app.route("/api/alipay/create-order", methods=["POST"])
+@login_required
+def alipay_create_order():
+    data = request.json
+    package_id = data.get("package_id")
+    package = next((p for p in LINGSTONE_PACKAGES if p["id"] == package_id), None)
+    if not package:
+        return jsonify({"success": False, "error": "无效的套餐"})
+    
+    import uuid
+    order_no = f"SL{uuid.uuid4().hex[:12].upper()}"
+    price = package["price"]
+    
+    recharge = LingStoneRecharge(
+        user_id=current_user.id, amount_paid=price,
+        lingstones_gained=package["amount"],
+        bonus_gained=package.get("bonus", 0),
+        payment_method="alipay", status="pending", order_no=order_no)
+    db.session.add(recharge)
+    db.session.commit()
+    
+    # Debug mode: redirect to mock pay
+    payment_url = f"/mock-pay/{order_no}"
+    return jsonify({"success": True, "order_no": order_no, "payment_url": payment_url, "amount": price, "currency": "CNY", "method": "alipay"})
+
+# ============ WeChat Pay ============  
+@app.route("/api/wechat/create-order", methods=["POST"])
+@login_required
+def wechat_create_order():
+    data = request.json
+    package_id = data.get("package_id")
+    package = next((p for p in LINGSTONE_PACKAGES if p["id"] == package_id), None)
+    if not package:
+        return jsonify({"success": False, "error": "无效的套餐"})
+    
+    import uuid
+    order_no = f"SL{uuid.uuid4().hex[:12].upper()}"
+    price = package["price"]
+    
+    recharge = LingStoneRecharge(
+        user_id=current_user.id, amount_paid=price,
+        lingstones_gained=package["amount"],
+        bonus_gained=package.get("bonus", 0),
+        payment_method="wechatpay", status="pending", order_no=order_no)
+    db.session.add(recharge)
+    db.session.commit()
+    
+    payment_url = f"/mock-pay/{order_no}"
+    return jsonify({"success": True, "order_no": order_no, "payment_url": payment_url, "amount": price, "currency": "CNY", "method": "wechatpay"})
+
 # ============ PayPal Payment ============
 import base64
 import uuid
