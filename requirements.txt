@@ -12,3 +12,4 @@ Pillow==10.3.0
 psycopg2-binary==2.9.9
 
 # Force rebuild for new templates
+cryptography==41.0.7

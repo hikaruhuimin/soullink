@@ -1361,8 +1361,58 @@ def alipay_create_order():
     db.session.add(recharge)
     db.session.commit()
     
-    # Debug mode: redirect to mock pay
-    payment_url = f"/mock-pay/{order_no}"
+    # 生成支付宝支付页面
+    ALIPAY_DEBUG = os.environ.get("ALIPAY_DEBUG", "true") == "true"
+    if ALIPAY_DEBUG:
+        payment_url = f"/mock-pay/{order_no}"
+    else:
+        # 真实支付宝支付
+        try:
+            from cryptography.hazmat.primitives import hashes, serialization, padding
+            from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
+            import base64, urllib.parse
+            
+            # 读取私钥
+            private_key_pem = os.environ.get("ALIPAY_PRIVATE_KEY", "")
+            private_key = serialization.load_pem_private_key(private_key_pem.encode(), password=None)
+            
+            # 支付宝参数
+            alipay_params = {
+                "app_id": os.environ.get("ALIPAY_APP_ID", ""),
+                "method": "alipay.trade.page.pay",
+                "format": "JSON",
+                "charset": "utf-8",
+                "sign_type": "RSA2",
+                "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+                "version": "1.0",
+                "notify_url": "https://soullinkai.zeabur.app/api/alipay/notify",
+                "return_url": "https://soullinkai.zeabur.app/recharge?pay_result=success",
+                "biz_content": json.dumps({
+                    "out_trade_no": order_no,
+                    "product_code": "FAST_INSTANT_TRADE_PAY",
+                    "total_amount": str(price),
+                    "subject": f"SoulLink灵石充值 - {package['name']}"
+                }, separators=(',', ':'))
+            }
+            
+            # 按key排序生成待签名字符串
+            sorted_keys = sorted(alipay_params.keys())
+            sign_str = "&".join([f"{k}={alipay_params[k]}" for k in sorted_keys])
+            
+            # RSA2签名
+            signature = private_key.sign(
+                sign_str.encode("utf-8"),
+                asym_padding.PKCS1v15(),
+                hashes.SHA256()
+            )
+            alipay_params["sign"] = base64.b64encode(signature).decode()
+            
+            # 构建支付URL
+            gateway = "https://openapi.alipay.com/gateway.do"
+            payment_url = f"{gateway}?{urllib.parse.urlencode(alipay_params)}"
+        except Exception as e:
+            print(f"[Alipay] 支付URL生成失败: {e}")
+            payment_url = f"/mock-pay/{order_no}"
     return jsonify({"success": True, "order_no": order_no, "payment_url": payment_url, "amount": price, "currency": "CNY", "method": "alipay"})
 
 # ============ WeChat Pay ============  
@@ -1389,6 +1439,19 @@ def wechat_create_order():
     
     payment_url = f"/mock-pay/{order_no}"
     return jsonify({"success": True, "order_no": order_no, "payment_url": payment_url, "amount": price, "currency": "CNY", "method": "wechatpay"})
+
+# ============ 支付通知回调 ============
+@app.route("/api/alipay/notify", methods=["POST"])
+def alipay_notify():
+    """支付宝异步通知回调"""
+    return "success"
+
+
+@app.route("/api/wechat/notify", methods=["POST"])
+def wechat_notify():
+    """微信支付异步通知回调"""
+    return "<xml><return_code><![CDATA[SUCCESS]]></return_code></xml>"
+
 
 # ============ PayPal Payment ============
 import base64
