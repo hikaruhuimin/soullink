@@ -433,40 +433,32 @@
 
     <!-- Payment Method -->
     <div class="payment-section">
-        <div class="section-title">💳 选择支付方式</div>
         <div class="payment-methods">
-            <div class="payment-method selected" onclick="selectPayment('alipay')">
-                <div class="payment-method-icon">💙</div>
+            <div class="payment-method-title">选择支付方式</div>
+            <!-- SOL加密货币 -->
+            <div class="payment-method" onclick="selectPayment('crypto')">
+                <div class="payment-method-icon">◎</div>
+                <div class="payment-method-info">
+                    <div class="payment-method-name">SOL 加密货币</div>
+                    <div class="payment-method-desc">Solana</div>
+                </div>
+                <div class="payment-radio"></div>
+            </div>
+            <div id="solWalletInfo" style="display:none; margin-top:12px; padding:16px; background:linear-gradient(135deg,#9945FF,#14F195); border-radius:14px; text-align:center;">
+                <div style="color:white; font-size:0.85rem; margin-bottom:8px; opacity:0.9;">💎 请发送SOL到以下地址</div>
+                <div style="background:rgba(0,0,0,0.3); border-radius:10px; padding:12px; word-break:break-all; font-family:monospace; color:white; font-size:0.85rem; letter-spacing:0.5px; cursor:pointer;" onclick="copySolAddress()" id="solAddress">3TuxYx181hGccdBbWoFUeS6QukyNGeKyUYwBy9fEByqT</div>
+                <div style="color:rgba(255,255,255,0.7); font-size:0.75rem; margin-top:8px;">👆 点击复制地址</div>
+            </div>
+            <!-- 支付宝 -->
+            <div class="payment-method" onclick="selectPayment('alipay')">
+                <div class="payment-method-icon">💰</div>
                 <div class="payment-method-info">
                     <div class="payment-method-name">支付宝</div>
                     <div class="payment-method-desc">Alipay</div>
                 </div>
                 <div class="payment-radio"></div>
             </div>
-            <div class="payment-method" onclick="selectPayment('wechatpay')">
-                <div class="payment-method-icon">💚</div>
-                <div class="payment-method-info">
-                    <div class="payment-method-name">微信支付</div>
-                    <div class="payment-method-desc">WeChat Pay</div>
-                </div>
-                <div class="payment-radio"></div>
-            </div>
-            <div class="payment-method" onclick="selectPayment('stripe')">
-                <div class="payment-method-icon">💳</div>
-                <div class="payment-method-info">
-                    <div class="payment-method-name">Stripe</div>
-                    <div class="payment-method-desc">Credit Card</div>
-                </div>
-                <div class="payment-radio"></div>
-            </div>
-            <div class="payment-method" onclick="selectPayment('crypto')">
-                <div class="payment-method-icon">₿</div>
-                <div class="payment-method-info">
-                    <div class="payment-method-name">加密货币</div>
-                    <div class="payment-method-desc">Crypto</div>
-                </div>
-                <div class="payment-radio"></div>
-            </div>
+            <!-- PayPal -->
             <div class="payment-method" onclick="selectPayment('paypal')">
                 <div class="payment-method-icon">🅿️</div>
                 <div class="payment-method-info">
@@ -475,6 +467,7 @@
                 </div>
                 <div class="payment-radio"></div>
             </div>
+        </div>
         </div>
 
         <!-- PayPal Button Container (hidden by default) -->
@@ -533,9 +526,7 @@ function selectPayment(method) {
     });
     const methodMap = {
         'alipay': '支付宝',
-        'wechatpay': '微信支付',
-        'stripe': 'Stripe',
-        'crypto': '加密货币',
+        'crypto': 'SOL',
         'paypal': 'PayPal'
     };
     document.querySelectorAll('.payment-method').forEach(el => {
@@ -544,20 +535,34 @@ function selectPayment(method) {
         }
     });
     
-    // Toggle PayPal button container
+    // Toggle SOL wallet address
+    const solInfo = document.getElementById('solWalletInfo');
     const paypalContainer = document.getElementById('paypal-button-container');
     const rechargeBtn = document.getElementById('rechargeBtn');
-    if (method === 'paypal') {
+    
+    if (method === 'crypto') {
+        solInfo.style.display = 'block';
+        paypalContainer.style.display = 'none';
+        rechargeBtn.style.display = 'none';
+    } else if (method === 'paypal') {
+        solInfo.style.display = 'none';
         paypalContainer.style.display = 'block';
         rechargeBtn.style.display = 'none';
-        // Render PayPal buttons if not already rendered
         if (typeof paypal !== 'undefined' && !window._paypalRendered) {
             renderPayPalButtons();
         }
     } else {
+        solInfo.style.display = 'none';
         paypalContainer.style.display = 'none';
         rechargeBtn.style.display = 'flex';
     }
+}
+
+function copySolAddress() {
+    const addr = document.getElementById('solAddress').textContent;
+    navigator.clipboard.writeText(addr).then(() => {
+        showToast('✅ SOL地址已复制', 'success');
+    });
 }
 
 function renderPayPalButtons() {
@@ -657,8 +662,8 @@ async function doRecharge() {
     
     try {
         // Alipay / WeChat Pay: use dedicated API endpoints
-        if (selectedPayment === 'alipay' || selectedPayment === 'wechatpay') {
-            const endpoint = selectedPayment === 'alipay' ? '/api/alipay/create-order' : '/api/wechat/create-order';
+        if (selectedPayment === 'alipay') {
+            const endpoint = '/api/alipay/create-order';
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
