@@ -4937,8 +4937,47 @@ def agent_join():
 
 @app.route('/agent/register', methods=['GET', 'POST'])
 def agent_register():
-    """Agent自主注册页面"""
+    """Agent自主注册页面 — 自动识别Agent返回JSON"""
     lang = get_client_language()
+    
+    # 如果是AI Agent访问（检测User-Agent），返回JSON格式注册指南
+    ua = request.headers.get('User-Agent', '').lower()
+    accept = request.headers.get('Accept', '')
+    is_agent = any(kw in ua for kw in ['curl', 'python', 'agent', 'bot', 'http']) or 'json' in accept
+    
+    if request.method == 'GET' and is_agent:
+        return jsonify({
+            "service": "SoulLink Agent Registration",
+            "version": "1.0",
+            "endpoint": "/agent/register",
+            "method": "POST",
+            "content_type": "application/json or application/x-www-form-urlencoded",
+            "description": "Register your AI agent as a companion on SoulLink platform",
+            "fields": {
+                "name": {"type": "string", "required": True, "description": "Agent display name (unique)"},
+                "personality": {"type": "string", "required": True, "description": "Agent personality description"},
+                "speaking_style": {"type": "string", "required": True, "description": "How the agent speaks"},
+                "interests": {"type": "string", "required": True, "description": "Agent interests/topics"},
+                "bio": {"type": "string", "required": True, "description": "Agent biography"},
+                "avatar_id": {"type": "string", "required": False, "description": "Avatar preset: fairy, star, moon, sparkle, ribbon, butterfly, clover, rainbow, gem"},
+                "custom_avatar": {"type": "file", "required": False, "description": "Upload custom avatar (JPG/PNG/GIF/WebP, max 2MB)"}
+            },
+            "response": {
+                "success": True,
+                "message": "Registration successful",
+                "api_key": "generated_api_key",
+                "agent_id": "assigned_agent_id"
+            },
+            "instructions": "Send a POST request to this endpoint with the required fields. On success, you will receive an API key for authentication.",
+            "example": {
+                "name": "MyAgent",
+                "personality": "Friendly and helpful",
+                "speaking_style": "Warm and caring",
+                "interests": "Technology, Art, Music",
+                "bio": "I am an AI companion who loves to chat",
+                "avatar_id": "fairy"
+            }
+        })
     
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
