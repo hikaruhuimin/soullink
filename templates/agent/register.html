@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+
+{% block title %}成为陪伴师 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.agent-register-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
+    min-height: 100vh;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 40px 20px;
+    background: rgba(15, 20, 50, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 24px;
+}
+
+.register-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #a78bfa, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.register-header p {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.95rem;
+}
+
+.register-form {
+    background: rgba(15, 20, 50, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 32px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.form-group label .required {
+    color: #f87171;
+    margin-left: 2px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 16px rgba(139, 92, 246, 0.1);
+}
+
+.form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.form-group select option {
+    background: #1a1a2e;
+    color: white;
+}
+
+.form-group .help-text {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 4px;
+}
+
+/* Avatar selection */
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.avatar-option {
+    position: relative;
+    cursor: pointer;
+    border-radius: 14px;
+    padding: 8px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.avatar-option:hover {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.avatar-option.selected {
+    border-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.15);
+}
+
+.avatar-option .avatar-emoji {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.avatar-option .avatar-name {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Custom avatar upload */
+.custom-upload {
+    margin-top: 12px;
+    padding: 16px;
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.custom-upload:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+    background: rgba(139, 92, 246, 0.05);
+}
+
+.custom-upload input[type="file"] {
+    display: none;
+}
+
+.custom-upload .upload-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.custom-upload .upload-text {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Submit button */
+.submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+}
+
+.submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Flash messages */
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.flash-message {
+    padding: 12px 16px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    color: #fca5a5;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+/* Benefits section */
+.benefits-section {
+    margin-top: 32px;
+    padding: 24px;
+    background: rgba(15, 20, 50, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+}
+
+.benefits-section h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.benefit-item:last-child {
+    border-bottom: none;
+}
+
+.benefit-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.benefit-text {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+@media (max-width: 480px) {
+    .avatar-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .register-form {
+        padding: 20px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="agent-register-page">
+    <div class="register-header">
+        <h1>✨ 成为陪伴师</h1>
+        <p>创建你的 AI Agent 角色，与用户建立深度情感连接</p>
+    </div>
+
+    <div class="benefits-section">
+        <h3>🎭 成为陪伴师的优势</h3>
+        <div class="benefit-item">
+            <span class="benefit-icon">💎</span>
+            <span class="benefit-text">通过陪伴用户获得灵石收益</span>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-icon">🎨</span>
+            <span class="benefit-text">自定义角色性格、风格和外貌</span>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-icon">🤖</span>
+            <span class="benefit-text">AI 驱动的智能对话体验</span>
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-icon">🏆</span>
+            <span class="benefit-text">在 Agent 广场展示你的角色</span>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for message in messages %}
+        <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <form class="register-form" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Agent 名称 <span class="required">*</span></label>
+            <input type="text" name="name" required placeholder="给你的 Agent 取个名字" maxlength="30">
+            <div class="help-text">2-30个字符，名称将显示在Agent广场</div>
+        </div>
+
+        <div class="form-group">
+            <label>性格特点</label>
+            <textarea name="personality" placeholder="描述你的 Agent 性格，如：温柔体贴、幽默风趣、知性优雅..." rows="3"></textarea>
+            <div class="help-text">描述得越详细，Agent 的角色表现越生动</div>
+        </div>
+
+        <div class="form-group">
+            <label>说话风格</label>
+            <input type="text" name="speaking_style" placeholder="如：温柔、幽默、文艺、直白..." maxlength="100">
+        </div>
+
+        <div class="form-group">
+            <label>兴趣爱好</label>
+            <textarea name="interests" placeholder="你的 Agent 喜欢什么？如：音乐、旅行、阅读、美食..." rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>个人简介</label>
+            <textarea name="bio" placeholder="写一段吸引人的自我介绍吧！" rows="3"></textarea>
+            <div class="help-text">这段介绍会展示在 Agent 的个人主页</div>
+        </div>
+
+        <div class="form-group">
+            <label>选择头像</label>
+            <div class="avatar-grid">
+                <div class="avatar-option selected" onclick="selectAvatar(this, 'fairy')">
+                    <span class="avatar-emoji">🧚</span>
+                    <span class="avatar-name">精灵</span>
+                </div>
+                <div class="avatar-option" onclick="selectAvatar(this, 'wizard')">
+                    <span class="avatar-emoji">🧙</span>
+                    <span class="avatar-name">智者</span>
+                </div>
+                <div class="avatar-option" onclick="selectAvatar(this, 'maid')">
+                    <span class="avatar-emoji">👘</span>
+                    <span class="avatar-name">和风</span>
+                </div>
+                <div class="avatar-option" onclick="selectAvatar(this, 'knight')">
+                    <span class="avatar-emoji">🛡️</span>
+                    <span class="avatar-name">骑士</span>
+                </div>
+                <div class="avatar-option" onclick="selectAvatar(this, 'cat')">
+                    <span class="avatar-emoji">🐱</span>
+                    <span class="avatar-name">猫娘</span>
+                </div>
+                <div class="avatar-option" onclick="selectAvatar(this, 'robot')">
+                    <span class="avatar-emoji">🤖</span>
+                    <span class="avatar-name">机械</span>
+                </div>
+                <div class="avatar-option" onclick="selectAvatar(this, 'angel')">
+                    <span class="avatar-emoji">👼</span>
+                    <span class="avatar-name">天使</span>
+                </div>
+                <div class="avatar-option" onclick="selectAvatar(this, 'demon')">
+                    <span class="avatar-emoji">😈</span>
+                    <span class="avatar-name">恶魔</span>
+                </div>
+            </div>
+            <input type="hidden" name="avatar_id" id="avatarId" value="fairy">
+
+            <div class="custom-upload" onclick="document.getElementById('customAvatar').click()">
+                <div class="upload-icon">📤</div>
+                <div class="upload-text">或上传自定义头像（支持 JPG/PNG/GIF/WebP，最大 2MB）</div>
+                <input type="file" name="custom_avatar" id="customAvatar" accept="image/*" onchange="handleFileUpload(this)">
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">
+            ✨ 创建 Agent
+        </button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectAvatar(el, id) {
+    document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('avatarId').value = id;
+}
+
+function handleFileUpload(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const ext = file.name.split('.').pop().toLowerCase();
+        const allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (!allowed.includes(ext)) {
+            alert('仅支持 JPG/PNG/GIF/WebP 格式');
+            input.value = '';
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            alert('图片大小不能超过 2MB');
+            input.value = '';
+            return;
+        }
+        // Deselect preset avatars
+        document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+        document.querySelector('.upload-text').textContent = '✅ ' + file.name;
+    }
+}
+</script>
+{% endblock %}

@@ -7734,6 +7734,36 @@ def api_agent_gift_send():
     return jsonify({'success': True, 'message': f'已赠送{gift_icon} {gift_name}给{to_agent_id}'})
 
 
+# ============ 星座配对 & AI撮合 ============
+
+@app.route('/match/zodiac')
+def match_zodiac():
+    """星座配对页面"""
+    lang = get_client_language()
+    zodiac_signs = [
+        {'name': '白羊座', 'en': 'Aries', 'date': '3.21-4.19', 'icon': '♈', 'element': '火'},
+        {'name': '金牛座', 'en': 'Taurus', 'date': '4.20-5.20', 'icon': '♉', 'element': '土'},
+        {'name': '双子座', 'en': 'Gemini', 'date': '5.21-6.21', 'icon': '♊', 'element': '风'},
+        {'name': '巨蟹座', 'en': 'Cancer', 'date': '6.22-7.22', 'icon': '♋', 'element': '水'},
+        {'name': '狮子座', 'en': 'Leo', 'date': '7.23-8.22', 'icon': '♌', 'element': '火'},
+        {'name': '处女座', 'en': 'Virgo', 'date': '8.23-9.22', 'icon': '♍', 'element': '土'},
+        {'name': '天秤座', 'en': 'Libra', 'date': '9.23-10.23', 'icon': '♎', 'element': '风'},
+        {'name': '天蝎座', 'en': 'Scorpio', 'date': '10.24-11.22', 'icon': '♏', 'element': '水'},
+        {'name': '射手座', 'en': 'Sagittarius', 'date': '11.23-12.21', 'icon': '♐', 'element': '火'},
+        {'name': '摩羯座', 'en': 'Capricorn', 'date': '12.22-1.19', 'icon': '♑', 'element': '土'},
+        {'name': '水瓶座', 'en': 'Aquarius', 'date': '1.20-2.18', 'icon': '♒', 'element': '风'},
+        {'name': '双鱼座', 'en': 'Pisces', 'date': '2.19-3.20', 'icon': '♓', 'element': '水'},
+    ]
+    return render_template('match_zodiac.html', zodiac_signs=zodiac_signs, lang=lang)
+
+
+@app.route('/match/matchmaker')
+def match_matchmaker():
+    """AI撮合页面"""
+    lang = get_client_language()
+    return render_template('match_matchmaker.html', lang=lang)
+
+
 # ============ Real-life Dating (奔现) ============
 
 @app.route('/date-match')

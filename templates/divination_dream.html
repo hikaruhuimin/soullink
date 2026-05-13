@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+
+{% block title %}AI解梦 - SoulLink 灵犀{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="SoulLink灵犀AI解梦平台 - 输入你的梦境，AI智能解读梦境背后的含义。探索潜意识的秘密，了解梦境中的象征和预示。">
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/starry.css?v=20260502">
+<style>
+.dream-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
+    min-height: 100vh;
+}
+
+/* Header */
+.dream-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 40px 20px;
+    background: rgba(15, 20, 50, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.dream-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #c4b5fd, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.dream-header p {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Input Section */
+.dream-input-section {
+    background: rgba(15, 20, 50, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 28px;
+}
+
+.dream-input-section label {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.dream-input-section textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    color: white;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.dream-input-section textarea:focus {
+    outline: none;
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+}
+
+.dream-input-section textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.dream-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 16px;
+    width: 100%;
+    justify-content: center;
+}
+
+.dream-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+}
+
+.dream-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Result */
+.dream-result {
+    display: none;
+    background: rgba(15, 20, 50, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 28px;
+    animation: fadeInUp 0.5s ease;
+}
+
+.dream-result.show {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-section {
+    margin-bottom: 20px;
+}
+
+.result-section:last-child {
+    margin-bottom: 0;
+}
+
+.result-section h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    color: #c4b5fd;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.result-section p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.result-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+/* Encyclopedia link */
+.encyclopedia-link {
+    text-align: center;
+    margin-top: 24px;
+    padding: 20px;
+    background: rgba(15, 20, 50, 0.4);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.encyclopedia-link a {
+    color: #a78bfa;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.encyclopedia-link a:hover {
+    color: #c4b5fd;
+    text-decoration: underline;
+}
+
+/* Loading spinner */
+.dream-loading {
+    display: none;
+    text-align: center;
+    padding: 40px;
+}
+
+.dream-loading.show {
+    display: block;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(139, 92, 246, 0.2);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.dream-loading p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+}
+
+/* History section */
+.dream-history {
+    margin-top: 32px;
+}
+
+.dream-history h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 16px;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    background: rgba(15, 20, 50, 0.45);
+    backdrop-filter: blur(12px);
+    border-radius: 14px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.history-item:hover {
+    background: rgba(20, 25, 60, 0.65);
+    transform: translateX(4px);
+}
+
+.history-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.history-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.history-text .dream-snippet {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-text .dream-date {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 2px;
+}
+
+/* Quick dream tips */
+.dream-tips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.dream-tip {
+    padding: 8px 16px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dream-tip:hover {
+    background: rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.4);
+    color: white;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dream-page">
+    <div class="dream-header">
+        <h1>💭 AI 解梦</h1>
+        <p>输入你的梦境，AI 智能解读梦境背后的奥秘</p>
+    </div>
+
+    <div class="dream-input-section">
+        <label for="dreamInput">描述你的梦境</label>
+        <textarea id="dreamInput" placeholder="昨晚我梦见了...（请详细描述梦中的场景、人物和感受）"></textarea>
+        <div class="dream-tips">
+            <span class="dream-tip" onclick="setDreamText('我梦到自己在天上飞，感觉很自由')">✈️ 飞翔</span>
+            <span class="dream-tip" onclick="setDreamText('我梦到掉牙齿，一颗一颗地掉')">🦷 掉牙</span>
+            <span class="dream-tip" onclick="setDreamText('我梦到被什么东西追赶，拼命跑')">🏃 被追</span>
+            <span class="dream-tip" onclick="setDreamText('我梦到考试迟到或没准备好')">📝 考试</span>
+        </div>
+        <button class="dream-btn" onclick="interpretDream()">
+            🔮 解读梦境
+        </button>
+    </div>
+
+    <div class="dream-loading" id="dreamLoading">
+        <div class="spinner"></div>
+        <p>正在解读你的梦境...</p>
+    </div>
+
+    <div class="dream-result" id="dreamResult">
+        <div class="result-icon" id="resultIcon">🔮</div>
+        <div class="result-section">
+            <h3>🔤 梦境象征</h3>
+            <p id="resultSymbol"></p>
+        </div>
+        <div class="result-section">
+            <h3>📖 深度分析</h3>
+            <p id="resultAnalysis"></p>
+        </div>
+        <div class="result-section">
+            <h3>💖 情感解读</h3>
+            <p id="resultEmotion"></p>
+        </div>
+        <div class="result-section">
+            <h3>💡 建议指引</h3>
+            <p id="resultAdvice"></p>
+        </div>
+        <div class="result-section">
+            <h3>🍀 幸运指引</h3>
+            <p id="resultLucky"></p>
+        </div>
+    </div>
+
+    <div class="encyclopedia-link">
+        <a href="/divination/dream/encyclopedia">📚 查看梦境图鉴 →</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setDreamText(text) {
+    document.getElementById('dreamInput').value = text;
+}
+
+function interpretDream() {
+    const dream = document.getElementById('dreamInput').value.trim();
+    if (!dream) {
+        alert('请输入梦境描述');
+        return;
+    }
+
+    const loading = document.getElementById('dreamLoading');
+    const result = document.getElementById('dreamResult');
+    const btn = document.querySelector('.dream-btn');
+
+    loading.classList.add('show');
+    result.classList.remove('show');
+    btn.disabled = true;
+    btn.textContent = '🔮 解读中...';
+
+    fetch('/api/dream/interpret', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dream: dream })
+    })
+    .then(r => r.json())
+    .then(data => {
+        loading.classList.remove('show');
+        btn.disabled = false;
+        btn.textContent = '🔮 解读梦境';
+
+        if (data.success) {
+            document.getElementById('resultSymbol').textContent = data.symbol;
+            document.getElementById('resultAnalysis').textContent = data.analysis;
+            document.getElementById('resultEmotion').textContent = data.emotion;
+            document.getElementById('resultAdvice').textContent = data.advice;
+            document.getElementById('resultLucky').textContent = data.lucky;
+            result.classList.add('show');
+            result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            alert(data.error || '解读失败，请重试');
+        }
+    })
+    .catch(err => {
+        loading.classList.remove('show');
+        btn.disabled = false;
+        btn.textContent = '🔮 解读梦境';
+        alert('网络错误，请重试');
+    });
+}
+</script>
+{% endblock %}

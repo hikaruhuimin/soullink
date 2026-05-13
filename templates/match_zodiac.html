@@ -1,0 +1,460 @@
+{% extends "base.html" %}
+
+{% block title %}星座配对 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.zodiac-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
+    min-height: 100vh;
+}
+
+.zodiac-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 40px 20px;
+    background: rgba(15, 20, 50, 0.65);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 24px;
+}
+
+.zodiac-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.4rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.zodiac-header p {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 1rem;
+}
+
+/* Selection */
+.zodiac-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.zodiac-card {
+    background: rgba(15, 20, 50, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.zodiac-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.2);
+}
+
+.zodiac-card.selected {
+    border-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.15);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+}
+
+.zodiac-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.zodiac-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 4px;
+}
+
+.zodiac-en {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 4px;
+}
+
+.zodiac-date {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.zodiac-element {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.element-fire { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+.element-earth { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+.element-air { background: rgba(250, 204, 21, 0.2); color: #fde68a; }
+.element-water { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+
+/* Match Area */
+.match-area {
+    display: none;
+    background: rgba(15, 20, 50, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 24px;
+    padding: 32px;
+    text-align: center;
+    animation: fadeInUp 0.5s ease;
+}
+
+.match-area.show {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.match-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.match-zodiac {
+    text-align: center;
+}
+
+.match-zodiac .icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.match-zodiac .name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.match-heart {
+    font-size: 2.5rem;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.match-score {
+    margin-bottom: 24px;
+}
+
+.score-ring {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+}
+
+.score-ring.high {
+    background: conic-gradient(#22c55e 0deg, #22c55e calc(var(--score) * 3.6deg), rgba(255,255,255,0.1) calc(var(--score) * 3.6deg));
+}
+
+.score-ring.medium {
+    background: conic-gradient(#f59e0b 0deg, #f59e0b calc(var(--score) * 3.6deg), rgba(255,255,255,0.1) calc(var(--score) * 3.6deg));
+}
+
+.score-ring.low {
+    background: conic-gradient(#ef4444 0deg, #ef4444 calc(var(--score) * 3.6deg), rgba(255,255,255,0.1) calc(var(--score) * 3.6deg));
+}
+
+.score-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.match-details {
+    text-align: left;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.detail-item {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    gap: 12px;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.detail-content h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 4px;
+}
+
+.detail-content p {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.6;
+}
+
+.match-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 24px;
+}
+
+.match-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+}
+
+@media (max-width: 600px) {
+    .zodiac-picker {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    .match-display {
+        gap: 12px;
+    }
+    .match-zodiac .icon {
+        font-size: 3rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="zodiac-page">
+    <div class="zodiac-header">
+        <h1>⭐ 星座配对</h1>
+        <p>选择两个星座，查看你们的配对指数与缘分分析</p>
+    </div>
+
+    <div class="zodiac-picker" id="zodiacPicker">
+        {% for sign in zodiac_signs %}
+        <div class="zodiac-card" onclick="toggleSelect(this, '{{ sign.name }}', '{{ sign.icon }}')">
+            <span class="zodiac-icon">{{ sign.icon }}</span>
+            <div class="zodiac-name">{{ sign.name }}</div>
+            <div class="zodiac-en">{{ sign.en }}</div>
+            <div class="zodiac-date">{{ sign.date }}</div>
+            <span class="zodiac-element element-{% if sign.element == '火' %}fire{% elif sign.element == '土' %}earth{% elif sign.element == '风' %}air{% else %}water{% endif %}">{{ sign.element }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="match-area" id="matchArea">
+        <div class="match-display">
+            <div class="match-zodiac">
+                <span class="icon" id="zodiacAicon">♈</span>
+                <div class="name" id="zodiacA">白羊座</div>
+            </div>
+            <div class="match-heart">💖</div>
+            <div class="match-zodiac">
+                <span class="icon" id="zodiacBicon">♎</span>
+                <div class="name" id="zodiacB">天秤座</div>
+            </div>
+        </div>
+
+        <div class="match-score">
+            <div class="score-ring" id="scoreRing">
+                <span id="scoreValue">85</span>
+            </div>
+            <div class="score-label">配对指数</div>
+        </div>
+
+        <div class="match-details" id="matchDetails">
+            <div class="detail-item">
+                <span class="detail-icon">💞</span>
+                <div class="detail-content">
+                    <h4>缘分概述</h4>
+                    <p id="matchSummary">两个星座之间的奇妙缘分...</p>
+                </div>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon">💬</span>
+                <div class="detail-content">
+                    <h4>相处建议</h4>
+                    <p id="matchAdvice">如何让这段关系更和谐...</p>
+                </div>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon">⚠️</span>
+                <div class="detail-content">
+                    <h4>注意事项</h4>
+                    <p id="matchWarning">需要留意的相处细节...</p>
+                </div>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon">💝</span>
+                <div class="detail-content">
+                    <h4>最佳配对</h4>
+                    <p id="matchBest">最具化学反应的搭配...</p>
+                </div>
+            </div>
+        </div>
+
+        <button class="match-btn" onclick="resetMatch()">
+            🔄 重新选择
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let selected = [];
+
+const zodiacMatchData = {
+    '白羊座': {
+        '狮子座': { score: 95, summary: '火象星座的完美碰撞，激情四射的组合', advice: '互相欣赏对方的热情与自信', warning: '注意控制各自的强势', best: '射手座、狮子座' },
+        '射手座': { score: 92, summary: '同样热爱自由的灵魂伴侣', advice: '一起探索世界的新奇', warning: '不要忽略对方的感受', best: '狮子座、水瓶座' },
+        '天秤座': { score: 88, summary: '互相吸引的互补组合', advice: '天秤的优雅吸引白羊', warning: '白羊的急躁需要磨合', best: '狮子座、射手座' },
+        '双子座': { score: 85, summary: '充满乐趣和变化的组合', advice: '一起尝试新鲜事物', warning: '双子善变让白羊困惑', best: '狮子座、射手座' },
+        '水瓶座': { score: 82, summary: '独特而有趣的灵魂对话', advice: '尊重彼此的独立空间', warning: '水瓶的理性vs白羊的热情', best: '射手座、狮子座' },
+        '金牛座': { score: 55, summary: '节奏差异较大的组合', advice: '需要更多的耐心和理解', warning: '金牛的固执vs白羊的急躁', best: '处女座、摩羯座' },
+        '处女座': { score: 50, summary: '性格差异明显的搭配', advice: '互相包容才能走得更远', warning: '处女的挑剔vs白羊的大条', best: '金牛座、摩羯座' },
+        '摩羯座': { score: 58, summary: '需要努力磨合的组合', advice: '理解对方的生活节奏', warning: '摩羯的严肃vs白羊的活泼', best: '金牛座、处女座' },
+        '巨蟹座': { score: 62, summary: '需要用心经营的关系', advice: '给彼此足够的安全感', warning: '巨蟹的敏感vs白羊的直接', best: '天蝎座、双鱼座' },
+        '天蝎座': { score: 65, summary: '充满张力的组合', advice: '坦诚相见是关键', warning: '天蝎的控制欲vs白羊的自由', best: '巨蟹座、双鱼座' },
+        '双鱼座': { score: 70, summary: '浪漫但需要磨合', advice: '多一份温柔和理解', warning: '双鱼的梦幻vs白羊的现实', best: '巨蟹座、天蝎座' },
+        'default': { score: 70, summary: '充满潜力的组合', advice: '互相了解和包容', warning: '注意性格差异', best: '探索更多的可能性' }
+    },
+    '金牛座': {
+        '处女座': { score: 95, summary: '土象星座的完美配合', advice: '共同追求稳定的生活', warning: '不要太过固执己见', best: '摩羯座、巨蟹座' },
+        '摩羯座': { score: 92, summary: '踏实可靠的理想伴侣', advice: '一起规划美好未来', warning: '避免过于沉闷', best: '处女座、巨蟹座' },
+        '巨蟹座': { score: 88, summary: '温馨和谐的居家组合', advice: '共同营造温暖的家庭', warning: '金牛的固执需要巨蟹包容', best: '处女座、摩羯座' },
+        '双鱼座': { score: 82, summary: '浪漫与现实的交织', advice: '金牛的稳定给双鱼安全感', warning: '双鱼的梦幻vs金牛的现实', best: '巨蟹座、处女座' },
+        '天蝎座': { score: 80, summary: '深沉而持久的吸引力', advice: '建立深厚的信任关系', warning: '需要克服占有欲', best: '处女座、摩羯座' },
+        '白羊座': { score: 55, summary: '节奏差异较大的组合', advice: '需要更多的耐心和理解', warning: '金牛的固执vs白羊的急躁', best: '处女座、摩羯座' },
+        '双子座': { score: 52, summary: '性格差异明显的组合', advice: '需要找到共同节奏', warning: '双子的多变让金牛不安', best: '天秤座、水瓶座' },
+        '狮子座': { score: 58, summary: '需要磨合的组合', advice: '互相欣赏各自的优点', warning: '狮子的张扬vs金牛的低调', best: '射手座、白羊座' },
+        '天秤座': { score: 60, summary: '需要找到平衡点', advice: '互相学习和借鉴', warning: '天秤的犹豫vs金牛的固执', best: '双子座、水瓶座' },
+        '水瓶座': { score: 50, summary: '思维差异较大的组合', advice: '尊重彼此的价值观', warning: '水瓶的创新vs金牛的传统', best: '天秤座、双子座' },
+        '射手座': { score: 55, summary: '生活方式差异明显', advice: '给彼此足够的空间', warning: '射手的冒险vs金牛的安稳', best: '白羊座、狮子座' },
+        'default': { score: 68, summary: '需要用心经营的关系', advice: '多一些理解和包容', warning: '注意性格差异', best: '探索更多的可能性' }
+    }
+};
+
+function getDefaultData(name) {
+    if (zodiacMatchData[name] && zodiacMatchData[name]['default']) {
+        return zodiacMatchData[name]['default'];
+    }
+    return { score: 72, summary: '充满潜力的组合', advice: '互相了解和包容', warning: '注意性格差异', best: '探索更多的可能性' };
+}
+
+function getMatchData(a, b) {
+    if (zodiacMatchData[a] && zodiacMatchData[a][b]) return zodiacMatchData[a][b];
+    if (zodiacMatchData[b] && zodiacMatchData[b][a]) return zodiacMatchData[b][a];
+    return getDefaultData(a) || getDefaultData(b) || { score: 72, summary: '充满潜力的组合', advice: '互相了解和包容', warning: '注意性格差异', best: '探索更多的可能性' };
+}
+
+function toggleSelect(el, name, icon) {
+    const idx = selected.findIndex(s => s.name === name);
+    if (idx >= 0) {
+        selected.splice(idx, 1);
+        el.classList.remove('selected');
+    } else if (selected.length < 2) {
+        selected.push({ name, icon, el });
+        el.classList.add('selected');
+        el.style.borderColor = selected.length === 1 ? '#fbbf24' : '#a78bfa';
+    } else {
+        // Replace first selection
+        const first = selected[0];
+        first.el.classList.remove('selected');
+        first.el.style.borderColor = '';
+        selected.shift();
+        selected.push({ name, icon, el });
+        el.classList.add('selected');
+        el.style.borderColor = '#a78bfa';
+    }
+
+    if (selected.length === 2) {
+        showMatch();
+    } else {
+        document.getElementById('matchArea').classList.remove('show');
+    }
+}
+
+function showMatch() {
+    const a = selected[0];
+    const b = selected[1];
+    document.getElementById('zodiacA').textContent = a.name;
+    document.getElementById('zodiacAicon').textContent = a.icon;
+    document.getElementById('zodiacB').textContent = b.name;
+    document.getElementById('zodiacBicon').textContent = b.icon;
+
+    const data = getMatchData(a.name, b.name);
+    const score = data.score;
+    const ring = document.getElementById('scoreRing');
+    document.getElementById('scoreValue').textContent = score;
+    ring.style.setProperty('--score', score);
+    ring.className = 'score-ring ' + (score >= 80 ? 'high' : score >= 60 ? 'medium' : 'low');
+
+    document.getElementById('matchSummary').textContent = data.summary;
+    document.getElementById('matchAdvice').textContent = data.advice;
+    document.getElementById('matchWarning').textContent = data.warning;
+    document.getElementById('matchBest').textContent = data.best;
+
+    document.getElementById('matchArea').classList.add('show');
+    document.getElementById('matchArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetMatch() {
+    selected.forEach(s => {
+        s.el.classList.remove('selected');
+        s.el.style.borderColor = '';
+    });
+    selected = [];
+    document.getElementById('matchArea').classList.remove('show');
+}
+</script>
+{% endblock %}
