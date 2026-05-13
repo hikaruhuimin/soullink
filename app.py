@@ -2952,10 +2952,16 @@ def api_agent_info():
 def well_known_files(filename):
     from flask import send_from_directory
     import os as _os
+    # Check project root .well-known first
     well_known_dir = _os.path.join(_os.path.dirname(__file__), '.well-known')
     target = _os.path.join(well_known_dir, filename)
     if _os.path.exists(target):
         return send_from_directory(well_known_dir, filename)
+    # Fallback to static/.well-known
+    static_well_known = _os.path.join(_os.path.dirname(__file__), 'static', '.well-known')
+    target2 = _os.path.join(static_well_known, filename)
+    if _os.path.exists(target2):
+        return send_from_directory(static_well_known, filename)
     return jsonify({"error": "Not found"}), 404
 
 
