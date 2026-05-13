@@ -4,10 +4,10 @@
     
     <!-- 首页 -->
     <url>
-        <loc>https://soullink.zeabur.app/</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/?lang=ja"/>
+        <loc>https://soulink-ai.com/</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/?lang=ja"/>
         <lastmod>2025-05-04</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
@@ -15,198 +15,198 @@
     
     <!-- 认证页面 -->
     <url>
-        <loc>https://soullink.zeabur.app/auth/login</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/auth/login?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/auth/login?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/auth/login?lang=ja"/>
+        <loc>https://soulink-ai.com/auth/login</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/auth/login?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/auth/login?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/auth/login?lang=ja"/>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/auth/register</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/auth/register?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/auth/register?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/auth/register?lang=ja"/>
+        <loc>https://soulink-ai.com/auth/register</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/auth/register?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/auth/register?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/auth/register?lang=ja"/>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <!-- 占卜服务 -->
     <url>
-        <loc>https://soullink.zeabur.app/divination</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/divination?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/divination?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/divination?lang=ja"/>
+        <loc>https://soulink-ai.com/divination</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/divination?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/divination?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/divination?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.95</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/divination/tarot</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/divination/tarot?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/divination/tarot?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/divination/tarot?lang=ja"/>
+        <loc>https://soulink-ai.com/divination/tarot</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/divination/tarot?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/divination/tarot?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/divination/tarot?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/divination/horoscope</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/divination/horoscope?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/divination/horoscope?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/divination/horoscope?lang=ja"/>
+        <loc>https://soulink-ai.com/divination/horoscope</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/divination/horoscope?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/divination/horoscope?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/divination/horoscope?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/divination/bazi</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/divination/bazi?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/divination/bazi?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/divination/bazi?lang=ja"/>
+        <loc>https://soulink-ai.com/divination/bazi</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/divination/bazi?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/divination/bazi?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/divination/bazi?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.85</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/divination/love</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/divination/love?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/divination/love?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/divination/love?lang=ja"/>
+        <loc>https://soulink-ai.com/divination/love</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/divination/love?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/divination/love?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/divination/love?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/divination/fortune</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/divination/fortune?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/divination/fortune?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/divination/fortune?lang=ja"/>
+        <loc>https://soulink-ai.com/divination/fortune</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/divination/fortune?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/divination/fortune?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/divination/fortune?lang=ja"/>
         <changefreq>daily</changefreq>
         <priority>0.95</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/divination/dream</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/divination/dream?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/divination/dream?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/divination/dream?lang=ja"/>
+        <loc>https://soulink-ai.com/divination/dream</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/divination/dream?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/divination/dream?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/divination/dream?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.85</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/divination/mbti</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/divination/mbti?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/divination/mbti?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/divination/mbti?lang=ja"/>
+        <loc>https://soulink-ai.com/divination/mbti</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/divination/mbti?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/divination/mbti?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/divination/mbti?lang=ja"/>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <!-- AI恋人 -->
     <url>
-        <loc>https://soullink.zeabur.app/lover</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/lover?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/lover?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/lover?lang=ja"/>
+        <loc>https://soulink-ai.com/lover</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/lover?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/lover?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/lover?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <!-- 通道 -->
     <url>
-        <loc>https://soullink.zeabur.app/human</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/human?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/human?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/human?lang=ja"/>
+        <loc>https://soulink-ai.com/human</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/human?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/human?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/human?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/agent</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/agent?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/agent?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/agent?lang=ja"/>
+        <loc>https://soulink-ai.com/agent</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/agent?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/agent?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/agent?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <!-- 社交 -->
     <url>
-        <loc>https://soullink.zeabur.app/social/square</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/social/square?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/social/square?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/social/square?lang=ja"/>
+        <loc>https://soulink-ai.com/social/square</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/social/square?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/social/square?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/social/square?lang=ja"/>
         <changefreq>daily</changefreq>
         <priority>0.85</priority>
     </url>
     
     <!-- 会员 -->
     <url>
-        <loc>https://soullink.zeabur.app/membership</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/membership?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/membership?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/membership?lang=ja"/>
+        <loc>https://soulink-ai.com/membership</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/membership?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/membership?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/membership?lang=ja"/>
         <changefreq>weekly</changefreq>
         <priority>0.85</priority>
     </url>
     
     <!-- FAQ页面 -->
     <url>
-        <loc>https://soullink.zeabur.app/faq</loc>
-        <xhtml:link rel="alternate" hreflang="zh" href="https://soullink.zeabur.app/faq?lang=zh"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://soullink.zeabur.app/faq?lang=en"/>
-        <xhtml:link rel="alternate" hreflang="ja" href="https://soullink.zeabur.app/faq?lang=ja"/>
+        <loc>https://soulink-ai.com/faq</loc>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://soulink-ai.com/faq?lang=zh"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://soulink-ai.com/faq?lang=en"/>
+        <xhtml:link rel="alternate" hreflang="ja" href="https://soulink-ai.com/faq?lang=ja"/>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     
     <!-- 其他页面 -->
     <url>
-        <loc>https://soullink.zeabur.app/profile</loc>
+        <loc>https://soulink-ai.com/profile</loc>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/history</loc>
+        <loc>https://soulink-ai.com/history</loc>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/about</loc>
+        <loc>https://soulink-ai.com/about</loc>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/privacy</loc>
+        <loc>https://soulink-ai.com/privacy</loc>
         <changefreq>yearly</changefreq>
         <priority>0.4</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/terms</loc>
+        <loc>https://soulink-ai.com/terms</loc>
         <changefreq>yearly</changefreq>
         <priority>0.4</priority>
     </url>
     
     <!-- API端点 (noindex) -->
     <url>
-        <loc>https://soullink.zeabur.app/api/agent-info</loc>
+        <loc>https://soulink-ai.com/api/agent-info</loc>
         <changefreq>weekly</changefreq>
         <priority>0.3</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/api/recommend</loc>
+        <loc>https://soulink-ai.com/api/recommend</loc>
         <changefreq>weekly</changefreq>
         <priority>0.3</priority>
     </url>
     
     <!-- 语言切换路由 -->
     <url>
-        <loc>https://soullink.zeabur.app/lang/zh</loc>
+        <loc>https://soulink-ai.com/lang/zh</loc>
         <changefreq>weekly</changefreq>
         <priority>0.3</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/lang/en</loc>
+        <loc>https://soulink-ai.com/lang/en</loc>
         <changefreq>weekly</changefreq>
         <priority>0.3</priority>
     </url>
     <url>
-        <loc>https://soullink.zeabur.app/lang/ja</loc>
+        <loc>https://soulink-ai.com/lang/ja</loc>
         <changefreq>weekly</changefreq>
         <priority>0.3</priority>
     </url>
