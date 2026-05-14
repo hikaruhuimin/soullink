@@ -412,7 +412,7 @@
     }
 }
 
-/* 验证码样式 */
+/* {{ _('verify_code') }}样式 */
 .captcha-section {
     margin-bottom: 1.25rem;
 }
@@ -599,7 +599,7 @@
             
             <button type="submit" class="btn btn-primary btn-block auth-submit-btn">{{ _('login') }}</button>
             
-            {# 登录验证码（失败3次后显示） #}
+            {# 登录{{ _('verify_code') }}（失败3次后显示） #}
             {% if require_captcha %}
             <div class="captcha-section" style="margin-top: 1rem;">
                 <div class="captcha-wrapper">
@@ -684,12 +684,12 @@
                     </div>
                     <p class="verification-hint">{{ _('phone_format_hint') }}</p>
                 </div>
-                <!-- 短信验证码 -->
+                <!-- 短信{{ _('verify_code') }} -->
                 <div class="form-group" style="margin-top:12px;">
-                    <label>验证码</label>
+                    <label>{{ _('verify_code') }}</label>
                     <div style="display:flex;gap:8px;">
-                        <input type="text" name="sms_code" id="smsCodeInput" placeholder="输入6位验证码" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="flex:1;padding:0.75rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:10px;color:var(--color-text);font-size:1rem;text-align:center;letter-spacing:4px;">
-                        <button type="button" id="sendSmsBtn" onclick="sendSmsCode()" style="white-space:nowrap;padding:0.75rem 1rem;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s;">发送验证码</button>
+                        <input type="text" name="sms_code" id="smsCodeInput" placeholder="输入6位{{ _('verify_code') }}" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="flex:1;padding:0.75rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:10px;color:var(--color-text);font-size:1rem;text-align:center;letter-spacing:4px;">
+                        <button type="button" id="sendSmsBtn" onclick="sendSmsCode()" style="white-space:nowrap;padding:0.75rem 1rem;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s;">{{ _('send_code') }}</button>
                     </div>
                     <p class="verification-hint" id="smsStatus" style="margin-top:6px;font-size:0.8rem;"></p>
                 </div>
@@ -719,7 +719,7 @@
             
             <button type="submit" class="btn btn-primary btn-block auth-submit-btn">{{ _('register') }}</button>
             
-            {# 注册验证码 #}
+            {# 注册{{ _('verify_code') }} #}
             <div class="captcha-section" style="margin-top: 1rem;">
                 <div class="captcha-wrapper">
                     <img src="/captcha" alt="captcha" class="captcha-image" id="registerCaptchaImg" onclick="this.src='/captcha?'+Math.random()">
@@ -910,11 +910,11 @@ document.getElementById('registerForm')?.addEventListener('submit', function(e) 
         return;
     }
     
-    // 手机注册需验证短信验证码
+    // 手机注册需验证短信{{ _('verify_code') }}
     if (registerMethod === 'phone') {
         const smsCode = document.getElementById('smsCodeInput').value;
         if (!smsCode || smsCode.length !== 6) {
-            alert('请输入6位短信验证码');
+            alert('请输入6位短信{{ _('verify_code') }}');
             e.preventDefault();
             return;
         }
@@ -933,7 +933,7 @@ document.getElementById('showRefCodeLink')?.addEventListener('click', function()
     }
 });
 
-// ── 短信验证码 ──
+// ── 短信{{ _('verify_code') }} ──
 let smsTimer = null;
 let smsCountdown = 0;
 
@@ -991,7 +991,7 @@ function sendSmsCode() {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            status.textContent = data.debug_code ? '验证码已发送（调试模式: ' + data.debug_code + '）' : '验证码已发送';
+            status.textContent = data.debug_code ? '{{ _('verify_code') }}已发送（调试模式: ' + data.debug_code + '）' : '{{ _('verify_code') }}已发送';
             status.style.color = '#10b981';
         } else {
             status.textContent = data.message || '发送失败';

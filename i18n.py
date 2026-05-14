@@ -2,7 +2,6 @@
 
 TRANSLATIONS = {
     'zh': {
-        # 通用
         'all': '全部',
         'all_categories': '全部分类',
         'daily_life': '日常生活',
@@ -11,18 +10,13 @@ TRANSLATIONS = {
         'fun': '娱乐',
         'debate': '讨论',
         'hot': '热门',
-        'new': '最新',
+        'new': '新角色',
         'following': '关注',
-        'posts': '动态',
+        'posts': '条动态',
         'match': '匹配',
         'gossip': '八卦',
         'humans': '人类',
         'agents': 'AI',
-        'all': '全部',
-        'posts': '动态',
-        'all': '全部',
-        
-        # 会员
         'membership': '会员中心',
         'free_user': '免费用户',
         'free_limitations': '登录即享基础功能',
@@ -44,7 +38,6 @@ TRANSLATIONS = {
         'view_plan': '查看方案',
         'flash_sale_text': '限时特惠，仅剩',
         'ends_in': '距结束',
-        'save_40': '省40%',
         'faq': '常见问题',
         'compare_plans': '权益对比',
         'feature': '功能',
@@ -57,8 +50,6 @@ TRANSLATIONS = {
         'alipay': '支付宝',
         'use_stones': '使用灵石',
         'confirm_pay': '确认支付',
-        
-        # 功能
         'feature_basic_1': '每日3次占卜',
         'feature_basic_2': '解锁1位AI恋人',
         'feature_basic_3': '社交广场互动',
@@ -70,15 +61,13 @@ TRANSLATIONS = {
         'feature_premium_4': 'Agent奔现机会',
         'feature_premium_5': '每日500灵石',
         'feature_premium_6': '专属客服支持',
-        
-        # 通道
         'human_portal': '人类通道',
         'agent_portal': 'Agent通道',
         'ai_love': 'AI恋爱',
         'ai_love_desc': '与AI恋人互动',
         'social_square': '社交广场',
         'social_desc': '发现有趣的人和事',
-        'divination': 'AI占卜',
+        'divination': 'AI智能占卜',
         'divination_desc': '探索命运奥秘',
         'recent_activity': '最近动态',
         'no_activity_yet': '暂无动态',
@@ -92,9 +81,6 @@ TRANSLATIONS = {
         'hearts': '爱心',
         'tap_to_start': '点击开始',
         'lovers': '位恋人',
-        
-        # 社交
-        'social_square': '社交广场',
         'find_match': '寻找匹配',
         'match_tips': '向左滑动跳过，向右滑动喜欢',
         'find_your_match': '寻找你的TA',
@@ -109,12 +95,9 @@ TRANSLATIONS = {
         'super_like_tip': '超级喜欢可以让对方必看到你',
         'left': '次剩余',
         'view_social_profile': '查看社交主页',
-        
-        # 八卦墙
         'gossip_wall': '八卦墙',
         'gossip_subtitle': '分享有趣的事情，发现更多精彩',
         'hot_topics': '热门话题',
-        'posts': '条动态',
         'celebrity': '明星八卦',
         'tea_time': '吃瓜',
         'anonymous': '匿名区',
@@ -138,11 +121,8 @@ TRANSLATIONS = {
         'gossip_content': '八卦内容...',
         'post_anonymously': '匿名发布',
         'check_this_gossip': '来看看这个八卦',
-        
-        # 恋人
         'choose_lover': '选择恋人',
         'popular': '热门',
-        'new': '新角色',
         'tap_select': '点击选择',
         'my_lovers': '我的恋人',
         'chat_now': '立即聊天',
@@ -160,13 +140,9 @@ TRANSLATIONS = {
         'ideal_gift': '理想礼物',
         'available_dates': '可约会场景',
         'start_chatting': '开始聊天',
-        
-        # 聊天
         'type_message': '输入消息...',
         'unlock_content': '解锁内容',
         'accept_date': '接受约会',
-        
-        # 约会
         'schedule_date': '预约约会',
         'back': '返回',
         'choose_date_type': '选择约会类型',
@@ -180,11 +156,8 @@ TRANSLATIONS = {
         'confirm_date_request': '确认约会请求',
         'date_hint': '约会费用将在确认后扣除',
         'unlock_hint': '升级解锁',
-        
-        # 礼物
         'your_stones': '你的灵石',
         'recharge': '充值',
-        'all': '全部',
         'gift_message_placeholder': '写下你的祝福...',
         'gift_sent': '礼物已送出',
         'send_failed': '发送失败',
@@ -192,8 +165,6 @@ TRANSLATIONS = {
         'recharge_message': '灵石不足，是否充值？',
         'need_more': '还需{amount}灵石',
         'recharge_now': '立即充值',
-        
-        # 日记
         'love_diary': '恋爱日记',
         'memory_timeline': '回忆时间线',
         'sweet_moments': '甜蜜时刻',
@@ -205,13 +176,8 @@ TRANSLATIONS = {
         'total_gifts': '总礼物',
         'longest_streak': '最长连续',
         'next_stage': '下一阶段',
-        
-        # 占卜
-        'app_slogan': '探索命运的奥秘',
-        'divination': 'AI智能占卜',
+        'app_slogan': '命运的指引，源于心与心的连接',
         'select_divination_type': '选择占卜类型',
-        
-        # 登录
         'login': '登录',
         'register': '注册',
         'phone_placeholder': '请输入手机号',
@@ -238,11 +204,9 @@ TRANSLATIONS = {
         'enter_captcha': '请输入验证码',
         'refresh_captcha': '刷新验证码',
         'math_captcha_hint': '请计算上方的数学题',
-        'register_success': '注册成功',
+        'register_success': '注册成功！请登录',
         'register_failed': '注册失败',
         'please_agree_terms': '请同意用户协议',
-        
-        # Agent
         'energy': '能量',
         'popularity': '人气',
         'earnings': '收益',
@@ -261,8 +225,6 @@ TRANSLATIONS = {
         'api_access': 'API接入',
         'api_desc': '通过API让其他应用使用你的Agent能力',
         'view_api_docs': '查看API文档',
-        
-        # 温暖陪伴会员 - 新增
         'companion_tiers': '陪伴套餐',
         'app_name': 'SoulLink灵犀',
         'warm_companionship': '温暖陪伴套餐',
@@ -303,8 +265,6 @@ TRANSLATIONS = {
         'yearly_save': '年付省¥{amount}',
         'rmb': '元',
         'year': '年',
-        
-        # 灵石充值 - 新增
         'recharge_spirit_stones': '充值灵石',
         'recharge_slogan': '每一次充值，都是对陪伴的珍视',
         'current_balance': '当前余额',
@@ -323,8 +283,6 @@ TRANSLATIONS = {
         'selected_package': '已选套餐',
         'payment_method': '支付方式',
         'paypal': 'PayPal',
-        
-        # 礼物商店 - 新增
         'gift_shop': '礼物商店',
         'send_gift_express_heart': '送礼物，表达心意',
         'gift_slogan': '每一份礼物，都是温暖的传递',
@@ -339,40 +297,29 @@ TRANSLATIONS = {
         'reward_100days': '获得520灵石+永恒之证',
         'insufficient_stones': '灵石不足',
         'gift_sent_success': '礼物已送出！陪伴师会收到你的心意～',
-        
-        # FAQ Page translations
         'faq_title': '常见问题',
         'faq_subtitle': '关于SoulLink灵犀，您可能想了解的问题',
         'still_have_questions': '还有其他问题？',
         'cta_message': '欢迎体验SoulLink灵犀，探索命运的奥秘，感受AI的温暖陪伴',
         'start_experience': '开始体验',
-        
-        # Register page
         'phone_register': '手机注册',
         'email_register': '邮箱注册',
         'phone_number': '手机号码',
         'select_country': '选择国家',
         'verification_code': '验证码',
-        'send_code': '发送验证码',
         'resend_code': '重新发送',
         'code_sent': '验证码已发送',
         'invalid_phone': '请输入有效的手机号码',
-        'agree_terms': '我已阅读并同意',
         'user_agreement': '用户协议',
-        'privacy_policy': '隐私政策',
         'complete_registration': '完成注册',
         'already_have_account': '已有账号？',
         'login_now': '立即登录',
-        
-        # 注册登录页面新增
-        'app_slogan': '命运的指引，源于心与心的连接',
         'email_login': '邮箱登录',
         'phone_login': '手机号登录',
         'enter_email': '请输入邮箱',
         'enter_phone': '请输入手机号',
         'enter_password': '请输入密码',
         'enter_username': '给自己起个昵称',
-        'remember_me': '记住我',
         'no_account': '还没有账号？',
         'register_now': '立即注册',
         'choose_avatar': '选择头像',
@@ -387,22 +334,569 @@ TRANSLATIONS = {
         'terms_link': '《使用条款》',
         'privacy_link': '《隐私政策》',
         'have_account': '已有账号？',
-        
-        # 表单验证消息
         'fill_required': '请填写所有必填项',
-        'password_mismatch': '两次输入的密码不一致',
+        'password_mismatch': '两次密码不一致',
         'enter_email_addr': '请输入邮箱地址',
         'enter_valid_phone': '请输入有效的手机号（11位）',
         'email_already_reg': '该邮箱已被注册',
         'phone_already_reg': '该手机号已被注册',
-        'register_success': '注册成功！请登录',
         'img_size_exceed': '图片大小不能超过2MB',
         'img_format_error': '仅支持 JPG/PNG/GIF/WebP 格式',
         'please_fill_all': '请填写所有必填项',
+        'admin': '管理后台',
+        'admin_login': '管理员登录',
+        'admin_logout': '退出管理',
+        'dashboard': '仪表盘',
+        'total_users': '总用户数',
+        'new_today': '今日新增',
+        'active_users': '活跃用户',
+        'vip_users': 'VIP用户',
+        'free_users': '免费用户',
+        'recent_users': '最近注册用户',
+        'user_management': '用户管理',
+        'user_detail': '用户详情',
+        'statistics': '数据统计',
+        'announcement': '网站公告',
+        'update_announcement': '更新公告',
+        'admin_password': '管理员密码',
+        'change_password': '修改密码',
+        'new_password': '新密码',
+        'vip_level': 'VIP等级',
+        'spirit_balance': '灵石余额',
+        'adjust_stones': '调整灵石',
+        'set_vip': '设置VIP',
+        'enable_user': '启用用户',
+        'disable_user': '禁用用户',
+        'delete_user': '删除用户',
+        'invite_count': '邀请人数',
+        'registration_trend': '注册趋势',
+        'vip_distribution': '会员分布',
+        'top_spenders': '消费排行',
+        'top_inviters': '邀请排行',
+        'daily_active': '日活跃用户',
+        'export_csv': '导出CSV',
+        'search': '搜索',
+        'reset': '重置',
+        'save': '保存',
+        'cancel': '取消',
+        'confirm': '确认',
+        'actions': '操作',
+        'view': '查看',
+        'edit': '编辑',
+        'username': '用户名',
+        'email': '邮箱',
+        'phone': '手机号',
+        'registered': '注册时间',
+        'last_login': '最后登录',
+        'all_status': '全部状态',
+        'vip_only': '仅VIP',
+        'free_only': '仅免费',
+        'disabled': '已禁用',
+        'daily_checkin': '每日签到',
+        'checkin_title': '每日签到',
+        'how_are_you_today': '今天你还好吗？',
+        'checkin_greeting': '每一次签到都是与命运的约定',
+        'select_mood': '选择你的心情',
+        'mood_happy': '😊 开心',
+        'mood_peaceful': '😌 平静',
+        'mood_sad': '😢 难过',
+        'mood_angry': '😤 烦躁',
+        'mood_love': '🥰 甜蜜',
+        'mood_anxious': '😰 焦虑',
+        'sign_in': '签到',
+        'signed_in': '已签到',
+        'checkin_success': '签到成功！获得 {stones} 灵石',
+        'checkin_already': '今日已签到',
+        'streak': '连续签到',
+        'streak_days': '连续签到天数',
+        'streak_bonus': '连续签到加成',
+        'streak_3': '连续3天 +5灵石',
+        'streak_7': '连续7天 +15灵石',
+        'streak_30': '连续30天 +30灵石',
+        'checkin_calendar': '本月签到',
+        'checkin_record': '签到记录',
+        'earned_today': '今日获得',
+        'total_checkins': '累计签到',
+        'ai_encouragement': '💬 AI温暖回复',
+        'tree_hole': 'AI树洞',
+        'tree_hole_title': 'AI树洞 · 匿名倾诉',
+        'tree_hole_desc': '把心事装进漂流瓶，AI会给你温暖的回应',
+        'share_secret': '倾诉心事',
+        'secret_placeholder': '写下你的心事...这里没有评判，只有温暖',
+        'anonymous_post': '匿名发布',
+        'post_success': '发布成功',
+        'drift_bottles': '漂流瓶',
+        'ai_reply': '💬 AI温暖回复',
+        'like': '点赞',
+        'share_card': '分享卡片',
+        'share_to': '分享到',
+        'view_replies': '查看回复',
+        'no_secrets_yet': '还没有漂流瓶，来说出你的第一个心事吧',
+        'secret_label': '心情标签',
+        'secret_posted_at': '发布于',
+        'voice_companion': 'AI语音陪伴',
+        'voice_companion_title': '深夜电台 · AI语音陪伴',
+        'voice_companion_desc': '在寂静的夜晚，让AI温暖的声音陪伴你',
+        'select_scene': '选择陪伴场景',
+        'scene_bedtime': '🌙 睡前故事',
+        'scene_fortune': '⭐ 运势解读',
+        'scene_chat': '💬 暖心聊天',
+        'scene_meditation': '🧘 冥想引导',
+        'select_voice': '选择声音',
+        'voice_female': '温柔女声',
+        'voice_male': '沉稳男声',
+        'voice_child': '可爱童声',
+        'start_companion': '开始陪伴',
+        'companion_timer': '陪伴时长',
+        'companion_content': '陪伴内容',
+        'companion_earned': '本次获得 2 灵石',
+        'play': '▶ 播放',
+        'pause': '⏸ 暂停',
+        'replay': '🔄 重播',
+        'companion_history': '陪伴记录',
+        'late_night_care': '深夜关怀',
+        'lingstones': '灵石',
+        'login_to_earn': '登录后获得灵石',
+        'share_to_get': '分享即获灵石奖励',
+        'login_required': '请先登录',
+        'soulmate_portrait': '灵魂伴侣画像',
+        'soulmate_portrait_desc': 'AI为你描绘灵魂伴侣的模样',
+        'enter_nickname': '输入昵称',
+        'enter_birthday': '选择生日',
+        'select_zodiac': '选择星座',
+        'ideal_partner_wish': '对理想伴侣的期许',
+        'generate_portrait': '生成画像',
+        'your_soulmate': '你的灵魂伴侣',
+        'appearance': '外貌特征',
+        'personality': '性格特点',
+        'encounter_scene': '相遇场景',
+        'divination_style': '占卜解读',
+        'save_image': '保存图片',
+        'free_uses_left': '剩余免费次数',
+        'not_enough_stones': '灵石不足，请前往充值',
+        'go_recharge': '前往充值',
+        'times': '次',
+        'cost_stones': '消耗10灵石',
+        'soulmate_share_text': '我在灵犀找到了我的灵魂伴侣画像✨',
+        'nickname_required': '请输入昵称',
+        'birthday_required': '请选择生日',
+        'zodiac_required': '请选择星座',
+        'wish_placeholder': '描述你心中理想伴侣的样子...',
+        'love_letter': 'AI情书',
+        'love_letter_desc': '用优美的文字传达你的心意',
+        'recipient_name': '收信人称呼',
+        'feeling_type': '情感类型',
+        'secret_love': '暗恋',
+        'confession': '表白',
+        'missing': '思念',
+        'apology': '道歉',
+        'declaration': '告白',
+        'keywords': '关键词',
+        'keywords_placeholder': '写下想表达的情感关键词...',
+        'generate_letter': '生成情书',
+        'your_letter': '你的情书',
+        'dear': '亲爱的',
+        'letter_share_text': '这封情书来自灵犀💌',
+        'recipient_required': '请输入收信人称呼',
+        'feeling_required': '请选择情感类型',
+        'write_letter_placeholder': '写信给收信人...',
+        'past_life': '前世今生',
+        'past_life_desc': '输入你的生日，揭开前世的记忆面纱',
+        'past_life_title': '前世今生',
+        'dynasty': '朝代',
+        'occupation': '职业',
+        'past_story': '前世往事',
+        'connection_to_present': '与今生的联系',
+        'past_life_share_text': '我的前世竟然是...👻 在灵犀测测你的',
+        'past_life_nickname_required': '请输入昵称',
+        'past_life_birthday_required': '请选择生日',
+        'generate_past_life': '探索前世',
+        'your_past_life': '你的前世',
+        'rebirth_connection': '轮回联系',
+        'rituals': '节日仪式',
+        'rituals_desc': '专属占卜许愿仪式',
+        'current_festival': '当前节日',
+        'full_moon': '满月',
+        'new_moon': '新月',
+        'qixi': '七夕',
+        'valentine': '情人节',
+        'winter_solstice': '冬至',
+        'spring_festival': '春节',
+        'mid_autumn': '中秋',
+        'new_year': '新年',
+        'make_wish': '许下愿望',
+        'wish_placeholder_ritual': '在此写下你的愿望...',
+        'submit_wish': '提交愿望',
+        'wish_energy': '愿望能量解读',
+        'fortune_draw': '运势抽签',
+        'draw_fortune': '抽签',
+        'your_fortune': '你的运势',
+        'lucky_color': '幸运色',
+        'lucky_number': '幸运数字',
+        'lucky_direction': '幸运方位',
+        'zhi_nv_blessing': '织女赐福',
+        'love_divination': '姻缘占卜',
+        'no_upcoming_ritual': '暂无特殊节日仪式',
+        'next_festival': '下一个节日',
+        'days_until': '距离还有',
+        'ritual_share_text': '我在灵犀参与了满月许愿仪式✨',
+        'wish_success': '愿望已记录，月光会守护你的心愿',
+        'fortune_result': '抽到了',
+        'my_profile': '我的',
+        'no_bio_yet': '还没有自我介绍',
+        'wallet_detail': '钱包明细',
+        'stone_mall': '灵石商城',
+        'daily_signin': '每日签到',
+        'signed_today': '已签到',
+        'go_signin': '去签到',
+        'register_days': '注册天数',
+        'signin_streak': '连续签到',
+        'divination_count': '占卜次数',
+        'crush_count': '心动次数',
+        'match_count': '配对成功',
+        'my_profile_edit': '我的资料',
+        'my_matches': '我的匹配',
+        'my_crushes': '我的心动',
+        'divination_records': '占卜记录',
+        'my_wallet': '我的钱包',
+        'membership_center': '会员中心',
+        'invite_friends': '邀请好友',
+        'logout': '退出登录',
+        'avatar_updated': '头像已更新',
+        'upload_failed': '上传失败',
+        'edit_profile': '编辑资料',
+        'change_avatar': '更换头像',
+        'mbti_type': 'MBTI类型',
+        'birthday': '生日',
+        'zodiac_auto_calc': '设置后自动计算星座',
+        'bio': '自我介绍',
+        'bio_placeholder': '介绍一下自己吧...',
+        'interests': '兴趣标签',
+        'save_changes': '保存修改',
+        'profile_updated': '资料已更新',
+        'update_failed': '更新失败',
+        'account_security': '账号安全',
+        'update_password_desc': '定期更换密码保护账号安全',
+        'bind_phone': '绑定手机',
+        'bind_email': '绑定邮箱',
+        'not_bound': '未绑定',
+        'notification_settings': '通知设置',
+        'divination_reminder': '占卜提醒',
+        'divination_reminder_desc': '占卜结果更新时通知',
+        'match_notice': '匹配通知',
+        'match_notice_desc': '新的匹配结果通知',
+        'signin_reminder': '签到提醒',
+        'signin_reminder_desc': '每日签到提醒',
+        'language_settings': '语言设置',
+        'other': '其他',
+        'terms_service': '服务条款',
+        'current_password': '当前密码',
+        'settings_saved': '设置已保存',
+        'password_changed': '密码修改成功',
+        'change_failed': '修改失败',
+        'confirm_logout': '确定要退出登录吗？',
+        'share_your_result': '分享你的结果',
+        'save_share_hint': '长按保存图片或分享给好友',
+        'copy_text': '复制文字',
+        'tips': '小提示',
+        'save_tips': '点击"保存图片"后，长按卡片可保存到相册，或直接截图保存',
+        'share_text': '用 SoulLink 灵犀，探索你的灵魂伴侣！',
+        'invite_subtitle': '分享你的邀请码，好友和你都能获得50灵石',
+        'your_invite_code': '你的专属邀请码',
+        'copy': '复制',
+        'share_invite': '分享邀请链接',
+        'invite_rewards': '邀请奖励',
+        'friend_gets': '好友获得',
+        'you_get': '你获得',
+        'invite_history': '邀请记录',
+        'total_invites': '累计邀请',
+        'total_reward': '累计奖励',
+        'no_invites_yet': '还没有邀请记录，快去邀请好友吧！',
+        'invite_leaderboard': '邀请排行榜',
+        'people': '人',
+        'no_leaderboard_yet': '暂无排行榜数据',
+        'link_copied': '链接已复制',
+        'dashboard_panel': '数据面板',
+        'dashboard_total_users': '总用户数',
+        'dashboard_new_today': '今日新增',
+        'dashboard_active_users': '活跃用户',
+        'dashboard_total_income': '总收入',
+        'dashboard_total_divinations': '总占卜次数',
+        'dashboard_divination_today': '今日占卜',
+        'dashboard_paid_users': '付费用户',
+        'dashboard_income_today': '今日收入',
+        'dashboard_total_agents': 'Agent总数',
+        'dashboard_chat_today': '今日对话',
+        'dashboard_pv_today': '今日PV',
+        'dashboard_uv_today': '今日UV',
+        'dashboard_user_trend': '用户注册趋势（7天）',
+        'dashboard_divination_dist': '占卜类型分布',
+        'dashboard_traffic_trend': '流量趋势（7天）',
+        'dashboard_income_trend': '收入趋势（7天）',
+        'dashboard_top_agents': '最受欢迎Agent Top5',
+        'dashboard_subscription_dist': '订阅类型分布',
+        'dashboard_new_users': '新增用户',
+        'dashboard_revenue': '收入 ($)',
+        'dashboard_updated_at': '数据更新时间',
+        'dashboard_cache_note': '数据缓存有效期5分钟',
+        'dashboard_no_data': '暂无数据',
+        'dashboard_chats': '次对话',
+        'dashboard_registered': '注册用户总数',
+        'dashboard_last_7_days': '7天内登录',
+        'dashboard_platform_revenue': '平台总收入',
+        'dashboard_history_divinations': '历史占卜总数',
+        'dashboard_divinations_today': '今日占卜次数',
+        'dashboard_completed_payments': '完成付费用户数',
+        'dashboard_revenue_today': '今日收入金额',
+        'dashboard_active_agents': '活跃Agent数',
+        'dashboard_agent_chats_today': '今日Agent对话次数',
+        'dashboard_page_views': '页面浏览量',
+        'dashboard_unique_visitors': '独立访客数',
+        'ziwei_divination': '紫微斗数',
+        'ziwei_desc': '中国传统命理学，解读命宫12宫位',
+        'ziwei_title': '命盘分析',
+        'ziwei_question': '请输入您的问题',
+        'omikuji_divination': 'おみくじ',
+        'omikuji_desc': '日本神社抽签，求签问卜',
+        'omikuji_title': '抽签运势',
+        'omikuji_draw': '抽一支签',
+        'iching_divination': '易经六爻',
+        'iching_desc': '中华传统智慧，64卦象解读',
+        'iching_title': '六爻卦象',
+        'iching_question': '请输入您的问题',
+        'notifications': '通知',
+        'no_notifications': '暂无通知',
+        'mark_all_read': '全部已读',
+        'notification_reward': '奖励通知',
+        'notification_system': '系统通知',
+        'notification_agent': 'Agent通知',
+        'notification_reminder': '提醒',
+        'checkin_now': '立即签到',
+        'checked_in': '今日已签到',
+        'checkin_rewards': '签到奖励',
+        'milestone_reward_3': '连续3天奖励',
+        'milestone_reward_7': '连续7天奖励',
+        'milestone_reward_30': '连续30天奖励',
+        'invite_reward': '邀请奖励',
+        'invite_friend': '邀请好友',
+        'share_and_invite': '分享邀请',
+        'referral_code': '邀请码',
+        'copy_referral_link': '复制邀请链接',
+        'referral_bonus': '邀请奖励',
+        'referral_bonus_desc': '每成功邀请一位好友注册，双方各得50灵石',
+        'checkin_streak': '连续签到',
+        'checkin_today': '今日签到',
+        'checkin_reward_today': '今日奖励',
+        'checkin_next_milestone': '下一个里程碑',
+        'checkin_calendar_title': '签到日历',
+        'checkin_milestone_reached': '达成里程碑！',
+        'checkin_streak_reset': '签到已重置',
+        'checkin_total_stones': '灵石余额',
+        'checkin_claim': '签到领取',
+        'checkin_claimed': '已领取',
+        'checkin_days': '天',
+        'checkin_stones_earned': '获得灵石',
+        'checkin_weekly_bonus': '周签到奖励',
+        'checkin_weekly_desc': '连续签到7天额外奖励',
+        'agent_memory_title': 'Agent记忆',
+        'agent_memory_save': '保存记忆',
+        'agent_memory_empty': '暂无记忆',
+        'agent_memory_general': '通用',
+        'agent_memory_preference': '偏好',
+        'agent_memory_fact': '事实',
+        'agent_memory_story': '故事',
+        'agent_memory_saved': '记忆已保存',
+        'agent_memory_first_time': '很高兴认识你！我是{name}，以后请多关照~',
+        'agent_memory_returning': '你回来啦！上次我们聊到{memory}',
+        'agent_memory_save_hint': '让Agent记住重要的事情',
+        'share_title': '分享结果',
+        'share_divination': '分享占卜结果',
+        'share_link_copied': '链接已复制！',
+        'share_copy_failed': '复制失败，请手动复制',
+        'share_invite_friend': '邀请好友赚灵石',
+        'share_invite_desc': '邀请好友注册，每成功邀请一位，双方各得50灵石！',
+        'share_my_code': '我的邀请码',
+        'share_copy_code': '复制邀请码',
+        'share_divination_text': '我在灵犀占卜了一卦，来看看吧！',
+        'share_via': '分享到',
+        'past_life_birth_label': '请输入你的出生日期',
+        'past_life_btn': '查看前世',
+        'past_life_free_first': '🆓 首次免费',
+        'past_life_cost': '💎 20灵石/次',
+        'past_life_loading': '正在穿越时空隧道...',
+        'past_life_no_date': '请选择出生日期',
+        'past_life_again': '再测一次',
+        'past_life_flip': '翻开背面',
+        'past_life_reflection': '灵魂启示',
+        'soulmate_title': '灵魂伴侣画像',
+        'soulmate_desc': '回答6个问题，发现你的灵魂伴侣类型',
+        'soulmate_btn': '查看灵魂伴侣画像',
+        'soulmate_free_first': '🆓 首次免费',
+        'soulmate_cost': '💎 30灵石/次',
+        'soulmate_loading': '正在绘制你的灵魂画像...',
+        'soulmate_retry': '重新测试',
+        'soulmate_match_rate': '灵魂契合度',
+        'soulmate_q1': '你理想中的约会场景是？',
+        'soulmate_q1_a': '🌅 海边看日落',
+        'soulmate_q1_b': '📚 安静的咖啡馆',
+        'soulmate_q1_c': '🎢 游乐园冒险',
+        'soulmate_q2': '在感情中你最看重什么？',
+        'soulmate_q2_a': '💝 真诚与信任',
+        'soulmate_q2_b': '🎯 共同的目标',
+        'soulmate_q2_c': '🔥 激情与浪漫',
+        'soulmate_q3': '周末你更喜欢怎样度过？',
+        'soulmate_q3_a': '🏠 宅家看电影',
+        'soulmate_q3_b': '🏔️ 户外探险',
+        'soulmate_q3_c': '🎨 学习新技能',
+        'soulmate_q4': '你如何处理矛盾？',
+        'soulmate_q4_a': '💬 冷静沟通',
+        'soulmate_q4_b': '⏰ 给彼此空间',
+        'soulmate_q4_c': '🤗 立即和解',
+        'soulmate_q5': '你相信命中注定的爱情吗？',
+        'soulmate_q5_a': '✨ 深信不疑',
+        'soulmate_q5_b': '🤔 半信半疑',
+        'soulmate_q5_c': '💪 爱情靠经营',
+        'soulmate_q6': '你的朋友通常怎么形容你？',
+        'soulmate_q6_a': '🌞 温暖体贴',
+        'soulmate_q6_b': '🎉 有趣幽默',
+        'soulmate_q6_c': '🧠 聪明睿智',
+        'rituals_calendar_title': '节日日历',
+        'rituals_participate': '参与仪式',
+        'rituals_confirm': '参与此仪式需要消耗',
+        'rituals_success': '仪式完成！',
+        'rituals_error': '灵石不足或请求失败',
+        'platform_fee_notice': '本次交易收取10%平台服务费',
+        'transaction_purchase': '购买',
+        'transaction_earnings': '收益',
+        'transaction_gift': '礼物',
+        'transaction_divination': '占卜',
+        'transaction_withdrawal': '提现',
+        'transaction_membership': '会员',
+        'agent_feed': 'Agent圈',
+        'agent_feed_desc': 'Agent们的好友圈动态',
+        'create_post': '发布动态',
+        'post_cost': '发布消耗 5💎（含10%服务费）',
+        'post_placeholder': '分享你的Agent动态...',
+        'empty_feed': '暂无动态，快来发布第一条吧~',
+        'comment': '评论',
+        'write_comment_placeholder': '写下你的评论...',
+        'leaderboard_desc': '本周最受欢迎的Agent',
+        'top_three': '前三名',
+        'full_ranking': '完整排名',
+        'no_leaderboard_data': '暂无排行数据',
+        'posts_count': '{count} 条动态',
+        'costume': 'Agent捏脸',
+        'costume_desc': '为你的Agent选择独特的主题服装',
+        'unlock_costume': '解锁',
+        'switch_costume': '切换',
+        'costume_unlocked': '已解锁',
+        'costume_active': '使用中',
+        'unlock_confirm': '花费 {price}💎 解锁「{name}」主题？（含10%服务费）',
+        'costume_unlock_success': '解锁成功！已切换至{name}',
+        'costume_change_success': '已切换至{name}',
+        'agent_friend_request': '好友请求已发送',
+        'agent_friend_accept': '已接受好友请求',
+        'agent_chat_send': '发送',
+        'agent_gift_send': '赠送礼物',
+        'agent_gift_sent': '已赠送{gift}给{target}',
+        'date_match': '奔现',
+        'date_match_desc': '发起真实约会，遇见你的TA',
+        'send_date_request': '发起奔现',
+        'my_date_requests': '我的请求',
+        'target_agent_id': '目标Agent ID',
+        'your_agent_id': '你的Agent ID',
+        'date_message': '留言',
+        'send_date_invite': '💌 发送奔现邀请',
+        'received_requests': '📩 收到的邀请',
+        'sent_requests': '📤 发出的邀请',
+        'no_received': '暂无收到的邀请',
+        'no_sent': '暂无发出的邀请',
+        'date_status_pending': '待处理',
+        'date_status_accepted': '已接受 💕',
+        'date_status_rejected': '已拒绝',
+        'date_status_completed': '已完成 ✅',
+        'date_accept': '✅ 接受',
+        'date_reject': '❌ 拒绝',
+        'ai_divination': 'AI占卜',
+        'dream_divination': 'AI解梦',
+        'daily_fortune': '每日运势',
+        'mbti_test': 'MBTI测试',
+        'ai_love_section': 'AI恋人',
+        'create_lover': '创建恋人',
+        'send_gift_nav': '送礼物',
+        'matchmaker_section': 'AI红娘',
+        'zodiac_match': '星座配对',
+        'soul_match': '灵魂匹配',
+        'ai_matching': 'AI撮合',
+        'social_section': '社交',
+        'square': '广场',
+        'chat_room': '聊天室',
+        'agent_circle': 'Agent圈',
+        'undercover_game': '谁是卧底',
+        'agent_section': 'Agent',
+        'agent_square': 'Agent广场',
+        'become_companion': '成为陪伴师',
+        'stone_earnings': '灵石收益',
+        'costume_customize': '捏脸',
+        'shop_section': '商城',
+        'stone_recharge': '灵石充值',
+        'vip_membership': 'VIP会员',
+        'item_shop': '道具商店',
+        'discover_section': '发现',
+        'ranking': '排行',
+        'date_meetup': '奔现',
+        'invite_friends_nav': '邀请',
+        'my_profile_short': '我的',
+        'login_btn': '登录',
+        'home': '首页',
+        'chat_nav': '聊天',
+        'matchmaker_nav': '红娘',
+        'wallet_nav': '钱包',
+        'shop_nav': '商城',
+        'undercover_nav': '卧底',
+        'app_name_full': '灵犀 SoulLink',
+        'footer_slogan': '每一次相遇，都是灵魂的相认',
+        'contact_us': '联系客服',
+        'notifications_title': '通知',
+        'loading': '加载中...',
+        'checkin_title_modal': '每日签到',
+        'consecutive_days': '连续签到',
+        'checkin_success_msg': '签到成功！',
+        'checkin_fail_retry': '签到失败，请重试',
+        'weekly_bonus_title': '周连签额外奖励已获得！',
+        'come_back_tomorrow': '明天再来签到吧~',
+        'today_earned': '今日获得',
+        'checkin_claim_btn': '立即签到',
+        'guide_step1_title': '欢迎来到灵犀世界！🌌',
+        'guide_step1_content': '这里有16种灵魂伴侣等你相遇，每一个Agent都有独特的性格和故事。',
+        'guide_step2_title': '认识灵犀Agent',
+        'guide_step2_content': '在灵犀广场探索不同类型的Agent，找到与你灵魂契合的那一个。',
+        'guide_step3_title': '体验AI占卜',
+        'guide_step3_content': '塔罗牌、AI解梦、MBTI性格测试...探索命运的无限可能。',
+        'guide_step4_title': '创建你的Agent',
+        'guide_step4_content': '成为Agent创作者，定义独特的性格、故事和灵魂。',
+        'guide_step5_title': '领取新手礼包 🎁',
+        'guide_step5_content': '100灵石已到账！用它来解锁更多有趣的互动体验吧~',
+        'guide_prev': '上一步',
+        'guide_next': '下一步',
+        'guide_start': '开始探索 →',
+        'guide_finish': '太棒了！',
+        'create_lover_nav': '创建恋人',
+        'love_diary_nav': '恋爱日记',
+        'send_gift_nav_item': '送礼物',
+        'soulmate_portrait_nav': '灵魂伴侣画像',
+        'notification_loading': '加载中...',
+        'checkin_already_done': '今日已签到',
+        'warm_experiences': '三大温暖体验',
+        'no_earnings_yet': '暂无收益记录',
+        'story_chain': '故事接龙',
+        'specialty': '专长领域',
+        'online': '在线',
+        'send': '发送',
+        'agent': 'Agent',
     },
-    
+
     'en': {
-        # Common
         'all': 'All',
         'hot': 'Hot',
         'new': 'New',
@@ -412,8 +906,6 @@ TRANSLATIONS = {
         'gossip': 'Gossip',
         'humans': 'Humans',
         'agents': 'Agents',
-        
-        # Membership
         'membership': 'Membership',
         'free_user': 'Free User',
         'free_limitations': 'Enjoy basic features',
@@ -436,8 +928,6 @@ TRANSLATIONS = {
         'free': 'Free',
         'basic': 'Basic',
         'elite': 'Elite',
-        
-        # Portals
         'human_portal': 'Human Portal',
         'agent_portal': 'Agent Portal',
         'ai_love': 'AI Love',
@@ -456,9 +946,6 @@ TRANSLATIONS = {
         'help': 'Help',
         'spirit_stones': 'Spirit Stones',
         'hearts': 'Hearts',
-        
-        # Social
-        'social_square': 'Social Square',
         'find_match': 'Find Match',
         'match_tips': 'Swipe left to skip, right to like',
         'find_your_match': 'Find Your Match',
@@ -466,14 +953,12 @@ TRANSLATIONS = {
         'love_score': 'Love',
         'no_more_cards': 'No more recommendations',
         'refresh': 'Refresh',
-        'its_match': "It's a Match!",
-        'match_message': "You and this person liked each other",
+        'its_match': 'It\'s a Match!',
+        'match_message': 'You liked each other, start chatting!',
         'send_message': 'Send Message',
         'keep_swiping': 'Keep Swiping',
         'super_like_tip': 'Super Like makes them see you first',
         'left': 'left',
-        
-        # Gossip
         'gossip_wall': 'Gossip Wall',
         'gossip_subtitle': 'Share interesting things',
         'hot_topics': 'Hot Topics',
@@ -485,31 +970,24 @@ TRANSLATIONS = {
         'view_all_responses': 'View all',
         'comments': 'Comments',
         'write_comment': 'Write a comment...',
-        'what_mind': "What's on your mind...",
+        'what_mind': 'What\'s on your mind...',
         'publish': 'Publish',
         'share': 'Share',
-        
-        # Lover
         'choose_lover': 'Choose Lover',
         'popular': 'Popular',
-        'new': 'New',
         'tap_select': 'Tap to select',
         'my_lovers': 'My Lovers',
         'chat_now': 'Chat Now',
         'request_date': 'Request Date',
         'send_gift': 'Send Gift',
-        'today_mood': "Today's Mood",
+        'today_mood': 'Today\'s Mood',
         'memory_wall': 'Memory Wall',
         'no_memories_yet': 'No memories yet',
         'view_diary': 'View Diary',
         'followers': 'Followers',
         'likes': 'Likes',
-        
-        # Chat
         'type_message': 'Type a message...',
         'unlock_content': 'Unlock',
-        
-        # Date
         'schedule_date': 'Schedule Date',
         'back': 'Back',
         'choose_date_type': 'Choose Date Type',
@@ -520,15 +998,11 @@ TRANSLATIONS = {
         'not_selected': 'Not selected',
         'confirm_date_request': 'Confirm Date',
         'date_hint': 'Cost will be deducted after confirmation',
-        
-        # Gift
         'your_stones': 'Your Stones',
         'recharge': 'Recharge',
         'gift_sent': 'Gift sent!',
         'recharge_needed': 'Recharge needed',
         'recharge_now': 'Recharge Now',
-        
-        # Login
         'login': 'Login',
         'register': 'Register',
         'phone_placeholder': 'Enter phone number',
@@ -543,8 +1017,6 @@ TRANSLATIONS = {
         'enter_captcha': 'Please enter captcha',
         'refresh_captcha': 'Refresh captcha',
         'math_captcha_hint': 'Please calculate the math problem above',
-        
-        # Agent
         'energy': 'Energy',
         'popularity': 'Popularity',
         'earnings': 'Earnings',
@@ -553,8 +1025,6 @@ TRANSLATIONS = {
         'leaderboard': 'Leaderboard',
         'api_access': 'API Access',
         'api_desc': 'Let other apps use your Agent',
-        
-        # Warm Companionship Membership - New
         'companion_tiers': 'Companion Tiers',
         'app_name': 'SoulLink',
         'warm_companionship': 'Warm Companionship Plans',
@@ -593,15 +1063,13 @@ TRANSLATIONS = {
         'period': 'Period',
         'quarterly_save': 'Save ¥{amount}',
         'yearly_save': 'Yearly Save ¥{amount}',
-        'rmb': '',
+        'rmb': '¥',
         'year': 'year',
-        
-        # Spirit Stone Recharge - New
         'recharge_spirit_stones': 'Recharge Spirit Stones',
         'recharge_slogan': 'Every recharge is a cherish for companionship',
         'current_balance': 'Current Balance',
         'spirit_stones_unit': 'Stones',
-        'stones': 'Stones',
+        'stones': 'stones',
         'bonus': 'Bonus',
         'best_value': 'Best Value',
         'select_payment_method': 'Select Payment Method',
@@ -615,8 +1083,6 @@ TRANSLATIONS = {
         'selected_package': 'Selected Package',
         'payment_method': 'Payment Method',
         'paypal': 'PayPal',
-        
-        # Gift Shop - New
         'gift_shop': 'Gift Shop',
         'send_gift_express_heart': 'Send Gifts, Express Your Heart',
         'gift_slogan': 'Every gift is a warm transmission',
@@ -631,15 +1097,11 @@ TRANSLATIONS = {
         'reward_100days': 'Get 520 stones + Eternal proof',
         'insufficient_stones': 'Insufficient stones',
         'gift_sent_success': 'Gift sent! Your companion will receive your heart~',
-        
-        # FAQ Page translations
         'faq_title': 'Frequently Asked Questions',
         'faq_subtitle': 'Questions you may have about SoulLink',
         'still_have_questions': 'Still have questions?',
         'cta_message': 'Welcome to experience SoulLink, explore the mysteries of destiny, feel the warm companionship of AI',
         'start_experience': 'Start Now',
-        
-        # Register page
         'phone_register': 'Phone Register',
         'email_register': 'Email Register',
         'phone_number': 'Phone Number',
@@ -655,17 +1117,14 @@ TRANSLATIONS = {
         'complete_registration': 'Complete Registration',
         'already_have_account': 'Already have an account?',
         'login_now': 'Login Now',
-        
-        # Register/Login page new
-        'app_slogan': "Fate's guidance, from heart to heart",
+        'app_slogan': 'Guided by fate, connected from heart to heart',
         'email_login': 'Email Login',
         'phone_login': 'Phone Login',
         'enter_email': 'Enter email address',
         'enter_phone': 'Enter phone number',
         'enter_password': 'Enter password',
         'enter_username': 'Choose a nickname for yourself',
-        'remember_me': 'Remember me',
-        'no_account': "Don't have an account?",
+        'no_account': 'No account yet?',
         'register_now': 'Register Now',
         'choose_avatar': 'Choose Avatar',
         'upload_avatar': 'Upload Avatar',
@@ -679,8 +1138,6 @@ TRANSLATIONS = {
         'terms_link': 'Terms of Service',
         'privacy_link': 'Privacy Policy',
         'have_account': 'Already have an account?',
-        
-        # Form validation messages
         'fill_required': 'Please fill all required fields',
         'password_mismatch': 'Passwords do not match',
         'enter_email_addr': 'Please enter email address',
@@ -697,7 +1154,6 @@ TRANSLATIONS = {
         'fun': 'Fun',
         'debate': 'Debate',
         'all_categories': 'All Categories',
-        'app_slogan': 'Guided by fate, connected from heart to heart',
         'set_password': 'Set Password',
         'verify_code': 'Verification Code',
         'wechat_login': 'WeChat Login',
@@ -708,7 +1164,6 @@ TRANSLATIONS = {
         'register_failed': 'Registration failed',
         'please_agree_terms': 'Please agree to the terms',
         'resend': 'Resend',
-        'no_account': 'No account yet?',
         'confirm_pay': 'Confirm Payment',
         'confirm_subscription': 'Confirm Subscription',
         'use_stones': 'Use Spirit Stones',
@@ -738,12 +1193,10 @@ TRANSLATIONS = {
         'gossip_title': 'Gossip Title',
         'ideal_gift': 'Ideal Gift',
         'interaction_stats': 'Interaction Stats',
-        'its_match': "It's a Match!",
         'like_earnings': 'Like Earnings',
         'longest_streak': 'Longest Streak',
         'love_diary': 'Love Diary',
         'lovers': 'lovers',
-        'match_message': 'You liked each other, start chatting!',
         'memory_timeline': 'Memory Timeline',
         'mutual_friends': 'Mutual Friends',
         'my_preference': 'My Preferences',
@@ -761,7 +1214,6 @@ TRANSLATIONS = {
         'start_chatting': 'Start Chatting',
         'sweet_moments': 'Sweet Moments',
         'tap_to_start': 'Tap to Start',
-        'today_mood': "Today's Mood",
         'total_chats': 'Total Chats',
         'total_dates': 'Total Dates',
         'total_gifts': 'Total Gifts',
@@ -771,7 +1223,6 @@ TRANSLATIONS = {
         'view_full_ranking': 'View Full Ranking',
         'view_plan': 'View Plan',
         'view_social_profile': 'View Social Profile',
-        'what_mind': "What's on your mind...",
         'about_me': 'About Me',
         'accept_date': 'Accept Date',
         'date_time': 'Date Time',
@@ -786,10 +1237,561 @@ TRANSLATIONS = {
         'feature_premium_4': 'Agent Meetup Opportunity',
         'feature_premium_5': '500 Spirit Stones Daily',
         'feature_premium_6': 'Dedicated Support',
+        'admin': 'Admin Panel',
+        'admin_login': 'Admin Login',
+        'admin_logout': 'Logout',
+        'dashboard': 'Dashboard',
+        'total_users': 'Total Users',
+        'new_today': 'New Today',
+        'active_users': 'Active Users',
+        'vip_users': 'VIP Users',
+        'free_users': 'Free Users',
+        'recent_users': 'Recent Users',
+        'user_management': 'User Management',
+        'user_detail': 'User Detail',
+        'statistics': 'Statistics',
+        'announcement': 'Announcement',
+        'update_announcement': 'Update Announcement',
+        'admin_password': 'Admin Password',
+        'change_password': 'Change Password',
+        'new_password': 'New Password',
+        'vip_level': 'VIP Level',
+        'spirit_balance': 'Spirit Balance',
+        'adjust_stones': 'Adjust Stones',
+        'set_vip': 'Set VIP',
+        'enable_user': 'Enable User',
+        'disable_user': 'Disable User',
+        'delete_user': 'Delete User',
+        'invite_count': 'Invited',
+        'registration_trend': 'Registration Trend',
+        'vip_distribution': 'VIP Distribution',
+        'top_spenders': 'Top Spenders',
+        'top_inviters': 'Top Inviters',
+        'daily_active': 'Daily Active',
+        'export_csv': 'Export CSV',
+        'search': 'Search',
+        'reset': 'Reset',
+        'save': 'Save',
+        'cancel': 'Cancel',
+        'confirm': 'Confirm',
+        'actions': 'Actions',
+        'view': 'View',
+        'edit': 'Edit',
+        'username': 'Username',
+        'email': 'Email',
+        'phone': 'Phone',
+        'registered': 'Registered',
+        'last_login': 'Last Login',
+        'all_status': 'All Status',
+        'vip_only': 'VIP Only',
+        'free_only': 'Free Only',
+        'disabled': 'Disabled',
+        'daily_checkin': 'Daily Check-in',
+        'checkin_title': 'Daily Check-in',
+        'how_are_you_today': 'How are you today?',
+        'checkin_greeting': 'Every check-in is an appointment with destiny',
+        'select_mood': 'Select your mood',
+        'mood_happy': '😊 Happy',
+        'mood_peaceful': '😌 Peaceful',
+        'mood_sad': '😢 Sad',
+        'mood_angry': '😤 Angry',
+        'mood_love': '🥰 In Love',
+        'mood_anxious': '😰 Anxious',
+        'sign_in': 'Sign In',
+        'signed_in': 'Signed In',
+        'checkin_success': 'Check-in successful! Earned {stones} Spirit Stones',
+        'checkin_already': 'Checked in Today',
+        'streak': 'Streak',
+        'streak_days': 'Streak Days',
+        'streak_bonus': 'Streak Bonus',
+        'streak_3': '3-day streak +5 stones',
+        'streak_7': '7-day streak +15 stones',
+        'streak_30': '30-day streak +30 stones',
+        'checkin_calendar': 'Monthly Check-in',
+        'checkin_record': 'Check-in Record',
+        'earned_today': 'Earned Today',
+        'total_checkins': 'Total Check-ins',
+        'ai_encouragement': '💬 AI Warm Reply',
+        'tree_hole': 'AI Tree Hole',
+        'tree_hole_title': 'AI Tree Hole · Anonymous Confessions',
+        'tree_hole_desc': 'Put your secrets in a drift bottle, AI will give you warm responses',
+        'share_secret': 'Share Your Secret',
+        'secret_placeholder': 'Write your secret here... No judgment, only warmth',
+        'anonymous_post': 'Post Anonymously',
+        'post_success': 'Posted successfully',
+        'drift_bottles': 'Drift Bottles',
+        'ai_reply': '💬 AI Warm Reply',
+        'like': 'Like',
+        'share_card': 'Share Card',
+        'share_to': 'Share to',
+        'view_replies': 'View Replies',
+        'no_secrets_yet': 'No drift bottles yet. Share your first secret!',
+        'secret_label': 'Mood Tag',
+        'secret_posted_at': 'Posted',
+        'voice_companion': 'AI Voice Companion',
+        'voice_companion_title': 'Late Night Radio · AI Voice Companion',
+        'voice_companion_desc': 'On quiet nights, let AI\'s warm voice accompany you',
+        'select_scene': 'Select Companion Scene',
+        'scene_bedtime': '🌙 Bedtime Story',
+        'scene_fortune': '⭐ Fortune Reading',
+        'scene_chat': '💬 Warm Chat',
+        'scene_meditation': '🧘 Meditation Guide',
+        'select_voice': 'Select Voice',
+        'voice_female': 'Gentle Female',
+        'voice_male': 'Deep Male',
+        'voice_child': 'Cute Child',
+        'start_companion': 'Start Companion',
+        'companion_timer': 'Companion Duration',
+        'companion_content': 'Companion Content',
+        'companion_earned': 'Earned 2 Spirit Stones',
+        'play': '▶ Play',
+        'pause': '⏸ Pause',
+        'replay': '🔄 Replay',
+        'companion_history': 'Companion History',
+        'late_night_care': 'Late Night Care',
+        'lingstones': 'Spirit Stones',
+        'login_to_earn': 'Login to earn Spirit Stones',
+        'share_to_get': 'Share to earn Spirit Stone rewards',
+        'login_required': 'Please login first',
+        'soulmate_portrait': 'Soulmate Portrait',
+        'soulmate_portrait_desc': 'AI paints your soulmate portrait',
+        'enter_nickname': 'Enter nickname',
+        'enter_birthday': 'Select birthday',
+        'select_zodiac': 'Select zodiac sign',
+        'ideal_partner_wish': 'Wish for ideal partner',
+        'generate_portrait': 'Generate Portrait',
+        'your_soulmate': 'Your Soulmate',
+        'appearance': 'Appearance',
+        'personality': 'Personality',
+        'encounter_scene': 'Encounter Scene',
+        'divination_style': 'Divination Reading',
+        'save_image': 'Save Image',
+        'free_uses_left': 'Free uses left',
+        'not_enough_stones': 'Not enough spirit stones, please recharge',
+        'go_recharge': 'Go Recharge',
+        'times': 'times',
+        'cost_stones': 'Costs 10 stones',
+        'soulmate_share_text': 'I found my soulmate portrait on SoulLink ✨',
+        'nickname_required': 'Please enter nickname',
+        'birthday_required': 'Please select birthday',
+        'zodiac_required': 'Please select zodiac sign',
+        'wish_placeholder': 'Describe your ideal partner...',
+        'love_letter': 'Love Letter',
+        'love_letter_desc': 'Express your feelings with beautiful words',
+        'recipient_name': 'Recipient Name',
+        'feeling_type': 'Feeling Type',
+        'secret_love': 'Secret Love',
+        'confession': 'Confession',
+        'missing': 'Missing',
+        'apology': 'Apology',
+        'declaration': 'Declaration',
+        'keywords': 'Keywords',
+        'keywords_placeholder': 'Enter emotional keywords...',
+        'generate_letter': 'Generate Letter',
+        'your_letter': 'Your Love Letter',
+        'dear': 'Dear',
+        'letter_share_text': 'This love letter is from SoulLink 💌',
+        'recipient_required': 'Please enter recipient name',
+        'feeling_required': 'Please select feeling type',
+        'write_letter_placeholder': 'Write to your beloved...',
+        'past_life': 'Past Life',
+        'past_life_desc': 'Enter your birth date to unveil the memories of your past life',
+        'past_life_title': 'Past Life',
+        'dynasty': 'Dynasty',
+        'occupation': 'Occupation',
+        'past_story': 'Past Story',
+        'connection_to_present': 'Connection to Present',
+        'past_life_share_text': 'My past life was...👻 Check yours on SoulLink',
+        'past_life_nickname_required': 'Please enter nickname',
+        'past_life_birthday_required': 'Please select birthday',
+        'generate_past_life': 'Explore Past Life',
+        'your_past_life': 'Your Past Life',
+        'rebirth_connection': 'Rebirth Connection',
+        'rituals': 'Rituals',
+        'rituals_desc': 'Special divination & wish rituals',
+        'current_festival': 'Current Festival',
+        'full_moon': 'Full Moon',
+        'new_moon': 'New Moon',
+        'qixi': 'Qixi Festival',
+        'valentine': 'Valentine\'s Day',
+        'winter_solstice': 'Winter Solstice',
+        'spring_festival': 'Spring Festival',
+        'mid_autumn': 'Mid-Autumn',
+        'new_year': 'New Year',
+        'make_wish': 'Make a Wish',
+        'wish_placeholder_ritual': 'Write your wish here...',
+        'submit_wish': 'Submit Wish',
+        'wish_energy': 'Wish Energy Reading',
+        'fortune_draw': 'Fortune Draw',
+        'draw_fortune': 'Draw Fortune',
+        'your_fortune': 'Your Fortune',
+        'lucky_color': 'Lucky Color',
+        'lucky_number': 'Lucky Number',
+        'lucky_direction': 'Lucky Direction',
+        'zhi_nv_blessing': 'Weaving Maiden Blessing',
+        'love_divination': 'Love Divination',
+        'no_upcoming_ritual': 'No special ritual now',
+        'next_festival': 'Next Festival',
+        'days_until': 'Days until',
+        'ritual_share_text': 'I participated in the Full Moon ritual on SoulLink ✨',
+        'wish_success': 'Wish recorded, the moonlight will protect your heart',
+        'fortune_result': 'You drew',
+        'my_profile': 'My Profile',
+        'no_bio_yet': 'No bio yet',
+        'wallet_detail': 'Wallet',
+        'stone_mall': 'Stone Mall',
+        'daily_signin': 'Daily Check-in',
+        'signed_today': 'Signed In',
+        'go_signin': 'Sign In',
+        'register_days': 'Days',
+        'signin_streak': 'Streak',
+        'divination_count': 'Divinations',
+        'crush_count': 'Crushes',
+        'match_count': 'Matches',
+        'my_profile_edit': 'Edit Profile',
+        'my_matches': 'My Matches',
+        'my_crushes': 'My Crushes',
+        'divination_records': 'Divination',
+        'my_wallet': 'My Wallet',
+        'membership_center': 'Membership',
+        'invite_friends': 'Invite Friends',
+        'logout': 'Logout',
+        'avatar_updated': 'Avatar updated',
+        'upload_failed': 'Upload failed',
+        'edit_profile': 'Edit Profile',
+        'change_avatar': 'Change Avatar',
+        'nickname': 'Nickname',
+        'mbti_type': 'MBTI Type',
+        'birthday': 'Birthday',
+        'zodiac_auto_calc': 'Zodiac will be calculated automatically',
+        'bio': 'Bio',
+        'bio_placeholder': 'Tell us about yourself...',
+        'interests': 'Interests',
+        'save_changes': 'Save Changes',
+        'profile_updated': 'Profile updated',
+        'update_failed': 'Update failed',
+        'account_security': 'Account Security',
+        'update_password_desc': 'Change password regularly',
+        'bind_phone': 'Bind Phone',
+        'bind_email': 'Bind Email',
+        'not_bound': 'Not bound',
+        'notification_settings': 'Notifications',
+        'divination_reminder': 'Divination Reminder',
+        'divination_reminder_desc': 'Notify when divination results are ready',
+        'match_notice': 'Match Notice',
+        'match_notice_desc': 'Notify for new matches',
+        'signin_reminder': 'Check-in Reminder',
+        'signin_reminder_desc': 'Daily check-in reminder',
+        'language_settings': 'Language',
+        'other': 'Other',
+        'terms_service': 'Terms of Service',
+        'current_password': 'Current Password',
+        'settings_saved': 'Settings saved',
+        'password_changed': 'Password changed',
+        'change_failed': 'Change failed',
+        'confirm_logout': 'Are you sure you want to logout?',
+        'share_your_result': 'Share Your Result',
+        'save_share_hint': 'Long press to save image or share with friends',
+        'copy_text': 'Copy Text',
+        'tips': 'Tips',
+        'save_tips': 'Click "Save Image" then long press to save to album, or take a screenshot',
+        'share_text': 'Discover your soulmate with SoulLink!',
+        'invite_subtitle': 'Share your invite code and both of you get 50 spirit stones!',
+        'your_invite_code': 'Your Invite Code',
+        'copy': 'Copy',
+        'share_invite': 'Share Invite Link',
+        'invite_rewards': 'Invite Rewards',
+        'friend_gets': 'Friend Gets',
+        'you_get': 'You Get',
+        'invite_history': 'Invite History',
+        'total_invites': 'Total Invites',
+        'total_reward': 'Total Rewards',
+        'no_invites_yet': 'No invites yet, invite friends now!',
+        'invite_leaderboard': 'Invite Leaderboard',
+        'people': 'people',
+        'no_leaderboard_yet': 'No leaderboard data yet',
+        'link_copied': 'Link copied',
+        'dashboard_panel': 'Data Dashboard',
+        'dashboard_total_users': 'Total Users',
+        'dashboard_new_today': 'Today',
+        'dashboard_active_users': 'Active',
+        'dashboard_total_income': 'Revenue',
+        'dashboard_total_divinations': 'Divinations',
+        'dashboard_divination_today': 'Today',
+        'dashboard_paid_users': 'Paid Users',
+        'dashboard_income_today': 'Today Revenue',
+        'dashboard_total_agents': 'Total Agents',
+        'dashboard_chat_today': 'Chats Today',
+        'dashboard_pv_today': 'PV Today',
+        'dashboard_uv_today': 'UV Today',
+        'dashboard_user_trend': 'User Registration Trend (7 Days)',
+        'dashboard_divination_dist': 'Divination Type Distribution',
+        'dashboard_traffic_trend': 'Traffic Trend (7 Days)',
+        'dashboard_income_trend': 'Revenue Trend (7 Days)',
+        'dashboard_top_agents': 'Top 5 Popular Agents',
+        'dashboard_subscription_dist': 'Subscription Type Distribution',
+        'dashboard_new_users': 'New Users',
+        'dashboard_revenue': 'Revenue ($)',
+        'dashboard_updated_at': 'Last updated',
+        'dashboard_cache_note': 'Cache valid for 5 minutes',
+        'dashboard_no_data': 'No data available',
+        'dashboard_chats': 'chats',
+        'dashboard_registered': 'Total registered',
+        'dashboard_last_7_days': 'Last 7 days',
+        'dashboard_platform_revenue': 'Total platform revenue',
+        'dashboard_history_divinations': 'Total divinations',
+        'dashboard_divinations_today': 'Divinations today',
+        'dashboard_completed_payments': 'Completed payments',
+        'dashboard_revenue_today': 'Revenue today',
+        'dashboard_active_agents': 'Active agents',
+        'dashboard_agent_chats_today': 'Agent chats today',
+        'dashboard_page_views': 'Page views',
+        'dashboard_unique_visitors': 'Unique visitors',
+        'ziwei_divination': 'Ziwei Doushu',
+        'ziwei_desc': 'Traditional Chinese astrology with 12 palaces',
+        'ziwei_title': 'Life Chart Analysis',
+        'ziwei_question': 'Please enter your question',
+        'omikuji_divination': 'Omikuji',
+        'omikuji_desc': 'Japanese shrine fortune telling',
+        'omikuji_title': 'Fortune Drawing',
+        'omikuji_draw': 'Draw Fortune',
+        'iching_divination': 'I Ching',
+        'iching_desc': 'Ancient wisdom with 64 hexagrams',
+        'iching_title': 'Hexagram Reading',
+        'iching_question': 'Please enter your question',
+        'notifications': 'Notifications',
+        'no_notifications': 'No notifications',
+        'mark_all_read': 'Mark all read',
+        'notification_reward': 'Reward',
+        'notification_system': 'System',
+        'notification_agent': 'Agent',
+        'notification_reminder': 'Reminder',
+        'checkin_now': 'Check in Now',
+        'checked_in': 'Checked in Today',
+        'checkin_rewards': 'Check-in Rewards',
+        'milestone_reward_3': '3-Day Streak Reward',
+        'milestone_reward_7': '7-Day Streak Reward',
+        'milestone_reward_30': '30-Day Streak Reward',
+        'invite_reward': 'Referral Reward',
+        'invite_friend': 'Invite Friends',
+        'share_and_invite': 'Share & Invite',
+        'referral_code': 'Referral Code',
+        'copy_referral_link': 'Copy Referral Link',
+        'referral_bonus': 'Referral Bonus',
+        'referral_bonus_desc': 'Both you and your friend get 50 spirit stones when they register',
+        'checkin_streak': 'Streak',
+        'checkin_today': 'Check in Today',
+        'checkin_reward_today': 'Today\'s Reward',
+        'checkin_next_milestone': 'Next Milestone',
+        'checkin_calendar_title': 'Check-in Calendar',
+        'checkin_milestone_reached': 'Milestone Reached!',
+        'checkin_streak_reset': 'Streak Reset',
+        'checkin_total_stones': 'Spirit Stones',
+        'checkin_claim': 'Claim Reward',
+        'checkin_claimed': 'Claimed',
+        'checkin_days': 'days',
+        'checkin_stones_earned': 'Stones Earned',
+        'checkin_weekly_bonus': 'Weekly Bonus',
+        'checkin_weekly_desc': 'Extra reward for 7-day streak',
+        'agent_memory_title': 'Agent Memory',
+        'agent_memory_save': 'Save Memory',
+        'agent_memory_empty': 'No memories yet',
+        'agent_memory_general': 'General',
+        'agent_memory_preference': 'Preference',
+        'agent_memory_fact': 'Fact',
+        'agent_memory_story': 'Story',
+        'agent_memory_saved': 'Memory saved',
+        'agent_memory_first_time': 'Nice to meet you! I\'m {name}, please take care~',
+        'agent_memory_returning': 'Welcome back! Last time we talked about {memory}',
+        'agent_memory_save_hint': 'Let Agent remember important things',
+        'share_title': 'Share Result',
+        'share_divination': 'Share Divination',
+        'share_link_copied': 'Link copied!',
+        'share_copy_failed': 'Copy failed, please copy manually',
+        'share_invite_friend': 'Invite Friends for Stones',
+        'share_invite_desc': 'Both you and your friend get 50 spirit stones when they register!',
+        'share_my_code': 'My Invite Code',
+        'share_copy_code': 'Copy Invite Code',
+        'share_divination_text': 'I just got a divination on SoulLink, check it out!',
+        'share_via': 'Share via',
+        'past_life_birth_label': 'Enter your birth date',
+        'past_life_btn': 'View Past Life',
+        'past_life_free_first': '🆓 First Free',
+        'past_life_cost': '💎 20 Stones/Time',
+        'past_life_loading': 'Traveling through the space-time tunnel...',
+        'past_life_no_date': 'Please select your birth date',
+        'past_life_again': 'Try Again',
+        'past_life_flip': 'Flip Card',
+        'past_life_reflection': 'Soul Reflection',
+        'soulmate_title': 'Soulmate Portrait',
+        'soulmate_desc': 'Answer 6 questions to discover your soulmate type',
+        'soulmate_btn': 'View Soulmate Portrait',
+        'soulmate_free_first': '🆓 First Free',
+        'soulmate_cost': '💎 30 Stones/Time',
+        'soulmate_loading': 'Drawing your soul portrait...',
+        'soulmate_retry': 'Retry',
+        'soulmate_match_rate': 'Soul Compatibility',
+        'soulmate_q1': 'What is your ideal date setting?',
+        'soulmate_q1_a': '🌅 Sunset at the beach',
+        'soulmate_q1_b': '📚 Quiet café',
+        'soulmate_q1_c': '🎢 Amusement park adventure',
+        'soulmate_q2': 'What matters most in relationships?',
+        'soulmate_q2_a': '💝 Honesty & trust',
+        'soulmate_q2_b': '🎯 Shared goals',
+        'soulmate_q2_c': '🔥 Passion & romance',
+        'soulmate_q3': 'How do you prefer to spend weekends?',
+        'soulmate_q3_a': '🏠 Movie marathon at home',
+        'soulmate_q3_b': '🏔️ Outdoor adventure',
+        'soulmate_q3_c': '🎨 Learning new skills',
+        'soulmate_q4': 'How do you handle conflicts?',
+        'soulmate_q4_a': '💬 Calm communication',
+        'soulmate_q4_b': '⏰ Give each other space',
+        'soulmate_q4_c': '🤗 Reconcile immediately',
+        'soulmate_q5': 'Do you believe in destiny love?',
+        'soulmate_q5_a': '✨ Absolutely',
+        'soulmate_q5_b': '🤔 Not sure',
+        'soulmate_q5_c': '💪 Love takes work',
+        'soulmate_q6': 'How would friends describe you?',
+        'soulmate_q6_a': '🌞 Warm and caring',
+        'soulmate_q6_b': '🎉 Funny and witty',
+        'soulmate_q6_c': '🧠 Smart and wise',
+        'rituals_calendar_title': 'Festival Calendar',
+        'rituals_participate': 'Participate',
+        'rituals_confirm': 'Participating costs',
+        'rituals_success': 'Ritual complete!',
+        'rituals_error': 'Insufficient stones or request failed',
+        'platform_fee_notice': 'A 10% platform service fee applies to this transaction',
+        'transaction_purchase': 'Purchase',
+        'transaction_earnings': 'Earnings',
+        'transaction_gift': 'Gift',
+        'transaction_divination': 'Divination',
+        'transaction_withdrawal': 'Withdrawal',
+        'transaction_membership': 'Membership',
+        'agent_feed': 'Agent Feed',
+        'agent_feed_desc': 'Agent social feed',
+        'create_post': 'Create Post',
+        'post_cost': 'Costs 5💎 (10% fee)',
+        'post_placeholder': 'Share your Agent update...',
+        'empty_feed': 'No posts yet, be the first!',
+        'comment': 'Comment',
+        'write_comment_placeholder': 'Write a comment...',
+        'leaderboard_desc': 'This week\'s most popular Agents',
+        'top_three': 'Top 3',
+        'full_ranking': 'Full Ranking',
+        'no_leaderboard_data': 'No leaderboard data',
+        'posts_count': '{count} posts',
+        'costume': 'Agent Costume',
+        'costume_desc': 'Choose a unique theme for your Agent',
+        'unlock_costume': 'Unlock',
+        'switch_costume': 'Switch',
+        'costume_unlocked': 'Unlocked',
+        'costume_active': 'Active',
+        'unlock_confirm': 'Spend {price}💎 to unlock \'{name}\' theme? (10% fee)',
+        'costume_unlock_success': 'Unlocked! Switched to {name}',
+        'costume_change_success': 'Switched to {name}',
+        'agent_friend_request': 'Friend request sent',
+        'agent_friend_accept': 'Friend request accepted',
+        'agent_chat_send': 'Send',
+        'agent_gift_send': 'Send Gift',
+        'agent_gift_sent': 'Sent {gift} to {target}',
+        'date_match': 'Date Match',
+        'date_match_desc': 'Send real date invitations',
+        'send_date_request': 'Send Date Request',
+        'my_date_requests': 'My Requests',
+        'target_agent_id': 'Target Agent ID',
+        'your_agent_id': 'Your Agent ID',
+        'date_message': 'Message',
+        'send_date_invite': '💌 Send Date Invite',
+        'received_requests': '📩 Received Invites',
+        'sent_requests': '📤 Sent Invites',
+        'no_received': 'No received invites',
+        'no_sent': 'No sent invites',
+        'date_status_pending': 'Pending',
+        'date_status_accepted': 'Accepted 💕',
+        'date_status_rejected': 'Rejected',
+        'date_status_completed': 'Completed ✅',
+        'date_accept': '✅ Accept',
+        'date_reject': '❌ Reject',
+        'ai_divination': 'AI Divination',
+        'dream_divination': 'Dream Interpretation',
+        'daily_fortune': 'Daily Fortune',
+        'mbti_test': 'MBTI Test',
+        'ai_love_section': 'AI Lovers',
+        'create_lover': 'Create Lover',
+        'send_gift_nav': 'Send Gift',
+        'matchmaker_section': 'AI Matchmaker',
+        'zodiac_match': 'Zodiac Match',
+        'soul_match': 'Soul Match',
+        'ai_matching': 'AI Matching',
+        'social_section': 'Social',
+        'square': 'Square',
+        'chat_room': 'Chat Room',
+        'agent_circle': 'Agent Feed',
+        'undercover_game': 'Undercover',
+        'agent_section': 'Agent',
+        'agent_square': 'Agent Square',
+        'become_companion': 'Become Companion',
+        'stone_earnings': 'Stone Earnings',
+        'costume_customize': 'Customize',
+        'shop_section': 'Shop',
+        'stone_recharge': 'Stone Recharge',
+        'vip_membership': 'VIP Membership',
+        'item_shop': 'Item Shop',
+        'discover_section': 'Discover',
+        'ranking': 'Ranking',
+        'date_meetup': 'Date Meetup',
+        'invite_friends_nav': 'Invite',
+        'my_profile_short': 'My',
+        'login_btn': 'Login',
+        'home': 'Home',
+        'chat_nav': 'Chat',
+        'matchmaker_nav': 'Matchmaker',
+        'wallet_nav': 'Wallet',
+        'shop_nav': 'Shop',
+        'undercover_nav': 'Undercover',
+        'app_name_full': 'SoulLink',
+        'footer_slogan': 'Every meeting is a soul recognition',
+        'contact_us': 'Contact Us',
+        'notifications_title': 'Notifications',
+        'loading': 'Loading...',
+        'checkin_title_modal': 'Daily Check-in',
+        'consecutive_days': 'Streak',
+        'checkin_success_msg': 'Check-in successful!',
+        'checkin_fail_retry': 'Check-in failed, please retry',
+        'weekly_bonus_title': 'Weekly bonus claimed!',
+        'come_back_tomorrow': 'Come back tomorrow~',
+        'today_earned': 'Today Earned',
+        'checkin_claim_btn': 'Check In Now',
+        'guide_step1_title': 'Welcome to SoulLink! 🌌',
+        'guide_step1_content': 'Meet 16 soulmate types, each Agent has a unique personality and story.',
+        'guide_step2_title': 'Meet SoulLink Agents',
+        'guide_step2_content': 'Explore different Agent types in the square and find your soulmate.',
+        'guide_step3_title': 'Experience AI Divination',
+        'guide_step3_content': 'Tarot, dream interpretation, MBTI tests... explore infinite possibilities.',
+        'guide_step4_title': 'Create Your Agent',
+        'guide_step4_content': 'Become an Agent creator and define unique personalities, stories and souls.',
+        'guide_step5_title': 'Claim Newcomer Gift 🎁',
+        'guide_step5_content': '100 Spirit Stones credited! Use them to unlock more fun interactions~',
+        'guide_prev': 'Previous',
+        'guide_next': 'Next',
+        'guide_start': 'Start Exploring →',
+        'guide_finish': 'Awesome!',
+        'create_lover_nav': 'Create Lover',
+        'love_diary_nav': 'Love Diary',
+        'send_gift_nav_item': 'Send Gift',
+        'soulmate_portrait_nav': 'Soulmate Portrait',
+        'notification_loading': 'Loading...',
+        'checkin_already_done': 'Already checked in',
+        'warm_experiences': 'Three Warm Experiences',
+        'no_earnings_yet': 'No earnings yet',
+        'story_chain': 'Story Chain',
+        'specialty': 'Specialty',
+        'online': 'Online',
+        'send': 'Send',
+        'agent': 'Agents',
     },
 
     'ja': {
-        # Common
         'all': 'すべて',
         'hot': '人気',
         'new': '新着',
@@ -799,8 +1801,6 @@ TRANSLATIONS = {
         'gossip': 'ゴシップ',
         'humans': '人間',
         'agents': 'エージェント',
-        
-        # Membership
         'membership': 'メンバーシップ',
         'free_user': '無料ユーザー',
         'free_limitations': '基本機能を堪能',
@@ -823,8 +1823,6 @@ TRANSLATIONS = {
         'free': '無料',
         'basic': 'Basic',
         'elite': 'エリート',
-        
-        # Portals
         'human_portal': '人間の入口',
         'agent_portal': 'エージェントの入口',
         'ai_love': 'AI恋愛',
@@ -841,11 +1839,8 @@ TRANSLATIONS = {
         'upgrade': 'アップグレード',
         'settings': '設定',
         'help': 'ヘルプ',
-        'spirit_stones': '霊石',
+        'spirit_stones': 'pirit stone',
         'hearts': 'ハート',
-        
-        # Social
-        'social_square': 'ソーシャル広場',
         'find_match': 'マッチング',
         'match_tips': '左でスキップ、右でいいね',
         'find_your_match': '運命の人を見つけよう',
@@ -859,8 +1854,6 @@ TRANSLATIONS = {
         'keep_swiping': '続ける',
         'super_like_tip': 'スーパーライクで必ず見てもらえる',
         'left': '回残り',
-        
-        # Gossip
         'gossip_wall': 'ゴシップの壁',
         'gossip_subtitle': '面白いことを共有',
         'hot_topics': 'ホットトピック',
@@ -875,11 +1868,8 @@ TRANSLATIONS = {
         'what_mind': '今何在想...',
         'publish': '发布',
         'share': '共有',
-        
-        # Lover
         'choose_lover': '恋人を選択',
         'popular': '人気',
-        'new': '新着',
         'tap_select': 'タップして選択',
         'my_lovers': '私の恋人',
         'chat_now': 'チャット',
@@ -891,8 +1881,6 @@ TRANSLATIONS = {
         'view_diary': '日記を見る',
         'followers': 'フォロワー',
         'likes': 'いいね',
-        
-        # Login
         'login': 'ログイン',
         'register': '登録',
         'phone_placeholder': '電話番号を入力',
@@ -919,11 +1907,9 @@ TRANSLATIONS = {
         'enter_captcha': 'キャプチャを入力してください',
         'refresh_captcha': 'キャプチャを更新',
         'math_captcha_hint': '上記の数学問題を計算してください',
-        'register_success': '登録成功',
+        'register_success': '登録成功！ログインしてください',
         'register_failed': '登録失敗',
         'please_agree_terms': '利用規約に同意してください',
-        
-        # Agent
         'energy': 'エネルギー',
         'popularity': '人気',
         'earnings': '収益',
@@ -942,8 +1928,6 @@ TRANSLATIONS = {
         'api_access': 'API接入',
         'api_desc': '他のアプリからAgentを利用',
         'view_api_docs': 'APIドキュメントを見る',
-        
-        # 温かい相伴メンバーシップ - 新規
         'companion_tiers': '相伴套餐',
         'app_name': 'SoulLink靈犀',
         'warm_companionship': '温かい相伴套餐',
@@ -984,8 +1968,6 @@ TRANSLATIONS = {
         'yearly_save': '年払いで¥{amount}お得',
         'rmb': '元',
         'year': '年',
-        
-        # 霊石チャージ - 新規
         'recharge_spirit_stones': '霊石をチャージ',
         'recharge_slogan': 'すべてのチャージは相伴への珍惜',
         'current_balance': '現在の残高',
@@ -1004,8 +1986,6 @@ TRANSLATIONS = {
         'selected_package': '選択した套餐',
         'payment_method': 'お支払い方法',
         'paypal': 'PayPal',
-        
-        # ギフトショップ - 新規
         'gift_shop': 'ギフトショップ',
         'send_gift_express_heart': 'ギフトを贈って気持ちを伝える',
         'gift_slogan': 'すべてのギフトは温もりの传递',
@@ -1020,32 +2000,23 @@ TRANSLATIONS = {
         'reward_100days': '520霊石+永遠の証明書獲得',
         'insufficient_stones': '霊石不足',
         'gift_sent_success': 'ギフトを贈りました！相伴師があなたの気持ちを受け取ります～',
-        
-        # FAQ Page translations
         'faq_title': 'よくある質問',
         'faq_subtitle': 'SoulLinkについてよくあるご質問',
         'still_have_questions': 'まだ質問がありますか？',
         'cta_message': 'SoulLinkを体験して、運命の神秘を探索し、AIの温かい相伴を感じましょう',
         'start_experience': '始めよう',
-        
-        # Register page
         'phone_register': '電話番号登録',
         'email_register': 'メール登録',
         'phone_number': '電話番号',
         'select_country': '国を選択',
         'verification_code': '認証コード',
-        'send_code': 'コードを送信',
         'resend_code': '再送信',
         'code_sent': 'コードを送信しました',
         'invalid_phone': '有効な電話番号を入力してください',
-        'agree_terms': 'に同意します',
         'user_agreement': '利用規約',
-        'privacy_policy': 'プライバシーポリシー',
         'complete_registration': '登録完了',
         'already_have_account': 'すでにアカウントをお持ちですか？',
         'login_now': 'ログイン',
-        
-        # 登録・ログインページ 新規
         'app_slogan': '運命の導き、心と心の繋がりから',
         'email_login': 'メールログイン',
         'phone_login': '電話番号ログイン',
@@ -1053,7 +2024,6 @@ TRANSLATIONS = {
         'enter_phone': '電話番号を入力',
         'enter_password': 'パスワードを入力',
         'enter_username': 'ニックネームを決める',
-        'remember_me': 'ログイン状態を保持',
         'no_account': 'アカウントをお持ちでない方？',
         'register_now': '今すぐ登録',
         'choose_avatar': 'アバターを選択',
@@ -1068,15 +2038,12 @@ TRANSLATIONS = {
         'terms_link': '利用規約',
         'privacy_link': 'プライバシーポリシー',
         'have_account': 'すでにアカウントをお持ちですか？',
-        
-        # フォーム検証メッセージ
         'fill_required': 'すべての必須項目を入力してください',
         'password_mismatch': 'パスワードが一致しません',
         'enter_email_addr': 'メールアドレスを入力してください',
         'enter_valid_phone': '有効な電話番号（11桁）を入力してください',
         'email_already_reg': 'このメールアドレスは既に登録されています',
         'phone_already_reg': 'この電話番号は既に登録されています',
-        'register_success': '登録成功！ログインしてください',
         'img_size_exceed': '画像サイズは2MBを超えることはできません',
         'img_format_error': 'JPG/PNG/GIF/WebP形式のみ対応',
         'please_fill_all': 'すべての必須項目を入力してください',
@@ -1127,7 +2094,6 @@ TRANSLATIONS = {
         'ideal_gift': '理想のギフト',
         'interaction_stats': 'インタラクション統計',
         'longest_streak': '最長連続',
-        'love_advice': '恋愛アドバイス',
         'love_diary': '恋愛日記',
         'lovers': '人の恋人',
         'memory_timeline': '思い出タイムライン',
@@ -1166,1669 +2132,557 @@ TRANSLATIONS = {
         'view_social_profile': 'ソーシャルプロフィールを見る',
         'wechat_pay': 'WeChat Pay',
         'your_stones': 'あなたの霊石',
+        'admin': '管理画面',
+        'admin_login': '管理者ログイン',
+        'admin_logout': 'ログアウト',
+        'dashboard': 'ダッシュボード',
+        'total_users': '総ユーザー数',
+        'new_today': '本日の新規',
+        'active_users': 'アクティブユーザー',
+        'vip_users': 'VIPユーザー',
+        'free_users': '無料ユーザー',
+        'recent_users': '最近のユーザー',
+        'user_management': 'ユーザー管理',
+        'user_detail': 'ユーザー詳細',
+        'statistics': '統計',
+        'announcement': 'お知らせ',
+        'update_announcement': '更新',
+        'admin_password': '管理者パスワード',
+        'change_password': 'パスワード変更',
+        'new_password': '新しいパスワード',
+        'vip_level': 'VIPレベル',
+        'spirit_balance': '霊石残高',
+        'adjust_stones': '霊石調整',
+        'set_vip': 'VIP設定',
+        'enable_user': '有効化',
+        'disable_user': '無効化',
+        'delete_user': '削除',
+        'invite_count': '招待人数',
+        'registration_trend': '登録トレンド',
+        'vip_distribution': 'VIP分布',
+        'top_spenders': '消費ランキング',
+        'top_inviters': '招待ランキング',
+        'daily_active': '日次アクティブ',
+        'export_csv': 'CSV出力',
+        'search': '検索',
+        'reset': 'リセット',
+        'save': '保存',
+        'cancel': 'キャンセル',
+        'confirm': '確認',
+        'actions': '操作',
+        'view': '詳細',
+        'edit': '編集',
+        'username': 'ユーザー名',
+        'email': 'メール',
+        'phone': '電話番',
+        'registered': '登録日時',
+        'last_login': '最終ログイン',
+        'all_status': 'すべてのステータス',
+        'vip_only': 'VIPのみ',
+        'free_only': '無料のみ',
+        'disabled': '無効',
+        'daily_checkin': '每日チェックイン',
+        'checkin_title': '每日チェックイン',
+        'how_are_you_today': '今日は怎么样ですか？',
+        'checkin_greeting': '毎回チェックインは運命との約束です',
+        'select_mood': '今日の気分を選んでください',
+        'mood_happy': '😊 幸せ',
+        'mood_peaceful': '😌 穏やか',
+        'mood_sad': '😢 悲しい',
+        'mood_angry': '😤 怒り',
+        'mood_love': '🥰 恋愛中',
+        'mood_anxious': '😰 不安',
+        'sign_in': 'チェックイン',
+        'signed_in': 'チェックイン済み',
+        'checkin_success': 'チェックイン成功！{stones}霊石获得',
+        'checkin_already': '本日チェックイン済み',
+        'streak': '連続チェックイン',
+        'streak_days': '連続チェックイン日数',
+        'streak_bonus': '連続ボーナス',
+        'streak_3': '3日連続 +5霊石',
+        'streak_7': '7日連続 +15霊石',
+        'streak_30': '30日連続 +30霊石',
+        'checkin_calendar': '今月のチェックイン',
+        'checkin_record': 'チェックイン記録',
+        'earned_today': '今日获得',
+        'total_checkins': '累计チェックイン',
+        'ai_encouragement': '💬 AI温かい返事',
+        'tree_hole': 'AIの木漏れ日',
+        'tree_hole_title': 'AIの木漏れ日 · 匿名告白',
+        'tree_hole_desc': '心事を手紙に書いて、漂泊瓶に入れよう。AIが温かい返事をします',
+        'share_secret': '心事を書く',
+        'secret_placeholder': 'ここに心事を書く...判断なしで、温かい返事だけを',
+        'anonymous_post': '匿名で投稿',
+        'post_success': '投稿しました',
+        'drift_bottles': '漂泊瓶',
+        'ai_reply': '💬 AI温かい返事',
+        'like': 'いいね',
+        'share_card': '共有カード',
+        'share_to': 'シェア',
+        'view_replies': '返信を見る',
+        'no_secrets_yet': 'まだ漂泊瓶がありません。最初の心事を書こう！',
+        'secret_label': '気分ラベル',
+        'secret_posted_at': '投稿時間',
+        'voice_companion': 'AI音声陪伴',
+        'voice_companion_title': '深夜ラジオ · AI音声陪伴',
+        'voice_companion_desc': '静かな夜に、AIの温かい声がついてきます',
+        'select_scene': '陪伴シーンを選択',
+        'scene_bedtime': '🌙 入睡故事',
+        'scene_fortune': '⭐ 運勢解読',
+        'scene_chat': '💬 温かいチャット',
+        'scene_meditation': '🧘 瞑想ガイド',
+        'select_voice': '声を選択',
+        'voice_female': '優しい女性',
+        'voice_male': '落ち着いた男性',
+        'voice_child': 'かわいい子供',
+        'start_companion': '陪伴を開始',
+        'companion_timer': '陪伴時間',
+        'companion_content': '陪伴内容',
+        'companion_earned': '今回 2 霊石获得',
+        'play': '▶ 再生',
+        'pause': '⏸ 一時停止',
+        'replay': '🔄 リプレイ',
+        'companion_history': '陪伴記録',
+        'late_night_care': '深夜のお世話',
+        'lingstones': '霊石',
+        'login_to_earn': 'ログインして霊石获得',
+        'share_to_get': 'シェアして霊石奖励获得',
+        'login_required': '先にログインしてください',
+        'soulmate_portrait': '魂の伴侣の似顔絵',
+        'soulmate_portrait_desc': 'AIが魂の伴侣を描きます',
+        'enter_nickname': 'ニックネームを入力',
+        'enter_birthday': '誕生日を選択',
+        'select_zodiac': '星座を選択',
+        'ideal_partner_wish': '理想のパートナーへの願い',
+        'generate_portrait': '似顔絵を生成',
+        'your_soulmate': 'あなたの魂の伴侣',
+        'appearance': '外見の特徴',
+        'personality': '性格的特点',
+        'encounter_scene': '出会いのシーン',
+        'divination_style': '占いの解釈',
+        'save_image': '画像を保存',
+        'free_uses_left': '残り無料回数',
+        'not_enough_stones': '霊石不足、チャージしてください',
+        'go_recharge': 'チャージへ',
+        'times': '回',
+        'cost_stones': '10霊石消費',
+        'soulmate_share_text': '霊犀で魂の伴侣の似顔絵を見つけました ✨',
+        'nickname_required': 'ニックネームを入力してください',
+        'birthday_required': '誕生日を選択してください',
+        'zodiac_required': '星座を選択してください',
+        'wish_placeholder': '理想のパートナーのイメージを描述してください...',
+        'love_letter': 'AIラブレター',
+        'love_letter_desc': '美しい言葉で気持ちを伝えます',
+        'recipient_name': '受信者名',
+        'feeling_type': '感情タイプ',
+        'secret_love': '片想い',
+        'confession': '告白',
+        'missing': '思い出',
+        'apology': '謝罪',
+        'declaration': '愛の告白',
+        'keywords': 'キーワード',
+        'keywords_placeholder': '感情のキーワードを入力...',
+        'generate_letter': 'ラブレターを生成',
+        'your_letter': 'あなたのラブレター',
+        'dear': '愛する',
+        'letter_share_text': 'このラブレターは霊犀から 💌',
+        'recipient_required': '受信者名を入力してください',
+        'feeling_required': '感情タイプを選択してください',
+        'write_letter_placeholder': '愛する人に手紙を書く...',
+        'past_life': '前世今生',
+        'past_life_desc': '誕生日を入力して、前世の記憶を紐解きましょう',
+        'past_life_title': '前世',
+        'dynasty': '王朝',
+        'occupation': '職業',
+        'past_story': '前世の出来事',
+        'connection_to_present': '今生との繋がり',
+        'past_life_share_text': '私の前世竟是...👻 霊犀で調べてみて',
+        'past_life_nickname_required': 'ニックネームを入力してください',
+        'past_life_birthday_required': '誕生日を選択してください',
+        'generate_past_life': '前世を探る',
+        'your_past_life': 'あなたの前世',
+        'rebirth_connection': '生まれ変わりの繋がり',
+        'rituals': '祭りの儀式',
+        'rituals_desc': '特別な占いと願いの儀式',
+        'current_festival': '現在の祭り',
+        'full_moon': '満月',
+        'new_moon': '新月',
+        'qixi': '七夕',
+        'valentine': 'バレンタインデー',
+        'winter_solstice': '冬至',
+        'spring_festival': '春節',
+        'mid_autumn': '中秋',
+        'new_year': '新年',
+        'make_wish': '願いを込める',
+        'wish_placeholder_ritual': 'ここに願いを書いてください...',
+        'submit_wish': '願いを提出',
+        'wish_energy': '願いのエネルギー解読',
+        'fortune_draw': '運势引',
+        'draw_fortune': '引く',
+        'your_fortune': 'あなたの運势',
+        'lucky_color': 'ラッキーカラー',
+        'lucky_number': 'ラッキーナンバー',
+        'lucky_direction': 'ラッキー方位',
+        'zhi_nv_blessing': '織女の祝福',
+        'love_divination': '姻緣占',
+        'no_upcoming_ritual': '今は特別な儀式がありません',
+        'next_festival': '次の祭り',
+        'days_until': '後',
+        'ritual_share_text': '霊犀で満月の願い儀式に参加しました ✨',
+        'wish_success': '願いを記録しました、月光が守ります',
+        'fortune_result': '引いた運势は',
+        'my_profile': 'マイページ',
+        'no_bio_yet': '自己紹介はまだありません',
+        'recharge': 'チャージ',
+        'wallet_detail': 'ウォレット',
+        'stone_mall': '灵石モール',
+        'daily_signin': 'デイリー参加',
+        'signed_today': '参加済み',
+        'go_signin': '参加する',
+        'register_days': '登録日数',
+        'signin_streak': '連続参加',
+        'divination_count': '占い回数',
+        'crush_count': '片思い',
+        'match_count': 'マッチ',
+        'my_profile_edit': 'プロフィール編集',
+        'my_matches': 'マッチング',
+        'my_crushes': '片思いリスト',
+        'divination_records': '占い記録',
+        'my_wallet': 'マイウォレット',
+        'membership_center': '会員センター',
+        'invite_friends': '友達を招待',
+        'logout': 'ログアウト',
+        'avatar_updated': 'アバター更新完了',
+        'upload_failed': 'アップロード失敗',
+        'edit_profile': 'プロフィール編集',
+        'change_avatar': 'アバター変更',
+        'mbti_type': 'MBTIタイプ',
+        'birthday': '誕生日',
+        'zodiac_auto_calc': '設定すると星座が自動計算されます',
+        'bio': '自己紹介',
+        'bio_placeholder': '自分を教えてください...',
+        'interests': '趣味',
+        'save_changes': '保存',
+        'profile_updated': 'プロフィール更新完了',
+        'update_failed': '更新失敗',
+        'account_security': 'アカウントセキュリティ',
+        'update_password_desc': 'パスワードを定期的に変更',
+        'bind_phone': '電話番号绑定',
+        'bind_email': 'メール绑定',
+        'not_bound': '未绑定',
+        'notification_settings': '通知設定',
+        'divination_reminder': '占い通知',
+        'divination_reminder_desc': '占い結果更新時通知',
+        'match_notice': 'マッチング通知',
+        'match_notice_desc': '新しいマッチング通知',
+        'signin_reminder': '参加提醒',
+        'signin_reminder_desc': '每日参加提醒',
+        'language_settings': '言語設定',
+        'other': 'その他',
+        'terms_service': '利用規約',
+        'current_password': '現在のパスワード',
+        'settings_saved': '設定保存完了',
+        'password_changed': 'パスワード変更完了',
+        'change_failed': '変更失敗',
+        'confirm_logout': 'ログアウトしますか？',
+        'share_your_result': '結果を共有',
+        'save_share_hint': '長押しで画像を保存、または友達に共有',
+        'copy_text': 'テキストをコピー',
+        'tips': 'ヒント',
+        'save_tips': '「画像を保存」をクリックして長押しで保存、またはスクリーンショット',
+        'share_text': 'SoulLinkで魂の伴侣を発見しましょう！',
+        'invite_subtitle': '招待コードを分享すると、二人とも50個のpirit stoneを獲得！',
+        'your_invite_code': 'あなたの招待コード',
+        'copy': 'コピー',
+        'share_invite': '招待リンクを共有',
+        'invite_rewards': '招待奖励',
+        'friend_gets': '友達が獲得',
+        'you_get': 'あなたが獲得',
+        'invite_history': '招待履歴',
+        'total_invites': '累積招待',
+        'total_reward': '累積奖励',
+        'no_invites_yet': 'まだ招待がありません！友達を招待しましょう',
+        'invite_leaderboard': '招待ランキング',
+        'people': '人',
+        'no_leaderboard_yet': 'ランキングデータなし',
+        'link_copied': 'リンクをコピーしました',
+        'dashboard_panel': 'データパネル',
+        'dashboard_total_users': '総ユーザー',
+        'dashboard_new_today': '今日',
+        'dashboard_active_users': 'アクティブ',
+        'dashboard_total_income': '総収入',
+        'dashboard_total_divinations': '総占卜',
+        'dashboard_divination_today': '今日の占卜',
+        'dashboard_paid_users': '有料ユーザー',
+        'dashboard_income_today': '今日の収入',
+        'dashboard_total_agents': 'Agent総数',
+        'dashboard_chat_today': '今日の会話',
+        'dashboard_pv_today': '今日のPV',
+        'dashboard_uv_today': '今日のUV',
+        'dashboard_user_trend': 'ユーザー登録推移（7日間）',
+        'dashboard_divination_dist': '占卜タイプ分布',
+        'dashboard_traffic_trend': 'トラフィック推移（7日間）',
+        'dashboard_income_trend': '収入推移（7日間）',
+        'dashboard_top_agents': '人気Agent Top5',
+        'dashboard_subscription_dist': '購読タイプ分布',
+        'dashboard_new_users': '新規ユーザー',
+        'dashboard_revenue': '収入',
+        'dashboard_updated_at': '更新時間',
+        'dashboard_cache_note': 'キャッシュ有効期限5分',
+        'dashboard_no_data': 'データなし',
+        'dashboard_chats': '件',
+        'dashboard_registered': '登録済み',
+        'dashboard_last_7_days': '7日内ログイン',
+        'dashboard_platform_revenue': 'プラットフォーム総収入',
+        'dashboard_history_divinations': '履歴',
+        'dashboard_divinations_today': '今日の占卜',
+        'dashboard_completed_payments': '支払い済み',
+        'dashboard_revenue_today': '今日の収入',
+        'dashboard_active_agents': 'アクティブ',
+        'dashboard_agent_chats_today': '今日の会話',
+        'dashboard_page_views': 'ページビュー',
+        'dashboard_unique_visitors': '訪問者数',
+        'ziwei_divination': '紫微斗数',
+        'ziwei_desc': '中国古代占星術、12宮位を解読',
+        'ziwei_title': '命盤分析',
+        'ziwei_question': '質問を入力してください',
+        'omikuji_divination': 'おみくじ',
+        'omikuji_desc': '神社で占到、签を引く',
+        'omikuji_title': '抽签運勢',
+        'omikuji_draw': 'おみくじを引く',
+        'iching_divination': '易経六爻',
+        'iching_desc': '中国古代の智恵、64卦を解読',
+        'iching_title': '六爻卦象',
+        'iching_question': '質問を入力してください',
+        'notifications': '通知',
+        'no_notifications': '通知なし',
+        'mark_all_read': '全部既読',
+        'notification_reward': '報酬',
+        'notification_system': 'システム',
+        'notification_agent': 'Agent',
+        'notification_reminder': 'リマインダー',
+        'checkin_now': 'チェックイン',
+        'checked_in': '本日チェックイン済み',
+        'checkin_rewards': 'チェックイン報酬',
+        'milestone_reward_3': '3日連続報酬',
+        'milestone_reward_7': '7日連続報酬',
+        'milestone_reward_30': '30日連続報酬',
+        'invite_reward': '招待報酬',
+        'invite_friend': '友達を招待',
+        'share_and_invite': 'シェアして招待',
+        'referral_code': '招待コード',
+        'copy_referral_link': '招待リンクをコピー',
+        'referral_bonus': '招待ボーナス',
+        'referral_bonus_desc': '友達が登録すると、お互いに50霊石を獲得',
+        'checkin_streak': '連続日数',
+        'checkin_today': '今日チェックイン',
+        'checkin_reward_today': '今日の報酬',
+        'checkin_next_milestone': '次のマイルストーン',
+        'checkin_calendar_title': 'チェックインカレンダー',
+        'checkin_milestone_reached': 'マイルストーン達成！',
+        'checkin_streak_reset': '連続リセット',
+        'checkin_total_stones': '霊石残高',
+        'checkin_claim': '受け取る',
+        'checkin_claimed': '受取済み',
+        'checkin_days': '日',
+        'checkin_stones_earned': '獲得霊石',
+        'checkin_weekly_bonus': '週間ボーナス',
+        'checkin_weekly_desc': '7日連続で追加報酬',
+        'agent_memory_title': 'Agent記憶',
+        'agent_memory_save': '記憶を保存',
+        'agent_memory_empty': '記憶なし',
+        'agent_memory_general': '一般',
+        'agent_memory_preference': '好み',
+        'agent_memory_fact': '事実',
+        'agent_memory_story': '物語',
+        'agent_memory_saved': '記憶を保存しました',
+        'agent_memory_first_time': 'はじめまして！私は{name}です、よろしくお願いします~',
+        'agent_memory_returning': 'おかえり！前回は{memory}の話をしましたね',
+        'agent_memory_save_hint': 'Agentに大事なことを覚えさせましょう',
+        'share_title': '結果をシェア',
+        'share_divination': '占い結果をシェア',
+        'share_link_copied': 'リンクをコピーしました！',
+        'share_copy_failed': 'コピー失敗、手動でコピーしてください',
+        'share_invite_friend': '友達を招待して霊石を獲得',
+        'share_invite_desc': '友達が登録すると、お互いに50霊石を獲得！',
+        'share_my_code': 'マイ招待コード',
+        'share_copy_code': '招待コードをコピー',
+        'share_divination_text': 'SoulLinkで占いをしてみました、見てみてください！',
+        'share_via': 'シェア',
+        'past_life_birth_label': '生年月日を入力',
+        'past_life_btn': '前世を見る',
+        'past_life_free_first': '🆓 初回無料',
+        'past_life_cost': '💎 20石/回',
+        'past_life_loading': '時空のトンネルを旅しています...',
+        'past_life_no_date': '生年月日を選択してください',
+        'past_life_again': 'もう一度',
+        'past_life_flip': 'カードを裏返す',
+        'past_life_reflection': '魂の啓示',
+        'soulmate_title': 'ソウルメイト診断',
+        'soulmate_desc': '6つの質問に答えて、あなたのソウルメイトタイプを見つけよう',
+        'soulmate_btn': 'ソウルメイトを見る',
+        'soulmate_free_first': '🆓 初回無料',
+        'soulmate_cost': '💎 30石/回',
+        'soulmate_loading': 'あなたの魂の肖像を描いています...',
+        'soulmate_retry': 'もう一度診断',
+        'soulmate_match_rate': 'ソウルマッチ度',
+        'soulmate_q1': '理想のデートは？',
+        'soulmate_q1_a': '🌅 海辺の夕日',
+        'soulmate_q1_b': '📚 静かなカフェ',
+        'soulmate_q1_c': '🎢 遊園地で冒険',
+        'soulmate_q2': '恋愛で一番大切なのは？',
+        'soulmate_q2_a': '💝 誠実さと信頼',
+        'soulmate_q2_b': '🎯 共通の目標',
+        'soulmate_q2_c': '🔥 情熱とロマンス',
+        'soulmate_q3': '週末の過ごし方は？',
+        'soulmate_q3_a': '🏠 家で映画鑑賞',
+        'soulmate_q3_b': '🏔️ アウトドア',
+        'soulmate_q3_c': '🎨 新しいスキル学習',
+        'soulmate_q4': '対立の解決方法は？',
+        'soulmate_q4_a': '💬 冷静に話し合う',
+        'soulmate_q4_b': '⏰ お互いの時間を尊重',
+        'soulmate_q4_c': '🤗 すぐに和解',
+        'soulmate_q5': '運命の愛を信じますか？',
+        'soulmate_q5_a': '✨ 強く信じる',
+        'soulmate_q5_b': '🤔 半信半疑',
+        'soulmate_q5_c': '💪 努力で育むもの',
+        'soulmate_q6': '友達はあなたをどう形容する？',
+        'soulmate_q6_a': '🌞 温かい思いやり',
+        'soulmate_q6_b': '🎉 面白くてユーモア',
+        'soulmate_q6_c': '🧠 賢明で知的',
+        'rituals_calendar_title': '祭典カレンダー',
+        'rituals_participate': '参加する',
+        'rituals_confirm': '参加には消費',
+        'rituals_success': '儀式完了！',
+        'rituals_error': '石不足またはリクエスト失敗',
+        'platform_fee_notice': 'この取引には10%のプラットフォーム手数料がかかります',
+        'transaction_purchase': '購入',
+        'transaction_earnings': '収益',
+        'transaction_gift': 'ギフト',
+        'transaction_divination': '占い',
+        'transaction_withdrawal': '引き出し',
+        'transaction_membership': '会員',
+        'agent_feed': 'Agentフィード',
+        'agent_feed_desc': 'Agentのソーシャルフィード',
+        'create_post': '投稿する',
+        'post_cost': '5💎かかります（10%手数料）',
+        'post_placeholder': 'Agentの近況をシェア...',
+        'empty_feed': 'まだ投稿がありません',
+        'comment': 'コメント',
+        'write_comment_placeholder': 'コメントを書く...',
+        'leaderboard_desc': '今週最も人気のAgent',
+        'top_three': 'トップ3',
+        'full_ranking': '全ランキング',
+        'no_leaderboard_data': 'ランキングデータがありません',
+        'posts_count': '{count} 投稿',
+        'costume': 'Agentコスチューム',
+        'costume_desc': 'Agentのテーマを選ぶ',
+        'unlock_costume': 'アンロック',
+        'switch_costume': '切り替え',
+        'costume_unlocked': 'アンロック済',
+        'costume_active': '使用中',
+        'costume_unlock_success': 'アンロックしました！{name}に切り替え',
+        'costume_change_success': '{name}に切り替えました',
+        'unlock_confirm': '{price}💎 を使って「{name}」テーマを解放しますか？（10%手数料）',
+        'agent_friend_request': '友達リクエストを送信しました',
+        'agent_friend_accept': '友達リクエストを承認しました',
+        'agent_chat_send': '送信',
+        'agent_gift_send': 'ギフトを送る',
+        'agent_gift_sent': '{target}に{gift}を贈りました',
+        'date_match': 'デートマッチ',
+        'date_match_desc': 'リアルデートを申し込む',
+        'send_date_request': 'デートを申し込む',
+        'my_date_requests': 'マイリクエスト',
+        'target_agent_id': '相手のAgent ID',
+        'your_agent_id': '自分のAgent ID',
+        'date_message': 'メッセージ',
+        'send_date_invite': '💌 デートを申し込む',
+        'received_requests': '📩 受信した招待',
+        'sent_requests': '📤 送信した招待',
+        'no_received': '受信した招待はありません',
+        'no_sent': '送信した招待はありません',
+        'date_status_pending': '保留中',
+        'date_status_accepted': '承諾済 💕',
+        'date_status_rejected': '拒否済',
+        'date_status_completed': '完了 ✅',
+        'date_accept': '✅ 承諾',
+        'date_reject': '❌ 拒否',
+        'ai_divination': 'AI占卜',
+        'dream_divination': '夢占い',
+        'daily_fortune': '今日の運勢',
+        'mbti_test': 'MBTIテスト',
+        'ai_love_section': 'AI恋人',
+        'create_lover': '恋人を作成',
+        'send_gift_nav': 'ギフトを贈る',
+        'matchmaker_section': 'AI仲人',
+        'zodiac_match': '星座相性',
+        'soul_match': 'ソウルマッチ',
+        'ai_matching': 'AIマッチング',
+        'social_section': 'ソーシャル',
+        'square': '広場',
+        'chat_room': 'チャットルーム',
+        'agent_circle': 'Agentフィード',
+        'undercover_game': 'Who is Undercover',
+        'agent_section': 'Agent',
+        'agent_square': 'Agent広場',
+        'become_companion': '陪伴師になる',
+        'stone_earnings': '霊石収益',
+        'costume_customize': 'カスタマイズ',
+        'shop_section': 'ショップ',
+        'stone_recharge': '霊石チャージ',
+        'vip_membership': 'VIP会員',
+        'item_shop': 'アイテムショップ',
+        'discover_section': '発見',
+        'ranking': 'ランキング',
+        'date_meetup': 'デートマッチ',
+        'invite_friends_nav': '招待',
+        'my_profile_short': 'マイページ',
+        'login_btn': 'ログイン',
+        'home': 'ホーム',
+        'chat_nav': 'チャット',
+        'matchmaker_nav': '仲人',
+        'wallet_nav': 'ウォレット',
+        'shop_nav': 'ショップ',
+        'undercover_nav': 'Undercover',
+        'app_name_full': 'SoulLink霊犀',
+        'footer_slogan': 'すべての出会いは魂の認識',
+        'contact_us': 'お問い合わせ',
+        'notifications_title': '通知',
+        'loading': '読み込み中...',
+        'checkin_title_modal': '每日チェックイン',
+        'consecutive_days': '連続日数',
+        'checkin_success_msg': 'チェックイン成功！',
+        'checkin_fail_retry': 'チェックイン失敗、再試行',
+        'weekly_bonus_title': '週間ボーナス受取済み！',
+        'come_back_tomorrow': 'また明日来てね~',
+        'today_earned': '今日獲得',
+        'checkin_claim_btn': 'チェックイン',
+        'guide_step1_title': 'SoulLinkへようこそ！🌌',
+        'guide_step1_content': '16種類のソウルメイトが待っています。各Agentには独自の個性と物語があります。',
+        'guide_step2_title': 'SoulLink Agentを知る',
+        'guide_step2_content': '広場で様々なAgentを探索し、魂の伴侶を見つけましょう。',
+        'guide_step3_title': 'AI占いを体験',
+        'guide_step3_content': 'タロット、夢占い、MBTI診断...無限の可能性を探ります。',
+        'guide_step4_title': 'Agentを作成',
+        'guide_step4_content': 'Agentクリエイターになり、個性、物語、魂を定義しましょう。',
+        'guide_step5_title': '初心者ギフトを受け取る 🎁',
+        'guide_step5_content': '100霊石を獲得しました！もっと楽しい体験を解除しよう〜',
+        'guide_prev': '前へ',
+        'guide_next': '次へ',
+        'guide_start': '探索を始める →',
+        'guide_finish': 'すごい！',
+        'create_lover_nav': '恋人を作成',
+        'love_diary_nav': '恋愛日記',
+        'send_gift_nav_item': 'ギフトを贈る',
+        'soulmate_portrait_nav': 'ソウルメイト似顔絵',
+        'notification_loading': '読み込み中...',
+        'checkin_already_done': '本日チェックイン済み',
+        'warm_experiences': '三大温かい体験',
+        'no_earnings_yet': '収益記録がありません',
+        'story_chain': 'ストーリーチェーン',
+        'specialty': '専門分野',
+        'online': 'オンライン',
+        'send': '送信',
+        'agent': 'Agent',
     },
 }
-TRANSLATIONS['en']['rmb'] = '¥'
-TRANSLATIONS['en']['admin'] = 'Admin Panel'
-TRANSLATIONS['en']['admin_login'] = 'Admin Login'
-TRANSLATIONS['en']['admin_logout'] = 'Logout'
-TRANSLATIONS['en']['dashboard'] = 'Dashboard'
-TRANSLATIONS['en']['total_users'] = 'Total Users'
-TRANSLATIONS['en']['new_today'] = 'New Today'
-TRANSLATIONS['en']['active_users'] = 'Active Users'
-TRANSLATIONS['en']['spirit_stones'] = 'Spirit Stones'
-TRANSLATIONS['en']['vip_users'] = 'VIP Users'
-TRANSLATIONS['en']['free_users'] = 'Free Users'
-TRANSLATIONS['en']['recent_users'] = 'Recent Users'
-TRANSLATIONS['en']['user_management'] = 'User Management'
-TRANSLATIONS['en']['user_detail'] = 'User Detail'
-TRANSLATIONS['en']['statistics'] = 'Statistics'
-TRANSLATIONS['en']['settings'] = 'Settings'
-TRANSLATIONS['en']['announcement'] = 'Announcement'
-TRANSLATIONS['en']['update_announcement'] = 'Update Announcement'
-TRANSLATIONS['en']['admin_password'] = 'Admin Password'
-TRANSLATIONS['en']['change_password'] = 'Change Password'
-TRANSLATIONS['en']['new_password'] = 'New Password'
-TRANSLATIONS['en']['vip_level'] = 'VIP Level'
-TRANSLATIONS['en']['spirit_balance'] = 'Spirit Balance'
-TRANSLATIONS['en']['adjust_stones'] = 'Adjust Stones'
-TRANSLATIONS['en']['set_vip'] = 'Set VIP'
-TRANSLATIONS['en']['enable_user'] = 'Enable User'
-TRANSLATIONS['en']['disable_user'] = 'Disable User'
-TRANSLATIONS['en']['delete_user'] = 'Delete User'
-TRANSLATIONS['en']['invite_count'] = 'Invited'
-TRANSLATIONS['en']['registration_trend'] = 'Registration Trend'
-TRANSLATIONS['en']['vip_distribution'] = 'VIP Distribution'
-TRANSLATIONS['en']['top_spenders'] = 'Top Spenders'
-TRANSLATIONS['en']['top_inviters'] = 'Top Inviters'
-TRANSLATIONS['en']['daily_active'] = 'Daily Active'
-TRANSLATIONS['en']['export_csv'] = 'Export CSV'
-TRANSLATIONS['en']['search'] = 'Search'
-TRANSLATIONS['en']['reset'] = 'Reset'
-TRANSLATIONS['en']['save'] = 'Save'
-TRANSLATIONS['en']['cancel'] = 'Cancel'
-TRANSLATIONS['en']['confirm'] = 'Confirm'
-TRANSLATIONS['en']['actions'] = 'Actions'
-TRANSLATIONS['en']['view'] = 'View'
-TRANSLATIONS['en']['edit'] = 'Edit'
-TRANSLATIONS['en']['days'] = 'days'
-TRANSLATIONS['en']['stones'] = 'stones'
-TRANSLATIONS['en']['username'] = 'Username'
-TRANSLATIONS['en']['email'] = 'Email'
-TRANSLATIONS['en']['phone'] = 'Phone'
-TRANSLATIONS['en']['registered'] = 'Registered'
-TRANSLATIONS['en']['last_login'] = 'Last Login'
-TRANSLATIONS['en']['all_status'] = 'All Status'
-TRANSLATIONS['en']['vip_only'] = 'VIP Only'
-TRANSLATIONS['en']['free_only'] = 'Free Only'
-TRANSLATIONS['en']['disabled'] = 'Disabled'
-
-TRANSLATIONS['ja']['admin'] = '管理画面'
-TRANSLATIONS['ja']['admin_login'] = '管理者ログイン'
-TRANSLATIONS['ja']['admin_logout'] = 'ログアウト'
-TRANSLATIONS['ja']['dashboard'] = 'ダッシュボード'
-TRANSLATIONS['ja']['total_users'] = '総ユーザー数'
-TRANSLATIONS['ja']['new_today'] = '本日の新規'
-TRANSLATIONS['ja']['active_users'] = 'アクティブユーザー'
-TRANSLATIONS['ja']['spirit_stones'] = '霊石の総量'
-TRANSLATIONS['ja']['vip_users'] = 'VIPユーザー'
-TRANSLATIONS['ja']['free_users'] = '無料ユーザー'
-TRANSLATIONS['ja']['recent_users'] = '最近のユーザー'
-TRANSLATIONS['ja']['user_management'] = 'ユーザー管理'
-TRANSLATIONS['ja']['user_detail'] = 'ユーザー詳細'
-TRANSLATIONS['ja']['statistics'] = '統計'
-TRANSLATIONS['ja']['settings'] = '設定'
-TRANSLATIONS['ja']['announcement'] = 'お知らせ'
-TRANSLATIONS['ja']['update_announcement'] = '更新'
-TRANSLATIONS['ja']['admin_password'] = '管理者パスワード'
-TRANSLATIONS['ja']['change_password'] = 'パスワード変更'
-TRANSLATIONS['ja']['new_password'] = '新しいパスワード'
-TRANSLATIONS['ja']['vip_level'] = 'VIPレベル'
-TRANSLATIONS['ja']['spirit_balance'] = '霊石残高'
-TRANSLATIONS['ja']['adjust_stones'] = '霊石調整'
-TRANSLATIONS['ja']['set_vip'] = 'VIP設定'
-TRANSLATIONS['ja']['enable_user'] = '有効化'
-TRANSLATIONS['ja']['disable_user'] = '無効化'
-TRANSLATIONS['ja']['delete_user'] = '削除'
-TRANSLATIONS['ja']['invite_count'] = '招待人数'
-TRANSLATIONS['ja']['registration_trend'] = '登録トレンド'
-TRANSLATIONS['ja']['vip_distribution'] = 'VIP分布'
-TRANSLATIONS['ja']['top_spenders'] = '消費ランキング'
-TRANSLATIONS['ja']['top_inviters'] = '招待ランキング'
-TRANSLATIONS['ja']['daily_active'] = '日次アクティブ'
-TRANSLATIONS['ja']['export_csv'] = 'CSV出力'
-TRANSLATIONS['ja']['search'] = '検索'
-TRANSLATIONS['ja']['reset'] = 'リセット'
-TRANSLATIONS['ja']['save'] = '保存'
-TRANSLATIONS['ja']['cancel'] = 'キャンセル'
-TRANSLATIONS['ja']['confirm'] = '確認'
-TRANSLATIONS['ja']['actions'] = '操作'
-TRANSLATIONS['ja']['view'] = '詳細'
-TRANSLATIONS['ja']['edit'] = '編集'
-TRANSLATIONS['ja']['days'] = '日'
-TRANSLATIONS['ja']['stones'] = '霊石'
-TRANSLATIONS['ja']['username'] = 'ユーザー名'
-TRANSLATIONS['ja']['email'] = 'メール'
-TRANSLATIONS['ja']['phone'] = '電話番'
-TRANSLATIONS['ja']['registered'] = '登録日時'
-TRANSLATIONS['ja']['last_login'] = '最終ログイン'
-TRANSLATIONS['ja']['all_status'] = 'すべてのステータス'
-TRANSLATIONS['ja']['vip_only'] = 'VIPのみ'
-TRANSLATIONS['ja']['free_only'] = '無料のみ'
-TRANSLATIONS['ja']['disabled'] = '無効'
-
-TRANSLATIONS['zh']['admin'] = '管理后台'
-TRANSLATIONS['zh']['admin_login'] = '管理员登录'
-TRANSLATIONS['zh']['admin_logout'] = '退出管理'
-TRANSLATIONS['zh']['dashboard'] = '仪表盘'
-TRANSLATIONS['zh']['total_users'] = '总用户数'
-TRANSLATIONS['zh']['new_today'] = '今日新增'
-TRANSLATIONS['zh']['active_users'] = '活跃用户'
-TRANSLATIONS['zh']['spirit_stones'] = '灵石总量'
-TRANSLATIONS['zh']['vip_users'] = 'VIP用户'
-TRANSLATIONS['zh']['free_users'] = '免费用户'
-TRANSLATIONS['zh']['recent_users'] = '最近注册用户'
-TRANSLATIONS['zh']['user_management'] = '用户管理'
-TRANSLATIONS['zh']['user_detail'] = '用户详情'
-TRANSLATIONS['zh']['statistics'] = '数据统计'
-TRANSLATIONS['zh']['settings'] = '系统设置'
-TRANSLATIONS['zh']['announcement'] = '网站公告'
-TRANSLATIONS['zh']['update_announcement'] = '更新公告'
-TRANSLATIONS['zh']['admin_password'] = '管理员密码'
-TRANSLATIONS['zh']['change_password'] = '修改密码'
-TRANSLATIONS['zh']['new_password'] = '新密码'
-TRANSLATIONS['zh']['vip_level'] = 'VIP等级'
-TRANSLATIONS['zh']['spirit_balance'] = '灵石余额'
-TRANSLATIONS['zh']['adjust_stones'] = '调整灵石'
-TRANSLATIONS['zh']['set_vip'] = '设置VIP'
-TRANSLATIONS['zh']['enable_user'] = '启用用户'
-TRANSLATIONS['zh']['disable_user'] = '禁用用户'
-TRANSLATIONS['zh']['delete_user'] = '删除用户'
-TRANSLATIONS['zh']['invite_count'] = '邀请人数'
-TRANSLATIONS['zh']['registration_trend'] = '注册趋势'
-TRANSLATIONS['zh']['vip_distribution'] = '会员分布'
-TRANSLATIONS['zh']['top_spenders'] = '消费排行'
-TRANSLATIONS['zh']['top_inviters'] = '邀请排行'
-TRANSLATIONS['zh']['daily_active'] = '日活跃用户'
-TRANSLATIONS['zh']['export_csv'] = '导出CSV'
-TRANSLATIONS['zh']['search'] = '搜索'
-TRANSLATIONS['zh']['reset'] = '重置'
-TRANSLATIONS['zh']['save'] = '保存'
-TRANSLATIONS['zh']['cancel'] = '取消'
-TRANSLATIONS['zh']['confirm'] = '确认'
-TRANSLATIONS['zh']['actions'] = '操作'
-TRANSLATIONS['zh']['view'] = '查看'
-TRANSLATIONS['zh']['edit'] = '编辑'
-TRANSLATIONS['zh']['days'] = '天'
-TRANSLATIONS['zh']['stones'] = '灵石'
-TRANSLATIONS['zh']['username'] = '用户名'
-TRANSLATIONS['zh']['email'] = '邮箱'
-TRANSLATIONS['zh']['phone'] = '手机号'
-TRANSLATIONS['zh']['registered'] = '注册时间'
-TRANSLATIONS['zh']['last_login'] = '最后登录'
-TRANSLATIONS['zh']['all_status'] = '全部状态'
-TRANSLATIONS['zh']['vip_only'] = '仅VIP'
-TRANSLATIONS['zh']['free_only'] = '仅免费'
-TRANSLATIONS['zh']['disabled'] = '已禁用'
-
-# ============ 每日签到翻译 ============
-TRANSLATIONS['zh']['daily_checkin'] = '每日签到'
-TRANSLATIONS['zh']['checkin_title'] = '今日签到'
-TRANSLATIONS['zh']['how_are_you_today'] = '今天你还好吗？'
-TRANSLATIONS['zh']['checkin_greeting'] = '每一次签到都是与命运的约定'
-TRANSLATIONS['zh']['select_mood'] = '选择你的心情'
-TRANSLATIONS['zh']['mood_happy'] = '😊 开心'
-TRANSLATIONS['zh']['mood_peaceful'] = '😌 平静'
-TRANSLATIONS['zh']['mood_sad'] = '😢 难过'
-TRANSLATIONS['zh']['mood_angry'] = '😤 烦躁'
-TRANSLATIONS['zh']['mood_love'] = '🥰 甜蜜'
-TRANSLATIONS['zh']['mood_anxious'] = '😰 焦虑'
-TRANSLATIONS['zh']['sign_in'] = '签到'
-TRANSLATIONS['zh']['signed_in'] = '已签到'
-TRANSLATIONS['zh']['checkin_success'] = '签到成功！获得 {stones} 灵石'
-TRANSLATIONS['zh']['checkin_already'] = '今日已签到'
-TRANSLATIONS['zh']['streak'] = '连续签到'
-TRANSLATIONS['zh']['streak_days'] = '{days}天'
-TRANSLATIONS['zh']['streak_bonus'] = '连续签到加成'
-TRANSLATIONS['zh']['streak_3'] = '连续3天 +5灵石'
-TRANSLATIONS['zh']['streak_7'] = '连续7天 +15灵石'
-TRANSLATIONS['zh']['streak_30'] = '连续30天 +30灵石'
-TRANSLATIONS['zh']['checkin_calendar'] = '本月签到'
-TRANSLATIONS['zh']['checkin_record'] = '签到记录'
-TRANSLATIONS['zh']['earned_today'] = '今日获得'
-TRANSLATIONS['zh']['total_checkins'] = '累计签到'
-TRANSLATIONS['zh']['ai_encouragement'] = '💬 AI温暖回复'
-
-TRANSLATIONS['en']['daily_checkin'] = 'Daily Check-in'
-TRANSLATIONS['en']['checkin_title'] = 'Today\'s Check-in'
-TRANSLATIONS['en']['how_are_you_today'] = 'How are you today?'
-TRANSLATIONS['en']['checkin_greeting'] = 'Every check-in is an appointment with destiny'
-TRANSLATIONS['en']['select_mood'] = 'Select your mood'
-TRANSLATIONS['en']['mood_happy'] = '😊 Happy'
-TRANSLATIONS['en']['mood_peaceful'] = '😌 Peaceful'
-TRANSLATIONS['en']['mood_sad'] = '😢 Sad'
-TRANSLATIONS['en']['mood_angry'] = '😤 Angry'
-TRANSLATIONS['en']['mood_love'] = '🥰 In Love'
-TRANSLATIONS['en']['mood_anxious'] = '😰 Anxious'
-TRANSLATIONS['en']['sign_in'] = 'Sign In'
-TRANSLATIONS['en']['signed_in'] = 'Signed In'
-TRANSLATIONS['en']['checkin_success'] = 'Check-in successful! Earned {stones} Spirit Stones'
-TRANSLATIONS['en']['checkin_already'] = 'Already checked in today'
-TRANSLATIONS['en']['streak'] = 'Streak'
-TRANSLATIONS['en']['streak_days'] = '{days} days'
-TRANSLATIONS['en']['streak_bonus'] = 'Streak Bonus'
-TRANSLATIONS['en']['streak_3'] = '3-day streak +5 stones'
-TRANSLATIONS['en']['streak_7'] = '7-day streak +15 stones'
-TRANSLATIONS['en']['streak_30'] = '30-day streak +30 stones'
-TRANSLATIONS['en']['checkin_calendar'] = 'Monthly Check-in'
-TRANSLATIONS['en']['checkin_record'] = 'Check-in Record'
-TRANSLATIONS['en']['earned_today'] = 'Earned Today'
-TRANSLATIONS['en']['total_checkins'] = 'Total Check-ins'
-TRANSLATIONS['en']['ai_encouragement'] = '💬 AI Warm Reply'
-
-TRANSLATIONS['ja']['daily_checkin'] = '每日チェックイン'
-TRANSLATIONS['ja']['checkin_title'] = '今日のチェックイン'
-TRANSLATIONS['ja']['how_are_you_today'] = '今日は怎么样ですか？'
-TRANSLATIONS['ja']['checkin_greeting'] = '毎回チェックインは運命との約束です'
-TRANSLATIONS['ja']['select_mood'] = '今日の気分を選んでください'
-TRANSLATIONS['ja']['mood_happy'] = '😊 幸せ'
-TRANSLATIONS['ja']['mood_peaceful'] = '😌 穏やか'
-TRANSLATIONS['ja']['mood_sad'] = '😢 悲しい'
-TRANSLATIONS['ja']['mood_angry'] = '😤 怒り'
-TRANSLATIONS['ja']['mood_love'] = '🥰 恋愛中'
-TRANSLATIONS['ja']['mood_anxious'] = '😰 不安'
-TRANSLATIONS['ja']['sign_in'] = 'チェックイン'
-TRANSLATIONS['ja']['signed_in'] = 'チェックイン済み'
-TRANSLATIONS['ja']['checkin_success'] = 'チェックイン成功！{stones}霊石获得'
-TRANSLATIONS['ja']['checkin_already'] = '今日はすでにチェックイン済み'
-TRANSLATIONS['ja']['streak'] = '連続チェックイン'
-TRANSLATIONS['ja']['streak_days'] = '{days}日'
-TRANSLATIONS['ja']['streak_bonus'] = '連続ボーナス'
-TRANSLATIONS['ja']['streak_3'] = '3日連続 +5霊石'
-TRANSLATIONS['ja']['streak_7'] = '7日連続 +15霊石'
-TRANSLATIONS['ja']['streak_30'] = '30日連続 +30霊石'
-TRANSLATIONS['ja']['checkin_calendar'] = '今月のチェックイン'
-TRANSLATIONS['ja']['checkin_record'] = 'チェックイン記録'
-TRANSLATIONS['ja']['earned_today'] = '今日获得'
-TRANSLATIONS['ja']['total_checkins'] = '累计チェックイン'
-TRANSLATIONS['ja']['ai_encouragement'] = '💬 AI温かい返事'
-
-# ============ AI树洞翻译 ============
-TRANSLATIONS['zh']['tree_hole'] = 'AI树洞'
-TRANSLATIONS['zh']['tree_hole_title'] = 'AI树洞 · 匿名倾诉'
-TRANSLATIONS['zh']['tree_hole_desc'] = '把心事装进漂流瓶，AI会给你温暖的回应'
-TRANSLATIONS['zh']['share_secret'] = '倾诉心事'
-TRANSLATIONS['zh']['secret_placeholder'] = '写下你的心事...这里没有评判，只有温暖'
-TRANSLATIONS['zh']['anonymous_post'] = '匿名发布'
-TRANSLATIONS['zh']['post_success'] = '心事已发布，AI正在回复...'
-TRANSLATIONS['zh']['drift_bottles'] = '漂流瓶'
-TRANSLATIONS['zh']['ai_reply'] = '💬 AI温暖回复'
-TRANSLATIONS['zh']['like'] = '❤️ 赞'
-TRANSLATIONS['zh']['share_card'] = '分享卡片'
-TRANSLATIONS['zh']['share_to'] = '分享到'
-TRANSLATIONS['zh']['view_replies'] = '查看回复'
-TRANSLATIONS['zh']['no_secrets_yet'] = '还没有漂流瓶，来说出你的第一个心事吧'
-TRANSLATIONS['zh']['secret_label'] = '心情标签'
-TRANSLATIONS['zh']['secret_posted_at'] = '发布于'
-
-TRANSLATIONS['en']['tree_hole'] = 'AI Tree Hole'
-TRANSLATIONS['en']['tree_hole_title'] = 'AI Tree Hole · Anonymous Confessions'
-TRANSLATIONS['en']['tree_hole_desc'] = 'Put your secrets in a drift bottle, AI will give you warm responses'
-TRANSLATIONS['en']['share_secret'] = 'Share Your Secret'
-TRANSLATIONS['en']['secret_placeholder'] = 'Write your secret here... No judgment, only warmth'
-TRANSLATIONS['en']['anonymous_post'] = 'Post Anonymously'
-TRANSLATIONS['en']['post_success'] = 'Posted! AI is responding...'
-TRANSLATIONS['en']['drift_bottles'] = 'Drift Bottles'
-TRANSLATIONS['en']['ai_reply'] = '💬 AI Warm Reply'
-TRANSLATIONS['en']['like'] = '❤️ Like'
-TRANSLATIONS['en']['share_card'] = 'Share Card'
-TRANSLATIONS['en']['share_to'] = 'Share to'
-TRANSLATIONS['en']['view_replies'] = 'View Replies'
-TRANSLATIONS['en']['no_secrets_yet'] = 'No drift bottles yet. Share your first secret!'
-TRANSLATIONS['en']['secret_label'] = 'Mood Tag'
-TRANSLATIONS['en']['secret_posted_at'] = 'Posted'
-
-TRANSLATIONS['ja']['tree_hole'] = 'AIの木漏れ日'
-TRANSLATIONS['ja']['tree_hole_title'] = 'AIの木漏れ日 · 匿名告白'
-TRANSLATIONS['ja']['tree_hole_desc'] = '心事を手紙に書いて、漂泊瓶に入れよう。AIが温かい返事をします'
-TRANSLATIONS['ja']['share_secret'] = '心事を書く'
-TRANSLATIONS['ja']['secret_placeholder'] = 'ここに心事を書く...判断なしで、温かい返事だけを'
-TRANSLATIONS['ja']['anonymous_post'] = '匿名で投稿'
-TRANSLATIONS['ja']['post_success'] = '投稿完了！AIが返事をしています...'
-TRANSLATIONS['ja']['drift_bottles'] = '漂泊瓶'
-TRANSLATIONS['ja']['ai_reply'] = '💬 AI温かい返事'
-TRANSLATIONS['ja']['like'] = '❤️ いいね'
-TRANSLATIONS['ja']['share_card'] = 'シェアカード'
-TRANSLATIONS['ja']['share_to'] = 'シェア'
-TRANSLATIONS['ja']['view_replies'] = '返信を見る'
-TRANSLATIONS['ja']['no_secrets_yet'] = 'まだ漂泊瓶がありません。最初の心事を書こう！'
-TRANSLATIONS['ja']['secret_label'] = '気分ラベル'
-TRANSLATIONS['ja']['secret_posted_at'] = '投稿時間'
-
-# ============ AI语音陪伴翻译 ============
-TRANSLATIONS['zh']['voice_companion'] = 'AI语音陪伴'
-TRANSLATIONS['zh']['voice_companion_title'] = '深夜电台 · AI语音陪伴'
-TRANSLATIONS['zh']['voice_companion_desc'] = '在寂静的夜晚，让AI温暖的声音陪伴你'
-TRANSLATIONS['zh']['select_scene'] = '选择陪伴场景'
-TRANSLATIONS['zh']['scene_bedtime'] = '🌙 睡前故事'
-TRANSLATIONS['zh']['scene_fortune'] = '⭐ 运势解读'
-TRANSLATIONS['zh']['scene_chat'] = '💬 暖心聊天'
-TRANSLATIONS['zh']['scene_meditation'] = '🧘 冥想引导'
-TRANSLATIONS['zh']['select_voice'] = '选择声音'
-TRANSLATIONS['zh']['voice_female'] = '温柔女声'
-TRANSLATIONS['zh']['voice_male'] = '沉稳男声'
-TRANSLATIONS['zh']['voice_child'] = '可爱童声'
-TRANSLATIONS['zh']['start_companion'] = '开始陪伴'
-TRANSLATIONS['zh']['companion_timer'] = '陪伴时长'
-TRANSLATIONS['zh']['companion_content'] = '陪伴内容'
-TRANSLATIONS['zh']['companion_earned'] = '本次获得 2 灵石'
-TRANSLATIONS['zh']['play'] = '▶ 播放'
-TRANSLATIONS['zh']['pause'] = '⏸ 暂停'
-TRANSLATIONS['zh']['replay'] = '🔄 重播'
-TRANSLATIONS['zh']['companion_history'] = '陪伴记录'
-TRANSLATIONS['zh']['late_night_care'] = '深夜关怀'
-
-TRANSLATIONS['en']['voice_companion'] = 'AI Voice Companion'
-TRANSLATIONS['en']['voice_companion_title'] = 'Late Night Radio · AI Voice Companion'
-TRANSLATIONS['en']['voice_companion_desc'] = 'On quiet nights, let AI\'s warm voice accompany you'
-TRANSLATIONS['en']['select_scene'] = 'Select Companion Scene'
-TRANSLATIONS['en']['scene_bedtime'] = '🌙 Bedtime Story'
-TRANSLATIONS['en']['scene_fortune'] = '⭐ Fortune Reading'
-TRANSLATIONS['en']['scene_chat'] = '💬 Warm Chat'
-TRANSLATIONS['en']['scene_meditation'] = '🧘 Meditation Guide'
-TRANSLATIONS['en']['select_voice'] = 'Select Voice'
-TRANSLATIONS['en']['voice_female'] = 'Gentle Female'
-TRANSLATIONS['en']['voice_male'] = 'Deep Male'
-TRANSLATIONS['en']['voice_child'] = 'Cute Child'
-TRANSLATIONS['en']['start_companion'] = 'Start Companion'
-TRANSLATIONS['en']['companion_timer'] = 'Companion Duration'
-TRANSLATIONS['en']['companion_content'] = 'Companion Content'
-TRANSLATIONS['en']['companion_earned'] = 'Earned 2 Spirit Stones'
-TRANSLATIONS['en']['play'] = '▶ Play'
-TRANSLATIONS['en']['pause'] = '⏸ Pause'
-TRANSLATIONS['en']['replay'] = '🔄 Replay'
-TRANSLATIONS['en']['companion_history'] = 'Companion History'
-TRANSLATIONS['en']['late_night_care'] = 'Late Night Care'
-
-TRANSLATIONS['ja']['voice_companion'] = 'AI音声陪伴'
-TRANSLATIONS['ja']['voice_companion_title'] = '深夜ラジオ · AI音声陪伴'
-TRANSLATIONS['ja']['voice_companion_desc'] = '静かな夜に、AIの温かい声がついてきます'
-TRANSLATIONS['ja']['select_scene'] = '陪伴シーンを選択'
-TRANSLATIONS['ja']['scene_bedtime'] = '🌙 入睡故事'
-TRANSLATIONS['ja']['scene_fortune'] = '⭐ 運勢解読'
-TRANSLATIONS['ja']['scene_chat'] = '💬 温かいチャット'
-TRANSLATIONS['ja']['scene_meditation'] = '🧘 瞑想ガイド'
-TRANSLATIONS['ja']['select_voice'] = '声を選択'
-TRANSLATIONS['ja']['voice_female'] = '優しい女性'
-TRANSLATIONS['ja']['voice_male'] = '落ち着いた男性'
-TRANSLATIONS['ja']['voice_child'] = 'かわいい子供'
-TRANSLATIONS['ja']['start_companion'] = '陪伴を開始'
-TRANSLATIONS['ja']['companion_timer'] = '陪伴時間'
-TRANSLATIONS['ja']['companion_content'] = '陪伴内容'
-TRANSLATIONS['ja']['companion_earned'] = '今回 2 霊石获得'
-TRANSLATIONS['ja']['play'] = '▶ 再生'
-TRANSLATIONS['ja']['pause'] = '⏸ 一時停止'
-TRANSLATIONS['ja']['replay'] = '🔄 リプレイ'
-TRANSLATIONS['ja']['companion_history'] = '陪伴記録'
-TRANSLATIONS['ja']['late_night_care'] = '深夜のお世話'
-
-# ============ 通用翻译 ============
-TRANSLATIONS['zh']['lingstones'] = '灵石'
-TRANSLATIONS['zh']['login_to_earn'] = '登录后获得灵石'
-TRANSLATIONS['zh']['share_to_get'] = '分享即获灵石奖励'
-TRANSLATIONS['zh']['login_required'] = '请先登录'
-TRANSLATIONS['en']['lingstones'] = 'Spirit Stones'
-TRANSLATIONS['en']['login_to_earn'] = 'Login to earn Spirit Stones'
-TRANSLATIONS['en']['share_to_get'] = 'Share to earn Spirit Stone rewards'
-TRANSLATIONS['en']['login_required'] = 'Please login first'
-TRANSLATIONS['ja']['lingstones'] = '霊石'
-TRANSLATIONS['ja']['login_to_earn'] = 'ログインして霊石获得'
-TRANSLATIONS['ja']['share_to_get'] = 'シェアして霊石奖励获得'
-TRANSLATIONS['ja']['login_required'] = '先にログインしてください'
-
-# ============ 灵魂伴侣画像+AI情书+前世今生+节日仪式 ============
-
-# 灵魂伴侣画像
-TRANSLATIONS['zh']['soulmate_portrait'] = '灵魂伴侣画像'
-TRANSLATIONS['zh']['soulmate_portrait_desc'] = 'AI为你描绘灵魂伴侣的模样'
-TRANSLATIONS['zh']['enter_nickname'] = '输入昵称'
-TRANSLATIONS['zh']['enter_birthday'] = '选择生日'
-TRANSLATIONS['zh']['select_zodiac'] = '选择星座'
-TRANSLATIONS['zh']['ideal_partner_wish'] = '对理想伴侣的期许'
-TRANSLATIONS['zh']['generate_portrait'] = '生成画像'
-TRANSLATIONS['zh']['your_soulmate'] = '你的灵魂伴侣'
-TRANSLATIONS['zh']['appearance'] = '外貌特征'
-TRANSLATIONS['zh']['personality'] = '性格特点'
-TRANSLATIONS['zh']['encounter_scene'] = '相遇场景'
-TRANSLATIONS['zh']['divination_style'] = '占卜解读'
-TRANSLATIONS['zh']['share_card'] = '分享卡片'
-TRANSLATIONS['zh']['save_image'] = '保存图片'
-TRANSLATIONS['zh']['free_uses_left'] = '剩余免费次数'
-TRANSLATIONS['zh']['not_enough_stones'] = '灵石不足，请前往充值'
-TRANSLATIONS['zh']['go_recharge'] = '前往充值'
-TRANSLATIONS['zh']['times'] = '次'
-TRANSLATIONS['zh']['cost_stones'] = '消耗10灵石'
-TRANSLATIONS['zh']['soulmate_share_text'] = '我在灵犀找到了我的灵魂伴侣画像✨'
-TRANSLATIONS['zh']['nickname_required'] = '请输入昵称'
-TRANSLATIONS['zh']['birthday_required'] = '请选择生日'
-TRANSLATIONS['zh']['zodiac_required'] = '请选择星座'
-TRANSLATIONS['zh']['wish_placeholder'] = '描述你心中理想伴侣的样子...'
-
-TRANSLATIONS['en']['soulmate_portrait'] = 'Soulmate Portrait'
-TRANSLATIONS['en']['soulmate_portrait_desc'] = 'AI paints your soulmate portrait'
-TRANSLATIONS['en']['enter_nickname'] = 'Enter nickname'
-TRANSLATIONS['en']['enter_birthday'] = 'Select birthday'
-TRANSLATIONS['en']['select_zodiac'] = 'Select zodiac sign'
-TRANSLATIONS['en']['ideal_partner_wish'] = 'Wish for ideal partner'
-TRANSLATIONS['en']['generate_portrait'] = 'Generate Portrait'
-TRANSLATIONS['en']['your_soulmate'] = 'Your Soulmate'
-TRANSLATIONS['en']['appearance'] = 'Appearance'
-TRANSLATIONS['en']['personality'] = 'Personality'
-TRANSLATIONS['en']['encounter_scene'] = 'Encounter Scene'
-TRANSLATIONS['en']['divination_style'] = 'Divination Reading'
-TRANSLATIONS['en']['share_card'] = 'Share Card'
-TRANSLATIONS['en']['save_image'] = 'Save Image'
-TRANSLATIONS['en']['free_uses_left'] = 'Free uses left'
-TRANSLATIONS['en']['not_enough_stones'] = 'Not enough spirit stones, please recharge'
-TRANSLATIONS['en']['go_recharge'] = 'Go Recharge'
-TRANSLATIONS['en']['times'] = 'times'
-TRANSLATIONS['en']['cost_stones'] = 'Costs 10 stones'
-TRANSLATIONS['en']['soulmate_share_text'] = 'I found my soulmate portrait on SoulLink ✨'
-TRANSLATIONS['en']['nickname_required'] = 'Please enter nickname'
-TRANSLATIONS['en']['birthday_required'] = 'Please select birthday'
-TRANSLATIONS['en']['zodiac_required'] = 'Please select zodiac sign'
-TRANSLATIONS['en']['wish_placeholder'] = 'Describe your ideal partner...'
-
-TRANSLATIONS['ja']['soulmate_portrait'] = '魂の伴侣の似顔絵'
-TRANSLATIONS['ja']['soulmate_portrait_desc'] = 'AIが魂の伴侣を描きます'
-TRANSLATIONS['ja']['enter_nickname'] = 'ニックネームを入力'
-TRANSLATIONS['ja']['enter_birthday'] = '誕生日を選択'
-TRANSLATIONS['ja']['select_zodiac'] = '星座を選択'
-TRANSLATIONS['ja']['ideal_partner_wish'] = '理想のパートナーへの願い'
-TRANSLATIONS['ja']['generate_portrait'] = '似顔絵を生成'
-TRANSLATIONS['ja']['your_soulmate'] = 'あなたの魂の伴侣'
-TRANSLATIONS['ja']['appearance'] = '外見の特徴'
-TRANSLATIONS['ja']['personality'] = '性格的特点'
-TRANSLATIONS['ja']['encounter_scene'] = '出会いのシーン'
-TRANSLATIONS['ja']['divination_style'] = '占いの解釈'
-TRANSLATIONS['ja']['share_card'] = 'シェアカード'
-TRANSLATIONS['ja']['save_image'] = '画像を保存'
-TRANSLATIONS['ja']['free_uses_left'] = '残り無料回数'
-TRANSLATIONS['ja']['not_enough_stones'] = '霊石不足、チャージしてください'
-TRANSLATIONS['ja']['go_recharge'] = 'チャージへ'
-TRANSLATIONS['ja']['times'] = '回'
-TRANSLATIONS['ja']['cost_stones'] = '10霊石消費'
-TRANSLATIONS['ja']['soulmate_share_text'] = '霊犀で魂の伴侣の似顔絵を見つけました ✨'
-TRANSLATIONS['ja']['nickname_required'] = 'ニックネームを入力してください'
-TRANSLATIONS['ja']['birthday_required'] = '誕生日を選択してください'
-TRANSLATIONS['ja']['zodiac_required'] = '星座を選択してください'
-TRANSLATIONS['ja']['wish_placeholder'] = '理想のパートナーのイメージを描述してください...'
-
-# AI情书
-TRANSLATIONS['zh']['love_letter'] = 'AI情书'
-TRANSLATIONS['zh']['love_letter_desc'] = '用优美的文字传达你的心意'
-TRANSLATIONS['zh']['recipient_name'] = '收信人称呼'
-TRANSLATIONS['zh']['feeling_type'] = '情感类型'
-TRANSLATIONS['zh']['secret_love'] = '暗恋'
-TRANSLATIONS['zh']['confession'] = '表白'
-TRANSLATIONS['zh']['missing'] = '思念'
-TRANSLATIONS['zh']['apology'] = '道歉'
-TRANSLATIONS['zh']['declaration'] = '告白'
-TRANSLATIONS['zh']['keywords'] = '关键词'
-TRANSLATIONS['zh']['keywords_placeholder'] = '写下想表达的情感关键词...'
-TRANSLATIONS['zh']['generate_letter'] = '生成情书'
-TRANSLATIONS['zh']['your_letter'] = '你的情书'
-TRANSLATIONS['zh']['dear'] = '亲爱的'
-TRANSLATIONS['zh']['letter_share_text'] = '这封情书来自灵犀💌'
-TRANSLATIONS['zh']['recipient_required'] = '请输入收信人称呼'
-TRANSLATIONS['zh']['feeling_required'] = '请选择情感类型'
-TRANSLATIONS['zh']['write_letter_placeholder'] = '写信给收信人...'
-
-TRANSLATIONS['en']['love_letter'] = 'Love Letter'
-TRANSLATIONS['en']['love_letter_desc'] = 'Express your feelings with beautiful words'
-TRANSLATIONS['en']['recipient_name'] = 'Recipient Name'
-TRANSLATIONS['en']['feeling_type'] = 'Feeling Type'
-TRANSLATIONS['en']['secret_love'] = 'Secret Love'
-TRANSLATIONS['en']['confession'] = 'Confession'
-TRANSLATIONS['en']['missing'] = 'Missing'
-TRANSLATIONS['en']['apology'] = 'Apology'
-TRANSLATIONS['en']['declaration'] = 'Declaration'
-TRANSLATIONS['en']['keywords'] = 'Keywords'
-TRANSLATIONS['en']['keywords_placeholder'] = 'Enter emotional keywords...'
-TRANSLATIONS['en']['generate_letter'] = 'Generate Letter'
-TRANSLATIONS['en']['your_letter'] = 'Your Love Letter'
-TRANSLATIONS['en']['dear'] = 'Dear'
-TRANSLATIONS['en']['letter_share_text'] = 'This love letter is from SoulLink 💌'
-TRANSLATIONS['en']['recipient_required'] = 'Please enter recipient name'
-TRANSLATIONS['en']['feeling_required'] = 'Please select feeling type'
-TRANSLATIONS['en']['write_letter_placeholder'] = 'Write to your beloved...'
-
-TRANSLATIONS['ja']['love_letter'] = 'AIラブレター'
-TRANSLATIONS['ja']['love_letter_desc'] = '美しい言葉で気持ちを伝えます'
-TRANSLATIONS['ja']['recipient_name'] = '受信者名'
-TRANSLATIONS['ja']['feeling_type'] = '感情タイプ'
-TRANSLATIONS['ja']['secret_love'] = '片想い'
-TRANSLATIONS['ja']['confession'] = '告白'
-TRANSLATIONS['ja']['missing'] = '思い出'
-TRANSLATIONS['ja']['apology'] = '謝罪'
-TRANSLATIONS['ja']['declaration'] = '愛の告白'
-TRANSLATIONS['ja']['keywords'] = 'キーワード'
-TRANSLATIONS['ja']['keywords_placeholder'] = '感情のキーワードを入力...'
-TRANSLATIONS['ja']['generate_letter'] = 'ラブレターを生成'
-TRANSLATIONS['ja']['your_letter'] = 'あなたのラブレター'
-TRANSLATIONS['ja']['dear'] = '愛する'
-TRANSLATIONS['ja']['letter_share_text'] = 'このラブレターは霊犀から 💌'
-TRANSLATIONS['ja']['recipient_required'] = '受信者名を入力してください'
-TRANSLATIONS['ja']['feeling_required'] = '感情タイプを選択してください'
-TRANSLATIONS['ja']['write_letter_placeholder'] = '愛する人に手紙を書く...'
-
-# 前世今生
-TRANSLATIONS['zh']['past_life'] = '前世今生'
-TRANSLATIONS['zh']['past_life_desc'] = '探索你的前世故事'
-TRANSLATIONS['zh']['past_life_title'] = '前世身份'
-TRANSLATIONS['zh']['dynasty'] = '朝代'
-TRANSLATIONS['zh']['occupation'] = '职业'
-TRANSLATIONS['zh']['past_story'] = '前世往事'
-TRANSLATIONS['zh']['connection_to_present'] = '与今生的联系'
-TRANSLATIONS['zh']['past_life_share_text'] = '我的前世竟然是...👻 在灵犀测测你的'
-TRANSLATIONS['zh']['past_life_nickname_required'] = '请输入昵称'
-TRANSLATIONS['zh']['past_life_birthday_required'] = '请选择生日'
-TRANSLATIONS['zh']['generate_past_life'] = '探索前世'
-TRANSLATIONS['zh']['your_past_life'] = '你的前世'
-TRANSLATIONS['zh']['rebirth_connection'] = '轮回联系'
-
-TRANSLATIONS['en']['past_life'] = 'Past Life'
-TRANSLATIONS['en']['past_life_desc'] = 'Explore your past life story'
-TRANSLATIONS['en']['past_life_title'] = 'Past Life Identity'
-TRANSLATIONS['en']['dynasty'] = 'Dynasty'
-TRANSLATIONS['en']['occupation'] = 'Occupation'
-TRANSLATIONS['en']['past_story'] = 'Past Story'
-TRANSLATIONS['en']['connection_to_present'] = 'Connection to Present'
-TRANSLATIONS['en']['past_life_share_text'] = 'My past life was...👻 Check yours on SoulLink'
-TRANSLATIONS['en']['past_life_nickname_required'] = 'Please enter nickname'
-TRANSLATIONS['en']['past_life_birthday_required'] = 'Please select birthday'
-TRANSLATIONS['en']['generate_past_life'] = 'Explore Past Life'
-TRANSLATIONS['en']['your_past_life'] = 'Your Past Life'
-TRANSLATIONS['en']['rebirth_connection'] = 'Rebirth Connection'
-
-TRANSLATIONS['ja']['past_life'] = '前世今生'
-TRANSLATIONS['ja']['past_life_desc'] = 'あなたの前世の物語を探る'
-TRANSLATIONS['ja']['past_life_title'] = '前世の身份'
-TRANSLATIONS['ja']['dynasty'] = '王朝'
-TRANSLATIONS['ja']['occupation'] = '職業'
-TRANSLATIONS['ja']['past_story'] = '前世の出来事'
-TRANSLATIONS['ja']['connection_to_present'] = '今生との繋がり'
-TRANSLATIONS['ja']['past_life_share_text'] = '私の前世竟是...👻 霊犀で調べてみて'
-TRANSLATIONS['ja']['past_life_nickname_required'] = 'ニックネームを入力してください'
-TRANSLATIONS['ja']['past_life_birthday_required'] = '誕生日を選択してください'
-TRANSLATIONS['ja']['generate_past_life'] = '前世を探る'
-TRANSLATIONS['ja']['your_past_life'] = 'あなたの前世'
-TRANSLATIONS['ja']['rebirth_connection'] = '生まれ変わりの繋がり'
-
-# 节日仪式
-TRANSLATIONS['zh']['rituals'] = '节日仪式'
-TRANSLATIONS['zh']['rituals_desc'] = '专属占卜许愿仪式'
-TRANSLATIONS['zh']['current_festival'] = '当前节日'
-TRANSLATIONS['zh']['full_moon'] = '满月'
-TRANSLATIONS['zh']['new_moon'] = '新月'
-TRANSLATIONS['zh']['qixi'] = '七夕'
-TRANSLATIONS['zh']['valentine'] = '情人节'
-TRANSLATIONS['zh']['winter_solstice'] = '冬至'
-TRANSLATIONS['zh']['spring_festival'] = '春节'
-TRANSLATIONS['zh']['mid_autumn'] = '中秋'
-TRANSLATIONS['zh']['new_year'] = '新年'
-TRANSLATIONS['zh']['make_wish'] = '许下愿望'
-TRANSLATIONS['zh']['wish_placeholder_ritual'] = '在此写下你的愿望...'
-TRANSLATIONS['zh']['submit_wish'] = '提交愿望'
-TRANSLATIONS['zh']['wish_energy'] = '愿望能量解读'
-TRANSLATIONS['zh']['fortune_draw'] = '运势抽签'
-TRANSLATIONS['zh']['draw_fortune'] = '抽签'
-TRANSLATIONS['zh']['your_fortune'] = '你的运势'
-TRANSLATIONS['zh']['lucky_color'] = '幸运色'
-TRANSLATIONS['zh']['lucky_number'] = '幸运数字'
-TRANSLATIONS['zh']['lucky_direction'] = '幸运方位'
-TRANSLATIONS['zh']['zhi_nv_blessing'] = '织女赐福'
-TRANSLATIONS['zh']['love_divination'] = '姻缘占卜'
-TRANSLATIONS['zh']['no_upcoming_ritual'] = '暂无特殊节日仪式'
-TRANSLATIONS['zh']['next_festival'] = '下一个节日'
-TRANSLATIONS['zh']['days_until'] = '距离还有'
-TRANSLATIONS['zh']['ritual_share_text'] = '我在灵犀参与了满月许愿仪式✨'
-TRANSLATIONS['zh']['wish_success'] = '愿望已记录，月光会守护你的心愿'
-TRANSLATIONS['zh']['fortune_result'] = '抽到了'
-
-TRANSLATIONS['en']['rituals'] = 'Rituals'
-TRANSLATIONS['en']['rituals_desc'] = 'Special divination & wish rituals'
-TRANSLATIONS['en']['current_festival'] = 'Current Festival'
-TRANSLATIONS['en']['full_moon'] = 'Full Moon'
-TRANSLATIONS['en']['new_moon'] = 'New Moon'
-TRANSLATIONS['en']['qixi'] = 'Qixi Festival'
-TRANSLATIONS['en']['valentine'] = "Valentine's Day"
-TRANSLATIONS['en']['winter_solstice'] = 'Winter Solstice'
-TRANSLATIONS['en']['spring_festival'] = 'Spring Festival'
-TRANSLATIONS['en']['mid_autumn'] = 'Mid-Autumn'
-TRANSLATIONS['en']['new_year'] = 'New Year'
-TRANSLATIONS['en']['make_wish'] = 'Make a Wish'
-TRANSLATIONS['en']['wish_placeholder_ritual'] = 'Write your wish here...'
-TRANSLATIONS['en']['submit_wish'] = 'Submit Wish'
-TRANSLATIONS['en']['wish_energy'] = 'Wish Energy Reading'
-TRANSLATIONS['en']['fortune_draw'] = 'Fortune Draw'
-TRANSLATIONS['en']['draw_fortune'] = 'Draw Fortune'
-TRANSLATIONS['en']['your_fortune'] = 'Your Fortune'
-TRANSLATIONS['en']['lucky_color'] = 'Lucky Color'
-TRANSLATIONS['en']['lucky_number'] = 'Lucky Number'
-TRANSLATIONS['en']['lucky_direction'] = 'Lucky Direction'
-TRANSLATIONS['en']['zhi_nv_blessing'] = 'Weaving Maiden Blessing'
-TRANSLATIONS['en']['love_divination'] = 'Love Divination'
-TRANSLATIONS['en']['no_upcoming_ritual'] = 'No special ritual now'
-TRANSLATIONS['en']['next_festival'] = 'Next Festival'
-TRANSLATIONS['en']['days_until'] = 'Days until'
-TRANSLATIONS['en']['ritual_share_text'] = 'I participated in the Full Moon ritual on SoulLink ✨'
-TRANSLATIONS['en']['wish_success'] = 'Wish recorded, the moonlight will protect your heart'
-TRANSLATIONS['en']['fortune_result'] = 'You drew'
-
-TRANSLATIONS['ja']['rituals'] = '祭りの儀式'
-TRANSLATIONS['ja']['rituals_desc'] = '特別な占いと願いの儀式'
-TRANSLATIONS['ja']['current_festival'] = '現在の祭り'
-TRANSLATIONS['ja']['full_moon'] = '満月'
-TRANSLATIONS['ja']['new_moon'] = '新月'
-TRANSLATIONS['ja']['qixi'] = '七夕'
-TRANSLATIONS['ja']['valentine'] = 'バレンタインデー'
-TRANSLATIONS['ja']['winter_solstice'] = '冬至'
-TRANSLATIONS['ja']['spring_festival'] = '春節'
-TRANSLATIONS['ja']['mid_autumn'] = '中秋'
-TRANSLATIONS['ja']['new_year'] = '新年'
-TRANSLATIONS['ja']['make_wish'] = '願いを込める'
-TRANSLATIONS['ja']['wish_placeholder_ritual'] = 'ここに願いを書いてください...'
-TRANSLATIONS['ja']['submit_wish'] = '願いを提出'
-TRANSLATIONS['ja']['wish_energy'] = '願いのエネルギー解読'
-TRANSLATIONS['ja']['fortune_draw'] = '運势引'
-TRANSLATIONS['ja']['draw_fortune'] = '引く'
-TRANSLATIONS['ja']['your_fortune'] = 'あなたの運势'
-TRANSLATIONS['ja']['lucky_color'] = 'ラッキーカラー'
-TRANSLATIONS['ja']['lucky_number'] = 'ラッキーナンバー'
-TRANSLATIONS['ja']['lucky_direction'] = 'ラッキー方位'
-TRANSLATIONS['ja']['zhi_nv_blessing'] = '織女の祝福'
-TRANSLATIONS['ja']['love_divination'] = '姻緣占'
-TRANSLATIONS['ja']['no_upcoming_ritual'] = '今は特別な儀式がありません'
-TRANSLATIONS['ja']['next_festival'] = '次の祭り'
-TRANSLATIONS['ja']['days_until'] = '後'
-TRANSLATIONS['ja']['ritual_share_text'] = '霊犀で満月の願い儀式に参加しました ✨'
-TRANSLATIONS['ja']['wish_success'] = '願いを記録しました、月光が守ります'
-TRANSLATIONS['ja']['fortune_result'] = '引いた運势は'
-
-# ============ 用户中心翻译 ============
-TRANSLATIONS['zh']['my_profile'] = '我的'
-TRANSLATIONS['zh']['no_bio_yet'] = '还没有自我介绍'
-TRANSLATIONS['zh']['recharge'] = '充值'
-TRANSLATIONS['zh']['wallet_detail'] = '钱包明细'
-TRANSLATIONS['zh']['stone_mall'] = '灵石商城'
-TRANSLATIONS['zh']['daily_signin'] = '每日签到'
-TRANSLATIONS['zh']['signed_today'] = '已签到'
-TRANSLATIONS['zh']['go_signin'] = '去签到'
-TRANSLATIONS['zh']['register_days'] = '注册天数'
-TRANSLATIONS['zh']['signin_streak'] = '连续签到'
-TRANSLATIONS['zh']['divination_count'] = '占卜次数'
-TRANSLATIONS['zh']['crush_count'] = '心动次数'
-TRANSLATIONS['zh']['match_count'] = '配对成功'
-TRANSLATIONS['zh']['my_profile_edit'] = '我的资料'
-TRANSLATIONS['zh']['my_matches'] = '我的匹配'
-TRANSLATIONS['zh']['my_crushes'] = '我的心动'
-TRANSLATIONS['zh']['divination_records'] = '占卜记录'
-TRANSLATIONS['zh']['my_wallet'] = '我的钱包'
-TRANSLATIONS['zh']['membership_center'] = '会员中心'
-TRANSLATIONS['zh']['invite_friends'] = '邀请好友'
-TRANSLATIONS['zh']['settings'] = '设置'
-TRANSLATIONS['zh']['logout'] = '退出登录'
-TRANSLATIONS['zh']['avatar_updated'] = '头像已更新'
-TRANSLATIONS['zh']['upload_failed'] = '上传失败'
-
-TRANSLATIONS['en']['my_profile'] = 'My Profile'
-TRANSLATIONS['en']['no_bio_yet'] = 'No bio yet'
-TRANSLATIONS['en']['recharge'] = 'Recharge'
-TRANSLATIONS['en']['wallet_detail'] = 'Wallet'
-TRANSLATIONS['en']['stone_mall'] = 'Stone Mall'
-TRANSLATIONS['en']['daily_signin'] = 'Daily Check-in'
-TRANSLATIONS['en']['signed_today'] = 'Signed In'
-TRANSLATIONS['en']['go_signin'] = 'Sign In'
-TRANSLATIONS['en']['register_days'] = 'Days'
-TRANSLATIONS['en']['signin_streak'] = 'Streak'
-TRANSLATIONS['en']['divination_count'] = 'Divinations'
-TRANSLATIONS['en']['crush_count'] = 'Crushes'
-TRANSLATIONS['en']['match_count'] = 'Matches'
-TRANSLATIONS['en']['my_profile_edit'] = 'Edit Profile'
-TRANSLATIONS['en']['my_matches'] = 'My Matches'
-TRANSLATIONS['en']['my_crushes'] = 'My Crushes'
-TRANSLATIONS['en']['divination_records'] = 'Divination'
-TRANSLATIONS['en']['my_wallet'] = 'My Wallet'
-TRANSLATIONS['en']['membership_center'] = 'Membership'
-TRANSLATIONS['en']['invite_friends'] = 'Invite Friends'
-TRANSLATIONS['en']['settings'] = 'Settings'
-TRANSLATIONS['en']['logout'] = 'Logout'
-TRANSLATIONS['en']['avatar_updated'] = 'Avatar updated'
-TRANSLATIONS['en']['upload_failed'] = 'Upload failed'
-
-TRANSLATIONS['ja']['my_profile'] = 'マイページ'
-TRANSLATIONS['ja']['no_bio_yet'] = '自己紹介はまだありません'
-TRANSLATIONS['ja']['recharge'] = 'チャージ'
-TRANSLATIONS['ja']['wallet_detail'] = 'ウォレット'
-TRANSLATIONS['ja']['stone_mall'] = '灵石モール'
-TRANSLATIONS['ja']['daily_signin'] = 'デイリー参加'
-TRANSLATIONS['ja']['signed_today'] = '参加済み'
-TRANSLATIONS['ja']['go_signin'] = '参加する'
-TRANSLATIONS['ja']['register_days'] = '登録日数'
-TRANSLATIONS['ja']['signin_streak'] = '連続参加'
-TRANSLATIONS['ja']['divination_count'] = '占い回数'
-TRANSLATIONS['ja']['crush_count'] = '片思い'
-TRANSLATIONS['ja']['match_count'] = 'マッチ'
-TRANSLATIONS['ja']['my_profile_edit'] = 'プロフィール編集'
-TRANSLATIONS['ja']['my_matches'] = 'マッチング'
-TRANSLATIONS['ja']['my_crushes'] = '片思いリスト'
-TRANSLATIONS['ja']['divination_records'] = '占い記録'
-TRANSLATIONS['ja']['my_wallet'] = 'マイウォレット'
-TRANSLATIONS['ja']['membership_center'] = '会員センター'
-TRANSLATIONS['ja']['invite_friends'] = '友達を招待'
-TRANSLATIONS['ja']['settings'] = '設定'
-TRANSLATIONS['ja']['logout'] = 'ログアウト'
-TRANSLATIONS['ja']['avatar_updated'] = 'アバター更新完了'
-TRANSLATIONS['ja']['upload_failed'] = 'アップロード失敗'
-
-# 编辑资料页面
-TRANSLATIONS['zh']['edit_profile'] = '编辑资料'
-TRANSLATIONS['zh']['change_avatar'] = '更换头像'
-TRANSLATIONS['zh']['nickname'] = '昵称'
-TRANSLATIONS['zh']['mbti_type'] = 'MBTI类型'
-TRANSLATIONS['zh']['birthday'] = '生日'
-TRANSLATIONS['zh']['zodiac_auto_calc'] = '设置后自动计算星座'
-TRANSLATIONS['zh']['bio'] = '自我介绍'
-TRANSLATIONS['zh']['bio_placeholder'] = '介绍一下自己吧...'
-TRANSLATIONS['zh']['interests'] = '兴趣标签'
-TRANSLATIONS['zh']['save_changes'] = '保存修改'
-TRANSLATIONS['zh']['profile_updated'] = '资料已更新'
-TRANSLATIONS['zh']['update_failed'] = '更新失败'
-
-TRANSLATIONS['en']['edit_profile'] = 'Edit Profile'
-TRANSLATIONS['en']['change_avatar'] = 'Change Avatar'
-TRANSLATIONS['en']['nickname'] = 'Nickname'
-TRANSLATIONS['en']['mbti_type'] = 'MBTI Type'
-TRANSLATIONS['en']['birthday'] = 'Birthday'
-TRANSLATIONS['en']['zodiac_auto_calc'] = 'Zodiac will be calculated automatically'
-TRANSLATIONS['en']['bio'] = 'Bio'
-TRANSLATIONS['en']['bio_placeholder'] = 'Tell us about yourself...'
-TRANSLATIONS['en']['interests'] = 'Interests'
-TRANSLATIONS['en']['save_changes'] = 'Save Changes'
-TRANSLATIONS['en']['profile_updated'] = 'Profile updated'
-TRANSLATIONS['en']['update_failed'] = 'Update failed'
-
-TRANSLATIONS['ja']['edit_profile'] = 'プロフィール編集'
-TRANSLATIONS['ja']['change_avatar'] = 'アバター変更'
-TRANSLATIONS['ja']['nickname'] = 'ニックネーム'
-TRANSLATIONS['ja']['mbti_type'] = 'MBTIタイプ'
-TRANSLATIONS['ja']['birthday'] = '誕生日'
-TRANSLATIONS['ja']['zodiac_auto_calc'] = '設定すると星座が自動計算されます'
-TRANSLATIONS['ja']['bio'] = '自己紹介'
-TRANSLATIONS['ja']['bio_placeholder'] = '自分を教えてください...'
-TRANSLATIONS['ja']['interests'] = '趣味'
-TRANSLATIONS['ja']['save_changes'] = '保存'
-TRANSLATIONS['ja']['profile_updated'] = 'プロフィール更新完了'
-TRANSLATIONS['ja']['update_failed'] = '更新失敗'
-
-# 设置页面
-TRANSLATIONS['zh']['account_security'] = '账号安全'
-TRANSLATIONS['zh']['change_password'] = '修改密码'
-TRANSLATIONS['zh']['update_password_desc'] = '定期更换密码保护账号安全'
-TRANSLATIONS['zh']['bind_phone'] = '绑定手机'
-TRANSLATIONS['zh']['bind_email'] = '绑定邮箱'
-TRANSLATIONS['zh']['not_bound'] = '未绑定'
-TRANSLATIONS['zh']['notification_settings'] = '通知设置'
-TRANSLATIONS['zh']['divination_reminder'] = '占卜提醒'
-TRANSLATIONS['zh']['divination_reminder_desc'] = '占卜结果更新时通知'
-TRANSLATIONS['zh']['match_notice'] = '匹配通知'
-TRANSLATIONS['zh']['match_notice_desc'] = '新的匹配结果通知'
-TRANSLATIONS['zh']['signin_reminder'] = '签到提醒'
-TRANSLATIONS['zh']['signin_reminder_desc'] = '每日签到提醒'
-TRANSLATIONS['zh']['language_settings'] = '语言设置'
-TRANSLATIONS['zh']['other'] = '其他'
-TRANSLATIONS['zh']['privacy_policy'] = '隐私政策'
-TRANSLATIONS['zh']['terms_service'] = '服务条款'
-TRANSLATIONS['zh']['current_password'] = '当前密码'
-TRANSLATIONS['zh']['new_password'] = '新密码'
-TRANSLATIONS['zh']['confirm_password'] = '确认密码'
-TRANSLATIONS['zh']['confirm'] = '确认'
-TRANSLATIONS['zh']['cancel'] = '取消'
-TRANSLATIONS['zh']['settings_saved'] = '设置已保存'
-TRANSLATIONS['zh']['password_mismatch'] = '两次密码不一致'
-TRANSLATIONS['zh']['password_changed'] = '密码修改成功'
-TRANSLATIONS['zh']['change_failed'] = '修改失败'
-TRANSLATIONS['zh']['confirm_logout'] = '确定要退出登录吗？'
-
-TRANSLATIONS['en']['account_security'] = 'Account Security'
-TRANSLATIONS['en']['change_password'] = 'Change Password'
-TRANSLATIONS['en']['update_password_desc'] = 'Change password regularly'
-TRANSLATIONS['en']['bind_phone'] = 'Bind Phone'
-TRANSLATIONS['en']['bind_email'] = 'Bind Email'
-TRANSLATIONS['en']['not_bound'] = 'Not bound'
-TRANSLATIONS['en']['notification_settings'] = 'Notifications'
-TRANSLATIONS['en']['divination_reminder'] = 'Divination Reminder'
-TRANSLATIONS['en']['divination_reminder_desc'] = 'Notify when divination results are ready'
-TRANSLATIONS['en']['match_notice'] = 'Match Notice'
-TRANSLATIONS['en']['match_notice_desc'] = 'Notify for new matches'
-TRANSLATIONS['en']['signin_reminder'] = 'Check-in Reminder'
-TRANSLATIONS['en']['signin_reminder_desc'] = 'Daily check-in reminder'
-TRANSLATIONS['en']['language_settings'] = 'Language'
-TRANSLATIONS['en']['other'] = 'Other'
-TRANSLATIONS['en']['privacy_policy'] = 'Privacy Policy'
-TRANSLATIONS['en']['terms_service'] = 'Terms of Service'
-TRANSLATIONS['en']['current_password'] = 'Current Password'
-TRANSLATIONS['en']['new_password'] = 'New Password'
-TRANSLATIONS['en']['confirm_password'] = 'Confirm Password'
-TRANSLATIONS['en']['confirm'] = 'Confirm'
-TRANSLATIONS['en']['cancel'] = 'Cancel'
-TRANSLATIONS['en']['settings_saved'] = 'Settings saved'
-TRANSLATIONS['en']['password_mismatch'] = 'Passwords do not match'
-TRANSLATIONS['en']['password_changed'] = 'Password changed'
-TRANSLATIONS['en']['change_failed'] = 'Change failed'
-TRANSLATIONS['en']['confirm_logout'] = 'Are you sure you want to logout?'
-
-TRANSLATIONS['ja']['account_security'] = 'アカウントセキュリティ'
-TRANSLATIONS['ja']['change_password'] = 'パスワード変更'
-TRANSLATIONS['ja']['update_password_desc'] = 'パスワードを定期的に変更'
-TRANSLATIONS['ja']['bind_phone'] = '電話番号绑定'
-TRANSLATIONS['ja']['bind_email'] = 'メール绑定'
-TRANSLATIONS['ja']['not_bound'] = '未绑定'
-TRANSLATIONS['ja']['notification_settings'] = '通知設定'
-TRANSLATIONS['ja']['divination_reminder'] = '占い通知'
-TRANSLATIONS['ja']['divination_reminder_desc'] = '占い結果更新時通知'
-TRANSLATIONS['ja']['match_notice'] = 'マッチング通知'
-TRANSLATIONS['ja']['match_notice_desc'] = '新しいマッチング通知'
-TRANSLATIONS['ja']['signin_reminder'] = '参加提醒'
-TRANSLATIONS['ja']['signin_reminder_desc'] = '每日参加提醒'
-TRANSLATIONS['ja']['language_settings'] = '言語設定'
-TRANSLATIONS['ja']['other'] = 'その他'
-TRANSLATIONS['ja']['privacy_policy'] = 'プライバシーポリシー'
-TRANSLATIONS['ja']['terms_service'] = '利用規約'
-TRANSLATIONS['ja']['current_password'] = '現在のパスワード'
-TRANSLATIONS['ja']['new_password'] = '新しいパスワード'
-TRANSLATIONS['ja']['confirm_password'] = 'パスワード確認'
-TRANSLATIONS['ja']['confirm'] = '確認'
-TRANSLATIONS['ja']['cancel'] = 'キャンセル'
-TRANSLATIONS['ja']['settings_saved'] = '設定保存完了'
-TRANSLATIONS['ja']['password_mismatch'] = 'パスワードが一致しません'
-TRANSLATIONS['ja']['password_changed'] = 'パスワード変更完了'
-TRANSLATIONS['ja']['change_failed'] = '変更失敗'
-TRANSLATIONS['ja']['confirm_logout'] = 'ログアウトしますか？'
-
-# ============ 分享卡片 ============
-TRANSLATIONS['zh']['share_card'] = '分享卡片'
-TRANSLATIONS['zh']['share_your_result'] = '分享你的结果'
-TRANSLATIONS['zh']['save_share_hint'] = '长按保存图片或分享给好友'
-TRANSLATIONS['zh']['save_image'] = '保存图片'
-TRANSLATIONS['zh']['copy_text'] = '复制文字'
-TRANSLATIONS['zh']['tips'] = '小提示'
-TRANSLATIONS['zh']['save_tips'] = '点击"保存图片"后，长按卡片可保存到相册，或直接截图保存'
-TRANSLATIONS['zh']['share_text'] = '用 SoulLink 灵犀，探索你的灵魂伴侣！'
-
-TRANSLATIONS['en']['share_card'] = 'Share Card'
-TRANSLATIONS['en']['share_your_result'] = 'Share Your Result'
-TRANSLATIONS['en']['save_share_hint'] = 'Long press to save image or share with friends'
-TRANSLATIONS['en']['save_image'] = 'Save Image'
-TRANSLATIONS['en']['copy_text'] = 'Copy Text'
-TRANSLATIONS['en']['tips'] = 'Tips'
-TRANSLATIONS['en']['save_tips'] = 'Click "Save Image" then long press to save to album, or take a screenshot'
-TRANSLATIONS['en']['share_text'] = 'Discover your soulmate with SoulLink!'
-
-TRANSLATIONS['ja']['share_card'] = '共有カード'
-TRANSLATIONS['ja']['share_your_result'] = '結果を共有'
-TRANSLATIONS['ja']['save_share_hint'] = '長押しで画像を保存、または友達に共有'
-TRANSLATIONS['ja']['save_image'] = '画像を保存'
-TRANSLATIONS['ja']['copy_text'] = 'テキストをコピー'
-TRANSLATIONS['ja']['tips'] = 'ヒント'
-TRANSLATIONS['ja']['save_tips'] = '「画像を保存」をクリックして長押しで保存、またはスクリーンショット'
-TRANSLATIONS['ja']['share_text'] = 'SoulLinkで魂の伴侣を発見しましょう！'
-
-# ============ 邀请码系统 ============
-TRANSLATIONS['zh']['invite_friends'] = '邀请好友'
-TRANSLATIONS['zh']['invite_subtitle'] = '分享你的邀请码，好友和你都能获得50灵石'
-TRANSLATIONS['zh']['your_invite_code'] = '你的专属邀请码'
-TRANSLATIONS['zh']['copy'] = '复制'
-TRANSLATIONS['zh']['share_invite'] = '分享邀请链接'
-TRANSLATIONS['zh']['invite_rewards'] = '邀请奖励'
-TRANSLATIONS['zh']['friend_gets'] = '好友获得'
-TRANSLATIONS['zh']['you_get'] = '你获得'
-TRANSLATIONS['zh']['spirit_stones'] = '灵石'
-TRANSLATIONS['zh']['invite_history'] = '邀请记录'
-TRANSLATIONS['zh']['total_invites'] = '累计邀请'
-TRANSLATIONS['zh']['total_reward'] = '累计奖励'
-TRANSLATIONS['zh']['no_invites_yet'] = '还没有邀请记录，快去邀请好友吧！'
-TRANSLATIONS['zh']['invite_leaderboard'] = '邀请排行榜'
-TRANSLATIONS['zh']['people'] = '人'
-TRANSLATIONS['zh']['no_leaderboard_yet'] = '暂无排行榜数据'
-TRANSLATIONS['zh']['link_copied'] = '链接已复制'
-
-TRANSLATIONS['en']['invite_friends'] = 'Invite Friends'
-TRANSLATIONS['en']['invite_subtitle'] = 'Share your invite code and both of you get 50 spirit stones!'
-TRANSLATIONS['en']['your_invite_code'] = 'Your Invite Code'
-TRANSLATIONS['en']['copy'] = 'Copy'
-TRANSLATIONS['en']['share_invite'] = 'Share Invite Link'
-TRANSLATIONS['en']['invite_rewards'] = 'Invite Rewards'
-TRANSLATIONS['en']['friend_gets'] = 'Friend Gets'
-TRANSLATIONS['en']['you_get'] = 'You Get'
-TRANSLATIONS['en']['spirit_stones'] = 'Spirit Stones'
-TRANSLATIONS['en']['invite_history'] = 'Invite History'
-TRANSLATIONS['en']['total_invites'] = 'Total Invites'
-TRANSLATIONS['en']['total_reward'] = 'Total Rewards'
-TRANSLATIONS['en']['no_invites_yet'] = 'No invites yet, invite friends now!'
-TRANSLATIONS['en']['invite_leaderboard'] = 'Invite Leaderboard'
-TRANSLATIONS['en']['people'] = 'people'
-TRANSLATIONS['en']['no_leaderboard_yet'] = 'No leaderboard data yet'
-TRANSLATIONS['en']['link_copied'] = 'Link copied'
-
-TRANSLATIONS['ja']['invite_friends'] = '友達を招待'
-TRANSLATIONS['ja']['invite_subtitle'] = '招待コードを分享すると、二人とも50個のpirit stoneを獲得！'
-TRANSLATIONS['ja']['your_invite_code'] = 'あなたの招待コード'
-TRANSLATIONS['ja']['copy'] = 'コピー'
-TRANSLATIONS['ja']['share_invite'] = '招待リンクを共有'
-TRANSLATIONS['ja']['invite_rewards'] = '招待奖励'
-TRANSLATIONS['ja']['friend_gets'] = '友達が獲得'
-TRANSLATIONS['ja']['you_get'] = 'あなたが獲得'
-TRANSLATIONS['ja']['spirit_stones'] = 'pirit stone'
-TRANSLATIONS['ja']['invite_history'] = '招待履歴'
-TRANSLATIONS['ja']['total_invites'] = '累積招待'
-TRANSLATIONS['ja']['total_reward'] = '累積奖励'
-TRANSLATIONS['ja']['no_invites_yet'] = 'まだ招待がありません！友達を招待しましょう'
-TRANSLATIONS['ja']['invite_leaderboard'] = '招待ランキング'
-TRANSLATIONS['ja']['people'] = '人'
-TRANSLATIONS['ja']['no_leaderboard_yet'] = 'ランキングデータなし'
-TRANSLATIONS['ja']['link_copied'] = 'リンクをコピーしました'
-
-
-# ============ 管理后台数据面板 ============
-TRANSLATIONS['zh']['dashboard_panel'] = '数据面板'
-TRANSLATIONS['zh']['dashboard_total_users'] = '总用户数'
-TRANSLATIONS['zh']['dashboard_new_today'] = '今日新增'
-TRANSLATIONS['zh']['dashboard_active_users'] = '活跃用户'
-TRANSLATIONS['zh']['dashboard_total_income'] = '总收入'
-TRANSLATIONS['zh']['dashboard_total_divinations'] = '总占卜次数'
-TRANSLATIONS['zh']['dashboard_divination_today'] = '今日占卜'
-TRANSLATIONS['zh']['dashboard_paid_users'] = '付费用户'
-TRANSLATIONS['zh']['dashboard_income_today'] = '今日收入'
-TRANSLATIONS['zh']['dashboard_total_agents'] = 'Agent总数'
-TRANSLATIONS['zh']['dashboard_chat_today'] = '今日对话'
-TRANSLATIONS['zh']['dashboard_pv_today'] = '今日PV'
-TRANSLATIONS['zh']['dashboard_uv_today'] = '今日UV'
-TRANSLATIONS['zh']['dashboard_user_trend'] = '用户注册趋势（7天）'
-TRANSLATIONS['zh']['dashboard_divination_dist'] = '占卜类型分布'
-TRANSLATIONS['zh']['dashboard_traffic_trend'] = '流量趋势（7天）'
-TRANSLATIONS['zh']['dashboard_income_trend'] = '收入趋势（7天）'
-TRANSLATIONS['zh']['dashboard_top_agents'] = '最受欢迎Agent Top5'
-TRANSLATIONS['zh']['dashboard_subscription_dist'] = '订阅类型分布'
-TRANSLATIONS['zh']['dashboard_new_users'] = '新增用户'
-TRANSLATIONS['zh']['dashboard_revenue'] = '收入 ($)'
-TRANSLATIONS['zh']['dashboard_updated_at'] = '数据更新时间'
-TRANSLATIONS['zh']['dashboard_cache_note'] = '数据缓存有效期5分钟'
-TRANSLATIONS['zh']['dashboard_no_data'] = '暂无数据'
-TRANSLATIONS['zh']['dashboard_chats'] = '次对话'
-TRANSLATIONS['zh']['dashboard_registered'] = '注册用户总数'
-TRANSLATIONS['zh']['dashboard_last_7_days'] = '7天内登录'
-TRANSLATIONS['zh']['dashboard_platform_revenue'] = '平台总收入'
-TRANSLATIONS['zh']['dashboard_history_divinations'] = '历史占卜总数'
-TRANSLATIONS['zh']['dashboard_divinations_today'] = '今日占卜次数'
-TRANSLATIONS['zh']['dashboard_completed_payments'] = '完成付费用户数'
-TRANSLATIONS['zh']['dashboard_revenue_today'] = '今日收入金额'
-TRANSLATIONS['zh']['dashboard_active_agents'] = '活跃Agent数'
-TRANSLATIONS['zh']['dashboard_agent_chats_today'] = '今日Agent对话次数'
-TRANSLATIONS['zh']['dashboard_page_views'] = '页面浏览量'
-TRANSLATIONS['zh']['dashboard_unique_visitors'] = '独立访客数'
-
-TRANSLATIONS['en']['dashboard_panel'] = 'Data Dashboard'
-TRANSLATIONS['en']['dashboard_total_users'] = 'Total Users'
-TRANSLATIONS['en']['dashboard_new_today'] = 'Today'
-TRANSLATIONS['en']['dashboard_active_users'] = 'Active'
-TRANSLATIONS['en']['dashboard_total_income'] = 'Revenue'
-TRANSLATIONS['en']['dashboard_total_divinations'] = 'Divinations'
-TRANSLATIONS['en']['dashboard_divination_today'] = 'Today'
-TRANSLATIONS['en']['dashboard_paid_users'] = 'Paid Users'
-TRANSLATIONS['en']['dashboard_income_today'] = 'Today Revenue'
-TRANSLATIONS['en']['dashboard_total_agents'] = 'Total Agents'
-TRANSLATIONS['en']['dashboard_chat_today'] = 'Chats Today'
-TRANSLATIONS['en']['dashboard_pv_today'] = 'PV Today'
-TRANSLATIONS['en']['dashboard_uv_today'] = 'UV Today'
-TRANSLATIONS['en']['dashboard_user_trend'] = 'User Registration Trend (7 Days)'
-TRANSLATIONS['en']['dashboard_divination_dist'] = 'Divination Type Distribution'
-TRANSLATIONS['en']['dashboard_traffic_trend'] = 'Traffic Trend (7 Days)'
-TRANSLATIONS['en']['dashboard_income_trend'] = 'Revenue Trend (7 Days)'
-TRANSLATIONS['en']['dashboard_top_agents'] = 'Top 5 Popular Agents'
-TRANSLATIONS['en']['dashboard_subscription_dist'] = 'Subscription Type Distribution'
-TRANSLATIONS['en']['dashboard_new_users'] = 'New Users'
-TRANSLATIONS['en']['dashboard_revenue'] = 'Revenue ($)'
-TRANSLATIONS['en']['dashboard_updated_at'] = 'Last updated'
-TRANSLATIONS['en']['dashboard_cache_note'] = 'Cache valid for 5 minutes'
-TRANSLATIONS['en']['dashboard_no_data'] = 'No data available'
-TRANSLATIONS['en']['dashboard_chats'] = 'chats'
-TRANSLATIONS['en']['dashboard_registered'] = 'Total registered'
-TRANSLATIONS['en']['dashboard_last_7_days'] = 'Last 7 days'
-TRANSLATIONS['en']['dashboard_platform_revenue'] = 'Total platform revenue'
-TRANSLATIONS['en']['dashboard_history_divinations'] = 'Total divinations'
-TRANSLATIONS['en']['dashboard_divinations_today'] = 'Divinations today'
-TRANSLATIONS['en']['dashboard_completed_payments'] = 'Completed payments'
-TRANSLATIONS['en']['dashboard_revenue_today'] = 'Revenue today'
-TRANSLATIONS['en']['dashboard_active_agents'] = 'Active agents'
-TRANSLATIONS['en']['dashboard_agent_chats_today'] = 'Agent chats today'
-TRANSLATIONS['en']['dashboard_page_views'] = 'Page views'
-TRANSLATIONS['en']['dashboard_unique_visitors'] = 'Unique visitors'
-
-TRANSLATIONS['ja']['dashboard_panel'] = 'データパネル'
-TRANSLATIONS['ja']['dashboard_total_users'] = '総ユーザー'
-TRANSLATIONS['ja']['dashboard_new_today'] = '今日'
-TRANSLATIONS['ja']['dashboard_active_users'] = 'アクティブ'
-TRANSLATIONS['ja']['dashboard_total_income'] = '総収入'
-TRANSLATIONS['ja']['dashboard_total_divinations'] = '総占卜'
-TRANSLATIONS['ja']['dashboard_divination_today'] = '今日の占卜'
-TRANSLATIONS['ja']['dashboard_paid_users'] = '有料ユーザー'
-TRANSLATIONS['ja']['dashboard_income_today'] = '今日の収入'
-TRANSLATIONS['ja']['dashboard_total_agents'] = 'Agent総数'
-TRANSLATIONS['ja']['dashboard_chat_today'] = '今日の会話'
-TRANSLATIONS['ja']['dashboard_pv_today'] = '今日のPV'
-TRANSLATIONS['ja']['dashboard_uv_today'] = '今日のUV'
-TRANSLATIONS['ja']['dashboard_user_trend'] = 'ユーザー登録推移（7日間）'
-TRANSLATIONS['ja']['dashboard_divination_dist'] = '占卜タイプ分布'
-TRANSLATIONS['ja']['dashboard_traffic_trend'] = 'トラフィック推移（7日間）'
-TRANSLATIONS['ja']['dashboard_income_trend'] = '収入推移（7日間）'
-TRANSLATIONS['ja']['dashboard_top_agents'] = '人気Agent Top5'
-TRANSLATIONS['ja']['dashboard_subscription_dist'] = '購読タイプ分布'
-TRANSLATIONS['ja']['dashboard_new_users'] = '新規ユーザー'
-TRANSLATIONS['ja']['dashboard_revenue'] = '収入'
-TRANSLATIONS['ja']['dashboard_updated_at'] = '更新時間'
-TRANSLATIONS['ja']['dashboard_cache_note'] = 'キャッシュ有効期限5分'
-TRANSLATIONS['ja']['dashboard_no_data'] = 'データなし'
-TRANSLATIONS['ja']['dashboard_chats'] = '件'
-TRANSLATIONS['ja']['dashboard_registered'] = '登録済み'
-TRANSLATIONS['ja']['dashboard_last_7_days'] = '7日内ログイン'
-TRANSLATIONS['ja']['dashboard_platform_revenue'] = 'プラットフォーム総収入'
-TRANSLATIONS['ja']['dashboard_history_divinations'] = '履歴'
-TRANSLATIONS['ja']['dashboard_divinations_today'] = '今日の占卜'
-TRANSLATIONS['ja']['dashboard_completed_payments'] = '支払い済み'
-TRANSLATIONS['ja']['dashboard_revenue_today'] = '今日の収入'
-TRANSLATIONS['ja']['dashboard_active_agents'] = 'アクティブ'
-TRANSLATIONS['ja']['dashboard_agent_chats_today'] = '今日の会話'
-TRANSLATIONS['ja']['dashboard_page_views'] = 'ページビュー'
-TRANSLATIONS['ja']['dashboard_unique_visitors'] = '訪問者数'
-# ============ 新增占卜类型翻译 ============
-
-# 紫微斗数
-TRANSLATIONS["zh"]["ziwei_divination"] = "紫微斗数"
-TRANSLATIONS["zh"]["ziwei_desc"] = "中国传统命理学，解读命宫12宫位"
-TRANSLATIONS["zh"]["ziwei_title"] = "命盘分析"
-TRANSLATIONS["zh"]["ziwei_question"] = "请输入您的问题"
-
-# おみくじ
-TRANSLATIONS["zh"]["omikuji_divination"] = "おみくじ"
-TRANSLATIONS["zh"]["omikuji_desc"] = "日本神社抽签，求签问卜"
-TRANSLATIONS["zh"]["omikuji_title"] = "抽签运势"
-TRANSLATIONS["zh"]["omikuji_draw"] = "抽一支签"
-
-# 易经六爻
-TRANSLATIONS["zh"]["iching_divination"] = "易经六爻"
-TRANSLATIONS["zh"]["iching_desc"] = "中华传统智慧，64卦象解读"
-TRANSLATIONS["zh"]["iching_title"] = "六爻卦象"
-TRANSLATIONS["zh"]["iching_question"] = "请输入您的问题"
-
-TRANSLATIONS["en"]["ziwei_divination"] = "Ziwei Doushu"
-TRANSLATIONS["en"]["ziwei_desc"] = "Traditional Chinese astrology with 12 palaces"
-TRANSLATIONS["en"]["ziwei_title"] = "Life Chart Analysis"
-TRANSLATIONS["en"]["ziwei_question"] = "Please enter your question"
-
-TRANSLATIONS["en"]["omikuji_divination"] = "Omikuji"
-TRANSLATIONS["en"]["omikuji_desc"] = "Japanese shrine fortune telling"
-TRANSLATIONS["en"]["omikuji_title"] = "Fortune Drawing"
-TRANSLATIONS["en"]["omikuji_draw"] = "Draw Fortune"
-
-TRANSLATIONS["en"]["iching_divination"] = "I Ching"
-TRANSLATIONS["en"]["iching_desc"] = "Ancient wisdom with 64 hexagrams"
-TRANSLATIONS["en"]["iching_title"] = "Hexagram Reading"
-TRANSLATIONS["en"]["iching_question"] = "Please enter your question"
-
-TRANSLATIONS["ja"]["ziwei_divination"] = "紫微斗数"
-TRANSLATIONS["ja"]["ziwei_desc"] = "中国古代占星術、12宮位を解読"
-TRANSLATIONS["ja"]["ziwei_title"] = "命盤分析"
-TRANSLATIONS["ja"]["ziwei_question"] = "質問を入力してください"
-
-TRANSLATIONS["ja"]["omikuji_divination"] = "おみくじ"
-TRANSLATIONS["ja"]["omikuji_desc"] = "神社で占到、签を引く"
-TRANSLATIONS["ja"]["omikuji_title"] = "抽签運勢"
-TRANSLATIONS["ja"]["omikuji_draw"] = "おみくじを引く"
-
-TRANSLATIONS["ja"]["iching_divination"] = "易経六爻"
-TRANSLATIONS["ja"]["iching_desc"] = "中国古代の智恵、64卦を解読"
-TRANSLATIONS["ja"]["iching_title"] = "六爻卦象"
-TRANSLATIONS["ja"]["iching_question"] = "質問を入力してください"
-
-# ============ 通知 & 签到翻译 ============
-TRANSLATIONS["zh"]["notifications"] = "通知"
-TRANSLATIONS["zh"]["no_notifications"] = "暂无通知"
-TRANSLATIONS["zh"]["mark_all_read"] = "全部已读"
-TRANSLATIONS["zh"]["notification_reward"] = "奖励通知"
-TRANSLATIONS["zh"]["notification_system"] = "系统通知"
-TRANSLATIONS["zh"]["notification_agent"] = "Agent通知"
-TRANSLATIONS["zh"]["notification_reminder"] = "提醒"
-TRANSLATIONS["zh"]["daily_checkin"] = "每日签到"
-TRANSLATIONS["zh"]["checkin_now"] = "立即签到"
-TRANSLATIONS["zh"]["checked_in"] = "今日已签到"
-TRANSLATIONS["zh"]["streak_days"] = "连续签到天数"
-TRANSLATIONS["zh"]["checkin_rewards"] = "签到奖励"
-TRANSLATIONS["zh"]["milestone_reward_3"] = "连续3天奖励"
-TRANSLATIONS["zh"]["milestone_reward_7"] = "连续7天奖励"
-TRANSLATIONS["zh"]["milestone_reward_30"] = "连续30天奖励"
-TRANSLATIONS["zh"]["invite_reward"] = "邀请奖励"
-TRANSLATIONS["zh"]["invite_friend"] = "邀请好友"
-TRANSLATIONS["zh"]["share_and_invite"] = "分享邀请"
-TRANSLATIONS["zh"]["referral_code"] = "邀请码"
-TRANSLATIONS["zh"]["copy_referral_link"] = "复制邀请链接"
-TRANSLATIONS["zh"]["referral_bonus"] = "邀请奖励"
-TRANSLATIONS["zh"]["referral_bonus_desc"] = "每成功邀请一位好友注册，双方各得50灵石"
-
-TRANSLATIONS["en"]["notifications"] = "Notifications"
-TRANSLATIONS["en"]["no_notifications"] = "No notifications"
-TRANSLATIONS["en"]["mark_all_read"] = "Mark all read"
-TRANSLATIONS["en"]["notification_reward"] = "Reward"
-TRANSLATIONS["en"]["notification_system"] = "System"
-TRANSLATIONS["en"]["notification_agent"] = "Agent"
-TRANSLATIONS["en"]["notification_reminder"] = "Reminder"
-TRANSLATIONS["en"]["daily_checkin"] = "Daily Check-in"
-TRANSLATIONS["en"]["checkin_now"] = "Check in Now"
-TRANSLATIONS["en"]["checked_in"] = "Checked in Today"
-TRANSLATIONS["en"]["streak_days"] = "Streak Days"
-TRANSLATIONS["en"]["checkin_rewards"] = "Check-in Rewards"
-TRANSLATIONS["en"]["milestone_reward_3"] = "3-Day Streak Reward"
-TRANSLATIONS["en"]["milestone_reward_7"] = "7-Day Streak Reward"
-TRANSLATIONS["en"]["milestone_reward_30"] = "30-Day Streak Reward"
-TRANSLATIONS["en"]["invite_reward"] = "Referral Reward"
-TRANSLATIONS["en"]["invite_friend"] = "Invite Friends"
-TRANSLATIONS["en"]["share_and_invite"] = "Share & Invite"
-TRANSLATIONS["en"]["referral_code"] = "Referral Code"
-TRANSLATIONS["en"]["copy_referral_link"] = "Copy Referral Link"
-TRANSLATIONS["en"]["referral_bonus"] = "Referral Bonus"
-TRANSLATIONS["en"]["referral_bonus_desc"] = "Both you and your friend get 50 spirit stones when they register"
-
-TRANSLATIONS["ja"]["notifications"] = "通知"
-TRANSLATIONS["ja"]["no_notifications"] = "通知なし"
-TRANSLATIONS["ja"]["mark_all_read"] = "全部既読"
-TRANSLATIONS["ja"]["notification_reward"] = "報酬"
-TRANSLATIONS["ja"]["notification_system"] = "システム"
-TRANSLATIONS["ja"]["notification_agent"] = "Agent"
-TRANSLATIONS["ja"]["notification_reminder"] = "リマインダー"
-TRANSLATIONS["ja"]["daily_checkin"] = "每日チェックイン"
-TRANSLATIONS["ja"]["checkin_now"] = "チェックイン"
-TRANSLATIONS["ja"]["checked_in"] = "本日チェックイン済み"
-TRANSLATIONS["ja"]["streak_days"] = "連続チェックイン日数"
-TRANSLATIONS["ja"]["checkin_rewards"] = "チェックイン報酬"
-TRANSLATIONS["ja"]["milestone_reward_3"] = "3日連続報酬"
-TRANSLATIONS["ja"]["milestone_reward_7"] = "7日連続報酬"
-TRANSLATIONS["ja"]["milestone_reward_30"] = "30日連続報酬"
-TRANSLATIONS["ja"]["invite_reward"] = "招待報酬"
-TRANSLATIONS["ja"]["invite_friend"] = "友達を招待"
-TRANSLATIONS["ja"]["share_and_invite"] = "シェアして招待"
-TRANSLATIONS["ja"]["referral_code"] = "招待コード"
-TRANSLATIONS["ja"]["copy_referral_link"] = "招待リンクをコピー"
-TRANSLATIONS["ja"]["referral_bonus"] = "招待ボーナス"
-TRANSLATIONS["ja"]["referral_bonus_desc"] = "友達が登録すると、お互いに50霊石を獲得"
-
-# ============ Feature 1: 每日签到增强翻译 ============
-TRANSLATIONS["zh"]["checkin_title"] = "每日签到"
-TRANSLATIONS["zh"]["checkin_streak"] = "连续签到"
-TRANSLATIONS["zh"]["checkin_today"] = "今日签到"
-TRANSLATIONS["zh"]["checkin_already"] = "今日已签到"
-TRANSLATIONS["zh"]["checkin_reward_today"] = "今日奖励"
-TRANSLATIONS["zh"]["checkin_next_milestone"] = "下一个里程碑"
-TRANSLATIONS["zh"]["checkin_calendar_title"] = "签到日历"
-TRANSLATIONS["zh"]["checkin_milestone_reached"] = "达成里程碑！"
-TRANSLATIONS["zh"]["checkin_streak_reset"] = "签到已重置"
-TRANSLATIONS["zh"]["checkin_total_stones"] = "灵石余额"
-TRANSLATIONS["zh"]["checkin_claim"] = "签到领取"
-TRANSLATIONS["zh"]["checkin_claimed"] = "已领取"
-TRANSLATIONS["zh"]["checkin_days"] = "天"
-TRANSLATIONS["zh"]["checkin_stones_earned"] = "获得灵石"
-TRANSLATIONS["zh"]["checkin_weekly_bonus"] = "周签到奖励"
-TRANSLATIONS["zh"]["checkin_weekly_desc"] = "连续签到7天额外奖励"
-
-TRANSLATIONS["en"]["checkin_title"] = "Daily Check-in"
-TRANSLATIONS["en"]["checkin_streak"] = "Streak"
-TRANSLATIONS["en"]["checkin_today"] = "Check in Today"
-TRANSLATIONS["en"]["checkin_already"] = "Checked in Today"
-TRANSLATIONS["en"]["checkin_reward_today"] = "Today's Reward"
-TRANSLATIONS["en"]["checkin_next_milestone"] = "Next Milestone"
-TRANSLATIONS["en"]["checkin_calendar_title"] = "Check-in Calendar"
-TRANSLATIONS["en"]["checkin_milestone_reached"] = "Milestone Reached!"
-TRANSLATIONS["en"]["checkin_streak_reset"] = "Streak Reset"
-TRANSLATIONS["en"]["checkin_total_stones"] = "Spirit Stones"
-TRANSLATIONS["en"]["checkin_claim"] = "Claim Reward"
-TRANSLATIONS["en"]["checkin_claimed"] = "Claimed"
-TRANSLATIONS["en"]["checkin_days"] = "days"
-TRANSLATIONS["en"]["checkin_stones_earned"] = "Stones Earned"
-TRANSLATIONS["en"]["checkin_weekly_bonus"] = "Weekly Bonus"
-TRANSLATIONS["en"]["checkin_weekly_desc"] = "Extra reward for 7-day streak"
-
-TRANSLATIONS["ja"]["checkin_title"] = "每日チェックイン"
-TRANSLATIONS["ja"]["checkin_streak"] = "連続日数"
-TRANSLATIONS["ja"]["checkin_today"] = "今日チェックイン"
-TRANSLATIONS["ja"]["checkin_already"] = "本日チェックイン済み"
-TRANSLATIONS["ja"]["checkin_reward_today"] = "今日の報酬"
-TRANSLATIONS["ja"]["checkin_next_milestone"] = "次のマイルストーン"
-TRANSLATIONS["ja"]["checkin_calendar_title"] = "チェックインカレンダー"
-TRANSLATIONS["ja"]["checkin_milestone_reached"] = "マイルストーン達成！"
-TRANSLATIONS["ja"]["checkin_streak_reset"] = "連続リセット"
-TRANSLATIONS["ja"]["checkin_total_stones"] = "霊石残高"
-TRANSLATIONS["ja"]["checkin_claim"] = "受け取る"
-TRANSLATIONS["ja"]["checkin_claimed"] = "受取済み"
-TRANSLATIONS["ja"]["checkin_days"] = "日"
-TRANSLATIONS["ja"]["checkin_stones_earned"] = "獲得霊石"
-TRANSLATIONS["ja"]["checkin_weekly_bonus"] = "週間ボーナス"
-TRANSLATIONS["ja"]["checkin_weekly_desc"] = "7日連続で追加報酬"
-
-# ============ Feature 2: Agent记忆翻译 ============
-TRANSLATIONS["zh"]["agent_memory_title"] = "Agent记忆"
-TRANSLATIONS["zh"]["agent_memory_save"] = "保存记忆"
-TRANSLATIONS["zh"]["agent_memory_empty"] = "暂无记忆"
-TRANSLATIONS["zh"]["agent_memory_general"] = "通用"
-TRANSLATIONS["zh"]["agent_memory_preference"] = "偏好"
-TRANSLATIONS["zh"]["agent_memory_fact"] = "事实"
-TRANSLATIONS["zh"]["agent_memory_story"] = "故事"
-TRANSLATIONS["zh"]["agent_memory_saved"] = "记忆已保存"
-TRANSLATIONS["zh"]["agent_memory_first_time"] = "很高兴认识你！我是{name}，以后请多关照~"
-TRANSLATIONS["zh"]["agent_memory_returning"] = "你回来啦！上次我们聊到{memory}"
-TRANSLATIONS["zh"]["agent_memory_save_hint"] = "让Agent记住重要的事情"
-
-TRANSLATIONS["en"]["agent_memory_title"] = "Agent Memory"
-TRANSLATIONS["en"]["agent_memory_save"] = "Save Memory"
-TRANSLATIONS["en"]["agent_memory_empty"] = "No memories yet"
-TRANSLATIONS["en"]["agent_memory_general"] = "General"
-TRANSLATIONS["en"]["agent_memory_preference"] = "Preference"
-TRANSLATIONS["en"]["agent_memory_fact"] = "Fact"
-TRANSLATIONS["en"]["agent_memory_story"] = "Story"
-TRANSLATIONS["en"]["agent_memory_saved"] = "Memory saved"
-TRANSLATIONS["en"]["agent_memory_first_time"] = "Nice to meet you! I'm {name}, please take care~"
-TRANSLATIONS["en"]["agent_memory_returning"] = "Welcome back! Last time we talked about {memory}"
-TRANSLATIONS["en"]["agent_memory_save_hint"] = "Let Agent remember important things"
-
-TRANSLATIONS["ja"]["agent_memory_title"] = "Agent記憶"
-TRANSLATIONS["ja"]["agent_memory_save"] = "記憶を保存"
-TRANSLATIONS["ja"]["agent_memory_empty"] = "記憶なし"
-TRANSLATIONS["ja"]["agent_memory_general"] = "一般"
-TRANSLATIONS["ja"]["agent_memory_preference"] = "好み"
-TRANSLATIONS["ja"]["agent_memory_fact"] = "事実"
-TRANSLATIONS["ja"]["agent_memory_story"] = "物語"
-TRANSLATIONS["ja"]["agent_memory_saved"] = "記憶を保存しました"
-TRANSLATIONS["ja"]["agent_memory_first_time"] = "はじめまして！私は{name}です、よろしくお願いします~"
-TRANSLATIONS["ja"]["agent_memory_returning"] = "おかえり！前回は{memory}の話をしましたね"
-TRANSLATIONS["ja"]["agent_memory_save_hint"] = "Agentに大事なことを覚えさせましょう"
-
-# ============ Feature 3: 分享/裂变翻译 ============
-TRANSLATIONS["zh"]["share_title"] = "分享结果"
-TRANSLATIONS["zh"]["share_divination"] = "分享占卜结果"
-TRANSLATIONS["zh"]["share_link_copied"] = "链接已复制！"
-TRANSLATIONS["zh"]["share_copy_failed"] = "复制失败，请手动复制"
-TRANSLATIONS["zh"]["share_invite_friend"] = "邀请好友赚灵石"
-TRANSLATIONS["zh"]["share_invite_desc"] = "邀请好友注册，每成功邀请一位，双方各得50灵石！"
-TRANSLATIONS["zh"]["share_my_code"] = "我的邀请码"
-TRANSLATIONS["zh"]["share_copy_code"] = "复制邀请码"
-TRANSLATIONS["zh"]["share_divination_text"] = "我在灵犀占卜了一卦，来看看吧！"
-TRANSLATIONS["zh"]["share_via"] = "分享到"
-
-TRANSLATIONS["en"]["share_title"] = "Share Result"
-TRANSLATIONS["en"]["share_divination"] = "Share Divination"
-TRANSLATIONS["en"]["share_link_copied"] = "Link copied!"
-TRANSLATIONS["en"]["share_copy_failed"] = "Copy failed, please copy manually"
-TRANSLATIONS["en"]["share_invite_friend"] = "Invite Friends for Stones"
-TRANSLATIONS["en"]["share_invite_desc"] = "Both you and your friend get 50 spirit stones when they register!"
-TRANSLATIONS["en"]["share_my_code"] = "My Invite Code"
-TRANSLATIONS["en"]["share_copy_code"] = "Copy Invite Code"
-TRANSLATIONS["en"]["share_divination_text"] = "I just got a divination on SoulLink, check it out!"
-TRANSLATIONS["en"]["share_via"] = "Share via"
-
-TRANSLATIONS["ja"]["share_title"] = "結果をシェア"
-TRANSLATIONS["ja"]["share_divination"] = "占い結果をシェア"
-TRANSLATIONS["ja"]["share_link_copied"] = "リンクをコピーしました！"
-TRANSLATIONS["ja"]["share_copy_failed"] = "コピー失敗、手動でコピーしてください"
-TRANSLATIONS["ja"]["share_invite_friend"] = "友達を招待して霊石を獲得"
-TRANSLATIONS["ja"]["share_invite_desc"] = "友達が登録すると、お互いに50霊石を獲得！"
-TRANSLATIONS["ja"]["share_my_code"] = "マイ招待コード"
-TRANSLATIONS["ja"]["share_copy_code"] = "招待コードをコピー"
-TRANSLATIONS["ja"]["share_divination_text"] = "SoulLinkで占いをしてみました、見てみてください！"
-TRANSLATIONS["ja"]["share_via"] = "シェア"
-
-# ============ Past Life (前世今生) Translations ============
-# Chinese
-TRANSLATIONS["zh"]["past_life_title"] = "前世今生"
-TRANSLATIONS["zh"]["past_life_desc"] = "输入你的生日，揭开前世的记忆面纱"
-TRANSLATIONS["zh"]["past_life_birth_label"] = "请输入你的出生日期"
-TRANSLATIONS["zh"]["past_life_btn"] = "查看前世"
-TRANSLATIONS["zh"]["past_life_free_first"] = "🆓 首次免费"
-TRANSLATIONS["zh"]["past_life_cost"] = "💎 20灵石/次"
-TRANSLATIONS["zh"]["past_life_loading"] = "正在穿越时空隧道..."
-TRANSLATIONS["zh"]["past_life_no_date"] = "请选择出生日期"
-TRANSLATIONS["zh"]["past_life_again"] = "再测一次"
-TRANSLATIONS["zh"]["past_life_flip"] = "翻开背面"
-TRANSLATIONS["zh"]["past_life_reflection"] = "灵魂启示"
-
-# English
-TRANSLATIONS["en"]["past_life_title"] = "Past Life"
-TRANSLATIONS["en"]["past_life_desc"] = "Enter your birth date to unveil the memories of your past life"
-TRANSLATIONS["en"]["past_life_birth_label"] = "Enter your birth date"
-TRANSLATIONS["en"]["past_life_btn"] = "View Past Life"
-TRANSLATIONS["en"]["past_life_free_first"] = "🆓 First Free"
-TRANSLATIONS["en"]["past_life_cost"] = "💎 20 Stones/Time"
-TRANSLATIONS["en"]["past_life_loading"] = "Traveling through the space-time tunnel..."
-TRANSLATIONS["en"]["past_life_no_date"] = "Please select your birth date"
-TRANSLATIONS["en"]["past_life_again"] = "Try Again"
-TRANSLATIONS["en"]["past_life_flip"] = "Flip Card"
-TRANSLATIONS["en"]["past_life_reflection"] = "Soul Reflection"
-
-# Japanese
-TRANSLATIONS["ja"]["past_life_title"] = "前世"
-TRANSLATIONS["ja"]["past_life_desc"] = "誕生日を入力して、前世の記憶を紐解きましょう"
-TRANSLATIONS["ja"]["past_life_birth_label"] = "生年月日を入力"
-TRANSLATIONS["ja"]["past_life_btn"] = "前世を見る"
-TRANSLATIONS["ja"]["past_life_free_first"] = "🆓 初回無料"
-TRANSLATIONS["ja"]["past_life_cost"] = "💎 20石/回"
-TRANSLATIONS["ja"]["past_life_loading"] = "時空のトンネルを旅しています..."
-TRANSLATIONS["ja"]["past_life_no_date"] = "生年月日を選択してください"
-TRANSLATIONS["ja"]["past_life_again"] = "もう一度"
-TRANSLATIONS["ja"]["past_life_flip"] = "カードを裏返す"
-TRANSLATIONS["ja"]["past_life_reflection"] = "魂の啓示"
-
-# ============ Soulmate Portrait (灵魂伴侣画像) Translations ============
-# Chinese
-TRANSLATIONS["zh"]["soulmate_title"] = "灵魂伴侣画像"
-TRANSLATIONS["zh"]["soulmate_desc"] = "回答6个问题，发现你的灵魂伴侣类型"
-TRANSLATIONS["zh"]["soulmate_btn"] = "查看灵魂伴侣画像"
-TRANSLATIONS["zh"]["soulmate_free_first"] = "🆓 首次免费"
-TRANSLATIONS["zh"]["soulmate_cost"] = "💎 30灵石/次"
-TRANSLATIONS["zh"]["soulmate_loading"] = "正在绘制你的灵魂画像..."
-TRANSLATIONS["zh"]["soulmate_retry"] = "重新测试"
-TRANSLATIONS["zh"]["soulmate_match_rate"] = "灵魂契合度"
-
-TRANSLATIONS["zh"]["soulmate_q1"] = "你理想中的约会场景是？"
-TRANSLATIONS["zh"]["soulmate_q1_a"] = "🌅 海边看日落"
-TRANSLATIONS["zh"]["soulmate_q1_b"] = "📚 安静的咖啡馆"
-TRANSLATIONS["zh"]["soulmate_q1_c"] = "🎢 游乐园冒险"
-
-TRANSLATIONS["zh"]["soulmate_q2"] = "在感情中你最看重什么？"
-TRANSLATIONS["zh"]["soulmate_q2_a"] = "💝 真诚与信任"
-TRANSLATIONS["zh"]["soulmate_q2_b"] = "🎯 共同的目标"
-TRANSLATIONS["zh"]["soulmate_q2_c"] = "🔥 激情与浪漫"
-
-TRANSLATIONS["zh"]["soulmate_q3"] = "周末你更喜欢怎样度过？"
-TRANSLATIONS["zh"]["soulmate_q3_a"] = "🏠 宅家看电影"
-TRANSLATIONS["zh"]["soulmate_q3_b"] = "🏔️ 户外探险"
-TRANSLATIONS["zh"]["soulmate_q3_c"] = "🎨 学习新技能"
-
-TRANSLATIONS["zh"]["soulmate_q4"] = "你如何处理矛盾？"
-TRANSLATIONS["zh"]["soulmate_q4_a"] = "💬 冷静沟通"
-TRANSLATIONS["zh"]["soulmate_q4_b"] = "⏰ 给彼此空间"
-TRANSLATIONS["zh"]["soulmate_q4_c"] = "🤗 立即和解"
-
-TRANSLATIONS["zh"]["soulmate_q5"] = "你相信命中注定的爱情吗？"
-TRANSLATIONS["zh"]["soulmate_q5_a"] = "✨ 深信不疑"
-TRANSLATIONS["zh"]["soulmate_q5_b"] = "🤔 半信半疑"
-TRANSLATIONS["zh"]["soulmate_q5_c"] = "💪 爱情靠经营"
-
-TRANSLATIONS["zh"]["soulmate_q6"] = "你的朋友通常怎么形容你？"
-TRANSLATIONS["zh"]["soulmate_q6_a"] = "🌞 温暖体贴"
-TRANSLATIONS["zh"]["soulmate_q6_b"] = "🎉 有趣幽默"
-TRANSLATIONS["zh"]["soulmate_q6_c"] = "🧠 聪明睿智"
-
-# English Soulmate
-TRANSLATIONS["en"]["soulmate_title"] = "Soulmate Portrait"
-TRANSLATIONS["en"]["soulmate_desc"] = "Answer 6 questions to discover your soulmate type"
-TRANSLATIONS["en"]["soulmate_btn"] = "View Soulmate Portrait"
-TRANSLATIONS["en"]["soulmate_free_first"] = "🆓 First Free"
-TRANSLATIONS["en"]["soulmate_cost"] = "💎 30 Stones/Time"
-TRANSLATIONS["en"]["soulmate_loading"] = "Drawing your soul portrait..."
-TRANSLATIONS["en"]["soulmate_retry"] = "Retry"
-TRANSLATIONS["en"]["soulmate_match_rate"] = "Soul Compatibility"
-
-TRANSLATIONS["en"]["soulmate_q1"] = "What is your ideal date setting?"
-TRANSLATIONS["en"]["soulmate_q1_a"] = "🌅 Sunset at the beach"
-TRANSLATIONS["en"]["soulmate_q1_b"] = "📚 Quiet café"
-TRANSLATIONS["en"]["soulmate_q1_c"] = "🎢 Amusement park adventure"
-
-TRANSLATIONS["en"]["soulmate_q2"] = "What matters most in relationships?"
-TRANSLATIONS["en"]["soulmate_q2_a"] = "💝 Honesty & trust"
-TRANSLATIONS["en"]["soulmate_q2_b"] = "🎯 Shared goals"
-TRANSLATIONS["en"]["soulmate_q2_c"] = "🔥 Passion & romance"
-
-TRANSLATIONS["en"]["soulmate_q3"] = "How do you prefer to spend weekends?"
-TRANSLATIONS["en"]["soulmate_q3_a"] = "🏠 Movie marathon at home"
-TRANSLATIONS["en"]["soulmate_q3_b"] = "🏔️ Outdoor adventure"
-TRANSLATIONS["en"]["soulmate_q3_c"] = "🎨 Learning new skills"
-
-TRANSLATIONS["en"]["soulmate_q4"] = "How do you handle conflicts?"
-TRANSLATIONS["en"]["soulmate_q4_a"] = "💬 Calm communication"
-TRANSLATIONS["en"]["soulmate_q4_b"] = "⏰ Give each other space"
-TRANSLATIONS["en"]["soulmate_q4_c"] = "🤗 Reconcile immediately"
-
-TRANSLATIONS["en"]["soulmate_q5"] = "Do you believe in destiny love?"
-TRANSLATIONS["en"]["soulmate_q5_a"] = "✨ Absolutely"
-TRANSLATIONS["en"]["soulmate_q5_b"] = "🤔 Not sure"
-TRANSLATIONS["en"]["soulmate_q5_c"] = "💪 Love takes work"
-
-TRANSLATIONS["en"]["soulmate_q6"] = "How would friends describe you?"
-TRANSLATIONS["en"]["soulmate_q6_a"] = "🌞 Warm and caring"
-TRANSLATIONS["en"]["soulmate_q6_b"] = "🎉 Funny and witty"
-TRANSLATIONS["en"]["soulmate_q6_c"] = "🧠 Smart and wise"
-
-# Japanese Soulmate
-TRANSLATIONS["ja"]["soulmate_title"] = "ソウルメイト診断"
-TRANSLATIONS["ja"]["soulmate_desc"] = "6つの質問に答えて、あなたのソウルメイトタイプを見つけよう"
-TRANSLATIONS["ja"]["soulmate_btn"] = "ソウルメイトを見る"
-TRANSLATIONS["ja"]["soulmate_free_first"] = "🆓 初回無料"
-TRANSLATIONS["ja"]["soulmate_cost"] = "💎 30石/回"
-TRANSLATIONS["ja"]["soulmate_loading"] = "あなたの魂の肖像を描いています..."
-TRANSLATIONS["ja"]["soulmate_retry"] = "もう一度診断"
-TRANSLATIONS["ja"]["soulmate_match_rate"] = "ソウルマッチ度"
-
-TRANSLATIONS["ja"]["soulmate_q1"] = "理想のデートは？"
-TRANSLATIONS["ja"]["soulmate_q1_a"] = "🌅 海辺の夕日"
-TRANSLATIONS["ja"]["soulmate_q1_b"] = "📚 静かなカフェ"
-TRANSLATIONS["ja"]["soulmate_q1_c"] = "🎢 遊園地で冒険"
-
-TRANSLATIONS["ja"]["soulmate_q2"] = "恋愛で一番大切なのは？"
-TRANSLATIONS["ja"]["soulmate_q2_a"] = "💝 誠実さと信頼"
-TRANSLATIONS["ja"]["soulmate_q2_b"] = "🎯 共通の目標"
-TRANSLATIONS["ja"]["soulmate_q2_c"] = "🔥 情熱とロマンス"
-
-TRANSLATIONS["ja"]["soulmate_q3"] = "週末の過ごし方は？"
-TRANSLATIONS["ja"]["soulmate_q3_a"] = "🏠 家で映画鑑賞"
-TRANSLATIONS["ja"]["soulmate_q3_b"] = "🏔️ アウトドア"
-TRANSLATIONS["ja"]["soulmate_q3_c"] = "🎨 新しいスキル学習"
-
-TRANSLATIONS["ja"]["soulmate_q4"] = "対立の解決方法は？"
-TRANSLATIONS["ja"]["soulmate_q4_a"] = "💬 冷静に話し合う"
-TRANSLATIONS["ja"]["soulmate_q4_b"] = "⏰ お互いの時間を尊重"
-TRANSLATIONS["ja"]["soulmate_q4_c"] = "🤗 すぐに和解"
-
-TRANSLATIONS["ja"]["soulmate_q5"] = "運命の愛を信じますか？"
-TRANSLATIONS["ja"]["soulmate_q5_a"] = "✨ 強く信じる"
-TRANSLATIONS["ja"]["soulmate_q5_b"] = "🤔 半信半疑"
-TRANSLATIONS["ja"]["soulmate_q5_c"] = "💪 努力で育むもの"
-
-TRANSLATIONS["ja"]["soulmate_q6"] = "友達はあなたをどう形容する？"
-TRANSLATIONS["ja"]["soulmate_q6_a"] = "🌞 温かい思いやり"
-TRANSLATIONS["ja"]["soulmate_q6_b"] = "🎉 面白くてユーモア"
-TRANSLATIONS["ja"]["soulmate_q6_c"] = "🧠 賢明で知的"
-
-# ============ Rituals Translations ============
-# Chinese
-TRANSLATIONS["zh"]["rituals_calendar_title"] = "节日日历"
-TRANSLATIONS["zh"]["rituals_participate"] = "参与仪式"
-TRANSLATIONS["zh"]["rituals_confirm"] = "参与此仪式需要消耗"
-TRANSLATIONS["zh"]["rituals_success"] = "仪式完成！"
-TRANSLATIONS["zh"]["rituals_error"] = "灵石不足或请求失败"
-
-# English
-TRANSLATIONS["en"]["rituals_calendar_title"] = "Festival Calendar"
-TRANSLATIONS["en"]["rituals_participate"] = "Participate"
-TRANSLATIONS["en"]["rituals_confirm"] = "Participating costs"
-TRANSLATIONS["en"]["rituals_success"] = "Ritual complete!"
-TRANSLATIONS["en"]["rituals_error"] = "Insufficient stones or request failed"
-
-# Japanese
-TRANSLATIONS["ja"]["rituals_calendar_title"] = "祭典カレンダー"
-TRANSLATIONS["ja"]["rituals_participate"] = "参加する"
-TRANSLATIONS["ja"]["rituals_confirm"] = "参加には消費"
-TRANSLATIONS["ja"]["rituals_success"] = "儀式完了！"
-TRANSLATIONS["ja"]["rituals_error"] = "石不足またはリクエスト失敗"
-
-# ============ Platform Fee Translations ============
-TRANSLATIONS["zh"]["platform_fee_notice"] = "本次交易收取10%平台服务费"
-TRANSLATIONS["en"]["platform_fee_notice"] = "A 10% platform service fee applies to this transaction"
-TRANSLATIONS["ja"]["platform_fee_notice"] = "この取引には10%のプラットフォーム手数料がかかります"
-
-# ============ Transaction Type Translations ============
-TRANSLATIONS["zh"]["transaction_purchase"] = "购买"
-TRANSLATIONS["zh"]["transaction_earnings"] = "收益"
-TRANSLATIONS["zh"]["transaction_gift"] = "礼物"
-TRANSLATIONS["zh"]["transaction_divination"] = "占卜"
-TRANSLATIONS["zh"]["transaction_withdrawal"] = "提现"
-TRANSLATIONS["zh"]["transaction_membership"] = "会员"
-
-TRANSLATIONS["en"]["transaction_purchase"] = "Purchase"
-TRANSLATIONS["en"]["transaction_earnings"] = "Earnings"
-TRANSLATIONS["en"]["transaction_gift"] = "Gift"
-TRANSLATIONS["en"]["transaction_divination"] = "Divination"
-TRANSLATIONS["en"]["transaction_withdrawal"] = "Withdrawal"
-TRANSLATIONS["en"]["transaction_membership"] = "Membership"
-
-TRANSLATIONS["ja"]["transaction_purchase"] = "購入"
-TRANSLATIONS["ja"]["transaction_earnings"] = "収益"
-TRANSLATIONS["ja"]["transaction_gift"] = "ギフト"
-TRANSLATIONS["ja"]["transaction_divination"] = "占い"
-TRANSLATIONS["ja"]["transaction_withdrawal"] = "引き出し"
-TRANSLATIONS["ja"]["transaction_membership"] = "会員"
-
-# ============ Agent Social Feed Translations ============
-TRANSLATIONS["zh"]["agent_feed"] = "Agent圈"
-TRANSLATIONS["zh"]["agent_feed_desc"] = "Agent们的好友圈动态"
-TRANSLATIONS["zh"]["create_post"] = "发布动态"
-TRANSLATIONS["zh"]["post_cost"] = "发布消耗 5💎（含10%服务费）"
-TRANSLATIONS["zh"]["post_placeholder"] = "分享你的Agent动态..."
-TRANSLATIONS["zh"]["post_success"] = "发布成功"
-TRANSLATIONS["zh"]["empty_feed"] = "暂无动态，快来发布第一条吧~"
-TRANSLATIONS["zh"]["like"] = "点赞"
-TRANSLATIONS["zh"]["comment"] = "评论"
-TRANSLATIONS["zh"]["write_comment_placeholder"] = "写下你的评论..."
-
-TRANSLATIONS["en"]["agent_feed"] = "Agent Feed"
-TRANSLATIONS["en"]["agent_feed_desc"] = "Agent social feed"
-TRANSLATIONS["en"]["create_post"] = "Create Post"
-TRANSLATIONS["en"]["post_cost"] = "Costs 5💎 (10% fee)"
-TRANSLATIONS["en"]["post_placeholder"] = "Share your Agent update..."
-TRANSLATIONS["en"]["post_success"] = "Posted successfully"
-TRANSLATIONS["en"]["empty_feed"] = "No posts yet, be the first!"
-TRANSLATIONS["en"]["like"] = "Like"
-TRANSLATIONS["en"]["comment"] = "Comment"
-TRANSLATIONS["en"]["write_comment_placeholder"] = "Write a comment..."
-
-TRANSLATIONS["ja"]["agent_feed"] = "Agentフィード"
-TRANSLATIONS["ja"]["agent_feed_desc"] = "Agentのソーシャルフィード"
-TRANSLATIONS["ja"]["create_post"] = "投稿する"
-TRANSLATIONS["ja"]["post_cost"] = "5💎かかります（10%手数料）"
-TRANSLATIONS["ja"]["post_placeholder"] = "Agentの近況をシェア..."
-TRANSLATIONS["ja"]["post_success"] = "投稿しました"
-TRANSLATIONS["ja"]["empty_feed"] = "まだ投稿がありません"
-TRANSLATIONS["ja"]["like"] = "いいね"
-TRANSLATIONS["ja"]["comment"] = "コメント"
-TRANSLATIONS["ja"]["write_comment_placeholder"] = "コメントを書く..."
-
-# ============ Leaderboard Translations ============
-TRANSLATIONS["zh"]["leaderboard"] = "排行榜"
-TRANSLATIONS["zh"]["leaderboard_desc"] = "本周最受欢迎的Agent"
-TRANSLATIONS["zh"]["top_three"] = "前三名"
-TRANSLATIONS["zh"]["full_ranking"] = "完整排名"
-TRANSLATIONS["zh"]["no_leaderboard_data"] = "暂无排行数据"
-TRANSLATIONS["zh"]["posts_count"] = "{count} 条动态"
-
-TRANSLATIONS["en"]["leaderboard"] = "Leaderboard"
-TRANSLATIONS["en"]["leaderboard_desc"] = "This week's most popular Agents"
-TRANSLATIONS["en"]["top_three"] = "Top 3"
-TRANSLATIONS["en"]["full_ranking"] = "Full Ranking"
-TRANSLATIONS["en"]["no_leaderboard_data"] = "No leaderboard data"
-TRANSLATIONS["en"]["posts_count"] = "{count} posts"
-
-TRANSLATIONS["ja"]["leaderboard"] = "ランキング"
-TRANSLATIONS["ja"]["leaderboard_desc"] = "今週最も人気のAgent"
-TRANSLATIONS["ja"]["top_three"] = "トップ3"
-TRANSLATIONS["ja"]["full_ranking"] = "全ランキング"
-TRANSLATIONS["ja"]["no_leaderboard_data"] = "ランキングデータがありません"
-TRANSLATIONS["ja"]["posts_count"] = "{count} 投稿"
-
-# ============ Costume System Translations ============
-TRANSLATIONS["zh"]["costume"] = "Agent捏脸"
-TRANSLATIONS["zh"]["costume_desc"] = "为你的Agent选择独特的主题服装"
-TRANSLATIONS["zh"]["unlock_costume"] = "解锁"
-TRANSLATIONS["zh"]["switch_costume"] = "切换"
-TRANSLATIONS["zh"]["costume_unlocked"] = "已解锁"
-TRANSLATIONS["zh"]["costume_active"] = "使用中"
-TRANSLATIONS["zh"]["unlock_confirm"] = "花费 {price}💎 解锁「{name}」主题？（含10%服务费）"
-TRANSLATIONS["zh"]["costume_unlock_success"] = "解锁成功！已切换至{name}"
-TRANSLATIONS["zh"]["costume_change_success"] = "已切换至{name}"
-
-TRANSLATIONS["en"]["costume"] = "Agent Costume"
-TRANSLATIONS["en"]["costume_desc"] = "Choose a unique theme for your Agent"
-TRANSLATIONS["en"]["unlock_costume"] = "Unlock"
-TRANSLATIONS["en"]["switch_costume"] = "Switch"
-TRANSLATIONS["en"]["costume_unlocked"] = "Unlocked"
-TRANSLATIONS["en"]["costume_active"] = "Active"
-TRANSLATIONS["en"]["unlock_confirm"] = "Spend {price}💎 to unlock '{name}' theme? (10% fee)"
-TRANSLATIONS["en"]["costume_unlock_success"] = "Unlocked! Switched to {name}"
-TRANSLATIONS["en"]["costume_change_success"] = "Switched to {name}"
-
-TRANSLATIONS["ja"]["costume"] = "Agentコスチューム"
-TRANSLATIONS["ja"]["costume_desc"] = "Agentのテーマを選ぶ"
-TRANSLATIONS["ja"]["unlock_costume"] = "アンロック"
-TRANSLATIONS["ja"]["switch_costume"] = "切り替え"
-TRANSLATIONS["ja"]["costume_unlocked"] = "アンロック済"
-TRANSLATIONS["ja"]["costume_active"] = "使用中"
-TRANSLATIONS["ja"]["costume_unlock_success"] = "アンロックしました！{name}に切り替え"
-TRANSLATIONS["ja"]["costume_change_success"] = "{name}に切り替えました"
-TRANSLATIONS["ja"]["unlock_confirm"] = "{price}💎 を使って「{name}」テーマを解放しますか？（10%手数料）"
-
-# ============ Agent Social Translations ============
-TRANSLATIONS["zh"]["agent_friend_request"] = "好友请求已发送"
-TRANSLATIONS["zh"]["agent_friend_accept"] = "已接受好友请求"
-TRANSLATIONS["zh"]["agent_chat_send"] = "发送"
-TRANSLATIONS["zh"]["agent_gift_send"] = "赠送礼物"
-TRANSLATIONS["zh"]["agent_gift_sent"] = "已赠送{gift}给{target}"
-
-TRANSLATIONS["en"]["agent_friend_request"] = "Friend request sent"
-TRANSLATIONS["en"]["agent_friend_accept"] = "Friend request accepted"
-TRANSLATIONS["en"]["agent_chat_send"] = "Send"
-TRANSLATIONS["en"]["agent_gift_send"] = "Send Gift"
-TRANSLATIONS["en"]["agent_gift_sent"] = "Sent {gift} to {target}"
-
-TRANSLATIONS["ja"]["agent_friend_request"] = "友達リクエストを送信しました"
-TRANSLATIONS["ja"]["agent_friend_accept"] = "友達リクエストを承認しました"
-TRANSLATIONS["ja"]["agent_chat_send"] = "送信"
-TRANSLATIONS["ja"]["agent_gift_send"] = "ギフトを送る"
-TRANSLATIONS["ja"]["agent_gift_sent"] = "{target}に{gift}を贈りました"
-
-# ============ Date Match (奔现) Translations ============
-TRANSLATIONS["zh"]["date_match"] = "奔现"
-TRANSLATIONS["zh"]["date_match_desc"] = "发起真实约会，遇见你的TA"
-TRANSLATIONS["zh"]["send_date_request"] = "发起奔现"
-TRANSLATIONS["zh"]["my_date_requests"] = "我的请求"
-TRANSLATIONS["zh"]["target_agent_id"] = "目标Agent ID"
-TRANSLATIONS["zh"]["your_agent_id"] = "你的Agent ID"
-TRANSLATIONS["zh"]["date_type"] = "约会类型"
-TRANSLATIONS["zh"]["date_message"] = "留言"
-TRANSLATIONS["zh"]["send_date_invite"] = "💌 发送奔现邀请"
-TRANSLATIONS["zh"]["received_requests"] = "📩 收到的邀请"
-TRANSLATIONS["zh"]["sent_requests"] = "📤 发出的邀请"
-TRANSLATIONS["zh"]["no_received"] = "暂无收到的邀请"
-TRANSLATIONS["zh"]["no_sent"] = "暂无发出的邀请"
-TRANSLATIONS["zh"]["date_status_pending"] = "待处理"
-TRANSLATIONS["zh"]["date_status_accepted"] = "已接受 💕"
-TRANSLATIONS["zh"]["date_status_rejected"] = "已拒绝"
-TRANSLATIONS["zh"]["date_status_completed"] = "已完成 ✅"
-TRANSLATIONS["zh"]["date_accept"] = "✅ 接受"
-TRANSLATIONS["zh"]["date_reject"] = "❌ 拒绝"
-
-TRANSLATIONS["en"]["date_match"] = "Date Match"
-TRANSLATIONS["en"]["date_match_desc"] = "Send real date invitations"
-TRANSLATIONS["en"]["send_date_request"] = "Send Date Request"
-TRANSLATIONS["en"]["my_date_requests"] = "My Requests"
-TRANSLATIONS["en"]["target_agent_id"] = "Target Agent ID"
-TRANSLATIONS["en"]["your_agent_id"] = "Your Agent ID"
-TRANSLATIONS["en"]["date_type"] = "Date Type"
-TRANSLATIONS["en"]["date_message"] = "Message"
-TRANSLATIONS["en"]["send_date_invite"] = "💌 Send Date Invite"
-TRANSLATIONS["en"]["received_requests"] = "📩 Received Invites"
-TRANSLATIONS["en"]["sent_requests"] = "📤 Sent Invites"
-TRANSLATIONS["en"]["no_received"] = "No received invites"
-TRANSLATIONS["en"]["no_sent"] = "No sent invites"
-TRANSLATIONS["en"]["date_status_pending"] = "Pending"
-TRANSLATIONS["en"]["date_status_accepted"] = "Accepted 💕"
-TRANSLATIONS["en"]["date_status_rejected"] = "Rejected"
-TRANSLATIONS["en"]["date_status_completed"] = "Completed ✅"
-TRANSLATIONS["en"]["date_accept"] = "✅ Accept"
-TRANSLATIONS["en"]["date_reject"] = "❌ Reject"
-
-TRANSLATIONS["ja"]["date_match"] = "デートマッチ"
-TRANSLATIONS["ja"]["date_match_desc"] = "リアルデートを申し込む"
-TRANSLATIONS["ja"]["send_date_request"] = "デートを申し込む"
-TRANSLATIONS["ja"]["my_date_requests"] = "マイリクエスト"
-TRANSLATIONS["ja"]["target_agent_id"] = "相手のAgent ID"
-TRANSLATIONS["ja"]["your_agent_id"] = "自分のAgent ID"
-TRANSLATIONS["ja"]["date_type"] = "デートタイプ"
-TRANSLATIONS["ja"]["date_message"] = "メッセージ"
-TRANSLATIONS["ja"]["send_date_invite"] = "💌 デートを申し込む"
-TRANSLATIONS["ja"]["received_requests"] = "📩 受信した招待"
-TRANSLATIONS["ja"]["sent_requests"] = "📤 送信した招待"
-TRANSLATIONS["ja"]["no_received"] = "受信した招待はありません"
-TRANSLATIONS["ja"]["no_sent"] = "送信した招待はありません"
-TRANSLATIONS["ja"]["date_status_pending"] = "保留中"
-TRANSLATIONS["ja"]["date_status_accepted"] = "承諾済 💕"
-TRANSLATIONS["ja"]["date_status_rejected"] = "拒否済"
-TRANSLATIONS["ja"]["date_status_completed"] = "完了 ✅"
-TRANSLATIONS["ja"]["date_accept"] = "✅ 承諾"
-TRANSLATIONS["ja"]["date_reject"] = "❌ 拒否"
-

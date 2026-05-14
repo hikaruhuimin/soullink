@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}奔现 - SoulLink 灵犀{% endblock %}
+{% block title %}{{ _(\'date_match\') }} - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -265,14 +265,14 @@
 {% block content %}
 <div class="date-page">
     <div class="date-header">
-        <h1>💘 奔现</h1>
+        <h1>💘 {{ _(\'date_match\') }}</h1>
         <p>发起真实约会，遇见你的TA</p>
     </div>
 
     <!-- Tabs -->
     <div class="date-tabs">
-        <button class="date-tab active" data-target="date-send">发起奔现</button>
-        <button class="date-tab" data-target="date-requests">我的请求</button>
+        <button class="date-tab active" data-target="date-send">发起{{ _(\'date_match\') }}</button>
+        <button class="date-tab" data-target="date-requests">{{ _(\'my_date_requests\') }}</button>
     </div>
 
     <!-- Send date request -->
@@ -306,7 +306,7 @@
                 <label>留言</label>
                 <textarea id="dateMessage" rows="3" placeholder="写一段邀请语..." maxlength="200"></textarea>
             </div>
-            <button class="send-btn" onclick="sendDateRequest()">💌 发送奔现邀请</button>
+            <button class="send-btn" onclick="sendDateRequest()">💌 发送{{ _(\'date_match\') }}邀请</button>
             <div id="dateSendError" style="color:#ef4444;font-size:0.85rem;margin-top:0.75rem;display:none;"></div>
         </div>
     </div>
@@ -384,23 +384,23 @@ function loadRequests() {
             let html = '';
 
             // Received
-            html += '<h3 style="margin-bottom:0.75rem;font-size:1rem;color:var(--color-text);">📩 收到的邀请</h3>';
+            html += '<h3 style="margin-bottom:0.75rem;font-size:1rem;color:var(--color-text);">📩 {{ _('received_requests') }}</h3>';
             if (data.received && data.received.length > 0) {
                 data.received.forEach(r => {
                     html += renderRequest(r, true);
                 });
             } else {
-                html += '<div class="empty-state"><p>暂无收到的邀请</p></div>';
+                html += '<div class="empty-state"><p>暂无{{ _('received_requests') }}</p></div>';
             }
 
             // Sent
-            html += '<h3 style="margin:1.5rem 0 0.75rem;font-size:1rem;color:var(--color-text);">📤 发出的邀请</h3>';
+            html += '<h3 style="margin:1.5rem 0 0.75rem;font-size:1rem;color:var(--color-text);">📤 {{ _('sent_requests') }}</h3>';
             if (data.sent && data.sent.length > 0) {
                 data.sent.forEach(r => {
                     html += renderRequest(r, false);
                 });
             } else {
-                html += '<div class="empty-state"><p>暂无发出的邀请</p></div>';
+                html += '<div class="empty-state"><p>暂无{{ _('sent_requests') }}</p></div>';
             }
 
             container.innerHTML = html;

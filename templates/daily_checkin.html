@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}每日签到 - SoulLink{% endblock %}
+{% block title %}{{ _('daily_checkin') }} - SoulLink{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -253,7 +253,7 @@
     color: #10b981;
 }
 
-/* 周奖励卡片 */
+/* {{ _('checkin_weekly_bonus') }}卡片 */
 .weekly-bonus-card {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
     border: 1px solid rgba(239, 68, 68, 0.3);
@@ -406,7 +406,7 @@
 
 <div class="checkin-container">
     <div class="checkin-header">
-        <h1>🌟 每日签到</h1>
+        <h1>🌟 {{ _('daily_checkin') }}</h1>
         <p>连续签到，灵石多多</p>
     </div>
     
@@ -425,7 +425,7 @@
         <button class="checkin-btn {% if checked_in %}checked-in{% else %}can-checkin{% endif %}" 
                 id="checkinBtn" onclick="doCheckin()">
             {% if checked_in %}
-            ✓ 今日已签到
+            ✓ {{ _('checkin_already') }}
             {% else %}
             🔔 立即签到
             {% endif %}
@@ -479,7 +479,7 @@
         </div>
     </div>
     
-    <!-- 周奖励 -->
+    <!-- {{ _('checkin_weekly_bonus') }} -->
     <div class="weekly-bonus-card">
         <div class="weekly-bonus-title">🌈 周末双倍惊喜</div>
         <div class="weekly-bonus-amount">+{{ 5 }}灵石</div>
@@ -549,7 +549,7 @@ function doCheckin() {
             // 更新UI
             document.getElementById('streakNumber').textContent = data.user_streak;
             btn.className = 'checkin-btn checked-in';
-            btn.textContent = '✓ 今日已签到';
+            btn.textContent = '✓ {{ _('checkin_already') }}';
             
             // 显示成功弹窗
             showSuccessModal(data.user_streak, data.reward_stones);

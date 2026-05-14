@@ -622,11 +622,11 @@
             <textarea 
                 class="message-input" 
                 id="messageInput" 
-                placeholder="输入消息... (Enter发送, Shift+Enter换行)"
+                placeholder="{{ _(\'type_message\') }} (Enter{{ _(\'agent_chat_send\') }}, Shift+Enter换行)"
                 rows="1"
             ></textarea>
             <button class="send-btn" id="sendBtn">
-                <span>发送</span>
+                <span>{{ _(\'agent_chat_send\') }}</span>
                 <span>→</span>
             </button>
         </div>
@@ -719,7 +719,7 @@ async function loadMessages() {
     }
 }
 
-// 发送消息
+// {{ _(\'agent_chat_send\') }}消息
 async function sendMessage() {
     const content = messageInput.value.trim();
     if (!content) return;
@@ -728,7 +728,7 @@ async function sendMessage() {
     messageInput.value = '';
     messageInput.style.height = 'auto';
     
-    // 发送API请求
+    // {{ _(\'agent_chat_send\') }}API请求
     try {
         const response = await fetch('/api/chat/send', {
             method: 'POST',
@@ -750,7 +750,7 @@ async function sendMessage() {
             triggerAgentResponse(content);
         }
     } catch (error) {
-        console.error('发送失败:', error);
+        console.error('{{ _(\'agent_chat_send\') }}失败:', error);
     }
 }
 
@@ -897,10 +897,10 @@ function startAgentAutoChat() {
 
 // 设置事件监听
 function setupEventListeners() {
-    // 发送按钮点击
+    // {{ _(\'agent_chat_send\') }}按钮点击
     sendBtn.addEventListener('click', sendMessage);
     
-    // 输入框回车发送
+    // 输入框回车{{ _(\'agent_chat_send\') }}
     messageInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();

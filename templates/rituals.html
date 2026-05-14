@@ -241,7 +241,7 @@
     line-height: 1.8;
 }
 
-/* 抽签样式 */
+/* {{ _(\'draw_fortune\') }}样式 */
 .fortune-card {
     background: white;
     border-radius: 16px;
@@ -374,7 +374,7 @@
 {% block content %}
 <div class="ritual-container">
     <div class="ritual-header">
-        <h1>{{ t('rituals') or '节日仪式' }}</h1>
+        <h1>{{ t('rituals') or '{{ _(\'rituals\') }}' }}</h1>
         <p>{{ t('rituals_desc') or '专属占卜许愿仪式' }}</p>
     </div>
 
@@ -406,17 +406,17 @@
 
     <div class="festival-banner" id="currentFestival">
         <div class="festival-icon" id="festivalIcon">🌕</div>
-        <h2 class="festival-name" id="festivalName">{{ t('full_moon') or '满月' }}</h2>
+        <h2 class="festival-name" id="festivalName">{{ t('full_moon') or '{{ _('full_moon') }}' }}</h2>
         <p class="festival-desc" id="festivalDesc">{{ t('wish_success') or '月光许愿，愿望将被月光守护' }}</p>
     </div>
 
     {% if current_festival == 'full_moon' %}
     <div class="ritual-card" id="wishRitual">
-        <h3 class="ritual-title">🌕 {{ t('make_wish') or '满月许愿' }}</h3>
+        <h3 class="ritual-title">🌕 {{ t('make_wish') or '{{ _('full_moon') }}许愿' }}</h3>
         <div class="wish-form" id="wishForm">
             <textarea class="wish-input" id="wishInput" placeholder="{{ t('wish_placeholder_ritual') or '在此写下你的愿望...' }}"></textarea>
             <button class="btn-wish" onclick="submitWish()">
-                ✨ {{ t('submit_wish') or '提交愿望' }}
+                ✨ {{ t('submit_wish') or '{{ _(\'submit_wish\') }}' }}
             </button>
         </div>
         <div class="wish-result" id="wishResult">
@@ -449,7 +449,7 @@
         <div class="fortune-card">
             <p style="color: #666; margin-bottom: 20px;">新年第一天，来抽一支运势签吧！</p>
             <button class="btn-draw" onclick="drawNewYearFortune()">
-                🎋 {{ t('draw_fortune') or '抽签' }}
+                🎋 {{ t('draw_fortune') or '{{ _(\'draw_fortune\') }}' }}
             </button>
         </div>
         <div class="fortune-result" id="newyearResult">
@@ -461,7 +461,7 @@
     </div>
     {% else %}
     <div class="ritual-card">
-        <h3 class="ritual-title">🎊 {{ t('next_festival') or '下一个节日' }}</h3>
+        <h3 class="ritual-title">🎊 {{ t('next_festival') or '{{ _('next_festival') }}' }}</h3>
         <div class="festival-list" id="festivalList"></div>
     </div>
     {% endif %}
@@ -517,7 +517,7 @@ async function drawLoveFortune() {
         
     } catch (error) {
         console.error('Error:', error);
-        alert('抽签失败，请重试');
+        alert('{{ _(\'draw_fortune\') }}失败，请重试');
     }
 }
 
@@ -535,15 +535,15 @@ async function drawNewYearFortune() {
         
         document.getElementById('fortuneLucky').innerHTML = `
             <div class="lucky-item">
-                <div class="lucky-label">{{ t('lucky_color') or '幸运色' }}</div>
+                <div class="lucky-label">{{ t('lucky_color') or '{{ _(\'lucky_color\') }}' }}</div>
                 <div class="lucky-value">${data.lucky_color}</div>
             </div>
             <div class="lucky-item">
-                <div class="lucky-label">{{ t('lucky_number') or '幸运数字' }}</div>
+                <div class="lucky-label">{{ t('lucky_number') or '{{ _(\'lucky_number\') }}' }}</div>
                 <div class="lucky-value">${data.lucky_number}</div>
             </div>
             <div class="lucky-item">
-                <div class="lucky-label">{{ t('lucky_direction') or '幸运方位' }}</div>
+                <div class="lucky-label">{{ t('lucky_direction') or '{{ _('lucky_direction') }}' }}</div>
                 <div class="lucky-value">${data.lucky_direction}</div>
             </div>
         `;
@@ -553,15 +553,15 @@ async function drawNewYearFortune() {
         
     } catch (error) {
         console.error('Error:', error);
-        alert('抽签失败，请重试');
+        alert('{{ _(\'draw_fortune\') }}失败，请重试');
     }
 }
 
 function shareRitual() {
-    const shareText = '{{ t('ritual_share_text') or '我在灵犀参与了满月许愿仪式✨' }}';
+    const shareText = '{{ t('ritual_share_text') or '我在灵犀参与了{{ _('full_moon') }}许愿仪式✨' }}';
     if (navigator.share) {
         navigator.share({
-            title: '{{ t('rituals') or '节日仪式' }}',
+            title: '{{ t('rituals') or '{{ _(\'rituals\') }}' }}',
             text: shareText,
             url: window.location.href
         });

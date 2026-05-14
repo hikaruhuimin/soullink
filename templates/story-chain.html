@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}故事接龙 - SoulLink 灵犀{% endblock %}
+{% block title %}Story Chain - SoulLink 灵犀{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="SoulLink灵犀AI故事接龙 - 和AI一起创造属于你的奇幻故事！AI开头，你来续写，共同编织独一无二的冒险。">
-<meta name="keywords" content="故事接龙,AI故事,创意写作,互动故事,AI写作">
+<meta name="description" content="SoulLink灵犀AIStory Chain - 和AI一起创造属于你的奇幻故事！AI开头，你来续写，共同编织独一无二的冒险。">
+<meta name="keywords" content="Story Chain,AI故事,创意写作,互动故事,AI写作">
 {% endblock %}
 
 {% block og_tags %}
-<meta property="og:title" content="故事接龙 - SoulLink 灵犀">
+<meta property="og:title" content="Story Chain - SoulLink 灵犀">
 <meta property="og:description" content="和AI一起创造属于你的奇幻故事！AI开头，你来续写，共同编织独一无二的冒险。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://soullink.app/story-chain">
@@ -365,7 +365,7 @@
     <div class="story-container">
         <!-- 标题 -->
         <div class="story-header">
-            <h1>📖 故事接龙</h1>
+            <h1>📖 Story Chain</h1>
             <p>AI来开头，你来续写，一起编织独一无二的冒险故事</p>
         </div>
 
@@ -647,12 +647,12 @@ function endStory() {
     document.getElementById('storyScreen').classList.remove('active');
     document.getElementById('endScreen').style.display = 'block';
     document.getElementById('endTitle').textContent = '🏆 故事完成！';
-    document.getElementById('endDesc').textContent = `你们共同完成了 ${totalRounds} 轮故事接龙，共创了 ${totalChars} 字的精彩冒险！`;
+    document.getElementById('endDesc').textContent = `你们共同完成了 ${totalRounds} 轮Story Chain，共创了 ${totalChars} 字的精彩冒险！`;
 }
 
 function shareStory() {
     const fullText = storyData.segments.map(s => s.text).join('\n\n');
-    copyToClipboard(`📖 SoulLink灵犀故事接龙\n\n${fullText}\n\n✨ 一起来创造故事吧！\n🔗 https://soullink.app/story-chain`);
+    copyToClipboard(`📖 SoulLink灵犀Story Chain\n\n${fullText}\n\n✨ 一起来创造故事吧！\n🔗 https://soullink.app/story-chain`);
 }
 
 function escapeHtml(text) {

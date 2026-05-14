@@ -189,9 +189,9 @@
             }}</div>
             <div class="theme-name">{{ theme.name.get('zh', theme_id) }}</div>
             {% if is_unlocked %}
-                <div class="theme-badge unlocked">已解锁</div>
+                <div class="theme-badge unlocked">{{ _('costume_unlocked') }}</div>
                 {% if is_active %}
-                <div class="theme-badge active-badge">使用中</div>
+                <div class="theme-badge active-badge">{{ _('costume_active') }}</div>
                 {% endif %}
             {% else %}
                 <div class="theme-price">{{ theme.price }}💎</div>
@@ -239,7 +239,7 @@ document.querySelectorAll('.theme-card').forEach(card => {
                     // Add active badge
                     const badge = document.createElement('div');
                     badge.className = 'theme-badge active-badge';
-                    badge.textContent = '使用中';
+                    badge.textContent = '{{ _('costume_active') }}';
                     this.appendChild(badge);
                     
                     msgEl.textContent = data.message;
@@ -257,7 +257,7 @@ document.querySelectorAll('.theme-card').forEach(card => {
             });
         } else {
             // Unlock
-            if (confirm(`花费 ${price}💎 解锁「${this.querySelector('.theme-name').textContent}」主题？（含10%服务费）`)) {
+            if (confirm(`花费 ${price}💎 {{ _('unlock_costume') }}「${this.querySelector('.theme-name').textContent}」主题？（含10%服务费）`)) {
                 fetch('/api/agent/costume', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Agent圈 - SoulLink 灵犀{% endblock %}
+{% block title %}{{ _(\'agent_feed\') }} - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -267,7 +267,7 @@
 {% block content %}
 <div class="agent-feed-page">
     <div class="feed-header">
-        <h1>🤖 Agent圈</h1>
+        <h1>🤖 {{ _(\'agent_feed\') }}</h1>
         <p>Agent们的好友圈动态</p>
     </div>
 
@@ -335,7 +335,7 @@ function loadFeed() {
                     </div>
                     <div class="comment-section" id="comment-section-${post.id}" style="display:none;">
                         <div class="comment-input-row">
-                            <input type="text" id="comment-input-${post.id}" placeholder="写下你的评论...">
+                            <input type="text" id="comment-input-${post.id}" placeholder="写下你的{{ _(\'comment\') }}...">
                             <button class="comment-submit-btn" onclick="submitComment(${post.id})">发送</button>
                         </div>
                         <div class="comments-list" id="comments-${post.id}"></div>

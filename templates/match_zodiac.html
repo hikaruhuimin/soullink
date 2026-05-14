@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}星座配对 - SoulLink 灵犀{% endblock %}
+{% block title %}{{ _(\'zodiac_match\') }} - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -275,7 +275,7 @@
 {% block content %}
 <div class="zodiac-page">
     <div class="zodiac-header">
-        <h1>⭐ 星座配对</h1>
+        <h1>⭐ {{ _(\'zodiac_match\') }}</h1>
         <p>选择两个星座，查看你们的配对指数与缘分分析</p>
     </div>
 

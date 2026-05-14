@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}紫微斗数 - SoulLink 灵犀{% endblock %}
+{% block title %}{{ _(\'ziwei_divination\') }} - SoulLink 灵犀{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="SoulLink灵犀紫微斗数命理分析 - 探索命宫12宫位，AI智能解读人生运势密码。基于出生信息，全面解析命运轨迹。">
-<meta name="keywords" content="紫微斗数,命理,占卜,星盘,命宫,AI命理">
+<meta name="description" content="SoulLink灵犀{{ _(\'ziwei_divination\') }}命理分析 - 探索命宫12宫位，AI智能解读人生运势密码。基于出生信息，全面解析命运轨迹。">
+<meta name="keywords" content="{{ _(\'ziwei_divination\') }},命理,占卜,星盘,命宫,AI命理">
 {% endblock %}
 
 {% block og_tags %}
-<meta property="og:title" content="紫微斗数命理分析 - SoulLink 灵犀">
+<meta property="og:title" content="{{ _(\'ziwei_divination\') }}命理分析 - SoulLink 灵犀">
 <meta property="og:description" content="探索命宫12宫位，AI智能解读人生运势密码。基于出生信息，全面解析命运轨迹。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://soullink.app/divination">
@@ -17,7 +17,7 @@
 
 {% block extra_css %}
 <style>
-/* 紫微斗数专属样式 */
+/* {{ _(\'ziwei_divination\') }}专属样式 */
 .ziwei-page {
     position: relative;
     min-height: 100vh;
@@ -311,8 +311,8 @@ textarea.form-input {
             <div class="header-icon-large">🔮</div>
             <h1 class="header-title">
                 {% if lang == 'en' %}Ziwei Doushu Analysis
-                {% elif lang == 'ja' %}紫微斗数命理分析
-                {% else %}紫微斗数命理分析{% endif %}
+                {% elif lang == 'ja' %}{{ _(\'ziwei_divination\') }}命理分析
+                {% else %}{{ _(\'ziwei_divination\') }}命理分析{% endif %}
             </h1>
             <p class="header-subtitle">
                 {% if lang == 'en' %}Discover your destiny through ancient Chinese metaphysics
@@ -446,7 +446,7 @@ function shareZiweiResult() {
     const resultContent = document.getElementById('resultContent');
     const text = resultContent.textContent || resultContent.innerText;
     
-    let shareText = `🔮 SoulLink灵犀 · 紫微斗数命理分析\n\n`;
+    let shareText = `🔮 SoulLink灵犀 · {{ _(\'ziwei_divination\') }}命理分析\n\n`;
     shareText += `${text.substring(0, 200)}${text.length > 200 ? '...' : ''}\n`;
     shareText += `\n✨ 来SoulLink灵犀探索你的命运密码吧！\n🔗 https://soullink.app/divination`;
     

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}会员中心 - SoulLink 灵犀{% endblock %}
+{% block title %}{{ _(\'membership\') }} - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -429,7 +429,7 @@
 {% block content %}
 <div class="membership-page">
     <div class="membership-header">
-        <h1>👑 会员中心</h1>
+        <h1>👑 {{ _(\'membership\') }}</h1>
         <p>解锁全部特权，开启你的灵犀之旅</p>
         <div class="current-vip-badge {% if current_vip == 0 or current_vip == 'none' %}free{% endif %}">
             <span class="current-vip-icon">

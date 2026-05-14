@@ -354,7 +354,7 @@
     'calm': 'rgba(100, 180, 220, 0.3)'
 }
 
-/* 用户卡片（人类） */
+/* 用户卡片（{{ _('humans') }}） */
 .user-card .card-avatar {
     animation: none;
 }
@@ -449,14 +449,14 @@
 <div class="soulsquare">
     <div class="page-header">
         <h1 class="page-title">✨ 灵犀广场 ✨</h1>
-        <p class="page-desc" style="color: var(--color-text-secondary);">探索灵犀世界，与AI伙伴和有趣的人类相遇</p>
+        <p class="page-desc" style="color: var(--color-text-secondary);">探索灵犀世界，与AI伙伴和有趣的{{ _('humans') }}相遇</p>
     </div>
     
     <!-- Tab切换 -->
     <div class="square-tabs">
         <button class="tab-btn active" data-tab="all">
             <span class="tab-icon">🌟</span>
-            <span>全部</span>
+            <span>{{ _('all') }}</span>
             <span class="tab-count" id="allCount">{{ system_agents|length + user_agents|length + online_users|length }}</span>
         </button>
         <button class="tab-btn" data-tab="agents">
@@ -467,12 +467,12 @@
         
         <button class="tab-btn" data-tab="humans">
             <span class="tab-icon">👤</span>
-            <span>人类</span>
+            <span>{{ _('humans') }}</span>
             <span class="tab-count" id="humansCount">{{ online_users|length }}</span>
         </button>
     </div>
     
-    <!-- 全部 -->
+    <!-- {{ _('all') }} -->
     <div class="tab-content active" id="allTab">
         {% if system_agents %}
         <div class="square-section">
@@ -569,7 +569,7 @@
         {% if online_users %}
         <div class="square-section">
             <div class="section-label">
-                <span>👤 人类</span>
+                <span>👤 {{ _('humans') }}</span>
                 <span class="section-badge badge-online">在线</span>
             </div>
             <div class="cards-grid">
@@ -647,11 +647,11 @@
         </div>
     </div>
     
-    <!-- 人类 -->
+    <!-- {{ _('humans') }} -->
     <div class="tab-content" id="humansTab">
         <div class="square-section">
             <div class="section-label">
-                <span>👤 人类</span>
+                <span>👤 {{ _('humans') }}</span>
                 <span class="section-badge badge-online">在线</span>
             </div>
             <div class="cards-grid" id="humansGrid">
@@ -697,7 +697,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.getElementById(tab + 'Tab').classList.add('active');
         
-        // 如果切换到人类标签，刷新在线用户列表
+        // 如果切换到{{ _('humans') }}标签，刷新在线用户列表
         if (tab === 'humans') {
             fetchOnlineUsers();
         }
@@ -719,7 +719,7 @@ async function fetchOnlineUsers() {
     }
 }
 
-// 更新人类网格
+// 更新{{ _('humans') }}网格
 function updateHumansGrid(users) {
     const grid = document.getElementById('humansGrid');
     const allGrid = document.querySelector('#allTab .square-section:last-child .cards-grid');

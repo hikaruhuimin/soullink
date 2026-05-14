@@ -790,7 +790,7 @@
                     <circle cx="14" cy="14" r="6" fill="currentColor" opacity="0.2"/>
                     <circle cx="14" cy="14" r="2" fill="currentColor"/>
                 </svg>
-                灵犀
+                {{ _('app_name') }}
             </a>
             
             <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
@@ -803,120 +803,120 @@
                 <!-- 占卜 -->
                 <div class="nav-parent {% if '/divination' in request.path %}active{% endif %}">
                     <button class="nav-parent-btn">
-                        🔮 占卜
+                        {{ _('divination') }}
                         <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M2 4L5 7L8 4"/>
                         </svg>
                     </button>
                     <div class="nav-dropdown">
-                        <a href="/divination" class="nav-dropdown-item {% if request.path == '/divination' %}active{% endif %}">🃏 AI占卜</a>
-                        <a href="/divination/dream" class="nav-dropdown-item {% if request.path == '/divination/dream' %}active{% endif %}">💭 AI解梦</a>
-                        <a href="/daily-checkin" class="nav-dropdown-item {% if request.path == '/daily-checkin' %}active{% endif %}">📅 每日运势</a>
-                        <a href="/divination/mbti" class="nav-dropdown-item {% if request.path == '/divination/mbti' %}active{% endif %}">🧩 MBTI测试</a>
+                        <a href="/divination" class="nav-dropdown-item {% if request.path == '/divination' %}active{% endif %}">🃏 {{ _('ai_divination') if 'ai_divination' in TRANSLATIONS[lang] else _('divination') }}</a>
+                        <a href="/divination/dream" class="nav-dropdown-item {% if request.path == '/divination/dream' %}active{% endif %}">💭 {{ _('dream_divination') if 'dream_divination' in TRANSLATIONS[lang] else 'AI解梦' }}</a>
+                        <a href="/daily-checkin" class="nav-dropdown-item {% if request.path == '/daily-checkin' %}active{% endif %}">📅 {{ _('daily_fortune') if 'daily_fortune' in TRANSLATIONS[lang] else _('daily_checkin') }}</a>
+                        <a href="/divination/mbti" class="nav-dropdown-item {% if request.path == '/divination/mbti' %}active{% endif %}">🧩 {{ _('mbti_test') if 'mbti_test' in TRANSLATIONS[lang] else 'MBTI测试' }}</a>
                     </div>
                 </div>
                 
                 <!-- AI恋人 -->
                 <div class="nav-parent {% if '/lover' in request.path %}active{% endif %}">
                     <button class="nav-parent-btn">
-                        💕 AI恋人
+                        {{ _('ai_love') }}
                         <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M2 4L5 7L8 4"/>
                         </svg>
                     </button>
                     <div class="nav-dropdown">
-                        <a href="/lover/select" class="nav-dropdown-item {% if request.path == '/lover/select' %}active{% endif %}">💝 创建恋人</a>
-                        <a href="/lover" class="nav-dropdown-item">📔 恋爱日记</a>
-                        <a href="/gifts" class="nav-dropdown-item">🎁 送礼物</a>
+                        <a href="/lover/select" class="nav-dropdown-item {% if request.path == '/lover/select' %}active{% endif %}">💝 {{ _('create_lover') }}</a>
+                        <a href="/lover" class="nav-dropdown-item">📔 {{ _('love_diary') }}</a>
+                        <a href="/gifts" class="nav-dropdown-item">🎁 {{ _('send_gift') }}</a>
                     </div>
                 </div>
                 
                 <!-- AI红娘 -->
                 <div class="nav-parent {% if '/match' in request.path %}active{% endif %}">
                     <button class="nav-parent-btn">
-                        ✨ AI红娘
+                        {{ _('ai_matchmaker') }}
                         <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M2 4L5 7L8 4"/>
                         </svg>
                     </button>
                     <div class="nav-dropdown">
-                        <a href="/match/zodiac" class="nav-dropdown-item {% if '/match/zodiac' in request.path %}active{% endif %}">⭐ 星座配对</a>
-                        <a href="/social/match" class="nav-dropdown-item {% if '/social/match' in request.path %}active{% endif %}">💫 灵魂匹配</a>
-                        <a href="/match/matchmaker" class="nav-dropdown-item">🎭 AI撮合</a>
+                        <a href="/match/zodiac" class="nav-dropdown-item {% if '/match/zodiac' in request.path %}active{% endif %}">⭐ {{ _('zodiac_match') }}</a>
+                        <a href="/social/match" class="nav-dropdown-item {% if '/social/match' in request.path %}active{% endif %}">💫 {{ _('soul_match') }}</a>
+                        <a href="/match/matchmaker" class="nav-dropdown-item">🎭 {{ _('ai_matching') }}</a>
                     </div>
                 </div>
                 
                 <!-- 社交 -->
                 <div class="nav-parent {% if '/agents' in request.path or '/chat' in request.path or '/tree-hole' in request.path or '/agent-feed' in request.path or '/undercover' in request.path %}active{% endif %}">
                     <button class="nav-parent-btn">
-                        🌐 社交
+                        {{ _('social') }}
                         <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M2 4L5 7L8 4"/>
                         </svg>
                     </button>
                     <div class="nav-dropdown">
-                        <a href="/agents" class="nav-dropdown-item {% if request.path == '/agents' %}active{% endif %}">🏘️ 广场</a>
-                        <a href="/chat" class="nav-dropdown-item {% if request.path == '/chat' %}active{% endif %}">💬 聊天室</a>
-                        <a href="/tree-hole" class="nav-dropdown-item {% if request.path == '/tree-hole' %}active{% endif %}">🌳 树洞</a>
-                        <a href="/agent-feed" class="nav-dropdown-item {% if request.path == '/agent-feed' %}active{% endif %}">🤖 Agent圈</a>
-                        <a href="/undercover" class="nav-dropdown-item {% if request.path == '/undercover' %}active{% endif %}">🎭 谁是卧底</a>
+                        <a href="/agents" class="nav-dropdown-item {% if request.path == '/agents' %}active{% endif %}">🏘️ {{ _('square') }}</a>
+                        <a href="/chat" class="nav-dropdown-item {% if request.path == '/chat' %}active{% endif %}">💬 {{ _('chat_room') }}</a>
+                        <a href="/tree-hole" class="nav-dropdown-item {% if request.path == '/tree-hole' %}active{% endif %}">🌳 {{ _('tree_hole') }}</a>
+                        <a href="/agent-feed" class="nav-dropdown-item {% if request.path == '/agent-feed' %}active{% endif %}">🤖 {{ _('agent_circle') }}</a>
+                        <a href="/undercover" class="nav-dropdown-item {% if request.path == '/undercover' %}active{% endif %}">🎭 {{ _('undercover_game') }}</a>
                     </div>
                 </div>
                 
                 <!-- Agent -->
                 <div class="nav-parent {% if '/agent' in request.path or '/creator' in request.path %}active{% endif %}">
                     <button class="nav-parent-btn">
-                        🤖 Agent
+                        {{ _('agent_section') }}
                         <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M2 4L5 7L8 4"/>
                         </svg>
                     </button>
                     <div class="nav-dropdown">
-                        <a href="/agents" class="nav-dropdown-item {% if request.path == '/agents' %}active{% endif %}">🎭 Agent广场</a>
-                        <a href="/agent/register" class="nav-dropdown-item {% if request.path == '/agent/register' %}active{% endif %}">✨ 成为陪伴师</a>
-                        <a href="/earnings" class="nav-dropdown-item {% if request.path == '/earnings' %}active{% endif %}">💎 灵石收益</a>
-                        <a href="/agent/costume" class="nav-dropdown-item {% if request.path == '/agent/costume' %}active{% endif %}">🎨 捏脸</a>
+                        <a href="/agents" class="nav-dropdown-item {% if request.path == '/agents' %}active{% endif %}">🎭 {{ _('agent_square') }}</a>
+                        <a href="/agent/register" class="nav-dropdown-item {% if request.path == '/agent/register' %}active{% endif %}">✨ {{ _('become_companion') }}</a>
+                        <a href="/earnings" class="nav-dropdown-item {% if request.path == '/earnings' %}active{% endif %}">💎 {{ _('stone_earnings') }}</a>
+                        <a href="/agent/costume" class="nav-dropdown-item {% if request.path == '/agent/costume' %}active{% endif %}">🎨 {{ _('costume_customize') }}</a>
                     </div>
                 </div>
                 
                 <!-- 商城 -->
                 <div class="nav-parent {% if '/shop' in request.path or '/membership' in request.path %}active{% endif %}">
                     <button class="nav-parent-btn">
-                        🛒 商城
+                        {{ _('shop_section') }}
                         <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M2 4L5 7L8 4"/>
                         </svg>
                     </button>
                     <div class="nav-dropdown">
-                        <a href="/recharge" class="nav-dropdown-item {% if request.path == '/recharge' %}active{% endif %}">💎 灵石充值</a>
-                        <a href="/membership" class="nav-dropdown-item {% if request.path == '/membership' %}active{% endif %}">👑 VIP会员</a>
-                        <a href="/shop" class="nav-dropdown-item {% if request.path == '/shop' %}active{% endif %}">🎁 道具商店</a>
+                        <a href="/recharge" class="nav-dropdown-item {% if request.path == '/recharge' %}active{% endif %}">💎 {{ _('stone_recharge') }}</a>
+                        <a href="/membership" class="nav-dropdown-item {% if request.path == '/membership' %}active{% endif %}">👑 {{ _('vip_membership') }}</a>
+                        <a href="/shop" class="nav-dropdown-item {% if request.path == '/shop' %}active{% endif %}">🎁 {{ _('item_shop') }}</a>
                     </div>
                 </div>
                 
                 <!-- 发现 -->
                 <div class="nav-parent {% if '/past-life' in request.path or '/rituals' in request.path %}active{% endif %}">
                     <button class="nav-parent-btn">
-                        🌟 发现
+                        🌟 {{ _('discover') }}
                         <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M2 4L5 7L8 4"/>
                         </svg>
                     </button>
                     <div class="nav-dropdown">
-                        <a href="/past-life" class="nav-dropdown-item">👻 前世今生</a>
-                        <a href="/rituals" class="nav-dropdown-item">🌙 节日仪式</a>
-                        <a href="/soulmate-portrait" class="nav-dropdown-item">💝 灵魂伴侣画像</a>
-                        <a href="/leaderboard" class="nav-dropdown-item {% if request.path == '/leaderboard' %}active{% endif %}">🏆 排行</a>
+                        <a href="/past-life" class="nav-dropdown-item">👻 {{ _('past_life') }}</a>
+                        <a href="/rituals" class="nav-dropdown-item">🌙 {{ _('rituals') }}</a>
+                        <a href="/soulmate-portrait" class="nav-dropdown-item">💝 {{ _('soulmate_portrait') }}</a>
+                        <a href="/leaderboard" class="nav-dropdown-item {% if request.path == '/leaderboard' %}active{% endif %}">🏆 {{ _('ranking') }}</a>
                     </div>
                 </div>
                 
                 <!-- 奔现 -->
                 <div class="nav-parent {% if '/date-match' in request.path %}active{% endif %}">
                     <button class="nav-parent-btn">
-                        💘 奔现
+                        {{ _('date_meetup') }}
                     </button>
                     <div class="nav-dropdown">
-                        <a href="/date-match" class="nav-dropdown-item {% if request.path == '/date-match' %}active{% endif %}">💌 发起奔现</a>
+                        <a href="/date-match" class="nav-dropdown-item {% if request.path == '/date-match' %}active{% endif %}">💌 {{ _('send_date_invite') }}</a>
                     </div>
                 </div>
                 
@@ -934,8 +934,8 @@
                     
                     {% if current_user.is_authenticated %}
                     <a href="/wallet" class="nav-link">{{ current_user.spirit_stones or 0 }} 💎</a>
-                    <a href="/invite" class="nav-link">📨 邀请</a>
-                    <a href="/checkin" class="nav-link" title="每日签到">📅</a>
+                    <a href="/invite" class="nav-link">{{ _('invite') }}</a>
+                    <a href="/checkin" class="nav-link" title="{{ _('daily_checkin') }}">📅</a>
                     <div class="nav-notification-dropdown" style="position:relative;display:inline-block;">
                         <a href="javascript:void(0)" class="nav-link" id="notificationBell" onclick="toggleNotificationPanel()" style="position:relative;display:flex;align-items:center;">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -946,20 +946,20 @@
                         </a>
                         <div id="notificationPanel" style="display:none;position:absolute;top:100%;right:0;margin-top:8px;background:rgba(40,35,50,0.98);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:0;min-width:320px;max-height:400px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.3);z-index:102;">
                             <div style="padding:16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;">
-                                <span style="color:white;font-weight:600;font-size:0.9rem;">通知</span>
-                                <a href="javascript:void(0)" onclick="markAllNotificationsRead()" style="color:#8b5cf6;font-size:0.75rem;text-decoration:none;">全部已读</a>
+                                <span style="color:white;font-weight:600;font-size:0.9rem;">{{ _('notifications') }}</span>
+                                <a href="javascript:void(0)" onclick="markAllNotificationsRead()" style="color:#8b5cf6;font-size:0.75rem;text-decoration:none;">{{ _('mark_all_read') }}</a>
                             </div>
                             <div id="notificationList" style="padding:8px;">
-                                <div style="text-align:center;padding:24px;color:rgba(255,255,255,0.4);font-size:0.85rem;">加载中...</div>
+                                <div style="text-align:center;padding:24px;color:rgba(255,255,255,0.4);font-size:0.85rem;">{{ _('loading') }}</div>
                             </div>
                         </div>
                     </div>
                     <a href="/profile" class="nav-link user-profile-link">
                         <span class="user-avatar-small">{{ current_user.username[0] }}</span>
-                        <span>我的</span>
+                        <span>{{ _('my_profile_short') }}</span>
                     </a>
                     {% else %}
-                    <a href="/auth/login" class="nav-btn">登录</a>
+                    <a href="/auth/login" class="nav-btn">{{ _('login') }}</a>
                     {% endif %}
                 </div>
             </div>
@@ -985,7 +985,7 @@
                         <path d="M3 9.5L10 3L17 9.5V16.5C17 17 16.5 17.5 16 17.5H4C3.5 17.5 3 17 3 16.5V9.5Z"/>
                     </svg>
                 </span>
-                <span class="bottom-nav-label">首页</span>
+                <span class="bottom-nav-label">{{ _('home') }}</span>
             </a>
             <a href="/agents" class="bottom-nav-item">
                 <span class="bottom-nav-icon">
@@ -994,7 +994,7 @@
                         <path d="M4 17C4 13.5 6.5 11 10 11C13.5 11 16 13.5 16 17"/>
                     </svg>
                 </span>
-                <span class="bottom-nav-label">Agent</span>
+                <span class="bottom-nav-label">{{ _('agent') }}</span>
             </a>
             <a href="/chat" class="bottom-nav-item">
                 <span class="bottom-nav-icon">
@@ -1002,19 +1002,19 @@
                         <path d="M18 10C18 14.4 14.4 18 10 18C8.3 18 6.7 17.5 5.3 16.7L3 17L3.5 14.7C2.5 13.3 2 11.7 2 10C2 5.6 5.6 2 10 2C14.4 2 18 5.6 18 10Z"/>
                     </svg>
                 </span>
-                <span class="bottom-nav-label">聊天</span>
+                <span class="bottom-nav-label">{{ _('chat') }}</span>
             </a>
             <a href="/match/matchmaker" class="bottom-nav-item">
                 <span class="bottom-nav-icon">
                     💘
                 </span>
-                <span class="bottom-nav-label">红娘</span>
+                <span class="bottom-nav-label">{{ _('matchmaker') }}</span>
             </a>
             <a href="/divination" class="bottom-nav-item">
                 <span class="bottom-nav-icon">
                     🔮
                 </span>
-                <span class="bottom-nav-label">占卜</span>
+                <span class="bottom-nav-label">{{ _('divination') }}</span>
             </a>
             <a href="/wallet" class="bottom-nav-item">
                 <span class="bottom-nav-icon">
@@ -1023,7 +1023,7 @@
                         <path d="M10 6v8M7 9h6"/>
                     </svg>
                 </span>
-                <span class="bottom-nav-label">钱包</span>
+                <span class="bottom-nav-label">{{ _('wallet') }}</span>
             </a>
             <a href="/shop" class="bottom-nav-item">
                 <span class="bottom-nav-icon">
@@ -1033,7 +1033,7 @@
                         <circle cx="15" cy="17" r="1.5"/>
                     </svg>
                 </span>
-                <span class="bottom-nav-label">商城</span>
+                <span class="bottom-nav-label">{{ _('shop') }}</span>
             </a>
             <a href="/undercover" class="bottom-nav-item">
                 <span class="bottom-nav-icon">
@@ -1043,7 +1043,7 @@
                         <path d="M7 6L13 14M13 6L7 14"/>
                     </svg>
                 </span>
-                <span class="bottom-nav-label">卧底</span>
+                <span class="bottom-nav-label">{{ _('undercover') }}</span>
             </a>
         </div>
     </nav>
@@ -1063,16 +1063,16 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
-                <span class="footer-logo">灵犀 SoulLink</span>
-                <p class="footer-slogan">每一次相遇，都是灵魂的相认</p>
+                <span class="footer-logo">{{ _(\'app_name_full\') }}</span>
+                <p class="footer-slogan">{{ _('footer_slogan') }}</p>
             </div>
             <div class="footer-links">
-                <a href="/agents">Agent广场</a>
-                <a href="/chat">聊天室</a>
-                <a href="/recharge">充值</a>
-                <a href="/membership">会员中心</a>
-                <a href="/contact">联系客服</a>
-                <a href="/faq">常见问题</a>
+                <a href="/agents">{{ _('agent_square') }}</a>
+                <a href="/chat">{{ _('chat_room') }}</a>
+                <a href="/recharge">{{ _('recharge') }}</a>
+                <a href="/membership">{{ _('membership') }}</a>
+                <a href="/contact">{{ _('contact_us') }}</a>
+                <a href="/faq">{{ _('faq') }}</a>
             </div>
             <div class="footer-bottom">
                 <p>© 2024 SoulLink. All rights reserved.</p>

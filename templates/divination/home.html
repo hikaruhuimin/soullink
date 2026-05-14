@@ -3,13 +3,13 @@
 {% block title %}{{ _('divination') }} - 灵犀{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="SoulLink灵犀AI占卜平台 - 提供塔罗占卜、星座分析、八字命理、紫微斗数、易经六爻、おみくじ、MBTI测试等多种占卜服务。AI智能解读，探索你的命运密码。">
-<meta name="keywords" content="AI占卜,塔罗牌,星座,八字,命理,紫微斗数,易经,占卜,灵犀">
+<meta name="description" content="SoulLink灵犀{{ _(\'divination\') }}平台 - 提供塔罗占卜、星座分析、八字命理、紫微斗数、易经六爻、おみくじ、MBTI测试等多种占卜服务。AI智能解读，探索你的命运密码。">
+<meta name="keywords" content="{{ _(\'divination\') }},塔罗牌,星座,八字,命理,紫微斗数,易经,占卜,灵犀">
 {% endblock %}
 
 {% block og_tags %}
-<meta property="og:title" content="AI占卜 - SoulLink 灵犀">
-<meta property="og:description" content="AI智能占卜平台，提供塔罗、星座、八字、紫微斗数等多种占卜服务，探索你的命运密码。">
+<meta property="og:title" content="{{ _(\'divination\') }} - SoulLink 灵犀">
+<meta property="og:description" content="{{ _(\'divination\') }}平台，提供塔罗、星座、八字、紫微斗数等多种占卜服务，探索你的命运密码。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://soullink.app/divination">
 <meta property="og:image" content="https://soullink.app/static/images/og-image.png">
@@ -1452,13 +1452,13 @@ body::before {
         <circle cx="47" cy="68" r="1.5" fill="white" opacity="0.4"/>
     </svg>
 </span>
-            <h1>AI智能占卜</h1>
+            <h1>{{ _(\'divination\') }}</h1>
             <p>探索你的命运，解锁未来秘密</p>
         </div>
     </div>
 
     <div class="divination-types">
-        <h3 class="section-title"><span class="icon">🎴</span>选择占卜类型</h3>
+        <h3 class="section-title"><span class="icon">🎴</span>{{ _(\'select_divination_type\') }}</h3>
         <div class="type-grid">
             {% for type in divination_types %}
             <div class="type-card" ontouchend="event.preventDefault();selectType('{{ type.id }}')" onclick="selectType('{{ type.id }}')" data-type="{{ type.id }}">
@@ -1555,7 +1555,7 @@ body::before {
     </div>
 
     <div class="fortune-tellers">
-        <h3 class="section-title"><span class="icon">👤</span>AI占卜师</h3>
+        <h3 class="section-title"><span class="icon">👤</span>{{ _(\'divination\') }}师</h3>
         <div class="tellers-scroll">
             {% for teller in fortune_tellers %}
             <button class="teller-card" type="button" ontouchend="event.preventDefault();selectTeller('{{ teller.id }}')" onclick="selectTeller('{{ teller.id }}')" data-teller="{{ teller.id }}">
@@ -2370,7 +2370,7 @@ const mysticalHistoryData = {
             },
             {
                 subtitle: '🤖 AI与性格分析的未来',
-                content: '传统MBTI需要受试者回答数十道选择题，而AI可以通过分析一个人的语言模式、社交媒体动态、甚至打字速度来推断其性格特征。\n\n据说，心理学家已经开始使用机器学习算法来提高性格预测的准确性。未来的AI占卜师或许能通过你与它的对话，瞬间"看透"你的性格特点，给你量身定制的人生建议。但问题是：性格是固定的吗？还是会随着时间和经历而改变？'
+                content: '传统MBTI需要受试者回答数十道选择题，而AI可以通过分析一个人的语言模式、社交媒体动态、甚至打字速度来推断其性格特征。\n\n据说，心理学家已经开始使用机器学习算法来提高性格预测的准确性。未来的{{ _(\'divination\') }}师或许能通过你与它的对话，瞬间"看透"你的性格特点，给你量身定制的人生建议。但问题是：性格是固定的吗？还是会随着时间和经历而改变？'
             }
         ]
     }
