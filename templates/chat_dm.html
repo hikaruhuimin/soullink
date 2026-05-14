@@ -1,0 +1,633 @@
+{% extends "base.html" %}
+
+{% block title %}对话 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.chat-room {
+    max-width: 1000px;
+    margin: 0 auto;
+    height: calc(100vh - 72px);
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
+}
+
+.chat-room.dark-theme {
+    background: #151a24;
+}
+
+.dark-theme .room-header {
+    background: #1a2030;
+    border-bottom-color: #2a3548;
+}
+
+.dark-theme .room-header .room-title,
+.dark-theme .room-header .room-agents {
+    color: #e0e0e0;
+}
+
+.dark-theme .message-input-area {
+    background: #1a2030;
+    border-top-color: #2a3548;
+}
+
+.dark-theme .message-input {
+    background: #252d3d;
+    border-color: #3a4558;
+    color: #e0e0e0;
+}
+
+.dark-theme .message-text {
+    color: #c0c0c0;
+}
+
+.room-header {
+    padding: var(--space-lg) var(--space-xl);
+    background: var(--color-bg-card);
+    border-bottom: 1px solid var(--color-border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+.room-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.room-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: var(--agent-color, var(--color-bg-cream));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.room-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.room-agents {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+.room-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.back-link:hover {
+    color: var(--color-primary);
+}
+
+/* Agent avatar in header */
+.agent-header-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--color-border-light);
+    flex-shrink: 0;
+}
+
+.agent-header-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Messages */
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.message {
+    display: flex;
+    gap: var(--space-md);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user-message {
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: white;
+    flex-shrink: 0;
+    background: var(--avatar-bg, var(--color-primary));
+    overflow: hidden;
+}
+
+.message-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.message.user-message .message-avatar {
+    background: var(--color-accent);
+}
+
+.message-content {
+    max-width: 70%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.message.user-message .message-content {
+    align-items: flex-end;
+}
+
+.message-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.message.user-message .message-name {
+    display: none;
+}
+
+.message-bubble {
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    word-break: break-word;
+    background: var(--color-bg-card);
+    color: var(--color-text-secondary);
+    border-bottom-left-radius: 4px;
+}
+
+.dark-theme .message-bubble {
+    background: #252d3d;
+    color: #c0c0c0;
+}
+
+.message.user-message .message-bubble {
+    background: var(--color-primary);
+    color: white;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 4px;
+}
+
+.message.agent-message .message-bubble {
+    background: linear-gradient(135deg, var(--agent-color, #6B5B7B) 0%, var(--agent-color-dark, #5B4B6B) 100%);
+    color: white;
+}
+
+.message-time {
+    font-size: 0.6875rem;
+    color: var(--color-text-light);
+    padding: 0 4px;
+}
+
+.dark-theme .message-time {
+    color: #666;
+}
+
+.message.system-message {
+    justify-content: center;
+}
+
+.message.system-message .message-bubble {
+    background: transparent;
+    color: var(--color-text-light);
+    font-size: 0.8125rem;
+    padding: 4px 16px;
+}
+
+.message.system-message .message-avatar {
+    display: none;
+}
+
+/* Input area */
+.message-input-area {
+    padding: var(--space-lg) var(--space-xl);
+    background: var(--color-bg-card);
+    border-top: 1px solid var(--color-border-light);
+}
+
+.dark-theme .message-input-area {
+    background: #1a2030;
+    border-top-color: #2a3548;
+}
+
+.message-input-wrapper {
+    display: flex;
+    gap: var(--space-md);
+    align-items: flex-end;
+}
+
+.message-input {
+    flex: 1;
+    padding: 14px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: 0.9375rem;
+    resize: none;
+    font-family: inherit;
+    background: var(--color-bg);
+    color: var(--color-text);
+    transition: all var(--transition-fast);
+}
+
+.dark-theme .message-input {
+    background: #252d3d;
+    border-color: #3a4558;
+    color: #e0e0e0;
+}
+
+.message-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(107, 91, 123, 0.1);
+}
+
+.dark-theme .message-input:focus {
+    border-color: #6B5B7B;
+}
+
+.send-btn {
+    padding: 14px 24px;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.send-btn:hover {
+    background: var(--color-primary-light);
+    transform: translateY(-1px);
+}
+
+.send-btn:active {
+    transform: translateY(0);
+}
+
+.send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Voice button */
+.voice-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    opacity: 0.6;
+    line-height: 1;
+}
+
+.voice-btn:hover {
+    opacity: 1;
+    transform: scale(1.15);
+    background: rgba(255,255,255,0.1);
+}
+
+.agent-message .voice-btn {
+    color: #fff;
+}
+
+/* Empty state */
+.empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    color: var(--color-text-muted);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    opacity: 0.5;
+}
+
+.empty-state-text {
+    font-size: 1rem;
+}
+
+/* Scrollbar */
+.messages-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+}
+
+.dark-theme .messages-container::-webkit-scrollbar-thumb {
+    background: #3a4558;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .room-header {
+        padding: var(--space-md) var(--space-lg);
+    }
+    .messages-container {
+        padding: var(--space-lg);
+    }
+    .message-content {
+        max-width: 85%;
+    }
+    .message-input-area {
+        padding: var(--space-md) var(--space-lg);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-room" id="chatRoom" style="--agent-color: {{ agent_color or '#6B5B7B' }}; --agent-color-dark: {{ agent_color_dark or '#5B4B6B' }}">
+    <!-- Header -->
+    <div class="room-header">
+        <div class="room-header-left">
+            <a href="{{ url_for('agents_square') if not request.referrer else request.referrer }}" class="back-link">
+                <span>←</span>
+                <span class="back-text">{% if lang == 'en' %}Back{% elif lang == 'ja' %}戻る{% else %}返回{% endif %}</span>
+            </a>
+            {% if agent %}
+            <div class="agent-header-avatar">
+                <img src="{{ agent.avatar }}" alt="{{ agent_name }}" onerror="this.style.display='none'">
+            </div>
+            <div>
+                <h1 class="room-title">{{ agent_name }}</h1>
+                <div class="room-agents">
+                    {% if lang == 'en' %}Online{% elif lang == 'ja' %}オンライン{% else %}在线{% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-container" id="messagesContainer">
+        <div class="empty-state">
+            <div class="empty-state-icon">💬</div>
+            <div class="empty-state-text">
+                {% if lang == 'en' %}Start a conversation with {{ agent_name }}{% elif lang == 'ja' %}{{ agent_name }}との会話を始めましょう{% else %}开始与{{ agent_name }}对话{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Input -->
+    <div class="message-input-area">
+        <div class="message-input-wrapper">
+            <textarea
+                class="message-input"
+                id="messageInput"
+                placeholder="{% if lang == 'en' %}Type a message... (Enter to send, Shift+Enter for new line){% elif lang == 'ja' %}メッセージを入力... (Enterで送信、Shift+Enterで改行){% else %}输入消息... (Enter发送, Shift+Enter换行){% endif %}"
+                rows="1"
+            ></textarea>
+            <button class="send-btn" id="sendBtn">
+                <span>{% if lang == 'en' %}Send{% elif lang == 'ja' %}送信{% else %}发送{% endif %}</span>
+                <span>→</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const AGENT_ID = '{{ agent_id }}';
+const AGENT_NAME = '{{ agent_name }}';
+const LANG = '{{ lang }}';
+
+const messagesContainer = document.getElementById('messagesContainer');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+
+// Load messages
+async function loadMessages() {
+    try {
+        const response = await fetch('/api/chat/dm/' + AGENT_ID + '/messages');
+        const data = await response.json();
+
+        messagesContainer.innerHTML = '';
+
+        if (data.messages && data.messages.length > 0) {
+            data.messages.forEach(function(msg) {
+                appendMessage(msg, false);
+            });
+        } else {
+            appendSystemMessage(getWelcomeText());
+        }
+
+        scrollToBottom();
+    } catch (error) {
+        console.error('Failed to load messages:', error);
+        messagesContainer.innerHTML =
+            '<div class="empty-state"><div class="empty-state-icon">💬</div><div class="empty-state-text">' +
+            (LANG === 'en' ? 'Connecting...' : LANG === 'ja' ? '接続中...' : '连接中...') +
+            '</div></div>';
+    }
+}
+
+function getWelcomeText() {
+    if (LANG === 'en') return 'Start chatting with ' + AGENT_NAME + '!';
+    if (LANG === 'ja') return AGENT_NAME + 'との会話を始めましょう！';
+    return '开始与' + AGENT_NAME + '聊天吧~';
+}
+
+// Send message
+async function sendMessage() {
+    var content = messageInput.value.trim();
+    if (!content) return;
+
+    messageInput.value = '';
+    messageInput.style.height = 'auto';
+
+    try {
+        var response = await fetch('/api/chat/dm/' + AGENT_ID + '/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: content })
+        });
+
+        var data = await response.json();
+
+        if (data.success) {
+            appendMessage(data.message, false);
+            scrollToBottom();
+            triggerAgentReply(content);
+        }
+    } catch (error) {
+        console.error('Send failed:', error);
+    }
+}
+
+// Trigger agent reply
+function triggerAgentReply(userMessage) {
+    var delay = 1000 + Math.random() * 3000;
+    setTimeout(function() {
+        fetch('/api/chat/dm/' + AGENT_ID + '/reply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: userMessage })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.message) {
+                appendMessage(data.message, true);
+                scrollToBottom();
+            }
+        })
+        .catch(function(e) {
+            console.error('Agent reply failed:', e);
+        });
+    }, delay);
+}
+
+// Append message
+function appendMessage(msg, isNew) {
+    var isUser = !msg.is_agent;
+    var agentId = msg.agent_id || '';
+    var shortName = isUser ? '{{ "我" if lang != "en" and lang != "ja" else ("Me" if lang == "en" else "私") }}' : AGENT_NAME[0];
+
+    var messageEl = document.createElement('div');
+    messageEl.className = 'message ' + (isUser ? 'user-message' : 'agent-message');
+    messageEl.dataset.agentId = agentId;
+
+    var nameHtml = !isUser ? '<span class="message-name">' + escapeHtml(msg.username || AGENT_NAME) + '</span>' : '';
+
+    var avatarHtml = !isUser
+        ? '<div class="message-avatar" style="background:#6B5B7B;color:white;overflow:hidden"><img src="{{ agent.avatar if agent else "" }}" alt="" style="width:100%;height:100%;object-fit:cover"></div>'
+        : '<div class="message-avatar" style="background:var(--color-accent);color:white">' + shortName + '</div>';
+
+    var voiceBtnHtml = !isUser
+        ? '<button class="voice-btn" onclick="playVoice(\'' + AGENT_ID + '\', \'' + escapeHtml(msg.content).replace(/'/g, "\\'") + '\', \'' + LANG + '\')" title="Play voice">🔊</button>'
+        : '';
+
+    messageEl.innerHTML =
+        avatarHtml +
+        '<div class="message-content">' +
+        nameHtml +
+        '<div class="message-bubble">' + escapeHtml(msg.content) + '</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;margin-top:4px">' +
+        '<span class="message-time">' + (msg.created_at || new Date().toLocaleTimeString()) + '</span>' +
+        voiceBtnHtml +
+        '</div>' +
+        '</div>';
+
+    messagesContainer.appendChild(messageEl);
+}
+
+// Append system message
+function appendSystemMessage(content) {
+    var messageEl = document.createElement('div');
+    messageEl.className = 'message system-message';
+    messageEl.innerHTML =
+        '<div class="message-content"><div class="message-bubble">' + content + '</div></div>';
+    messagesContainer.appendChild(messageEl);
+}
+
+// Scroll to bottom
+function scrollToBottom() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Escape HTML
+function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Voice playback
+function playVoice(agentId, text, lang) {
+    fetch('/api/tts/demo/' + agentId + '?lang=' + (lang || 'zh'))
+        .then(function(r) {
+            if (!r.ok) throw new Error('TTS unavailable');
+            return r.json();
+        })
+        .then(function(data) {
+            if (data.audio_url) {
+                var audio = new Audio(data.audio_url);
+                audio.play().catch(function(e) { console.error('Audio play failed:', e); });
+            }
+        })
+        .catch(function(e) {
+            console.error('Voice playback failed:', e);
+        });
+}
+
+// Event listeners
+sendBtn.addEventListener('click', sendMessage);
+
+messageInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+messageInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    loadMessages();
+});
+</script>
+{% endblock %}

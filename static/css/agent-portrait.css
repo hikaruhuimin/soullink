@@ -1,0 +1,86 @@
+/* Agent Portrait Component */
+.agent-portrait {
+    --portrait-size: 80px;
+    --glow-size: 20px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--portrait-size);
+    height: var(--portrait-size);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.agent-portrait .portrait-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: var(--color-bg-card, #2a2a3a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.agent-portrait .portrait-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.agent-portrait .portrait-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.agent-portrait .portrait-glow {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(var(--portrait-size) + var(--glow-size));
+    height: calc(var(--glow-size) / 2);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(107, 91, 123, 0.3) 0%, transparent 70%);
+    filter: blur(8px);
+    pointer-events: none;
+    animation: glowPulse 3s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+}
+
+.agent-portrait .portrait-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+@keyframes particleFade {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-30px) scale(0); }
+}
+
+/* Size variants */
+.agent-portrait.size-tiny { --portrait-size: 36px; --glow-size: 8px; }
+.agent-portrait.size-small { --portrait-size: 48px; --glow-size: 12px; }
+.agent-portrait.size-medium { --portrait-size: 80px; --glow-size: 20px; }
+.agent-portrait.size-large { --portrait-size: 120px; --glow-size: 30px; }
+.agent-portrait.size-xl { --portrait-size: 160px; --glow-size: 40px; }

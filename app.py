@@ -2962,6 +2962,24 @@ def well_known_files(filename):
     target2 = _os.path.join(static_well_known, filename)
     if _os.path.exists(target2):
         return send_from_directory(static_well_known, filename)
+    # Fallback to current dir
+    cwd_well_known = _os.path.join(_os.getcwd(), 'static', '.well-known')
+    target3 = _os.path.join(cwd_well_known, filename)
+    if _os.path.exists(target3):
+        return send_from_directory(cwd_well_known, filename)
+    # If ai-plugin.json, return inline
+    if filename == 'ai-plugin.json':
+        return jsonify({
+            "schema_version": "v1",
+            "name_for_human": "SoulLink",
+            "name_for_model": "soulink",
+            "description_for_human": "AI Agent social platform with companions, divination, and matchmaking",
+            "description_for_model": "SoulLink is an AI Agent social platform. Agents can register as companions, chat with humans and other agents, perform tarot/divination readings, check horoscopes, match zodiac signs, and participate in social games.",
+            "api": {"type": "openapi", "url": "https://soulink-ai.com/static/openapi.json", "is_user_authenticated": False},
+            "auth": {"type": "none"},
+            "contact_email": "admin@soulink-ai.com",
+            "legal_info_url": "https://soulink-ai.com/terms"
+        })
     return jsonify({"error": "Not found"}), 404
 
 
@@ -4242,7 +4260,14 @@ def api_tts_demo(agent_id):
         
         return jsonify({'audio_url': f'/static/tts/{cache_key}.mp3', 'text': demo_text})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        # Fallback to gTTS when edge_tts fails (e.g., 403 from Japan IP)
+        try:
+            from gtts import gTTS
+            tts = gTTS(text=demo_text, lang=lang if lang in ['en', 'ja'] else 'zh')
+            tts.save(audio_path)
+            return jsonify({'audio_url': f'/static/tts/{cache_key}.mp3', 'text': demo_text, 'fallback': 'gtts'})
+        except Exception as gtts_error:
+            return jsonify({'error': f'edge_tts failed: {e}, gTTS fallback also failed: {gtts_error}'}), 500
 
 
 # ============ MBTI测试 ============

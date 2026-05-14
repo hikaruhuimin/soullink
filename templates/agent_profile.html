@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ current_agent.name.zh }} - SoulLink 灵犀{% endblock %}
+{% block title %}{{ current_agent.name.get(lang, current_agent.name.zh) }} - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -556,7 +556,7 @@
                      data-avatar="{{ current_agent.avatar }}"
                      data-mood="{{ current_agent.mood if current_agent.mood else 'happy' }}">
                     <div class="portrait-frame">
-                        <img src="{{ current_agent.avatar }}" alt="{{ current_agent.name.zh }}" class="portrait-img" onerror="this.onerror=null; this.src='/static/agents/default_avatar.svg';">
+                        <img src="{{ current_agent.avatar }}" alt="{{ current_agent.name.get(lang, current_agent.name.zh) }}" class="portrait-img" onerror="this.onerror=null; this.src='/static/agents/default_avatar.svg';">
                         <div class="portrait-overlay"></div>
                         <div class="portrait-particles"></div>
                         <div class="portrait-glow"></div>
@@ -577,10 +577,10 @@
                 <div class="agent-mbti-badge">
                     <span>{{ current_agent.mbti }}</span>
                     <span>|</span>
-                    <span>{{ current_agent.personality.zh }}</span>
+                    <span>{{ current_agent.personality.get(lang, current_agent.personality.zh) }}</span>
                 </div>
-                <h1 class="agent-name-display">{{ current_agent.name.zh }}</h1>
-                <p class="agent-personality-display">{{ current_agent.description.zh }}</p>
+                <h1 class="agent-name-display">{{ current_agent.name.get(lang, current_agent.name.zh) }}</h1>
+                <p class="agent-personality-display">{{ current_agent.description.get(lang, current_agent.description.zh) }}</p>
             </div>
             
             <div class="info-cards">
@@ -606,7 +606,7 @@
                         <span class="info-card-title">背景故事</span>
                     </div>
                     <div class="info-card-content">
-                        <p>{{ current_agent.backstory or (current_agent.name.zh + '是一位来自灵犀世界的独特存在，拥有着温暖人心的力量。' + (current_agent.personality.zh if current_agent.personality else '')) }}</p>
+                        <p>{{ current_agent.backstory or (current_agent.name.get(lang, current_agent.name.zh) + '是一位来自灵犀世界的独特存在，拥有着温暖人心的力量。' + (current_agent.personality.get(lang, current_agent.personality.zh) if current_agent.personality else '')) }}</p>
                     </div>
                 </div>
                 
@@ -635,7 +635,7 @@
                         <span class="info-card-title">性格特点</span>
                     </div>
                     <div class="info-card-content">
-                        <p>{{ current_agent.personality.zh if current_agent.personality else '温柔陪伴' }}</p>
+                        <p>{{ current_agent.personality.get(lang, current_agent.personality.zh) if current_agent.personality else '温柔陪伴' }}</p>
                     </div>
                 </div>
                 
@@ -646,7 +646,7 @@
                         <span class="info-card-title">经典台词</span>
                     </div>
                     <div class="info-card-content">
-                        <p>"{{ current_agent.demo_text.zh if current_agent.demo_text else '很高兴遇见你' }}"</p>
+                        <p>\"{{ current_agent.demo_text.get(lang, current_agent.demo_text.zh) if current_agent.demo_text else '很高兴遇见你' }}\"</p>
                     </div>
                 </div>
             </div>
@@ -682,7 +682,7 @@
         <div class="login-modal-header">
             <div class="login-modal-icon">💕</div>
             <h2 class="login-modal-title">欢迎来到灵犀</h2>
-            <p class="login-modal-subtitle" id="loginModalSubtitle">登录后即可与{{ current_agent.name.zh }}畅聊</p>
+            <p class="login-modal-subtitle" id="loginModalSubtitle">登录后即可与{{ current_agent.name.get(lang, current_agent.name.zh) }}畅聊</p>
         </div>
         
         <div class="login-modal-body">
@@ -744,7 +744,7 @@
                 <div class="login-success">
                     <div class="login-success-icon">🎉</div>
                     <p class="login-success-text">登录成功！正在跳转...</p>
-                    <p class="login-redirect">即将带你进入与{{ current_agent.name.zh }}的对话</p>
+                    <p class="login-redirect">即将带你进入与{{ current_agent.name.get(lang, current_agent.name.zh) }}的对话</p>
                 </div>
             </div>
         </div>
@@ -801,7 +801,7 @@ const moodZhMap = {
 // 当前Agent信息
 const currentAgent = {
     id: '{{ current_agent.id }}',
-    name: '{{ current_agent.name.zh }}'
+    name: '{{ current_agent.name.get(lang, current_agent.name.zh) }}'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
