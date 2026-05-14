@@ -3,7 +3,7 @@
  * Web Push notifications + PWA offline support
  */
 
-const CACHE_NAME = 'soullink-v1';
+const CACHE_NAME = 'soullink-v2';
 const STATIC_ASSETS = [
   '/',
   '/static/css/variables.css',
@@ -37,11 +37,23 @@ self.addEventListener('activate', event => {
 
 // ============ Fetch: Serve from cache, fallback to network ============
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      return cached || fetch(event.request);
-    })
-  );
+  // For HTML pages, always try network first (fresh content)
+  if (event.request.mode === 'navigate' || 
+      (event.request.headers.get('Accept') || '').includes('text/html')) {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        return response;
+      }).catch(() => caches.match(event.request))
+    );
+  } else {
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        return cached || fetch(event.request);
+      })
+    );
+  }
 });
 
 // ============ Push: Show notification ============
