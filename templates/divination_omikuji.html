@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _(\'omikuji_divination\') }} - SoulLink 灵犀{% endblock %}
+{% block title %}{{ _('omikuji_divination') }} - SoulLink 灵犀{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="SoulLink灵犀{{ _(\'omikuji_divination\') }}占卜 - 日本神社风格电子御神签，抽取你的运势签文。AI智能解读，指引你的未来方向。">
-<meta name="keywords" content="{{ _(\'omikuji_divination\') }},御神签,运势,抽签,占卜,日本占卜">
+<meta name="description" content="SoulLink灵犀{{ _('omikuji_divination') }}占卜 - 日本神社风格电子御神签，抽取你的运势签文。AI智能解读，指引你的未来方向。">
+<meta name="keywords" content="{{ _('omikuji_divination') }},御神签,运势,抽签,占卜,日本占卜">
 {% endblock %}
 
 {% block og_tags %}
-<meta property="og:title" content="{{ _(\'omikuji_divination\') }} - SoulLink 灵犀">
+<meta property="og:title" content="{{ _('omikuji_divination') }} - SoulLink 灵犀">
 <meta property="og:description" content="日本神社风格电子御神签，抽取你的运势签文。AI智能解读，指引你的未来方向。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://soullink.app/divination">
@@ -17,7 +17,7 @@
 
 {% block extra_css %}
 <style>
-/* {{ _(\'omikuji_divination\') }}专属样式 */
+/* {{ _('omikuji_divination') }}专属样式 */
 .omikuji-page {
     position: relative;
     min-height: 100vh;
@@ -369,7 +369,7 @@
         
         <!-- 神社区域 -->
         <div class="omikuji-container">
-            <h1 class="shrine-title">{{ _(\'omikuji_divination\') }}</h1>
+            <h1 class="shrine-title">{{ _('omikuji_divination') }}</h1>
             <p class="shrine-subtitle">
                 {% if lang == 'en' %}Draw your fortune at the shrine
                 {% elif lang == 'ja' %}神社であなたの運勢を引いてください
@@ -381,7 +381,7 @@
                 <span class="draw-btn-icon">🎍</span>
                 <span class="draw-btn-text">
                     {% if lang == 'en' %}Draw Omikuji
-                    {% elif lang == 'ja' %}{{ _(\'omikuji_divination\') }}を引く
+                    {% elif lang == 'ja' %}{{ _('omikuji_divination') }}を引く
                     {% else %}{{ _('omikuji_draw') }}{% endif %}
                 </span>
             </button>
@@ -479,7 +479,7 @@ document.getElementById('drawBtn').addEventListener('click', async function() {
     }
     
     btn.disabled = false;
-    btn.innerHTML = '<span class="draw-btn-icon">🎍</span><span class="draw-btn-text">{% if lang == "en" %}Draw Omikuji{% elif lang == "ja" %}{{ _(\'omikuji_divination\') }}を引く{% else %}{{ _('omikuji_draw') }}{% endif %}</span>';
+    btn.innerHTML = '<span class="draw-btn-icon">🎍</span><span class="draw-btn-text">{% if lang == "en" %}Draw Omikuji{% elif lang == "ja" %}{{ _('omikuji_divination') }}を引く{% else %}{{ _('omikuji_draw') }}{% endif %}</span>';
 });
 
 // 显示签运
@@ -598,7 +598,7 @@ function shareOmikujiResult() {
     const lang = '{{ lang }}';
     const fortune = currentFortune['fortune_' + (lang === 'en' ? 'en' : lang === 'ja' ? 'ja' : 'zh')] || currentFortune.fortune_zh;
     
-    let shareText = `🔮 SoulLink灵犀 · {{ _(\'omikuji_divination\') }}占卜结果\n\n`;
+    let shareText = `🔮 SoulLink灵犀 · {{ _('omikuji_divination') }}占卜结果\n\n`;
     shareText += `🏷️ 签运：${currentFortune.type} ${currentFortune.type_info.emoji}\n`;
     if (fortune && fortune.overall) {
         shareText += `📜 整体运势：${fortune.overall}\n`;

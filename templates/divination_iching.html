@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _(\'iching_divination\') }} - SoulLink 灵犀{% endblock %}
+{% block title %}{{ _('iching_divination') }} - SoulLink 灵犀{% endblock %}
 
 {% block meta_description %}
-<meta name="description" content="SoulLink灵犀{{ _(\'iching_divination\') }}占卜 - 以铜钱起卦，探寻变化之道。AI智能解卦，为你解读命运的奥秘。">
+<meta name="description" content="SoulLink灵犀{{ _('iching_divination') }}占卜 - 以铜钱起卦，探寻变化之道。AI智能解卦，为你解读命运的奥秘。">
 <meta name="keywords" content="易经,六爻,占卜,起卦,命理,AI占卜">
 {% endblock %}
 
 {% block og_tags %}
-<meta property="og:title" content="{{ _(\'iching_divination\') }}占卜 - SoulLink 灵犀">
+<meta property="og:title" content="{{ _('iching_divination') }}占卜 - SoulLink 灵犀">
 <meta property="og:description" content="以铜钱起卦，探寻变化之道。AI智能解卦，为你解读命运的奥秘。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://soullink.app/divination">
@@ -18,7 +18,7 @@
 
 {% block extra_css %}
 <style>
-/* {{ _(\'iching_divination\') }}专属样式 */
+/* {{ _('iching_divination') }}专属样式 */
 .iching-page {
     position: position: relative;
     min-height: 100vh;
@@ -428,7 +428,7 @@ textarea.form-input {
             <h1 class="header-title">
                 {% if lang == 'en' %}I Ching Hexagrams
                 {% elif lang == 'ja' %}易経六爻
-                {% else %}{{ _(\'iching_divination\') }}占卜{% endif %}
+                {% else %}{{ _('iching_divination') }}占卜{% endif %}
             </h1>
             <p class="header-subtitle">
                 {% if lang == 'en' %}Seek wisdom from the ancient Book of Changes
@@ -763,7 +763,7 @@ function shareIchingResult() {
     const lang = '{{ lang }}';
     const judgement = document.getElementById('judgementText').textContent;
     
-    let shareText = `📜 SoulLink灵犀 · {{ _(\'iching_divination\') }}占卜结果\n\n`;
+    let shareText = `📜 SoulLink灵犀 · {{ _('iching_divination') }}占卜结果\n\n`;
     shareText += `本卦：${currentHexagram.ben_gua.name}\n`;
     shareText += `变卦：${currentHexagram.bian_gua.name}\n`;
     shareText += `卦辞：${judgement.substring(0, 80)}${judgement.length > 80 ? '...' : ''}\n`;

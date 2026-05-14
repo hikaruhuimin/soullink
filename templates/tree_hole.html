@@ -390,7 +390,7 @@
 <div class="tree-hole-page">
     <div class="tree-hole-header">
         <h1>🌳 树洞</h1>
-        <p>{{ _(\'anonymous_confession\') }}你的心事，释放内心的秘密</p>
+        <p>{{ _('anonymous_confession') }}你的心事，释放内心的秘密</p>
     </div>
 
     <!-- New Post Form -->
@@ -418,7 +418,7 @@
                     <span class="char-counter"><span id="charCount">0</span>/500</span>
                 </div>
                 <button type="submit" class="post-submit-btn" id="submitBtn">
-                    🌱 {{ _(\'publish\') }}到树洞
+                    🌱 {{ _('publish') }}到树洞
                 </button>
             </div>
         </form>
@@ -513,7 +513,7 @@ function submitPost(event) {
     }
 
     btn.disabled = true;
-    btn.textContent = '{{ _(\'publish\') }}中...';
+    btn.textContent = '{{ _('publish') }}中...';
 
     fetch('/api/treehole/post', {
         method: 'POST',
@@ -525,15 +525,15 @@ function submitPost(event) {
         if (data.success) {
             location.reload();
         } else {
-            alert(data.error || '{{ _(\'publish\') }}失败，请重试');
+            alert(data.error || '{{ _('publish') }}失败，请重试');
             btn.disabled = false;
-            btn.textContent = '🌱 {{ _(\'publish\') }}到树洞';
+            btn.textContent = '🌱 {{ _('publish') }}到树洞';
         }
     })
     .catch(err => {
-        alert('{{ _(\'publish\') }}失败，请稍后重试');
+        alert('{{ _('publish') }}失败，请稍后重试');
         btn.disabled = false;
-        btn.textContent = '🌱 {{ _(\'publish\') }}到树洞';
+        btn.textContent = '🌱 {{ _('publish') }}到树洞';
     });
 }
 

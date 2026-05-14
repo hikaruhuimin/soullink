@@ -554,7 +554,7 @@ function appendMessage(msg, isNew) {
         : '<div class="message-avatar" style="background:var(--color-accent);color:white">' + shortName + '</div>';
 
     var voiceBtnHtml = !isUser
-        ? '<button class="voice-btn" onclick="playVoice(\'' + AGENT_ID + '\', \'' + escapeHtml(msg.content).replace(/'/g, "\\'") + '\', \'' + LANG + '\')" title="Play voice">🔊</button>'
+        ? '<button class="voice-btn" onclick="playVoice('' + AGENT_ID + '', '' + escapeHtml(msg.content).replace(/'/g, "\'") + '', '' + LANG + '')" title="Play voice">🔊</button>'
         : '';
 
     messageEl.innerHTML =

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _(\'daily_checkin\') }} - SoulLink{% endblock %}
+{% block title %}{{ _('daily_checkin') }} - SoulLink{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -32,7 +32,7 @@
     opacity: 0.3;
 }
 
-/* {{ _(\'sign_in\') }}容器 */
+/* {{ _('sign_in') }}容器 */
 .checkin-container {
     max-width: 480px;
     margin: 0 auto;
@@ -60,7 +60,7 @@
     font-size: 0.95rem;
 }
 
-/* {{ _(\'sign_in\') }}卡片 */
+/* {{ _('sign_in') }}卡片 */
 .checkin-card {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);
@@ -70,7 +70,7 @@
     margin-bottom: 20px;
 }
 
-/* 连续{{ _(\'sign_in\') }}状态 */
+/* 连续{{ _('sign_in') }}状态 */
 .streak-status {
     text-align: center;
     margin-bottom: 24px;
@@ -104,7 +104,7 @@
     50% { transform: scale(1.2); }
 }
 
-/* {{ _(\'sign_in\') }}按钮 */
+/* {{ _('sign_in') }}按钮 */
 .checkin-btn {
     display: block;
     width: 100%;
@@ -315,7 +315,7 @@
     animation: celebrate 0.5s ease;
 }
 
-/* {{ _(\'sign_in\') }}成功弹窗 */
+/* {{ _('sign_in') }}成功弹窗 */
 .success-modal {
     position: fixed;
     top: 0;
@@ -406,16 +406,16 @@
 
 <div class="checkin-container">
     <div class="checkin-header">
-        <h1>🌟 {{ _(\'daily_checkin\') }}</h1>
-        <p>连续{{ _(\'sign_in\') }}，灵石多多</p>
+        <h1>🌟 {{ _('daily_checkin') }}</h1>
+        <p>连续{{ _('sign_in') }}，灵石多多</p>
     </div>
     
-    <!-- {{ _(\'sign_in\') }}主卡片 -->
+    <!-- {{ _('sign_in') }}主卡片 -->
     <div class="checkin-card">
         <div class="streak-status">
             <div class="streak-number" id="streakNumber">{{ streak_days }}</div>
             <div class="streak-label">
-                连续{{ _(\'sign_in\') }}天数
+                连续{{ _('sign_in') }}天数
                 {% if streak_days >= 7 %}
                 <span class="streak-fire">🔥</span>
                 {% endif %}
@@ -425,9 +425,9 @@
         <button class="checkin-btn {% if checked_in %}checked-in{% else %}can-checkin{% endif %}" 
                 id="checkinBtn" onclick="doCheckin()">
             {% if checked_in %}
-            ✓ 今日已{{ _(\'sign_in\') }}
+            ✓ 今日已{{ _('sign_in') }}
             {% else %}
-            🔔 立即{{ _(\'sign_in\') }}
+            🔔 立即{{ _('sign_in') }}
             {% endif %}
         </button>
         
@@ -467,7 +467,7 @@
     <!-- 阶梯奖励 -->
     <div class="checkin-card rewards-section">
         <div class="section-title">
-            <span>🎁</span> {{ _(\'sign_in\') }}奖励
+            <span>🎁</span> {{ _('sign_in') }}奖励
         </div>
         <div class="rewards-grid">
             {% for reward in rewards %}
@@ -483,7 +483,7 @@
     <div class="weekly-bonus-card">
         <div class="weekly-bonus-title">🌈 周末双倍惊喜</div>
         <div class="weekly-bonus-amount">+{{ weekly_bonus }}灵石</div>
-        <div class="weekly-bonus-desc">连续{{ _(\'sign_in\') }}7天额外奖励</div>
+        <div class="weekly-bonus-desc">连续{{ _('sign_in') }}7天额外奖励</div>
     </div>
     
     <!-- 里程碑奖励 -->
@@ -509,12 +509,12 @@
     </div>
 </div>
 
-<!-- {{ _(\'sign_in\') }}成功弹窗 -->
+<!-- {{ _('sign_in') }}成功弹窗 -->
 <div class="success-modal" id="successModal">
     <div class="success-content">
         <div class="success-icon">🎉</div>
-        <div class="success-title">{{ _(\'sign_in\') }}成功！</div>
-        <div class="success-info" id="successInfo">连续{{ _(\'sign_in\') }} 1 天</div>
+        <div class="success-title">{{ _('sign_in') }}成功！</div>
+        <div class="success-info" id="successInfo">连续{{ _('sign_in') }} 1 天</div>
         <div class="success-stones" id="successStones">+10 灵石</div>
         {% if can_claim_weekly %}
         <div style="color: #f87171; font-size: 0.85rem; margin-bottom: 16px;">
@@ -534,7 +534,7 @@ function doCheckin() {
     if (btn.classList.contains('checked-in')) return;
     
     btn.disabled = true;
-    btn.textContent = '{{ _(\'sign_in\') }}中...';
+    btn.textContent = '{{ _('sign_in') }}中...';
     
     fetch('/api/checkin', {
         method: 'POST',
@@ -546,7 +546,7 @@ function doCheckin() {
             // 更新UI
             document.getElementById('streakNumber').textContent = data.streak_days;
             btn.className = 'checkin-btn checked-in';
-            btn.textContent = '✓ 今日已{{ _(\'sign_in\') }}';
+            btn.textContent = '✓ 今日已{{ _('sign_in') }}';
             
             // 显示成功弹窗
             showSuccessModal(data.streak_days, data.reward_stones);
@@ -558,26 +558,26 @@ function doCheckin() {
                 todayCell.classList.add('checked');
             }
             
-            // 更新周{{ _(\'sign_in\') }}按钮
+            // 更新周{{ _('sign_in') }}按钮
             if (data.has_weekly_bonus) {
                 showToast('🎊 获得周末双倍灵石奖励！');
             }
         } else {
-            showToast(data.error || '{{ _(\'sign_in\') }}失败');
-            btn.textContent = '🔔 立即{{ _(\'sign_in\') }}';
+            showToast(data.error || '{{ _('sign_in') }}失败');
+            btn.textContent = '🔔 立即{{ _('sign_in') }}';
         }
         btn.disabled = false;
     })
     .catch(err => {
-        showToast('{{ _(\'sign_in\') }}失败，请重试');
-        btn.textContent = '🔔 立即{{ _(\'sign_in\') }}';
+        showToast('{{ _('sign_in') }}失败，请重试');
+        btn.textContent = '🔔 立即{{ _('sign_in') }}';
         btn.disabled = false;
     });
 }
 
 function showSuccessModal(streak, stones) {
     const modal = document.getElementById('successModal');
-    document.getElementById('successInfo').textContent = `连续{{ _(\'sign_in\') }} ${streak} 天`;
+    document.getElementById('successInfo').textContent = `连续{{ _('sign_in') }} ${streak} 天`;
     document.getElementById('successStones').textContent = `+${stones} 灵石`;
     modal.classList.add('show');
 }

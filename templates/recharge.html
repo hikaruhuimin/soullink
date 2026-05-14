@@ -434,7 +434,7 @@
     <!-- Payment Method -->
     <div class="payment-section">
         <div class="payment-methods">
-            <div class="payment-method-title">{{ _(\'select_payment_method\') }}</div>
+            <div class="payment-method-title">{{ _('select_payment_method') }}</div>
             <!-- SOL加密货币 -->
             <div class="payment-method" onclick="selectPayment('crypto')">
                 <div class="payment-method-icon">◎</div>
@@ -474,7 +474,7 @@
         <div id="paypal-button-container" style="display:none; margin-bottom:16px;"></div>
 
         <button class="recharge-action-btn" id="rechargeBtn" onclick="doRecharge()" style="display:flex;">
-            🔮 {{ _(\'recharge_now\') }}
+            🔮 {{ _('recharge_now') }}
         </button>
     </div>
 
@@ -675,7 +675,7 @@ async function doRecharge() {
             } else {
                 showToast(data.error || '创建订单失败', 'error');
                 btn.disabled = false;
-                btn.textContent = '🔮 {{ _(\'recharge_now\') }}';
+                btn.textContent = '🔮 {{ _('recharge_now') }}';
                 showProcessing(false);
             }
             return;
@@ -711,19 +711,19 @@ async function doRecharge() {
                 } else {
                     showToast(confirmData.error || '充值确认失败', 'error');
                     btn.disabled = false;
-                    btn.textContent = '🔮 {{ _(\'recharge_now\') }}';
+                    btn.textContent = '🔮 {{ _('recharge_now') }}';
                 }
             }
         } else {
             showToast(data.error || '充值失败，请重试', 'error');
             btn.disabled = false;
-            btn.textContent = '🔮 {{ _(\'recharge_now\') }}';
+            btn.textContent = '🔮 {{ _('recharge_now') }}';
             showProcessing(false);
         }
     } catch (err) {
         showToast('网络错误，请稍后重试', 'error');
         btn.disabled = false;
-        btn.textContent = '🔮 {{ _(\'recharge_now\') }}';
+        btn.textContent = '🔮 {{ _('recharge_now') }}';
         showProcessing(false);
     }
 }

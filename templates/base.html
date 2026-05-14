@@ -1063,7 +1063,7 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
-                <span class="footer-logo">{{ _(\'app_name_full\') }}</span>
+                <span class="footer-logo">{{ _('app_name_full') }}</span>
                 <p class="footer-slogan">{{ _('footer_slogan') }}</p>
             </div>
             <div class="footer-links">
@@ -1641,7 +1641,7 @@
                     const iconMap = {'system': '🔔', 'agent': '🤖', 'reward': '🎁', 'reminder': '⏰'};
                     const icon = iconMap[n.notification_type] || '🔔';
                     const bg = n.is_read ? '' : 'rgba(139,92,246,0.08)';
-                    const link = n.link ? ' onclick="window.location.href=\'' + n.link.replace(/'/g, "\\'") + '\'"' : '';
+                    const link = n.link ? ' onclick="window.location.href='' + n.link.replace(/'/g, "\'") + ''"' : '';
                     return '<div style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;background:' + bg + ';border-radius:8px;margin-bottom:4px;"' + link + '>' +
                         '<div style="display:flex;gap:10px;align-items:flex-start;">' +
                         '<span style="font-size:1.1rem;">' + icon + '</span>' +

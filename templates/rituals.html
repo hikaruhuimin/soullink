@@ -241,7 +241,7 @@
     line-height: 1.8;
 }
 
-/* {{ _(\'draw_fortune\') }}样式 */
+/* {{ _('draw_fortune') }}样式 */
 .fortune-card {
     background: white;
     border-radius: 16px;
@@ -374,13 +374,13 @@
 {% block content %}
 <div class="ritual-container">
     <div class="ritual-header">
-        <h1>{{ t('rituals') or '{{ _(\'rituals\') }}' }}</h1>
-        <p>{{ t('rituals_desc') or '专属占卜许愿仪式' }}</p>
+        <h1>{{ _('rituals') }}</h1>
+        <p>{{ _('rituals_desc') }}</p>
     </div>
 
     <!-- Festival Calendar -->
     <div class="festival-calendar">
-        <h2>📅 {{ t('rituals_calendar_title') or '节日日历' }}</h2>
+        <h2>📅 {{ _('rituals_calendar_title') }}</h2>
         <div class="festival-grid">
             {% for f in festivals %}
             <div class="festival-item">
@@ -397,7 +397,7 @@
                 <div class="fi-cost">💎 {{ f.cost }}</div>
                 <br>
                 <button class="participate-btn" onclick="participateRitual('{{ f.date }}', '{{ f.ritual }}', {{ f.cost }})">
-                    ✨ {{ t('rituals_participate') or '参与仪式' }}
+                    ✨ {{ _('rituals_participate') }}
                 </button>
             </div>
             {% endfor %}
@@ -406,35 +406,35 @@
 
     <div class="festival-banner" id="currentFestival">
         <div class="festival-icon" id="festivalIcon">🌕</div>
-        <h2 class="festival-name" id="festivalName">{{ t('full_moon') or '{{ _('full_moon') }}' }}</h2>
-        <p class="festival-desc" id="festivalDesc">{{ t('wish_success') or '月光许愿，愿望将被月光守护' }}</p>
+        <h2 class="festival-name" id="festivalName">{{ _('full_moon') }}</h2>
+        <p class="festival-desc" id="festivalDesc">{{ _('wish_success') }}</p>
     </div>
 
     {% if current_festival == 'full_moon' %}
     <div class="ritual-card" id="wishRitual">
-        <h3 class="ritual-title">🌕 {{ t('make_wish') or '{{ _('full_moon') }}许愿' }}</h3>
+        <h3 class="ritual-title">🌕 {{ _('make_wish') }}</h3>
         <div class="wish-form" id="wishForm">
-            <textarea class="wish-input" id="wishInput" placeholder="{{ t('wish_placeholder_ritual') or '在此写下你的愿望...' }}"></textarea>
+            <textarea class="wish-input" id="wishInput" placeholder="{{ _('wish_placeholder_ritual') }}"></textarea>
             <button class="btn-wish" onclick="submitWish()">
-                ✨ {{ t('submit_wish') or '{{ _(\'submit_wish\') }}' }}
+                ✨ {{ _('submit_wish') }}
             </button>
         </div>
         <div class="wish-result" id="wishResult">
             <div class="wish-blessing">🌕✨</div>
-            <div class="wish-message">{{ t('wish_success') or '愿望已记录，月光会守护你的心愿' }}</div>
+            <div class="wish-message">{{ _('wish_success') }}</div>
             <div class="wish-energy">
-                <div class="energy-title">🔮 {{ t('wish_energy') or '愿望能量解读' }}</div>
+                <div class="energy-title">🔮 {{ _('wish_energy') }}</div>
                 <div class="energy-content" id="energyContent"></div>
             </div>
         </div>
     </div>
     {% elif current_festival == 'qixi' %}
     <div class="ritual-card" id="loveRitual">
-        <h3 class="ritual-title">💕 {{ t('love_divination') or '姻缘占卜' }}</h3>
+        <h3 class="ritual-title">💕 {{ _('love_divination') }}</h3>
         <div class="fortune-card" id="loveFortune">
             <p style="color: #666; margin-bottom: 20px;">在七夕这个浪漫的日子里，织女会为你指引姻缘方向...</p>
             <button class="btn-draw" onclick="drawLoveFortune()">
-                💘 {{ t('draw_fortune') or '抽取姻缘签' }}
+                💘 {{ _('draw_fortune') }}
             </button>
         </div>
         <div class="fortune-result" id="loveResult">
@@ -445,11 +445,11 @@
     </div>
     {% elif current_festival == 'new_year' %}
     <div class="ritual-card" id="newyearRitual">
-        <h3 class="ritual-title">🎋 {{ t('fortune_draw') or '新年运势签' }}</h3>
+        <h3 class="ritual-title">🎋 {{ _('fortune_draw') }}</h3>
         <div class="fortune-card">
             <p style="color: #666; margin-bottom: 20px;">新年第一天，来抽一支运势签吧！</p>
             <button class="btn-draw" onclick="drawNewYearFortune()">
-                🎋 {{ t('draw_fortune') or '{{ _(\'draw_fortune\') }}' }}
+                🎋 {{ _('draw_fortune') }}
             </button>
         </div>
         <div class="fortune-result" id="newyearResult">
@@ -461,14 +461,14 @@
     </div>
     {% else %}
     <div class="ritual-card">
-        <h3 class="ritual-title">🎊 {{ t('next_festival') or '{{ _('next_festival') }}' }}</h3>
+        <h3 class="ritual-title">🎊 {{ _('next_festival') }}</h3>
         <div class="festival-list" id="festivalList"></div>
     </div>
     {% endif %}
 
     <div style="text-align: center; margin-top: 30px;">
         <button class="btn-download" onclick="shareRitual()">
-            📤 {{ t('share_card') or '分享仪式' }}
+            📤 {{ _('share_card') }}
         </button>
     </div>
 </div>
@@ -479,7 +479,7 @@ const currentFestival = '{{ current_festival }}';
 async function submitWish() {
     const wish = document.getElementById('wishInput').value;
     if (!wish) {
-        alert('{{ t('please_fill_all') or '请写下你的愿望' }}');
+        alert('{{ _('please_fill_all') }}');
         return;
     }
     
@@ -517,7 +517,7 @@ async function drawLoveFortune() {
         
     } catch (error) {
         console.error('Error:', error);
-        alert('{{ _(\'draw_fortune\') }}失败，请重试');
+        alert('{{ _('draw_fortune') }}失败，请重试');
     }
 }
 
@@ -535,15 +535,15 @@ async function drawNewYearFortune() {
         
         document.getElementById('fortuneLucky').innerHTML = `
             <div class="lucky-item">
-                <div class="lucky-label">{{ t('lucky_color') or '{{ _(\'lucky_color\') }}' }}</div>
+                <div class="lucky-label">{{ _('lucky_color') }}</div>
                 <div class="lucky-value">${data.lucky_color}</div>
             </div>
             <div class="lucky-item">
-                <div class="lucky-label">{{ t('lucky_number') or '{{ _(\'lucky_number\') }}' }}</div>
+                <div class="lucky-label">{{ _('lucky_number') }}</div>
                 <div class="lucky-value">${data.lucky_number}</div>
             </div>
             <div class="lucky-item">
-                <div class="lucky-label">{{ t('lucky_direction') or '{{ _('lucky_direction') }}' }}</div>
+                <div class="lucky-label">{{ _('lucky_direction') }}</div>
                 <div class="lucky-value">${data.lucky_direction}</div>
             </div>
         `;
@@ -553,15 +553,15 @@ async function drawNewYearFortune() {
         
     } catch (error) {
         console.error('Error:', error);
-        alert('{{ _(\'draw_fortune\') }}失败，请重试');
+        alert('{{ _('draw_fortune') }}失败，请重试');
     }
 }
 
 function shareRitual() {
-    const shareText = '{{ t('ritual_share_text') or '我在灵犀参与了{{ _('full_moon') }}许愿仪式✨' }}';
+    const shareText = '{{ _('ritual_share_text') }}';
     if (navigator.share) {
         navigator.share({
-            title: '{{ t('rituals') or '{{ _(\'rituals\') }}' }}',
+            title: '{{ _('rituals') }}',
             text: shareText,
             url: window.location.href
         });
@@ -598,12 +598,12 @@ if (currentFestival === 'none') {
 // Participate in paid ritual
 async function participateRitual(date, ritual, cost) {
     if (!{{ 'true' if current_user.is_authenticated else 'false' }}) {
-        alert('{{ t("login_required") or "请先登录" }}');
+        alert('{{ _("login_required") or "请先登录" }}');
         window.location.href = '/login';
         return;
     }
     
-    const confirmMsg = '{{ t("rituals_confirm") or "参与此仪式需要消耗" }}' + ' ' + cost + '💎，确认参与吗？';
+    const confirmMsg = '{{ _("rituals_confirm") or "参与此仪式需要消耗" }}' + ' ' + cost + '💎，确认参与吗？';
     if (!confirm(confirmMsg)) return;
     
     try {
@@ -614,13 +614,13 @@ async function participateRitual(date, ritual, cost) {
         });
         const data = await response.json();
         if (data.success) {
-            alert('✨ ' + (data.message || '{{ t("rituals_success") or "仪式完成！" }}'));
+            alert('✨ ' + (data.message || '{{ _("rituals_success") or "仪式完成！" }}'));
             location.reload();
         } else {
-            alert(data.message || '{{ t("rituals_error") or "灵石不足" }}');
+            alert(data.message || '{{ _("rituals_error") or "灵石不足" }}');
         }
     } catch (error) {
-        alert('{{ t("rituals_error") or "请求失败" }}');
+        alert('{{ _("rituals_error") or "请求失败" }}');
     }
 }
 </script>

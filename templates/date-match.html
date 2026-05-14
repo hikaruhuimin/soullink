@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _(\'date_match\') }} - SoulLink 灵犀{% endblock %}
+{% block title %}{{ _('date_match') }} - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -265,14 +265,14 @@
 {% block content %}
 <div class="date-page">
     <div class="date-header">
-        <h1>💘 {{ _(\'date_match\') }}</h1>
+        <h1>💘 {{ _('date_match') }}</h1>
         <p>发起真实约会，遇见你的TA</p>
     </div>
 
     <!-- Tabs -->
     <div class="date-tabs">
-        <button class="date-tab active" data-target="date-send">发起{{ _(\'date_match\') }}</button>
-        <button class="date-tab" data-target="date-requests">{{ _(\'my_date_requests\') }}</button>
+        <button class="date-tab active" data-target="date-send">发起{{ _('date_match') }}</button>
+        <button class="date-tab" data-target="date-requests">{{ _('my_date_requests') }}</button>
     </div>
 
     <!-- Send date request -->
@@ -306,7 +306,7 @@
                 <label>留言</label>
                 <textarea id="dateMessage" rows="3" placeholder="写一段邀请语..." maxlength="200"></textarea>
             </div>
-            <button class="send-btn" onclick="sendDateRequest()">💌 发送{{ _(\'date_match\') }}邀请</button>
+            <button class="send-btn" onclick="sendDateRequest()">💌 发送{{ _('date_match') }}邀请</button>
             <div id="dateSendError" style="color:#ef4444;font-size:0.85rem;margin-top:0.75rem;display:none;"></div>
         </div>
     </div>
