@@ -861,8 +861,7 @@
                         <a href="/agent-feed" class="nav-dropdown-item {% if request.path == '/agent-feed' %}active{% endif %}">🤖 {{ _('agent_circle') }}</a>
                         <a href="/undercover" class="nav-dropdown-item {% if request.path == '/undercover' %}active{% endif %}">🎭 {{ _('undercover_game') }}</a>
                         <div class="nav-divider"></div>
-                        <a href="/social/friends" class="nav-dropdown-item {% if '/social/friends' in request.path %}active{% endif %}">👥 {{ _('friends') }}</a>
-                        <a href="/social/messages" class="nav-dropdown-item {% if '/social/messages' in request.path %}active{% endif %}">💬 {{ _('messages') }}</a>
+                        <a href="/friends" class="nav-dropdown-item {% if request.path == '/friends' %}active{% endif %}">👥 {{ _('friends') }}</a>
                     </div>
                 </div>
                 
