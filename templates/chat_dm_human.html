@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ target_user.username }} - 私聊 - SoulLink 灵犀{% endblock %}
+{% block title %}{{ target_user.username }} - {{ _('dm_chat') }} - SoulLink{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -343,8 +343,8 @@
     <!-- Header -->
     <div class="dm-header">
         <div class="dm-header-left">
-            <a href="/friends" class="back-btn" title="返回好友列表">
-                ←
+            <a href="/friends" class="back-btn" title="{{ _('back') }}">
+                {{ _('back') }}
             </a>
             <div class="dm-user-avatar">
                 {% if target_user.avatar and '/default_avatar' not in target_user.avatar %}
@@ -354,7 +354,7 @@
             </div>
             <div class="dm-user-info">
                 <div class="dm-user-name">{{ target_user.username }}</div>
-                <div class="dm-user-status" id="userStatus">在线</div>
+<div class=\"dm-user-status\" id=\"userStatus\">{{ _('online') }}</div>
             </div>
         </div>
     </div>
@@ -371,8 +371,8 @@
         {% else %}
             <div class="empty-chat" id="emptyState">
                 <div class="empty-chat-icon">💬</div>
-                <div class="empty-chat-text">开始聊天吧</div>
-                <div class="empty-chat-sub">发送第一条消息</div>
+                <div class="empty-chat-text">{{ _('start_chatting') }}</div>
+                <div class="empty-chat-sub">{{ _('send_first_message') }}</div>
             </div>
         {% endif %}
     </div>
@@ -383,10 +383,10 @@
             <textarea
                 class="dm-input"
                 id="dmInput"
-                placeholder="输入消息... (Enter发送, Shift+Enter换行)"
+                placeholder="{{ _('input_message_placeholder') }} (Enter发送, Shift+Enter换行)"
                 rows="1"
             ></textarea>
-            <button class="send-btn" id="sendBtn" title="发送">
+            <button class="send-btn" id="sendBtn" title="{{ _('send') }}">
                 ➤
             </button>
         </div>
@@ -477,12 +477,12 @@ function sendMessage() {
             appendMessage(msg, true);
             LAST_MSG_ID = msg.id;
         } else {
-            showError(data.error || '发送失败');
+            showError(data.error || '{{ _("send_failed") }}');
         }
     })
     .catch(function() {
         sendBtn.disabled = false;
-        showError('网络错误');
+        showError('{{ _("network_error") }}');
     });
 }
 

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}好友 - SoulLink 灵犀{% endblock %}
+{% block title %}{{ _('friends_page_title') }} - SoulLink{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -427,18 +427,18 @@
 {% block content %}
 <div class="friends-page">
     <div class="friends-header">
-        <h1>👥 好友</h1>
-        <p>与你的好友保持联系</p>
+                <h1>👥 {{ _('friends_page_title') }}</h1>
+                <p>{{ _('friends_page_subtitle') }}</p>
     </div>
 
     <!-- Tabs -->
     <div class="tabs" role="tablist">
         <button class="tab-btn active" data-tab="friends" role="tab" aria-selected="true">
-            👫 好友列表
+            {{ _('friends_list') }}
             {% if friends %}<span class="badge">{{ friends|length }}</span>{% endif %}
         </button>
         <button class="tab-btn {% if not friends %}active{% endif %}" data-tab="requests" role="tab" aria-selected="false">
-            📨 待处理请求
+            {{ _('pending_requests') }}
             {% if pending_requests %}<span class="badge">{{ pending_requests|length }}</span>{% endif %}
         </button>
     </div>
@@ -462,14 +462,14 @@
                         <div class="friend-name">{{ friend.nickname }}</div>
                     </a>
                     <div class="friend-status {% if friend.is_online %}online{% endif %}">
-                        {% if friend.is_online %}🟢 在线{% else %}⚪ 离线{% endif %}
+                        {% if friend.is_online %}{{ _('online_status') }}{% else %}{{ _('offline_status') }}{% endif %}
                     </div>
                 </div>
                 <div class="friend-actions">
                     <a href="/chat/dm/human/{{ friend.id }}" class="btn-dm">
-                        💬 发消息
+                        {{ _('send_message') }}
                     </a>
-                    <button class="btn-remove" onclick="removeFriend(this)" data-friend-id="{{ friend.id }}" data-nickname="{{ friend.nickname }}" title="删除好友">
+                    <button class="btn-remove" onclick="removeFriend(this)" data-friend-id="{{ friend.id }}" data-nickname="{{ friend.nickname }}" title="{{ _('remove_friend') }}">
                         ✕
                     </button>
                 </div>
@@ -478,8 +478,8 @@
         {% else %}
             <div class="empty-state">
                 <div class="empty-state-icon">👥</div>
-                <div class="empty-state-text">暂无好友</div>
-                <div class="empty-state-sub">去灵犀广场认识新朋友吧</div>
+                <div class="empty-state-text">{{ _('no_friends_yet') }}</div>
+                <div class="empty-state-sub">{{ _('go_to_square') }}</div>
             </div>
         {% endif %}
     </div>
@@ -497,14 +497,14 @@
                 </div>
                 <div class="request-info">
                     <div class="friend-name">{{ req.sender_name }}</div>
-                    <div class="request-time">请求时间: {{ req.created_at }}</div>
+                    <div class="request-time">{{ _('request_time') }} {{ req.created_at }}</div>
                 </div>
                 <div class="request-actions">
                     <button class="btn-accept" onclick="acceptRequest({{ req.id }})">
-                        ✓ 接受
+                        {{ _('accept') }}
                     </button>
                     <button class="btn-reject" onclick="rejectRequest({{ req.id }})">
-                        ✕ 拒绝
+                        {{ _('reject') }}
                     </button>
                 </div>
             </div>
@@ -512,8 +512,8 @@
         {% else %}
             <div class="empty-state">
                 <div class="empty-state-icon">📨</div>
-                <div class="empty-state-text">暂无待处理请求</div>
-                <div class="empty-state-sub">新好友请求将会显示在这里</div>
+                <div class="empty-state-text">{{ _('no_pending_requests') }}</div>
+                <div class="empty-state-sub">{{ _('new_requests_here') }}</div>
             </div>
         {% endif %}
     </div>
@@ -572,7 +572,7 @@ function acceptRequest(requestId) {
     .then(function(r) { return r.json(); })
     .then(function(data) {
         if (data.success) {
-            showToast('✓ 已添加好友');
+            showToast('{{ _("friend_added") }}');
             if (card) {
                 card.style.transition = 'all 0.3s ease';
                 card.style.opacity = '0';
@@ -582,20 +582,20 @@ function acceptRequest(requestId) {
             // Update badge counts
             updateBadges();
         } else {
-            showToast(data.error || '操作失败', true);
+            showToast(data.error || '{{ _("operation_failed") }}', true);
             if (card) {
                 var btn = card.querySelector('.btn-accept');
                 btn.disabled = false;
-                btn.textContent = '✓ 接受';
+                btn.textContent = '{{ _("accept") }}';
             }
         }
     })
     .catch(function() {
-        showToast('网络错误', true);
+        showToast('{{ _("network_error") }}', true);
         if (card) {
             var btn = card.querySelector('.btn-accept');
             btn.disabled = false;
-            btn.textContent = '✓ 接受';
+            btn.textContent = '{{ _("accept") }}';
         }
     });
 }
@@ -617,7 +617,7 @@ function rejectRequest(requestId) {
     .then(function(r) { return r.json(); })
     .then(function(data) {
         if (data.success) {
-            showToast('已拒绝请求');
+            showToast('{{ _("request_rejected") }}');
             if (card) {
                 card.style.transition = 'all 0.3s ease';
                 card.style.opacity = '0';
@@ -626,20 +626,20 @@ function rejectRequest(requestId) {
             }
             updateBadges();
         } else {
-            showToast(data.error || '操作失败', true);
+            showToast(data.error || '{{ _("operation_failed") }}', true);
             if (card) {
                 var btn = card.querySelector('.btn-reject');
                 btn.disabled = false;
-                btn.textContent = '✕ 拒绝';
+                btn.textContent = '{{ _("reject") }}';
             }
         }
     })
     .catch(function() {
-        showToast('网络错误', true);
+        showToast('{{ _("network_error") }}', true);
         if (card) {
             var btn = card.querySelector('.btn-reject');
             btn.disabled = false;
-            btn.textContent = '✕ 拒绝';
+            btn.textContent = '{{ _("reject") }}';
         }
     });
 }
@@ -648,7 +648,7 @@ function rejectRequest(requestId) {
 function removeFriend(btn) {
     var friendId = parseInt(btn.getAttribute('data-friend-id'));
     var nickname = btn.getAttribute('data-nickname');
-    if (!confirm('确定要删除好友 "' + nickname + '" 吗？')) return;
+    if (!confirm('{{ _("confirm_remove_friend") }} "' + nickname + '"?')) return;
 
     var card = btn.closest('.friend-card');
     if (card) {
@@ -664,7 +664,7 @@ function removeFriend(btn) {
     .then(function(r) { return r.json(); })
     .then(function(data) {
         if (data.success) {
-            showToast('已删除好友');
+            showToast('{{ _("friend_removed") }}');
             if (card) {
                 card.style.opacity = '0';
                 card.style.transform = 'translateX(-20px)';
@@ -672,14 +672,14 @@ function removeFriend(btn) {
             }
             updateBadges();
         } else {
-            showToast(data.error || '操作失败', true);
+            showToast(data.error || '{{ _("operation_failed") }}', true);
             if (card) {
                 card.style.opacity = '1';
             }
         }
     })
     .catch(function() {
-        showToast('网络错误', true);
+        showToast('{{ _("network_error") }}', true);
         if (card) {
             card.style.opacity = '1';
         }
