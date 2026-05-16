@@ -7925,3 +7925,283 @@ def api_date_my_requests():
         'sent': [serialize(d) for d in sent],
         'received': [serialize(d) for d in received]
     })
+
+
+# ============ 好友系统 ============
+
+@app.route('/social/friends')
+@login_required
+def social_friends_page():
+    """好友列表页面"""
+    lang = session.get('lang', 'zh')
+    return render_template('social/friends.html', lang=lang)
+
+
+@app.route('/social/friend-requests')
+@login_required
+def social_friend_requests_page():
+    """好友请求页面"""
+    lang = session.get('lang', 'zh')
+    return render_template('social/friend_requests.html', lang=lang)
+
+
+@app.route('/social/messages')
+@login_required
+def social_messages_page():
+    """私信列表页面"""
+    lang = session.get('lang', 'zh')
+    return render_template('social/messages.html', lang=lang)
+
+
+@app.route('/social/messages/<int:user_id>')
+@login_required
+def social_dm_conversation_page(user_id):
+    """私信对话页面"""
+    lang = session.get('lang', 'zh')
+    other = User.query.get(user_id)
+    if not other:
+        abort(404)
+    return render_template('social/dm.html', lang=lang, other=other)
+
+
+# API: 搜索用户
+@app.route('/api/social/search-users')
+@login_required
+def api_search_users():
+    q = request.args.get('q', '').strip()
+    if not q or len(q) < 1:
+        return jsonify({'success': True, 'users': []})
+    users = User.query.filter(
+        db.or_(User.username.ilike(f'%{q}%'), User.email.ilike(f'%{q}%')),
+        User.id != current_user.id,
+        User.is_disabled == False
+    ).limit(20).all()
+    return jsonify({'success': True, 'users': [{
+        'id': u.id, 'username': u.username, 'avatar': u.avatar or '',
+        'bio': (u.bio or '')[:50], 'mbti': u.mbti or ''
+    } for u in users]})
+
+
+# API: 发送好友请求
+@app.route('/api/friend/send-request', methods=['POST'])
+@login_required
+def api_friend_send_request():
+    data = request.get_json()
+    receiver_id = data.get('user_id', type=int)
+    if not receiver_id or receiver_id == current_user.id:
+        return jsonify({'success': False, 'message': '无效的用户'})
+    
+    receiver = User.query.get(receiver_id)
+    if not receiver:
+        return jsonify({'success': False, 'message': '用户不存在'})
+    
+    existing = FriendRequest.query.filter_by(
+        sender_id=current_user.id, receiver_id=receiver_id,
+        status='pending'
+    ).first()
+    if existing:
+        return jsonify({'success': False, 'message': '已发送过好友请求'})
+    
+    already_friends = Friendship.query.filter_by(
+        user_id=current_user.id, friend_id=receiver_id
+    ).first()
+    if already_friends:
+        return jsonify({'success': False, 'message': '已经是好友了'})
+    
+    req = FriendRequest(sender_id=current_user.id, receiver_id=receiver_id)
+    db.session.add(req)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': '好友请求已发送'})
+
+
+# API: 处理好友请求
+@app.route('/api/friend/handle-request', methods=['POST'])
+@login_required
+def api_friend_handle_request():
+    data = request.get_json()
+    request_id = data.get('request_id', type=int)
+    action = data.get('action', '')  # accept or reject
+    
+    req = FriendRequest.query.get(request_id)
+    if not req or req.receiver_id != current_user.id:
+        return jsonify({'success': False, 'message': '请求不存在'})
+    
+    if action == 'accept':
+        req.status = 'accepted'
+        # 建立双向好友关系
+        db.session.add(Friendship(user_id=req.sender_id, friend_id=req.receiver_id))
+        db.session.add(Friendship(user_id=req.receiver_id, friend_id=req.sender_id))
+        db.session.commit()
+        return jsonify({'success': True, 'message': '已添加好友'})
+    elif action == 'reject':
+        req.status = 'rejected'
+        db.session.commit()
+        return jsonify({'success': True, 'message': '已拒绝'})
+    
+    return jsonify({'success': False, 'message': '无效操作'})
+
+
+# API: 获取好友列表
+@app.route('/api/friends/list')
+@login_required
+def api_friends_list():
+    friendships = Friendship.query.filter_by(user_id=current_user.id).all()
+    friends = []
+    for f in friendships:
+        u = User.query.get(f.friend_id)
+        if u:
+            friends.append({
+                'id': u.id, 'username': u.username, 'avatar': u.avatar or '',
+                'bio': (u.bio or '')[:50], 'mbti': u.mbti or '',
+                'is_online': False
+            })
+    return jsonify({'success': True, 'friends': friends})
+
+
+# API: 获取好友请求列表
+@app.route('/api/friend/requests')
+@login_required
+def api_friend_requests():
+    received = FriendRequest.query.filter_by(
+        receiver_id=current_user.id, status='pending'
+    ).order_by(FriendRequest.created_at.desc()).all()
+    
+    sent = FriendRequest.query.filter_by(
+        sender_id=current_user.id
+    ).order_by(FriendRequest.created_at.desc()).limit(20).all()
+    
+    def serialize(req, is_sent=False):
+        u = User.query.get(req.receiver_id if is_sent else req.sender_id)
+        return {
+            'id': req.id, 'status': req.status,
+            'created_at': req.created_at.strftime('%Y-%m-%d %H:%M'),
+            'user': {'id': u.id, 'username': u.username, 'avatar': u.avatar or ''}
+        } if u else None
+    
+    return jsonify({
+        'success': True,
+        'received': [serialize(r) for r in received if serialize(r)],
+        'sent': [serialize(r, True) for r in sent if serialize(r, True)]
+    })
+
+
+# API: 删除好友
+@app.route('/api/friend/remove', methods=['POST'])
+@login_required
+def api_friend_remove():
+    data = request.get_json()
+    friend_id = data.get('user_id', type=int)
+    
+    f1 = Friendship.query.filter_by(user_id=current_user.id, friend_id=friend_id).first()
+    f2 = Friendship.query.filter_by(user_id=friend_id, friend_id=current_user.id).first()
+    if f1: db.session.delete(f1)
+    if f2: db.session.delete(f2)
+    db.session.commit()
+    return jsonify({'success': True, 'message': '已删除好友'})
+
+
+# ============ 私信系统 ============
+
+# API: 发送私信
+@app.route('/api/dm/send', methods=['POST'])
+@login_required
+def api_dm_send():
+    data = request.get_json()
+    receiver_id = data.get('receiver_id', type=int)
+    content = data.get('content', '').strip()
+    
+    if not receiver_id or not content:
+        return jsonify({'success': False, 'message': '参数不完整'})
+    
+    receiver = User.query.get(receiver_id)
+    if not receiver:
+        return jsonify({'success': False, 'message': '用户不存在'})
+    
+    msg = DirectMessage(sender_id=current_user.id, receiver_id=receiver_id, content=content)
+    db.session.add(msg)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': '发送成功', 'msg': {
+        'id': msg.id, 'content': msg.content, 'is_read': msg.is_read,
+        'created_at': msg.created_at.strftime('%Y-%m-%d %H:%M'),
+        'sender_id': msg.sender_id
+    }})
+
+
+# API: 获取对话列表
+@app.route('/api/dm/conversations')
+@login_required
+def api_dm_conversations():
+    sent_ids = db.session.query(DirectMessage.receiver_id).filter(
+        DirectMessage.sender_id == current_user.id
+    ).distinct().subquery()
+    
+    received_ids = db.session.query(DirectMessage.sender_id).filter(
+        DirectMessage.receiver_id == current_user.id
+    ).distinct().subquery()
+    
+    # Get all unique conversation partner IDs
+    partner_ids = set()
+    for row in db.session.query(sent_ids).all():
+        partner_ids.add(row[0])
+    for row in db.session.query(received_ids).all():
+        partner_ids.add(row[0])
+    
+    conversations = []
+    for pid in partner_ids:
+        last_msg = DirectMessage.query.filter(
+            db.or_(
+                db.and_(DirectMessage.sender_id == current_user.id, DirectMessage.receiver_id == pid),
+                db.and_(DirectMessage.sender_id == pid, DirectMessage.receiver_id == current_user.id)
+            )
+        ).order_by(DirectMessage.created_at.desc()).first()
+        
+        unread = DirectMessage.query.filter_by(
+            sender_id=pid, receiver_id=current_user.id, is_read=False
+        ).count()
+        
+        partner = User.query.get(pid)
+        if partner and last_msg:
+            conversations.append({
+                'user': {'id': partner.id, 'username': partner.username, 'avatar': partner.avatar or ''},
+                'last_message': {'content': last_msg.content[:50], 'created_at': last_msg.created_at.strftime('%m-%d %H:%M')},
+                'unread_count': unread
+            })
+    
+    conversations.sort(key=lambda c: c['last_message']['created_at'], reverse=True)
+    return jsonify({'success': True, 'conversations': conversations})
+
+
+# API: 获取对话消息
+@app.route('/api/dm/messages/<int:user_id>')
+@login_required
+def api_dm_messages(user_id):
+    messages = DirectMessage.query.filter(
+        db.or_(
+            db.and_(DirectMessage.sender_id == current_user.id, DirectMessage.receiver_id == user_id),
+            db.and_(DirectMessage.sender_id == user_id, DirectMessage.receiver_id == current_user.id)
+        )
+    ).order_by(DirectMessage.created_at.asc()).limit(100).all()
+    
+    # Mark as read
+    DirectMessage.query.filter_by(sender_id=user_id, receiver_id=current_user.id, is_read=False).update(
+        {DirectMessage.is_read: True}
+    )
+    db.session.commit()
+    
+    return jsonify({'success': True, 'messages': [{
+        'id': m.id, 'content': m.content, 'is_read': m.is_read,
+        'created_at': m.created_at.strftime('%Y-%m-%d %H:%M'),
+        'sender_id': m.sender_id
+    } for m in messages]})
+
+
+# API: 未读消息数
+@app.route('/api/dm/unread-count')
+@login_required
+def api_dm_unread_count():
+    count = DirectMessage.query.filter_by(
+        receiver_id=current_user.id, is_read=False
+    ).count()
+    return jsonify({'success': True, 'count': count})

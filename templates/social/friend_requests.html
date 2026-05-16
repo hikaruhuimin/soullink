@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ _("friend_requests") }} - SoulLink 灵犀{% endblock %}
+{% block content %}
+<div class="social-page">
+  <div class="social-header">
+    <h2>{{ _("friend_requests") }}</h2>
+    <div class="social-nav">
+      <a href="/social/friends">{{ _("friends") }}</a>
+      <a href="/social/friend-requests" class="active">{{ _("friend_requests") }}</a>
+      <a href="/social/messages">{{ _("messages") }}</a>
+    </div>
+  </div>
+  <h3>{{ _("received_requests") }}</h3>
+  <div id="receivedRequests"><div class="loading">{{ _("loading") }}...</div></div>
+  <h3>{{ _("sent_requests") }}</h3>
+  <div id="sentRequests"><div class="loading">{{ _("loading") }}...</div></div>
+</div>
+<script>
+async function load() {
+  const r = await fetch('/api/friend/requests');
+  const d = await r.json();
+  const recv = document.getElementById('receivedRequests');
+  if (d.received.length) {
+    recv.innerHTML = d.received.map(r => `
+      <div class="friend-card">
+        <div class="friend-avatar"><span>${r.user.username[0]}</span></div>
+        <div class="friend-info"><div class="friend-name">${r.user.username}</div><div class="friend-bio">{{ _("want_to_be_friend") }}</div></div>
+        <div class="friend-actions">
+          <button class="btn-sm" onclick="handle(${r.id},'accept')">{{ _("accept") }}</button>
+          <button class="btn-sm btn-danger" onclick="handle(${r.id},'reject')">{{ _("reject") }}</button>
+        </div>
+      </div>`).join('');
+  } else recv.innerHTML = '<div class="empty-state">{{ _("no_requests") }}</div>';
+  
+  const sent = document.getElementById('sentRequests');
+  if (d.sent.length) {
+    sent.innerHTML = d.sent.map(r => {
+      const statusText = r.status === 'pending' ? '{{ _("pending") }}' : (r.status === 'accepted' ? '{{ _("accepted") }}' : '{{ _("rejected") }}');
+      return '<div class="friend-card"><div class="friend-avatar"><span>'+r.user.username[0]+'</span></div><div class="friend-info"><div class="friend-name">'+r.user.username+'</div><div class="friend-bio">'+statusText+'</div></div></div>';
+    }).join('');
+  } else sent.innerHTML = '<div class="empty-state">{{ _("no_sent_requests") }}</div>';
+}
+async function handle(id, action) {
+  const r = await fetch('/api/friend/handle-request', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({request_id:id, action:action})});
+  const d = await r.json();
+  alert(d.message);
+  load();
+}
+load();
+</script>
+<style>
+h3 { margin: 1rem 0 0.5rem; font-size: 1rem; color: #555; }
+.btn-danger { background: #ff4757; }
+</style>
+{% endblock %}
