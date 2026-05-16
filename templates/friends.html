@@ -1,0 +1,729 @@
+{% extends "base.html" %}
+
+{% block title %}好友 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.friends-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 100px;
+    min-height: calc(100vh - 72px);
+}
+
+.friends-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.friends-header h1 {
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: 2rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #c4b5fd, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+}
+
+.friends-header p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 14px;
+    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+}
+
+.tab-btn:hover {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.tab-btn.active {
+    background: rgba(139, 92, 246, 0.25);
+    color: #c4b5fd;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+}
+
+.tab-btn .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 10px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #c4b5fd;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Friend card */
+.friend-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    margin-bottom: 10px;
+    transition: all 0.25s ease;
+}
+
+.friend-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(167, 139, 250, 0.2);
+    transform: translateY(-1px);
+}
+
+.friend-avatar {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: linear-gradient(135deg, #6B5B7B, #8B7B9B);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.friend-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.friend-avatar .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+}
+
+.online-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4ade80;
+    border: 2px solid #1a1a2e;
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.friend-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.friend-status {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.friend-status.online {
+    color: #4ade80;
+}
+
+.friend-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-dm {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    font-family: inherit;
+}
+
+.btn-dm:hover {
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+}
+
+.btn-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 10px;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+}
+
+.btn-remove:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.35);
+    transform: translateY(-1px);
+}
+
+/* Request card */
+.request-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    margin-bottom: 10px;
+    transition: all 0.25s ease;
+}
+
+.request-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.request-time {
+    font-size: 0.6875rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 2px;
+}
+
+.request-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-accept {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+}
+
+.btn-accept:hover {
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+}
+
+.btn-reject {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+}
+
+.btn-reject:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.25);
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state-icon {
+    font-size: 3.5rem;
+    opacity: 0.3;
+    margin-bottom: 16px;
+}
+
+.empty-state-text {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin-bottom: 4px;
+}
+
+.empty-state-sub {
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* Loading */
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(139, 92, 246, 0.15);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: 12px 24px;
+    background: rgba(40, 35, 50, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    white-space: nowrap;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast.error {
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .friends-page {
+        padding: 16px 12px 90px;
+    }
+
+    .friends-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .friend-card,
+    .request-card {
+        padding: 12px 14px;
+    }
+
+    .friend-avatar {
+        width: 42px;
+        height: 42px;
+    }
+
+    .btn-dm {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+
+    .btn-accept,
+    .btn-reject {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="friends-page">
+    <div class="friends-header">
+        <h1>👥 好友</h1>
+        <p>与你的好友保持联系</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="friends" role="tab" aria-selected="true">
+            👫 好友列表
+            {% if friends %}<span class="badge">{{ friends|length }}</span>{% endif %}
+        </button>
+        <button class="tab-btn {% if not friends %}active{% endif %}" data-tab="requests" role="tab" aria-selected="false">
+            📨 待处理请求
+            {% if pending_requests %}<span class="badge">{{ pending_requests|length }}</span>{% endif %}
+        </button>
+    </div>
+
+    <!-- Friends Tab -->
+    <div class="tab-content active" id="tab-friends" role="tabpanel">
+        {% if friends %}
+            {% for friend in friends %}
+            <div class="friend-card" data-friend-id="{{ friend.id }}" data-friendship-id="{{ friend.friendship_id }}">
+                <a href="/chat/dm/human/{{ friend.id }}" class="friend-avatar" style="text-decoration:none;">
+                    {% if friend.avatar and '/default_avatar' not in friend.avatar %}
+                    <img src="{{ friend.avatar }}" alt="{{ friend.nickname }}" onerror="this.style.display='none'">
+                    {% endif %}
+                    <div class="avatar-placeholder">{{ friend.nickname[0]|upper }}</div>
+                    {% if friend.is_online %}
+                    <span class="online-dot"></span>
+                    {% endif %}
+                </a>
+                <div class="friend-info">
+                    <a href="/chat/dm/human/{{ friend.id }}" style="text-decoration:none;color:inherit;">
+                        <div class="friend-name">{{ friend.nickname }}</div>
+                    </a>
+                    <div class="friend-status {% if friend.is_online %}online{% endif %}">
+                        {% if friend.is_online %}🟢 在线{% else %}⚪ 离线{% endif %}
+                    </div>
+                </div>
+                <div class="friend-actions">
+                    <a href="/chat/dm/human/{{ friend.id }}" class="btn-dm">
+                        💬 发消息
+                    </a>
+                    <button class="btn-remove" onclick="removeFriend(this)" data-friend-id="{{ friend.id }}" data-nickname="{{ friend.nickname }}" title="删除好友">
+                        ✕
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">👥</div>
+                <div class="empty-state-text">暂无好友</div>
+                <div class="empty-state-sub">去灵犀广场认识新朋友吧</div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Requests Tab -->
+    <div class="tab-content" id="tab-requests" role="tabpanel">
+        {% if pending_requests %}
+            {% for req in pending_requests %}
+            <div class="request-card" data-request-id="{{ req.id }}">
+                <div class="friend-avatar">
+                    {% if req.sender_avatar and '/default_avatar' not in req.sender_avatar %}
+                    <img src="{{ req.sender_avatar }}" alt="{{ req.sender_name }}" onerror="this.style.display='none'">
+                    {% endif %}
+                    <div class="avatar-placeholder">{{ req.sender_name[0]|upper }}</div>
+                </div>
+                <div class="request-info">
+                    <div class="friend-name">{{ req.sender_name }}</div>
+                    <div class="request-time">请求时间: {{ req.created_at }}</div>
+                </div>
+                <div class="request-actions">
+                    <button class="btn-accept" onclick="acceptRequest({{ req.id }})">
+                        ✓ 接受
+                    </button>
+                    <button class="btn-reject" onclick="rejectRequest({{ req.id }})">
+                        ✕ 拒绝
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📨</div>
+                <div class="empty-state-text">暂无待处理请求</div>
+                <div class="empty-state-sub">新好友请求将会显示在这里</div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var tab = this.getAttribute('data-tab');
+
+        document.querySelectorAll('.tab-btn').forEach(function(b) {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+        });
+        this.classList.add('active');
+        this.setAttribute('aria-selected', 'true');
+
+        document.querySelectorAll('.tab-content').forEach(function(c) {
+            c.classList.remove('active');
+        });
+        document.getElementById('tab-' + tab).classList.add('active');
+    });
+});
+
+// Toast helper
+function showToast(message, isError) {
+    var toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast' + (isError ? ' error' : '') + ' show';
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(function() {
+        toast.classList.remove('show');
+    }, 2500);
+}
+
+// Accept friend request
+function acceptRequest(requestId) {
+    var card = document.querySelector('[data-request-id="' + requestId + '"]');
+    if (card) {
+        var btn = card.querySelector('.btn-accept');
+        btn.disabled = true;
+        btn.textContent = '...';
+    }
+
+    fetch('/api/friend/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_id: requestId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            showToast('✓ 已添加好友');
+            if (card) {
+                card.style.transition = 'all 0.3s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(20px)';
+                setTimeout(function() { card.remove(); }, 300);
+            }
+            // Update badge counts
+            updateBadges();
+        } else {
+            showToast(data.error || '操作失败', true);
+            if (card) {
+                var btn = card.querySelector('.btn-accept');
+                btn.disabled = false;
+                btn.textContent = '✓ 接受';
+            }
+        }
+    })
+    .catch(function() {
+        showToast('网络错误', true);
+        if (card) {
+            var btn = card.querySelector('.btn-accept');
+            btn.disabled = false;
+            btn.textContent = '✓ 接受';
+        }
+    });
+}
+
+// Reject friend request
+function rejectRequest(requestId) {
+    var card = document.querySelector('[data-request-id="' + requestId + '"]');
+    if (card) {
+        var btn = card.querySelector('.btn-reject');
+        btn.disabled = true;
+        btn.textContent = '...';
+    }
+
+    fetch('/api/friend/reject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_id: requestId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            showToast('已拒绝请求');
+            if (card) {
+                card.style.transition = 'all 0.3s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(20px)';
+                setTimeout(function() { card.remove(); }, 300);
+            }
+            updateBadges();
+        } else {
+            showToast(data.error || '操作失败', true);
+            if (card) {
+                var btn = card.querySelector('.btn-reject');
+                btn.disabled = false;
+                btn.textContent = '✕ 拒绝';
+            }
+        }
+    })
+    .catch(function() {
+        showToast('网络错误', true);
+        if (card) {
+            var btn = card.querySelector('.btn-reject');
+            btn.disabled = false;
+            btn.textContent = '✕ 拒绝';
+        }
+    });
+}
+
+// Remove friend
+function removeFriend(btn) {
+    var friendId = parseInt(btn.getAttribute('data-friend-id'));
+    var nickname = btn.getAttribute('data-nickname');
+    if (!confirm('确定要删除好友 "' + nickname + '" 吗？')) return;
+
+    var card = btn.closest('.friend-card');
+    if (card) {
+        card.style.transition = 'all 0.3s ease';
+        card.style.opacity = '0.3';
+    }
+
+    fetch('/api/friend/remove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ friend_id: friendId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success) {
+            showToast('已删除好友');
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(-20px)';
+                setTimeout(function() { card.remove(); }, 300);
+            }
+            updateBadges();
+        } else {
+            showToast(data.error || '操作失败', true);
+            if (card) {
+                card.style.opacity = '1';
+            }
+        }
+    })
+    .catch(function() {
+        showToast('网络错误', true);
+        if (card) {
+            card.style.opacity = '1';
+        }
+    });
+}
+
+// Update badge counts
+function updateBadges() {
+    var friendCount = document.querySelectorAll('#tab-friends .friend-card').length;
+    var requestCount = document.querySelectorAll('#tab-requests .request-card').length;
+
+    var btns = document.querySelectorAll('.tab-btn');
+    if (btns[0]) {
+        var badge0 = btns[0].querySelector('.badge');
+        if (badge0) {
+            if (friendCount > 0) {
+                badge0.textContent = friendCount;
+                badge0.style.display = 'inline-flex';
+            } else {
+                badge0.style.display = 'none';
+            }
+        } else if (friendCount > 0) {
+            var b = document.createElement('span');
+            b.className = 'badge';
+            b.textContent = friendCount;
+            btns[0].appendChild(b);
+        }
+    }
+    if (btns[1]) {
+        var badge1 = btns[1].querySelector('.badge');
+        if (badge1) {
+            if (requestCount > 0) {
+                badge1.textContent = requestCount;
+                badge1.style.display = 'inline-flex';
+            } else {
+                badge1.style.display = 'none';
+            }
+        } else if (requestCount > 0) {
+            var b = document.createElement('span');
+            b.className = 'badge';
+            b.textContent = requestCount;
+            btns[1].appendChild(b);
+        }
+    }
+}
+</script>
+{% endblock %}

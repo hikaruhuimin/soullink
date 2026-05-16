@@ -1,0 +1,574 @@
+{% extends "base.html" %}
+
+{% block title %}{{ target_user.username }} - 私聊 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.dm-chat {
+    max-width: 800px;
+    margin: 0 auto;
+    height: calc(100vh - 72px);
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+}
+
+/* Header */
+.dm-header {
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+}
+
+.dm-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    transform: translateX(-2px);
+}
+
+.dm-user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: linear-gradient(135deg, #6B5B7B, #8B7B9B);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.dm-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dm-user-avatar .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+}
+
+.dm-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.dm-user-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dm-user-status {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Messages */
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+}
+
+.messages-container::-webkit-scrollbar {
+    width: 5px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+/* Message bubbles */
+.msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 75%;
+    animation: msgIn 0.25s ease;
+}
+
+@keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.msg.mine {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.msg.other {
+    align-self: flex-start;
+    align-items: flex-start;
+}
+
+.msg-bubble {
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    word-break: break-word;
+    position: relative;
+}
+
+.msg.mine .msg-bubble {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.msg.other .msg-bubble {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+    border-bottom-left-radius: 4px;
+}
+
+.msg-time {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.3);
+    margin-top: 4px;
+    padding: 0 4px;
+}
+
+.msg.mine .msg-time {
+    text-align: right;
+}
+
+/* Input area */
+.dm-input-area {
+    padding: 14px 20px;
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.dm-input-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.dm-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    font-size: 0.9375rem;
+    resize: none;
+    font-family: inherit;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+    transition: all 0.2s ease;
+    min-height: 44px;
+    max-height: 120px;
+    outline: none;
+}
+
+.dm-input:focus {
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.dm-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.send-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.send-btn:hover {
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+}
+
+.send-btn:active {
+    transform: translateY(0);
+}
+
+.send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Empty state */
+.empty-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.empty-chat-icon {
+    font-size: 4rem;
+    opacity: 0.4;
+}
+
+.empty-chat-text {
+    font-size: 1rem;
+}
+
+.empty-chat-sub {
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* Date separator */
+.date-sep {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    align-self: center;
+    width: 100%;
+}
+
+.date-sep-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.date-sep-text {
+    font-size: 0.6875rem;
+    color: rgba(255, 255, 255, 0.25);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dm-chat {
+        height: calc(100vh - 56px);
+    }
+
+    .dm-header {
+        padding: 10px 14px;
+    }
+
+    .messages-container {
+        padding: 14px;
+    }
+
+    .dm-input-area {
+        padding: 10px 14px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+
+    .msg {
+        max-width: 85%;
+    }
+
+    .msg-bubble {
+        font-size: 0.9rem;
+        padding: 10px 14px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dm-chat" id="dmChat">
+    <!-- Header -->
+    <div class="dm-header">
+        <div class="dm-header-left">
+            <a href="/friends" class="back-btn" title="返回好友列表">
+                ←
+            </a>
+            <div class="dm-user-avatar">
+                {% if target_user.avatar and '/default_avatar' not in target_user.avatar %}
+                <img src="{{ target_user.avatar }}" alt="{{ target_user.username }}" onerror="this.style.display='none'">
+                {% endif %}
+                <div class="avatar-placeholder">{{ target_user.username[0]|upper }}</div>
+            </div>
+            <div class="dm-user-info">
+                <div class="dm-user-name">{{ target_user.username }}</div>
+                <div class="dm-user-status" id="userStatus">在线</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-container" id="messagesContainer">
+        {% if messages %}
+            {% for msg in messages %}
+            <div class="msg {% if msg.is_mine %}mine{% else %}other{% endif %}" data-msg-id="{{ msg.id }}">
+                <div class="msg-bubble">{{ msg.content }}</div>
+                <div class="msg-time">{{ msg.created_at }}</div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-chat" id="emptyState">
+                <div class="empty-chat-icon">💬</div>
+                <div class="empty-chat-text">开始聊天吧</div>
+                <div class="empty-chat-sub">发送第一条消息</div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Input -->
+    <div class="dm-input-area">
+        <div class="dm-input-wrapper">
+            <textarea
+                class="dm-input"
+                id="dmInput"
+                placeholder="输入消息... (Enter发送, Shift+Enter换行)"
+                rows="1"
+            ></textarea>
+            <button class="send-btn" id="sendBtn" title="发送">
+                ➤
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+var TARGET_USER_ID = {{ target_user.id }};
+var LAST_MSG_ID = 0;
+var POLLING = true;
+
+var messagesContainer = document.getElementById('messagesContainer');
+var dmInput = document.getElementById('dmInput');
+var sendBtn = document.getElementById('sendBtn');
+var emptyState = document.getElementById('emptyState');
+
+// Initialize last message ID
+(function() {
+    var msgs = messagesContainer.querySelectorAll('.msg');
+    if (msgs.length > 0) {
+        LAST_MSG_ID = parseInt(msgs[msgs.length - 1].getAttribute('data-msg-id')) || 0;
+    }
+    scrollToBottom();
+})();
+
+// Scroll to bottom
+function scrollToBottom() {
+    setTimeout(function() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 50);
+}
+
+// Append a message
+function appendMessage(msg, isNew) {
+    // Remove empty state if present
+    if (emptyState) {
+        emptyState.remove();
+        emptyState = null;
+    }
+
+    // Check if message already exists
+    var existing = messagesContainer.querySelector('[data-msg-id="' + msg.id + '"]');
+    if (existing) return;
+
+    var div = document.createElement('div');
+    div.className = 'msg ' + (msg.is_mine ? 'mine' : 'other');
+    div.setAttribute('data-msg-id', msg.id);
+
+    var bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.textContent = msg.content;
+    div.appendChild(bubble);
+
+    var time = document.createElement('div');
+    time.className = 'msg-time';
+    time.textContent = msg.created_at || '';
+    div.appendChild(time);
+
+    messagesContainer.appendChild(div);
+
+    if (isNew) {
+        scrollToBottom();
+    }
+}
+
+// Send message
+function sendMessage() {
+    var content = dmInput.value.trim();
+    if (!content) return;
+
+    dmInput.value = '';
+    dmInput.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    fetch('/api/dm/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ receiver_id: TARGET_USER_ID, content: content })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        sendBtn.disabled = false;
+        if (data.success && data.message) {
+            var msg = data.message;
+            msg.is_mine = true;
+            appendMessage(msg, true);
+            LAST_MSG_ID = msg.id;
+        } else {
+            showError(data.error || '发送失败');
+        }
+    })
+    .catch(function() {
+        sendBtn.disabled = false;
+        showError('网络错误');
+    });
+}
+
+// Poll for new messages
+function pollMessages() {
+    if (!POLLING) return;
+
+    fetch('/api/dm/messages/' + TARGET_USER_ID + '?last_id=' + LAST_MSG_ID)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.success && data.messages && data.messages.length > 0) {
+            data.messages.forEach(function(msg) {
+                appendMessage(msg, true);
+                if (msg.id > LAST_MSG_ID) {
+                    LAST_MSG_ID = msg.id;
+                }
+            });
+        }
+    })
+    .catch(function() {
+        // Silently fail polling
+    })
+    .finally(function() {
+        if (POLLING) {
+            setTimeout(pollMessages, 3000);
+        }
+    });
+}
+
+// Show error toast
+function showError(msg) {
+    var existing = document.querySelector('.dm-toast');
+    if (existing) existing.remove();
+
+    var toast = document.createElement('div');
+    toast.className = 'dm-toast';
+    toast.textContent = msg;
+    Object.assign(toast.style, {
+        position: 'fixed',
+        bottom: '100px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        padding: '10px 20px',
+        background: 'rgba(239, 68, 68, 0.9)',
+        borderRadius: '10px',
+        color: 'white',
+        fontSize: '0.875rem',
+        zIndex: '1000',
+        opacity: '0',
+        transition: 'opacity 0.3s ease'
+    });
+    document.body.appendChild(toast);
+    setTimeout(function() { toast.style.opacity = '1'; }, 10);
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        setTimeout(function() { toast.remove(); }, 300);
+    }, 2500);
+}
+
+// Auto-resize textarea
+dmInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// Enter to send, Shift+Enter for newline
+dmInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+// Send on button click
+sendBtn.addEventListener('click', sendMessage);
+
+// Start polling
+setTimeout(pollMessages, 2000);
+
+// Stop polling when page is hidden
+document.addEventListener('visibilitychange', function() {
+    POLLING = !document.hidden;
+    if (POLLING) {
+        // Immediate poll when coming back
+        setTimeout(pollMessages, 500);
+    }
+});
+</script>
+{% endblock %}
