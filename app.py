@@ -1374,6 +1374,8 @@ def alipay_create_order():
             
             # 读取私钥
             private_key_pem = os.environ.get("ALIPAY_PRIVATE_KEY", "")
+            if "\\n" in private_key_pem:
+                private_key_pem = private_key_pem.replace("\\n", "\n")
             private_key = serialization.load_pem_private_key(private_key_pem.encode(), password=None)
             
             # 支付宝参数
@@ -1385,8 +1387,8 @@ def alipay_create_order():
                 "sign_type": "RSA2",
                 "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
                 "version": "1.0",
-                "notify_url": "https://soullinkai.zeabur.app/api/alipay/notify",
-                "return_url": "https://soullinkai.zeabur.app/recharge?pay_result=success",
+                "notify_url": "https://soulink-ai.com/api/alipay/notify",
+                "return_url": "https://soulink-ai.com/recharge?pay_result=success",
                 "biz_content": json.dumps({
                     "out_trade_no": order_no,
                     "product_code": "FAST_INSTANT_TRADE_PAY",
