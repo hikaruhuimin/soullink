@@ -810,9 +810,9 @@
                     </button>
                     <div class="nav-dropdown">
                         <a href="/divination" class="nav-dropdown-item {% if request.path == '/divination' %}active{% endif %}">🃏 {{ _('ai_divination') if 'ai_divination' in TRANSLATIONS[lang] else _('divination') }}</a>
-                        <a href="/divination/dream" class="nav-dropdown-item {% if request.path == '/divination/dream' %}active{% endif %}">💭 {{ _('dream_divination') if 'dream_divination' in TRANSLATIONS[lang] else 'AI解梦' }}</a>
+                        <a href="/divination/dream" class="nav-dropdown-item {% if request.path == '/divination/dream' %}active{% endif %}">💭 {{ _('dream_divination') if 'dream_divination' in TRANSLATIONS[lang] else _('dream_divination') }}</a>
                         <a href="/daily-checkin" class="nav-dropdown-item {% if request.path == '/daily-checkin' %}active{% endif %}">📅 {{ _('daily_fortune') if 'daily_fortune' in TRANSLATIONS[lang] else _('daily_checkin') }}</a>
-                        <a href="/divination/mbti" class="nav-dropdown-item {% if request.path == '/divination/mbti' %}active{% endif %}">🧩 {{ _('mbti_test') if 'mbti_test' in TRANSLATIONS[lang] else 'MBTI测试' }}</a>
+                        <a href="/divination/mbti" class="nav-dropdown-item {% if request.path == '/divination/mbti' %}active{% endif %}">🧩 {{ _('mbti_test') if 'mbti_test' in TRANSLATIONS[lang] else _('mbti_test') }}</a>
                     </div>
                 </div>
                 
@@ -928,9 +928,9 @@
                             {{ lang|upper or 'ZH' }}
                         </button>
                         <div class="nav-lang-menu" id="langMenu">
-                            <a href="/lang/zh" class="lang-option {% if lang == 'zh' %}active{% endif %}">中文</a>
-                            <a href="/lang/en" class="lang-option {% if lang == 'en' %}active{% endif %}">English</a>
-                            <a href="/lang/ja" class="lang-option {% if lang == 'ja' %}active{% endif %}">日本語</a>
+                            <a href="/lang/zh" class="lang-option {% if lang == 'zh' %}active{% endif %}">{{ _('lang_zh') }}</a>
+                            <a href="/lang/en" class="lang-option {% if lang == 'en' %}active{% endif %}">{{ _('lang_en') }}</a>
+                            <a href="/lang/ja" class="lang-option {% if lang == 'ja' %}active{% endif %}">{{ _('lang_ja') }}</a>
                         </div>
                     </div>
                     

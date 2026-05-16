@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}灵石充值 - SoulLink 灵犀{% endblock %}
+{% block title %}{{ _('recharge_title') }} - SoulLink 灵犀{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -399,26 +399,26 @@
 {% block content %}
 <div class="recharge-page">
     <div class="recharge-header">
-        <h1>💎 灵石充值</h1>
-        <p>为你的冒险之旅补充能量</p>
+        <h1>💎 {{ _('recharge_title') }}</h1>
+        <p>{{ _('recharge_subtitle') }}</p>
     </div>
 
     {% if is_logged_in %}
     <!-- Balance Display -->
     <div class="balance-card">
-        <div class="balance-label">当前灵石余额</div>
-        <div class="balance-amount">{{ spirit_stones or 0 }} <span class="balance-unit">灵石</span></div>
+        <div class="balance-label">{{ _('current_balance_label') }}</div>
+        <div class="balance-amount">{{ spirit_stones or 0 }} <span class="balance-unit">{{ _('stones') }}</span></div>
     </div>
 
     <!-- Package Grid -->
-    <div class="section-title">📦 选择充值套餐</div>
+    <div class="section-title">📦 {{ _('select_recharge_package') }}</div>
     <div class="package-grid">
         {% for pkg in packages %}
         <div class="package-card {% if pkg.popular or pkg.best_value %}best-value{% endif %}" 
              onclick="selectPackage('{{ pkg.id }}')"
              data-package-id="{{ pkg.id }}">
             {% if pkg.popular or pkg.best_value %}
-            <span class="best-value-badge">推荐</span>
+            <span class="best-value-badge">{{ _('recommended') }}</span>
             {% endif %}
             <div class="package-icon">{{ pkg.icon or '💎' }}</div>
             <div class="package-name">{{ pkg.label or pkg.name }}</div>
@@ -445,15 +445,15 @@
                 <div class="payment-radio"></div>
             </div>
             <div id="solWalletInfo" style="display:none; margin-top:12px; padding:16px; background:linear-gradient(135deg,#9945FF,#14F195); border-radius:14px; text-align:center;">
-                <div style="color:white; font-size:0.85rem; margin-bottom:8px; opacity:0.9;">💎 请发送SOL到以下地址</div>
+                <div style="color:white; font-size:0.85rem; margin-bottom:8px; opacity:0.9;">💎 {{ _('send_sol_to_address') }}</div>
                 <div style="background:rgba(0,0,0,0.3); border-radius:10px; padding:12px; word-break:break-all; font-family:monospace; color:white; font-size:0.85rem; letter-spacing:0.5px; cursor:pointer;" onclick="copySolAddress()" id="solAddress">3TuxYx181hGccdBbWoFUeS6QukyNGeKyUYwBy9fEByqT</div>
-                <div style="color:rgba(255,255,255,0.7); font-size:0.75rem; margin-top:8px;">👆 点击复制地址</div>
+                <div style="color:rgba(255,255,255,0.7); font-size:0.75rem; margin-top:8px;">👆 {{ _('click_to_copy_address') }}</div>
             </div>
             <!-- 支付宝 -->
             <div class="payment-method" onclick="selectPayment('alipay')">
                 <div class="payment-method-icon">💰</div>
                 <div class="payment-method-info">
-                    <div class="payment-method-name">支付宝</div>
+                    <div class="payment-method-name">{{ _('payment_alipay') }}</div>
                     <div class="payment-method-desc">Alipay</div>
                 </div>
                 <div class="payment-radio"></div>
@@ -482,8 +482,8 @@
     <div id="processingOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
         <div style="background:rgba(40,35,50,0.95); border-radius:24px; padding:40px; text-align:center; max-width:360px; width:90%;">
             <div style="width:48px; height:48px; border:3px solid rgba(167,139,250,0.2); border-top-color:#a78bfa; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 20px;"></div>
-            <div style="color:white; font-size:1.1rem; font-weight:600; margin-bottom:8px;">正在跳转支付...</div>
-            <div style="color:rgba(255,255,255,0.5); font-size:0.85rem;">请稍候，正在处理您的订单</div>
+            <div style="color:white; font-size:1.1rem; font-weight:600; margin-bottom:8px;">{{ _('redirecting_to_payment') }}</div>
+            <div style="color:rgba(255,255,255,0.5); font-size:0.85rem;">{{ _('processing_order') }}</div>
         </div>
     </div>
 
@@ -492,18 +492,18 @@
 
     <!-- Notes -->
     <div class="recharge-notes">
-        <h4>📋 说明</h4>
+        <h4>📋 {{ _('notes_title') }}</h4>
         <ul>
-            <li>充值后灵石将立即到账</li>
-            <li>灵石可用于购买道具、解锁特权等</li>
-            <li>如有问题请联系客服 support@soullink.app</li>
+            <li>{{ _('recharge_note_1') }}</li>
+            <li>{{ _('recharge_note_2') }}</li>
+            <li>{{ _('recharge_note_3') }}</li>
         </ul>
     </div>
     {% else %}
     <div class="not-logged-in">
         <div class="not-logged-in-icon">🔒</div>
-        <div class="not-logged-in-text">请先登录后再进行充值</div>
-        <a href="/auth/login" class="login-btn">去登录</a>
+        <div class="not-logged-in-text">{{ _('login_to_recharge') }}</div>
+        <a href="/auth/login" class="login-btn">{{ _('go_login') }}</a>
     </div>
     {% endif %}
 </div>

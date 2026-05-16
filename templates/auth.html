@@ -688,7 +688,7 @@
                 <div class="form-group" style="margin-top:12px;">
                     <label>{{ _('verify_code') }}</label>
                     <div style="display:flex;gap:8px;">
-                        <input type="text" name="sms_code" id="smsCodeInput" placeholder="输入6位{{ _('verify_code') }}" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="flex:1;padding:0.75rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:10px;color:var(--color-text);font-size:1rem;text-align:center;letter-spacing:4px;">
+                        <input type="text" name="sms_code" id="smsCodeInput" placeholder="{{ _('enter_6_digit_code') }}" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="flex:1;padding:0.75rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:10px;color:var(--color-text);font-size:1rem;text-align:center;letter-spacing:4px;">
                         <button type="button" id="sendSmsBtn" onclick="sendSmsCode()" style="white-space:nowrap;padding:0.75rem 1rem;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:white;border:none;border-radius:10px;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s;">{{ _('send_code') }}</button>
                     </div>
                     <p class="verification-hint" id="smsStatus" style="margin-top:6px;font-size:0.8rem;"></p>
@@ -710,11 +710,11 @@
             
             <!-- 邀请码（选填）- 默认隐藏，点击链接展开 -->
             <div class="form-group" id="refCodeGroup" style="display:none;">
-                <label>邀请码</label>
-                <input type="text" name="ref_code" placeholder="输入邀请码（选填）" class="auth-input">
+                <label>{{ _('invite_code') }}</label>
+                <input type="text" name="ref_code" placeholder="{{ _('invite_code_placeholder') }}" class="auth-input">
             </div>
             <div class="form-group" style="margin-top:-0.75rem;margin-bottom:1.25rem;">
-                <a href="javascript:void(0)" id="showRefCodeLink" style="color:var(--color-gold);font-size:0.8rem;text-decoration:none;">有邀请码？</a>
+                <a href="javascript:void(0)" id="showRefCodeLink" style="color:var(--color-gold);font-size:0.8rem;text-decoration:none;">{{ _('have_invite_code') }}</a>
             </div>
             
             <button type="submit" class="btn btn-primary btn-block auth-submit-btn">{{ _('register') }}</button>
@@ -914,7 +914,7 @@ document.getElementById('registerForm')?.addEventListener('submit', function(e) 
     if (registerMethod === 'phone') {
         const smsCode = document.getElementById('smsCodeInput').value;
         if (!smsCode || smsCode.length !== 6) {
-            alert('请输入6位短信{{ _('verify_code') }}');
+            alert('{{ _('enter_6_digit_verify_code') }}');
             e.preventDefault();
             return;
         }
@@ -926,10 +926,10 @@ document.getElementById('showRefCodeLink')?.addEventListener('click', function()
     const group = document.getElementById('refCodeGroup');
     if (group.style.display === 'none') {
         group.style.display = 'block';
-        this.textContent = '隐藏邀请码';
+        this.textContent = '{{ _('hide_invite_code') }}';
     } else {
         group.style.display = 'none';
-        this.textContent = '有邀请码？';
+        this.textContent = '{{ _('have_invite_code') }}';
     }
 });
 
@@ -957,7 +957,7 @@ function sendSmsCode() {
     }
     
     if (!phone || !phoneValid) {
-        status.textContent = '请输入正确的手机号';
+        status.textContent = '{{ _('enter_correct_phone') }}';
         status.style.color = '#ef4444';
         return;
     }
@@ -972,11 +972,11 @@ function sendSmsCode() {
         if (smsCountdown <= 0) {
             clearInterval(smsTimer);
             btn.disabled = false;
-            btn.textContent = '重新发送';
+            btn.textContent = '{{ _('resend_code') }}';
         }
     }, 1000);
     
-    status.textContent = '发送中...';
+    status.textContent = '{{ _('sending') }}';
     status.style.color = '#8b5cf6';
     
     fetch('/api/sms/send', {
@@ -991,22 +991,22 @@ function sendSmsCode() {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            status.textContent = data.debug_code ? '{{ _('verify_code') }}已发送（调试模式: ' + data.debug_code + '）' : '{{ _('verify_code') }}已发送';
+            status.textContent = data.debug_code ? '{{ _('code_sent_prefix') }}（{{ _('debug_mode') }}: ' + data.debug_code + '）' : '{{ _('code_sent') }}';
             status.style.color = '#10b981';
         } else {
-            status.textContent = data.message || '发送失败';
+            status.textContent = data.message || '{{ _('send_failed') }}';
             status.style.color = '#ef4444';
             clearInterval(smsTimer);
             btn.disabled = false;
-            btn.textContent = '重新发送';
+            btn.textContent = '{{ _('resend_code') }}';
         }
     })
     .catch(err => {
-        status.textContent = '网络错误，请重试';
+        status.textContent = '{{ _('network_error_retry') }}';
         status.style.color = '#ef4444';
         clearInterval(smsTimer);
         btn.disabled = false;
-        btn.textContent = '重新发送';
+        btn.textContent = '{{ _('resend_code') }}';
     });
 }
 </script>
