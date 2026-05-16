@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ _('my_profile') }} - SoulLink 灵犀{% endblock %}
+{% block content %}
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="profile-avatar">
+      <div class="avatar-circle">{{ user.username[:1] }}</div>
+    </div>
+    <h2>{{ user.username }}</h2>
+    <p class="profile-email">{{ user.email }}</p>
+    <p class="profile-bio">{{ user.bio or _('no_bio') }}</p>
+  </div>
+  <div class="profile-stats">
+    <div class="stat-item">
+      <span class="stat-number">{{ register_days }}</span>
+      <span class="stat-label">{{ _('register_days') }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">{{ divination_count }}</span>
+      <span class="stat-label">{{ _('divination_count') }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-number">{{ signin_streak }}</span>
+      <span class="stat-label">{{ _('signin_streak') }}</span>
+    </div>
+  </div>
+  <div class="profile-actions">
+    <a href="/profile/edit" class="btn btn-primary">{{ _('edit_profile') }}</a>
+    <a href="/profile/settings" class="btn btn-secondary">{{ _('settings') }}</a>
+    <a href="/recharge" class="btn btn-gold">{{ _('recharge') }}</a>
+  </div>
+</div>
+<style>
+.profile-container { max-width: 600px; margin: 0 auto; padding: 2rem; }
+.profile-header { text-align: center; margin-bottom: 2rem; }
+.avatar-circle { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; margin: 0 auto 1rem; }
+.profile-stats { display: flex; justify-content: space-around; margin-bottom: 2rem; }
+.stat-item { text-align: center; }
+.stat-number { font-size: 1.5rem; font-weight: bold; display: block; color: #667eea; }
+.stat-label { font-size: 0.8rem; color: #888; }
+.profile-actions { display: flex; flex-direction: column; gap: 0.5rem; }
+.btn { padding: 0.8rem; border-radius: 8px; text-align: center; text-decoration: none; font-weight: 500; }
+.btn-primary { background: #667eea; color: white; }
+.btn-secondary { background: #f0f0f0; color: #333; }
+.btn-gold { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+</style>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ _('settings') }} - SoulLink 灵犀{% endblock %}
+{% block content %}
+<div class="settings-container">
+  <h2>{{ _('settings') }}</h2>
+  <div class="settings-section">
+    <h3>{{ _('notification_settings') }}</h3>
+    <p>{{ _('notification_desc') }}</p>
+  </div>
+  <div class="settings-section">
+    <h3>{{ _('account') }}</h3>
+    <a href="/auth/logout" class="btn btn-danger">{{ _('logout') }}</a>
+  </div>
+</div>
+<style>
+.settings-container { max-width: 500px; margin: 0 auto; padding: 2rem; }
+.settings-section { margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 8px; }
+.btn-danger { padding: 0.6rem 1.2rem; background: #ff4757; color: white; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; }
+</style>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ _('edit_profile') }} - SoulLink 灵犀{% endblock %}
+{% block content %}
+<div class="edit-container">
+  <h2>{{ _('edit_profile') }}</h2>
+  <form id="profileForm">
+    <div class="form-group">
+      <label>{{ _('username') }}</label>
+      <input type="text" name="username" value="{{ user.username }}" class="form-input">
+    </div>
+    <div class="form-group">
+      <label>MBTI</label>
+      <select name="mbti" class="form-input">
+        {% for mt in mbti_types %}
+        <option value="{{ mt }}" {% if user.mbti == mt %}selected{% endif %}>{{ mt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>{{ _('bio') }}</label>
+      <textarea name="bio" class="form-input" rows="3">{{ user.bio or '' }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>{{ _('interests') }}</label>
+      <div class="tags-container">
+        {% for tag in interest_tags %}
+        <label class="tag-item">
+          <input type="checkbox" name="interests" value="{{ tag }}" {% if tag in user_interests %}checked{% endif %}>
+          <span>{{ tag }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">{{ _('save') }}</button>
+  </form>
+</div>
+<style>
+.edit-container { max-width: 500px; margin: 0 auto; padding: 2rem; }
+.form-group { margin-bottom: 1rem; }
+.form-input { width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; }
+.tags-container { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tag-item { display: flex; align-items: center; gap: 0.3rem; }
+.btn { padding: 0.8rem; border-radius: 8px; text-align: center; font-weight: 500; cursor: pointer; }
+.btn-primary { background: #667eea; color: white; border: none; width: 100%; }
+</style>
+<script>
+document.getElementById('profileForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const form = new FormData(e.target);
+  const data = {};
+  form.forEach((v, k) => { if (k !== 'interests') data[k] = v; });
+  data.interests = form.getAll('interests').join(',');
+  const res = await fetch('/profile/edit', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+  const json = await res.json();
+  if (json.success) { alert('{{ _("saved") }}'); window.location.href = '/profile'; }
+  else { alert(json.message); }
+};
+</script>
+{% endblock %}
