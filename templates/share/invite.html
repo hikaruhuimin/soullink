@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('invite_friends', '邀请好友') }} - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.invite-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px;
+    min-height: calc(100vh - 72px);
+}
+
+.invite-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.invite-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #E8D5C4;
+    margin-bottom: 8px;
+}
+
+.invite-subtitle {
+    font-size: 0.95rem;
+    color: #A0A8C0;
+}
+
+/* 邀请码卡片 */
+.code-card {
+    background: linear-gradient(145deg, rgba(30, 25, 60, 0.9), rgba(15, 10, 40, 0.95));
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    text-align: center;
+}
+
+.code-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 12px;
+}
+
+.code-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #C4B5FD;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    font-family: 'Courier New', monospace;
+}
+
+.share-link-box {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.share-link {
+    flex: 1;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-copy-link {
+    background: rgba(139, 92, 246, 0.3);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-copy-link:hover {
+    background: rgba(139, 92, 246, 0.5);
+}
+
+/* 奖励说明 */
+.reward-info {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.reward-title {
+    font-size: 1rem;
+    color: #FFD700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reward-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.reward-item {
+    text-align: center;
+}
+
+.reward-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.reward-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.reward-amount {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #FFD700;
+}
+
+/* 邀请记录 */
+.invite-history {
+    background: rgba(15, 20, 50, 0.75);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(100, 120, 180, 0.2);
+}
+
+.history-title {
+    font-size: 1rem;
+    color: #E8D5C4;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(100, 120, 180, 0.2);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #C4B5FD;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.history-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(100, 120, 180, 0.1);
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-user {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.history-date {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.history-reward {
+    color: #FFD700;
+    font-size: 0.9rem;
+}
+
+/* 排行榜 */
+.leaderboard {
+    background: rgba(15, 20, 50, 0.75);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(100, 120, 180, 0.2);
+}
+
+.leaderboard-title {
+    font-size: 1rem;
+    color: #E8D5C4;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(100, 120, 180, 0.1);
+}
+
+.leaderboard-item:last-child {
+    border-bottom: none;
+}
+
+.rank-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: #1a1033; }
+.rank-2 { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); color: #1a1033; }
+.rank-3 { background: linear-gradient(135deg, #CD7F32, #8B4513); color: white; }
+.rank-default { background: rgba(100, 120, 180, 0.3); color: rgba(255, 255, 255, 0.6); }
+
+.leaderboard-user {
+    flex: 1;
+}
+
+.leaderboard-name {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.leaderboard-count {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: rgba(255, 255, 255, 0.4);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="invite-container">
+    <div class="invite-header">
+        <h1 class="invite-title">🎁 {{ t('invite_friends', '邀请好友') }}</h1>
+        <p class="invite-subtitle">{{ t('invite_subtitle', '分享你的邀请码，好友和你都能获得50灵石') }}</p>
+    </div>
+    
+    <!-- 邀请码卡片 -->
+    <div class="code-card">
+        <div class="code-label">{{ t('your_invite_code', '你的专属邀请码') }}</div>
+        <div class="code-value">{{ invite_code }}</div>
+        
+        <div class="share-link-box">
+            <span class="share-link" id="shareLink">{{ share_url }}</span>
+            <button class="btn-copy-link" onclick="copyShareLink()">{{ t('copy', '复制') }}</button>
+        </div>
+        
+        <button class="btn btn-primary" onclick="shareToSocial()" style="width: 100%;">
+            <span>📤</span> {{ t('share_invite', '分享邀请链接') }}
+        </button>
+    </div>
+    
+    <!-- 奖励说明 -->
+    <div class="reward-info">
+        <div class="reward-title">
+            <span>🎁</span>
+            {{ t('invite_rewards', '邀请奖励') }}
+        </div>
+        <div class="reward-items">
+            <div class="reward-item">
+                <div class="reward-icon">👤</div>
+                <div class="reward-text">{{ t('friend_gets', '好友获得') }}</div>
+                <div class="reward-amount">50 {{ t('spirit_stones', '灵石') }}</div>
+            </div>
+            <div class="reward-item">
+                <div class="reward-icon">🎉</div>
+                <div class="reward-text">{{ t('you_get', '你获得') }}</div>
+                <div class="reward-amount">+50 {{ t('spirit_stones', '灵石') }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 邀请记录 -->
+    <div class="invite-history">
+        <div class="history-title">
+            <span>📋</span>
+            {{ t('invite_history', '邀请记录') }}
+        </div>
+        
+        <div class="history-stats">
+            <div class="stat-item">
+                <div class="stat-value">{{ total_invites }}</div>
+                <div class="stat-label">{{ t('total_invites', '累计邀请') }}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ total_reward }}</div>
+                <div class="stat-label">{{ t('total_reward', '累计奖励') }}</div>
+            </div>
+        </div>
+        
+        {% if invitations %}
+        <div class="history-list">
+            {% for inv in invitations %}
+            <div class="history-item">
+                <div>
+                    <div class="history-user">{{ inv.invitee.username }}</div>
+                    <div class="history-date">{{ inv.created_at.strftime('%Y-%m-%d') }}</div>
+                </div>
+                <div class="history-reward">+{{ inv.reward }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>{{ t('no_invites_yet', '还没有邀请记录，快去邀请好友吧！') }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- 邀请排行榜 -->
+    <div class="leaderboard">
+        <div class="leaderboard-title">
+            <span>🏆</span>
+            {{ t('invite_leaderboard', '邀请排行榜') }}
+        </div>
+        
+        {% if leaderboard %}
+        {% for item in leaderboard %}
+        <div class="leaderboard-item">
+            <div class="rank-badge {% if loop.index <= 3 %}rank-{{ loop.index }}{% else %}rank-default{% endif %}">
+                {{ loop.index }}
+            </div>
+            <div class="leaderboard-user">
+                <div class="leaderboard-name">{{ item.username }}</div>
+                <div class="leaderboard-count">{{ item.count }} {{ t('people', '人') }}</div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <p>{{ t('no_leaderboard_yet', '暂无排行榜数据') }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function copyShareLink() {
+    const link = document.getElementById('shareLink').textContent;
+    navigator.clipboard.writeText(link).then(() => {
+        alert('{{ t("link_copied", "链接已复制") }}');
+    });
+}
+
+function shareToSocial() {
+    const link = document.getElementById('shareLink').textContent;
+    const text = '{{ t("share_text", "用 SoulLink 灵犀，探索你的灵魂伴侣！") }}';
+    
+    // 尝试使用 Web Share API
+    if (navigator.share) {
+        navigator.share({
+            title: 'SoulLink 灵犀',
+            text: text,
+            url: link
+        }).catch(() => {});
+    } else {
+        // 复制链接作为后备
+        copyShareLink();
+    }
+}
+</script>
+{% endblock %}

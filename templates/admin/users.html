@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'zh' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SoulLink Admin - Users</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;min-height:100vh;background:#0f172a;color:#e2e8f0}
+.sidebar{width:260px;background:#1e293b;padding:24px 0;position:fixed;height:100vh;overflow-y:auto}
+.sidebar h1{font-size:20px;color:#f8fafc;padding:0 24px 24px;border-bottom:1px solid #334155;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.sidebar h1 span{font-size:24px}
+.nav-item{display:block;padding:12px 24px;color:#94a3b8;text-decoration:none;font-size:14px;transition:all .2s;border-left:3px solid transparent}
+.nav-item:hover,.nav-item.active{background:#334155;color:#f8fafc;border-left-color:#8b5cf6}
+.nav-item span{margin-right:10px}
+.sidebar .section-title{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding:16px 24px 8px}
+.content{flex:1;margin-left:260px;padding:32px;background:#f1f5f9;min-height:100vh}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:16px}
+.header h2{font-size:24px;color:#1e293b}
+.header-right{display:flex;gap:8px}
+.search-box{display:flex;gap:8px;flex-wrap:wrap}
+.search-box input{padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;min-width:200px;background:#fff}
+.search-box select{padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;background:#fff}
+.search-box button,.search-box a.btn{padding:10px 18px;background:#8b5cf6;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;text-decoration:none;transition:all .2s}
+.search-box button:hover,.search-box a.btn:hover{background:#7c3aed}
+.section{background:#fff;border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:12px 16px;color:#64748b;border-bottom:2px solid #e2e8f0;font-size:11px;font-weight:600;text-transform:uppercase}
+td{padding:12px 16px;border-bottom:1px solid #f1f5f9;color:#475569}
+tr:hover td{background:#f8fafc}
+tr:last-child td{border-bottom:none}
+a{color:#8b5cf6;text-decoration:none}
+a:hover{text-decoration:underline}
+.badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-vip{background:#ede9fe;color:#7c3aed}
+.badge-free{background:#f1f5f9;color:#64748b}
+.badge-disabled{background:#fef2f2;color:#dc2626}
+.pagination{display:flex;gap:6px;justify-content:center;margin-top:24px}
+.pagination a{padding:8px 14px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;color:#475569;text-decoration:none;font-size:14px;transition:all .2s}
+.pagination a:hover{background:#f1f5f9}
+.pagination a.active{background:#8b5cf6;color:#fff;border-color:#8b5cf6}
+.pagination .disabled{opacity:0.5;pointer-events:none}
+.action-form{display:inline}
+.action-form button{padding:6px 12px;border:none;border-radius:6px;font-size:12px;cursor:pointer;margin-left:4px}
+.btn-view{background:#ede9fe;color:#7c3aed}
+.btn-view:hover{background:#ddd6fe}
+.btn-danger{background:#fef2f2;color:#dc2626}
+.btn-danger:hover{background:#fee2e2}
+.btn-success{background:#dcfce7;color:#16a34a}
+.btn-success:hover{background:#bbf7d0}
+.flash{padding:16px;background:#dcfce7;color:#16a34a;border-radius:8px;margin-bottom:24px}
+@media(max-width:768px){.sidebar{display:none}.content{margin-left:0;padding:16px}.search-box{flex-direction:column}.search-box input,.search-box select,.search-box button,.search-box a.btn{width:100%}.table-wrapper{overflow-x:auto}}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+<h1><span>🧿</span>SoulLink</h1>
+<div class="section-title">Main</div>
+<a href="/admin2" class="nav-item"><span>📊</span>{% if lang == 'zh' %}仪表盘{% elif lang == 'ja' %}ダッシュボード{% else %}Dashboard{% endif %}</a>
+<a href="/admin/dashboard" class="nav-item"><span>📈</span>{% if lang == 'zh' %}数据面板{% elif lang == 'ja' %}データパネル{% else %}Data Dashboard{% endif %}</a>
+<a href="/admin2/users" class="nav-item active"><span>👥</span>{% if lang == 'zh' %}用户管理{% elif lang == 'ja' %}ユーザー{% else %}Users{% endif %}</a>
+<a href="/admin2/content" class="nav-item"><span>📝</span>{% if lang == 'zh' %}内容管理{% elif lang == 'ja' %}コンテンツ{% else %}Content{% endif %}</a>
+<a href="/admin2/settings" class="nav-item"><span>⚙️</span>{% if lang == 'zh' %}系统设置{% elif lang == 'ja' %}設定{% else %}Settings{% endif %}</a>
+<div class="section-title">Quick</div>
+<a href="/admin" class="nav-item"><span>🔗</span>{% if lang == 'zh' %}旧版后台{% elif lang == 'ja' %}旧管理{% else %}Legacy Admin{% endif %}</a>
+</nav>
+<div class="content">
+<div class="header">
+<h2>👥 {% if lang == 'zh' %}用户管理{% elif lang == 'ja' %}ユーザー管理{% else %}User Management{% endif %} ({{ users.total }})</h2>
+</div>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="flash">{{ messages[0] }}</div>
+{% endif %}
+{% endwith %}
+<div class="section" style="margin-bottom:24px">
+<form class="search-box" method="get">
+<input type="text" name="search" value="{{ search }}" placeholder="{% if lang == 'zh' %}搜索用户名/邮箱/手机号{% elif lang == 'ja' %}検索...{% else %}Search username/email/phone{% endif %}">
+<select name="status">
+<option value="all" {% if status_filter=='all' %}selected{% endif %}>{% if lang == 'zh' %}全部状态{% elif lang == 'ja' %}全て{% else %}All Status{% endif %}</option>
+<option value="vip" {% if status_filter=='vip' %}selected{% endif %}>{% if lang == 'zh' %}VIP用户{% elif lang == 'ja' %}VIP{% else %}VIP Only{% endif %}</option>
+<option value="free" {% if status_filter=='free' %}selected{% endif %}>{% if lang == 'zh' %}免费用户{% elif lang == 'ja' %}無料{% else %}Free Only{% endif %}</option>
+<option value="disabled" {% if status_filter=='disabled' %}selected{% endif %}>{% if lang == 'zh' %}已禁用{% elif lang == 'ja' %}無効{% else %}Disabled{% endif %}</option>
+</select>
+<button type="submit">{% if lang == 'zh' %}搜索{% elif lang == 'ja' %}検索{% else %}Search{% endif %}</button>
+<a href="/admin2/users" class="btn">{% if lang == 'zh' %}重置{% elif lang == 'ja' %}リセット{% else %}Reset{% endif %}</a>
+</form>
+</div>
+<div class="section">
+{% if users.items %}
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>{% if lang == 'zh' %}用户名{% elif lang == 'ja' %}ユーザー{% else %}Username{% endif %}</th>
+<th>{% if lang == 'zh' %}邮箱/手机{% elif lang == 'ja' %}メール/電話{% else %}Email/Phone{% endif %}</th>
+<th>{% if lang == 'zh' %}状态{% elif lang == 'ja' %}ステータス{% else %}Status{% endif %}</th>
+<th>{% if lang == 'zh' %}灵石{% elif lang == 'ja' %}霊石{% else %}Stones{% endif %}</th>
+<th>{% if lang == 'zh' %}注册时间{% elif lang == 'ja' %}登録日{% else %}Registered{% endif %}</th>
+<th>{% if lang == 'zh' %}最后登录{% elif lang == 'ja' %}最終ログイン{% else %}Last Login{% endif %}</th>
+<th>{% if lang == 'zh' %}操作{% elif lang == 'ja' %}操作{% else %}Actions{% endif %}</th>
+</tr>
+</thead>
+<tbody>
+{% for u in users.items %}
+<tr>
+<td>{{ u.id }}</td>
+<td><strong>{{ u.username }}</strong></td>
+<td>
+<div>{{ u.email or '-' }}</div>
+{% if u.phone %}<div style="color:#94a3b8;font-size:12px">{{ u.phone }}</div>{% endif %}
+</td>
+<td>
+{% if u.is_disabled %}
+<span class="badge badge-disabled">{% if lang == 'zh' %}已禁用{% elif lang == 'ja' %}無効{% else %}Disabled{% endif %}</span>
+{% elif u.vip_level > 0 %}
+<span class="badge badge-vip">VIP {{ u.vip_level }}</span>
+{% else %}
+<span class="badge badge-free">{% if lang == 'zh' %}免费{% elif lang == 'ja' %}無料{% else %}Free{% endif %}</span>
+{% endif %}
+</td>
+<td><span style="color:#8b5cf6;font-weight:600">{{ u.spirit_stones }}</span></td>
+<td>{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '-' }}</td>
+<td>{{ u.last_login.strftime('%Y-%m-%d') if u.last_login else '-' }}</td>
+<td>
+<a href="/admin2/user/{{ u.id }}">{% if lang == 'zh' %}详情{% elif lang == 'ja' %}詳細{% else %}View{% endif %}</a>
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% if users.pages > 1 %}
+<div class="pagination">
+<a href="?page=1{% if search %}&search={{ search }}{% endif %}&status={{ status_filter }}" class="{% if users.page == 1 %}disabled{% endif %}">«</a>
+<a href="?page={{ users.page - 1 if users.page > 1 else 1 }}{% if search %}&search={{ search }}{% endif %}&status={{ status_filter }}" class="{% if users.page == 1 %}disabled{% endif %}">‹</a>
+{% for p in range(1, users.pages + 1) %}
+{% if p >= users.page - 2 and p <= users.page + 2 %}
+<a href="?page={{ p }}{% if search %}&search={{ search }}{% endif %}&status={{ status_filter %}" class="{% if p == users.page %}active{% endif %}">{{ p }}</a>
+{% endif %}
+{% endfor %}
+<a href="?page={{ users.page + 1 if users.page < users.pages else users.pages }}{% if search %}&search={{ search }}{% endif %}&status={{ status_filter }}" class="{% if users.page == users.pages %}disabled{% endif %}">›</a>
+<a href="?page={{ users.pages }}{% if search %}&search={{ search }}{% endif %}&status={{ status_filter }}" class="{% if users.page == users.pages %}disabled{% endif %}">»</a>
+</div>
+{% endif %}
+{% else %}
+<div style="text-align:center;padding:48px;color:#94a3b8">
+<p>{% if lang == 'zh' %}暂无用户数据{% elif lang == 'ja' %}ユーザーが見つかりません{% else %}No users found{% endif %}</p>
+</div>
+{% endif %}
+</div>
+</div>
+</body>
+</html>

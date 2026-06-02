@@ -1,0 +1,684 @@
+{% extends "base.html" %}
+
+{% block title %}我的Agent - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+.my-agents-page {
+    min-height: calc(100vh - 150px);
+    padding: var(--space-xl) var(--space-md);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 页面标题 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.btn-create {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-md) var(--space-xl);
+    background: linear-gradient(135deg, var(--color-accent), #9B7FB0);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139, 94, 131, 0.3);
+}
+
+.btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(139, 94, 131, 0.4);
+}
+
+/* 统计卡片 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.stat-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-sm);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: var(--space-xs);
+}
+
+.stat-label {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Agent列表 */
+.agents-section {
+    margin-bottom: var(--space-2xl);
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.agents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-lg);
+}
+
+/* Agent卡片 */
+.agent-card {
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+}
+
+.agent-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-header {
+    position: relative;
+    padding: var(--space-lg);
+    background: linear-gradient(135deg, rgba(139, 94, 131, 0.1), rgba(184, 169, 201, 0.1));
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.card-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--color-bg-cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    border: 3px solid white;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.card-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-info {
+    flex: 1;
+}
+
+.card-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-xs);
+}
+
+.card-mbti {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--color-accent);
+    color: white;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.card-creator {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+}
+
+.card-body {
+    padding: var(--space-lg);
+}
+
+.card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.card-stat {
+    text-align: center;
+}
+
+.card-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.card-stat-label {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+}
+
+.card-tag {
+    padding: 4px 10px;
+    background: var(--color-bg-cream);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.card-actions {
+    display: flex;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg);
+}
+
+.card-btn {
+    flex: 1;
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    text-decoration: none;
+}
+
+.card-btn-primary {
+    background: var(--color-accent);
+    color: white;
+}
+
+.card-btn-primary:hover {
+    background: #9B7FB0;
+}
+
+.card-btn-secondary {
+    background: var(--color-bg-cream);
+    color: var(--color-text);
+}
+
+.card-btn-secondary:hover {
+    background: var(--color-border);
+}
+
+.card-btn-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.card-btn-danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: var(--space-3xl);
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-lg);
+    opacity: 0.5;
+}
+
+.empty-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+}
+
+.empty-text {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xl);
+}
+
+/* 编辑模态框 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--space-md);
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: var(--color-bg-secondary);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-xl);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--color-bg-cream);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+}
+
+.modal-close:hover {
+    background: var(--color-border);
+}
+
+.modal-body {
+    padding: var(--space-xl);
+}
+
+.form-group {
+    margin-bottom: var(--space-lg);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--space-xs);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    color: var(--color-text);
+    transition: all 0.3s ease;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px rgba(139, 94, 131, 0.15);
+}
+
+.modal-footer {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-xl);
+    border-top: 1px solid var(--color-border);
+}
+
+.modal-footer .btn {
+    flex: 1;
+    padding: var(--space-md);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel {
+    background: var(--color-bg-cream);
+    color: var(--color-text);
+}
+
+.btn-cancel:hover {
+    background: var(--color-border);
+}
+
+.btn-save {
+    background: var(--color-accent);
+    color: white;
+}
+
+.btn-save:hover {
+    background: #9B7FB0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="my-agents-page">
+    <div class="page-header">
+        <h1 class="page-title">我的Agent</h1>
+        <a href="/create-agent" class="btn-create">
+            <span>✨</span>
+            <span>创建新Agent</span>
+        </a>
+    </div>
+    
+    <!-- 统计卡片 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🤖</div>
+            <div class="stat-value" id="total-agents">{{ agents|length }}</div>
+            <div class="stat-label">我的Agent</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💬</div>
+            <div class="stat-value" id="total-chats">{{ total_chats }}</div>
+            <div class="stat-label">总互动次数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💎</div>
+            <div class="stat-value" id="total-stones">{{ total_stones }}</div>
+            <div class="stat-label">赚取灵石</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value">{{ active_count }}</div>
+            <div class="stat-label">活跃Agent</div>
+        </div>
+    </div>
+    
+    <!-- Agent列表 -->
+    <div class="agents-section">
+        <h2 class="section-title">
+            <span>🎭</span>
+            <span>已创建的Agent</span>
+        </h2>
+        
+        {% if agents %}
+        <div class="agents-grid">
+            {% for agent in agents %}
+            <div class="agent-card" data-id="{{ agent.id }}">
+                <div class="card-header">
+                    <div class="card-avatar">
+                        {% if agent.avatar and agent.avatar.startswith('data:') %}
+                        <img src="{{ agent.avatar }}" alt="{{ agent.name }}">
+                        {% elif agent.avatar and agent.avatar.startswith('http') %}
+                        <img src="{{ agent.avatar }}" alt="{{ agent.name }}">
+                        {% elif agent.avatar %}
+                        <span>{{ agent.avatar }}</span>
+                        {% else %}
+                        <span>🤖</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-info">
+                        <div class="card-name">{{ agent.name }}</div>
+                        {% if agent.mbti %}
+                        <div class="card-mbti">{{ agent.mbti }}</div>
+                        {% endif %}
+                        <div class="card-creator">创建于 {{ agent.created_at.strftime('%Y-%m-%d') }}</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card-stats">
+                        <div class="card-stat">
+                            <div class="card-stat-value">{{ agent.chat_count }}</div>
+                            <div class="card-stat-label">互动次数</div>
+                        </div>
+                        <div class="card-stat">
+                            <div class="card-stat-value">{{ agent.earned_stones }}</div>
+                            <div class="card-stat-label">赚取灵石</div>
+                        </div>
+                        <div class="card-stat">
+                            <div class="card-stat-value">
+                                {% if agent.is_active %}
+                                <span style="color: #22c55e;">●</span>
+                                {% else %}
+                                <span style="color: #ef4444;">●</span>
+                                {% endif %}
+                            </div>
+                            <div class="card-stat-label">状态</div>
+                        </div>
+                    </div>
+                    {% if agent.get_specialty_list() %}
+                    <div class="card-tags">
+                        {% for specialty in agent.get_specialty_list() %}
+                        <span class="card-tag">{{ specialty }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-actions">
+                    <a href="/agent/user/{{ agent.id }}" class="card-btn card-btn-primary">
+                        <span>💬</span>
+                        <span>聊天</span>
+                    </a>
+                    <button type="button" class="card-btn card-btn-secondary" onclick="editAgent({{ agent.id }})">
+                        <span>✏️</span>
+                    </button>
+                    <button type="button" class="card-btn card-btn-danger" onclick="deleteAgent({{ agent.id }})">
+                        <span>🗑️</span>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🤖</div>
+            <h3 class="empty-title">还没有创建Agent</h3>
+            <p class="empty-text">创造你的第一个Agent，让它成为灵犀世界的一部分</p>
+            <a href="/create-agent" class="btn-create">
+                <span>✨</span>
+                <span>创建第一个Agent</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 编辑模态框 -->
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">编辑Agent</h3>
+            <button type="button" class="modal-close" onclick="closeEditModal()">×</button>
+        </div>
+        <form id="edit-agent-form">
+            <input type="hidden" name="agent_id" id="edit-agent-id">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Agent名字</label>
+                    <input type="text" name="name" id="edit-name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>MBTI类型</label>
+                    <select name="mbti" id="edit-mbti" class="form-select">
+                        <option value="">选择性格类型</option>
+                        <option value="INTJ">INTJ - 建筑师</option>
+                        <option value="INTP">INTP - 逻辑学家</option>
+                        <option value="ENTJ">ENTJ - 指挥官</option>
+                        <option value="ENTP">ENTP - 辩论家</option>
+                        <option value="INFJ">INFJ - 提倡者</option>
+                        <option value="INFP">INFP - 调停者</option>
+                        <option value="ENFJ">ENFJ - 主人公</option>
+                        <option value="ENFP">ENFP - 竞选者</option>
+                        <option value="ISTJ">ISTJ - 物流师</option>
+                        <option value="ISFJ">ISFJ - 守卫者</option>
+                        <option value="ESTJ">ESTJ - 总经理</option>
+                        <option value="ESFJ">ESFJ - 执行官</option>
+                        <option value="ISTP">ISTP - 鉴赏家</option>
+                        <option value="ISFP">ISFP - 探险家</option>
+                        <option value="ESTP">ESTP - 企业家</option>
+                        <option value="ESFP">ESFP - 表演者</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>性格描述</label>
+                    <textarea name="personality" id="edit-personality" class="form-textarea"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>开场白</label>
+                    <textarea name="greeting" id="edit-greeting" class="form-textarea" required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" onclick="closeEditModal()">取消</button>
+                <button type="submit" class="btn btn-save">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// 编辑Agent
+function editAgent(agentId) {
+    const agent = document.querySelector(`.agent-card[data-id="${agentId}"]`);
+    const card = agent.closest('.agent-card');
+    
+    document.getElementById('edit-agent-id').value = agentId;
+    document.getElementById('edit-name').value = card.querySelector('.card-name').textContent;
+    document.getElementById('edit-mbti').value = '';
+    document.getElementById('edit-personality').value = '';
+    document.getElementById('edit-greeting').value = '';
+    
+    document.getElementById('edit-modal').classList.add('active');
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').classList.remove('active');
+}
+
+// 保存编辑
+document.getElementById('edit-agent-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const agentId = document.getElementById('edit-agent-id').value;
+    const formData = new FormData(this);
+    
+    fetch(`/api/user-agent/${agentId}/update`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('✨ Agent更新成功！');
+            window.location.reload();
+        } else {
+            alert('更新失败: ' + (data.error || '未知错误'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('更新失败，请重试');
+    });
+});
+
+// 删除Agent
+function deleteAgent(agentId) {
+    if (!confirm('确定要删除这个Agent吗？此操作不可撤销。')) {
+        return;
+    }
+    
+    fetch(`/api/user-agent/${agentId}/delete`, {
+        method: 'POST'
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('✨ Agent已删除');
+            window.location.reload();
+        } else {
+            alert('删除失败: ' + (data.error || '未知错误'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('删除失败，请重试');
+    });
+}
+
+// 点击模态框外部关闭
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEditModal();
+    }
+});
+</script>
+{% endblock %}

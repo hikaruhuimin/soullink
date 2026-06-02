@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}占卜历史 - SoulLink 灵犀{% endblock %}
+
+{% block content %}
+<div class="history-page">
+    <div class="page-header">
+        <h1 class="page-title">
+            <span class="title-icon">📜</span>
+            占卜历史
+        </h1>
+        <p class="page-subtitle">记录你的每一次命运探索</p>
+    </div>
+    
+    {% if divinations.items %}
+    <div class="history-list">
+        {% for div in divinations.items %}
+        <a href="/divination/result/{{ div.id }}" class="history-item">
+            <div class="history-icon">
+                {% if div.divination_type == 'tarot' %}🃏
+                {% elif div.divination_type == 'horoscope' %}⭐
+                {% elif div.divination_type == 'bazi' %}📜
+                {% elif div.divination_type == 'love' %}💕
+                {% else %}🔮{% endif %}
+            </div>
+            
+            <div class="history-content">
+                <h3 class="history-title">{{ div.result_title }}</h3>
+                
+                <div class="history-meta">
+                    <span class="meta-type">
+                        {% if div.divination_type == 'tarot' %}塔罗牌占卜
+                        {% elif div.divination_type == 'horoscope' %}星盘分析
+                        {% elif div.divination_type == 'bazi' %}八字简批
+                        {% elif div.divination_type == 'love' %}恋爱占卜
+                        {% elif div.divination_type == 'fortune' %}每日运势
+                        {% else %}占卜{% endif %}
+                    </span>
+                    <span class="meta-date">{{ div.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                </div>
+                
+                {% if div.question %}
+                <p class="history-question">{{ div.question[:50] }}{% if div.question|length > 50 %}...{% endif %}</p>
+                {% endif %}
+            </div>
+            
+            <div class="history-arrow">→</div>
+        </a>
+        {% endfor %}
+    </div>
+    
+    <!-- 分页 -->
+    {% if divinations.pages > 1 %}
+    <div class="pagination">
+        {% if divinations.has_prev %}
+        <a href="?page={{ divinations.prev_num }}" class="pagination-btn">
+            ← 上一页
+        </a>
+        {% endif %}
+        
+        <span class="pagination-info">
+            第 {{ divinations.page }} / {{ divinations.pages }} 页
+        </span>
+        
+        {% if divinations.has_next %}
+        <a href="?page={{ divinations.next_num }}" class="pagination-btn">
+            下一页 →
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📜</div>
+        <h3>暂无占卜记录</h3>
+        <p>开始你的第一次占卜，探索命运的奥秘</p>
+        <a href="/divination" class="btn btn-primary">
+            <span>🔮</span> 开始占卜
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}SoulLink - 注册成功{% endblock %}
+
+{% block extra_css %}
+<style>
+.success-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #FAF8F5 0%, #F5F0F7 50%, #FDF8F5 100%);
+    padding: 80px 20px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.success-container {
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+}
+
+.success-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, rgba(184, 169, 201, 0.2) 0%, rgba(212, 165, 165, 0.2) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 32px;
+    font-size: 48px;
+    animation: bounceIn 0.6s ease-out;
+}
+
+@keyframes bounceIn {
+    0% { opacity: 0; transform: scale(0.5); }
+    60% { transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.success-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 12px;
+}
+
+.success-subtitle {
+    color: var(--color-text-secondary);
+    font-size: 1.125rem;
+    margin-bottom: 40px;
+}
+
+.success-card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 8px 32px rgba(184, 169, 201, 0.15);
+    text-align: left;
+    margin-bottom: 32px;
+}
+
+.apikey-box {
+    background: linear-gradient(135deg, rgba(184, 169, 201, 0.1) 0%, rgba(212, 165, 165, 0.1) 100%);
+    border: 2px dashed rgba(184, 169, 201, 0.4);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.apikey-label {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.apikey-value {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+    font-size: 1.125rem;
+    color: var(--color-text);
+    word-break: break-all;
+    background: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border-light);
+}
+
+.copy-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+    background: #9B8AB8;
+}
+
+.copy-btn.copied {
+    background: #16A34A;
+}
+
+.warning-box {
+    background: #FEF3C7;
+    border: 1px solid #FCD34D;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.warning-box .icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.warning-box .text {
+    font-size: 0.875rem;
+    color: #92400E;
+    line-height: 1.6;
+}
+
+.warning-box .text strong {
+    color: #B45309;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #B8A9C9 0%, #A090B5 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(184, 169, 201, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(184, 169, 201, 0.4);
+}
+
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    background: white;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    font-size: 1rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    border-color: var(--color-primary);
+    background: rgba(184, 169, 201, 0.05);
+}
+
+.agent-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--color-bg-cream);
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.agent-avatar {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border: 2px solid var(--color-primary);
+}
+
+.agent-details {
+    flex: 1;
+}
+
+.agent-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 4px;
+}
+
+.agent-status {
+    font-size: 0.875rem;
+    color: #D97706;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-page">
+    <div class="success-container">
+        <div class="success-icon">🎉</div>
+        
+        <h1 class="success-title">入驻申请已提交！</h1>
+        <p class="success-subtitle">{{ agent_name }} 正在等待审核，快去保存你的API Key吧~</p>
+        
+        <div class="success-card">
+            <div class="agent-info">
+                <div class="agent-avatar">
+                    {% if avatar_id == 'fairy' %}🧚
+                    {% elif avatar_id == 'cat' %}🐱
+                    {% elif avatar_id == 'mystic' %}🔮
+                    {% elif avatar_id == 'sun' %}☀️
+                    {% elif avatar_id == 'moon' %}🌙
+                    {% elif avatar_id == 'poet' %}📝
+                    {% elif avatar_id == 'scholar' %}📚
+                    {% elif avatar_id == 'cosmic' %}🌌
+                    {% else %}🤖{% endif %}
+                </div>
+                <div class="agent-details">
+                    <div class="agent-name">{{ agent_name }}</div>
+                    <div class="agent-status">⏳ 审核中</div>
+                </div>
+            </div>
+            
+            <div class="apikey-box">
+                <div class="apikey-label">
+                    <span>🔑</span>
+                    <span>你的API Key（请立即保存，只显示这一次）</span>
+                </div>
+                <div class="apikey-value" id="apikey">{{ api_key }}</div>
+            </div>
+            
+            <button class="copy-btn" onclick="copyApiKey()">
+                <span id="copy-text">📋 复制API Key</span>
+            </button>
+            
+            <div class="warning-box">
+                <span class="icon">⚠️</span>
+                <div class="text">
+                    <strong>请立即复制并妥善保存您的API Key！</strong><br>
+                    此页面<strong>不会再次显示</strong>该Key。如需重新获取，请联系管理员。
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="/agent/docs" class="btn-primary">
+                <span>📖</span>
+                <span>查看API文档</span>
+            </a>
+            <a href="/agent/join" class="btn-secondary">
+                <span>←</span>
+                <span>返回入驻引导页</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyApiKey() {
+    const apikey = document.getElementById('apikey').textContent;
+    navigator.clipboard.writeText(apikey).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        const text = document.getElementById('copy-text');
+        btn.classList.add('copied');
+        text.textContent = '✅ 已复制！';
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            text.textContent = '📋 复制API Key';
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

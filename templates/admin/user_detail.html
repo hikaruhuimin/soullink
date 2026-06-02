@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'zh' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SoulLink Admin - User Detail</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;min-height:100vh;background:#0f172a;color:#e2e8f0}
+.sidebar{width:260px;background:#1e293b;padding:24px 0;position:fixed;height:100vh;overflow-y:auto}
+.sidebar h1{font-size:20px;color:#f8fafc;padding:0 24px 24px;border-bottom:1px solid #334155;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.sidebar h1 span{font-size:24px}
+.nav-item{display:block;padding:12px 24px;color:#94a3b8;text-decoration:none;font-size:14px;transition:all .2s;border-left:3px solid transparent}
+.nav-item:hover,.nav-item.active{background:#334155;color:#f8fafc;border-left-color:#8b5cf6}
+.nav-item span{margin-right:10px}
+.sidebar .section-title{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding:16px 24px 8px}
+.content{flex:1;margin-left:260px;padding:32px;background:#f1f5f9;min-height:100vh}
+.back-link{display:inline-flex;align-items:center;gap:8px;color:#8b5cf6;text-decoration:none;font-size:14px;margin-bottom:24px}
+.back-link:hover{text-decoration:underline}
+.flash{padding:16px;background:#dcfce7;color:#16a34a;border-radius:8px;margin-bottom:24px}
+.flash.error{background:#fef2f2;color:#dc2626}
+.user-header{background:#fff;border-radius:16px;padding:24px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.user-header h2{font-size:24px;color:#1e293b;margin-bottom:16px}
+.user-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.info-item{padding:12px;background:#f8fafc;border-radius:8px}
+.info-item label{font-size:12px;color:#64748b;display:block;margin-bottom:4px}
+.info-item .value{font-size:16px;font-weight:600;color:#1e293b}
+.info-item .value.vip{color:#7c3aed}
+.info-item .value.disabled{color:#dc2626}
+.actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+.btn{padding:12px 20px;border:none;border-radius:8px;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-danger{background:#fef2f2;color:#dc2626}
+.btn-danger:hover{background:#fee2e2}
+.btn-success{background:#dcfce7;color:#16a34a}
+.btn-success:hover{background:#bbf7d0}
+.btn-secondary{background:#f1f5f9;color:#475569}
+.btn-secondary:hover{background:#e2e8f0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:24px}
+.section{background:#fff;border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.section h3{font-size:16px;color:#1e293b;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;color:#64748b;margin-bottom:6px}
+.form-group input,.form-group select{padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;width:100%;background:#fff}
+.form-row{display:flex;gap:12px}
+.form-row .form-group{flex:1}
+.table{width:100%;border-collapse:collapse;font-size:14px}
+.table th{text-align:left;padding:10px 12px;color:#64748b;border-bottom:2px solid #f1f5f9;font-size:11px;text-transform:uppercase}
+.table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:#475569}
+.table tr:hover td{background:#f8fafc}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat-box{background:#f8fafc;border-radius:12px;padding:16px;text-align:center}
+.stat-box .icon{font-size:24px;margin-bottom:8px}
+.stat-box .num{font-size:24px;font-weight:700;color:#1e293b}
+.stat-box .label{font-size:12px;color:#64748b}
+@media(max-width:768px){.sidebar{display:none}.content{margin-left:0;padding:16px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+<h1><span>🧿</span>SoulLink</h1>
+<div class="section-title">Main</div>
+<a href="/admin2" class="nav-item"><span>📊</span>{% if lang == 'zh' %}仪表盘{% elif lang == 'ja' %}ダッシュボード{% else %}Dashboard{% endif %}</a>
+<a href="/admin2/users" class="nav-item active"><span>👥</span>{% if lang == 'zh' %}用户管理{% elif lang == 'ja' %}ユーザー{% else %}Users{% endif %}</a>
+<a href="/admin2/content" class="nav-item"><span>📝</span>{% if lang == 'zh' %}内容管理{% elif lang == 'ja' %}コンテンツ{% else %}Content{% endif %}</a>
+<a href="/admin2/settings" class="nav-item"><span>⚙️</span>{% if lang == 'zh' %}系统设置{% elif lang == 'ja' %}設定{% else %}Settings{% endif %}</a>
+</nav>
+<div class="content">
+<a href="/admin2/users" class="back-link">← {% if lang == 'zh' %}返回用户列表{% elif lang == 'ja' %}ユーザー一覧{% else %}Back to Users{% endif %}</a>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="flash">{{ messages[0] }}</div>
+{% endif %}
+{% endwith %}
+<div class="user-header">
+<h2>{{ user.username }} <span style="font-size:14px;font-weight:normal;color:#64748b">(ID: {{ user.id }})</span></h2>
+<div class="user-info">
+<div class="info-item">
+<label>{% if lang == 'zh' %}邮箱{% elif lang == 'ja' %}メール{% else %}Email{% endif %}</label>
+<div class="value">{{ user.email or '-' }}</div>
+</div>
+<div class="info-item">
+<label>{% if lang == 'zh' %}手机号{% elif lang == 'ja' %}電話番号{% else %}Phone{% endif %}</label>
+<div class="value">{{ user.phone or '-' }}</div>
+</div>
+<div class="info-item">
+<label>{% if lang == 'zh' %}灵石余额{% elif lang == 'ja' %}霊石残高{% else %}Spirit Stones{% endif %}</label>
+<div class="value vip">{{ user.spirit_stones }}</div>
+</div>
+<div class="info-item">
+<label>{% if lang == 'zh' %}VIP等级{% elif lang == 'ja' %}VIPレベル{% else %}VIP Level{% endif %}</label>
+<div class="value {% if user.vip_level > 0 %}vip{% endif %}">{% if user.vip_level > 0 %}VIP {{ user.vip_level }}{% else %}{% if lang == 'zh' %}免费用户{% elif lang == 'ja' %}無料{% else %}Free{% endif %}{% endif %}</div>
+</div>
+<div class="info-item">
+<label>{% if lang == 'zh' %}状态{% elif lang == 'ja' %}ステータス{% else %}Status{% endif %}</label>
+<div class="value {% if user.is_disabled %}disabled{% endif %}">{% if user.is_disabled %}{% if lang == 'zh' %}已禁用{% elif lang == 'ja' %}無効{% else %}Disabled{% endif %}{% else %}{% if lang == 'zh' %}正常{% elif lang == 'ja' %}通常{% else %}Active{% endif %}{% endif %}</div>
+</div>
+<div class="info-item">
+<label>{% if lang == 'zh' %}注册时间{% elif lang == 'ja' %}登録日{% else %}Registered{% endif %}</label>
+<div class="value">{{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else '-' }}</div>
+</div>
+</div>
+<div class="actions">
+<form method="POST" action="/admin2/user/{{ user.id }}/toggle" class="action-form" style="display:inline">
+<button type="submit" class="btn {% if user.is_disabled %}btn-success{% else %}btn-danger{% endif %}">
+{{ '✅' if user.is_disabled else '🚫' }} {% if user.is_disabled %}{% if lang == 'zh' %}启用用户{% elif lang == 'ja' %}有効化{% else %}Enable User{% endif %}{% else %}{% if lang == 'zh' %}禁用用户{% elif lang == 'ja' %}無効化{% else %}Disable User{% endif %}{% endif %}
+</button>
+</form>
+</div>
+</div>
+<div class="grid">
+<div class="section">
+<h3>💎 {% if lang == 'zh' %}调整灵石{% elif lang == 'ja' %}霊石調整{% else %}Adjust Spirit Stones{% endif %}</h3>
+<form method="POST" action="/admin2/user/{{ user.id }}/spirit">
+<div class="form-group">
+<label>{% if lang == 'zh' %}调整数量{% elif lang == 'ja' %}調整量{% else %}Adjustment Amount{% endif %}</label>
+<input type="number" name="amount" value="0" placeholder="{% if lang == 'zh' %}输入正数增加，负数减少{% elif lang == 'ja' %}正数で増加、負数で減少{% else %}Positive to add, negative to subtract{% endif %}">
+<div style="font-size:12px;color:#64748b;margin-top:4px">{% if lang == 'zh' %}当前余额{% elif lang == 'ja' %}現在の残高{% else %}Current Balance{% endif %}: {{ user.spirit_stones }}</div>
+</div>
+<div class="form-group">
+<label>{% if lang == 'zh' %}原因（可选）{% elif lang == 'ja' %}理由（任意）{% else %}Reason (Optional){% endif %}</label>
+<input type="text" name="reason" placeholder="{% if lang == 'zh' %}记录调整原因...{% elif lang == 'ja' %}理由を入力...{% else %}Enter reason...{% endif %}">
+</div>
+<button type="submit" class="btn btn-secondary">💎 {% if lang == 'zh' %}确认调整{% elif lang == 'ja' %}確認{% else %}Confirm Adjustment{% endif %}</button>
+</form>
+</div>
+<div class="section">
+<h3>📊 {% if lang == 'zh' %}用户数据统计{% elif lang == 'ja' %}ユーザー統計{% else %}User Stats{% endif %}</h3>
+<div class="stats-grid">
+<div class="stat-box">
+<div class="icon">🔮</div>
+<div class="num">{{ divinations|length if divinations else 0 }}</div>
+<div class="label">{% if lang == 'zh' %}占卜次数{% elif lang == 'ja' %}占卜{% else %}Divinations{% endif %}</div>
+</div>
+<div class="stat-box">
+<div class="icon">✨</div>
+<div class="num">{{ checkins|length if checkins else 0 }}</div>
+<div class="label">{% if lang == 'zh' %}签到次数{% elif lang == 'ja' %}チェックイン{% else %}Check-ins{% endif %}</div>
+</div>
+<div class="stat-box">
+<div class="icon">🌙</div>
+<div class="num">{{ treehole_posts }}</div>
+<div class="label">{% if lang == 'zh' %}树洞帖子{% elif lang == 'ja' %}樹洞{% else %}Treehole Posts{% endif %}</div>
+</div>
+<div class="stat-box">
+<div class="icon">💕</div>
+<div class="num">{{ matches }}</div>
+<div class="label">{% if lang == 'zh' %}匹配次数{% elif lang == 'ja' %}マッチ{% else %}Matches{% endif %}</div>
+</div>
+</div>
+</div>
+</div>
+{% if divinations %}
+<div class="section">
+<h3>🔮 {% if lang == 'zh' %}最近占卜记录{% elif lang == 'ja' %}占卜履歴{% else %}Recent Divinations{% endif %}</h3>
+<table class="table">
+<thead><tr><th>{% if lang == 'zh' %}类型{% elif lang == 'ja' %}タイプ{% else %}Type{% endif %}</th><th>{% if lang == 'zh' %}问题{% elif lang == 'ja' %}質問{% else %}Question{% endif %}</th><th>{% if lang == 'zh' %}时间{% elif lang == 'ja' %}時間{% else %}Time{% endif %}</th></tr></thead>
+<tbody>
+{% for d in divinations %}
+<tr>
+<td>{{ d.divination_type or 'tarot' }}</td>
+<td>{{ d.question[:50] if d.question else '-' }}{% if d.question and d.question|length > 50 %}...{% endif %}</td>
+<td>{{ d.created_at.strftime('%Y-%m-%d %H:%M') if d.created_at else '-' }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}
+{% if checkins %}
+<div class="section">
+<h3>✨ {% if lang == 'zh' %}最近签到记录{% elif lang == 'ja' %}チェックイン履歴{% else %}Recent Check-ins{% endif %}</h3>
+<table class="table">
+<thead><tr><th>{% if lang == 'zh' %}签到日期{% elif lang == 'ja' %}日付{% else %}Date{% endif %}</th><th>{% if lang == 'zh' %}获得灵石{% elif lang == 'ja' %}獲得霊石{% else %}Stones Earned{% endif %}</th></tr></thead>
+<tbody>
+{% for c in checkins %}
+<tr>
+<td>{{ c.signin_date }}</td>
+<td>{{ c.stones_earned if c.stones_earned else '-' }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}
+</div>
+</body>
+</html>

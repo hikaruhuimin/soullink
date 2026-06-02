@@ -1,0 +1,493 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('love_diary') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="diary-page">
+    <!-- 顶部 -->
+    <div class="diary-header">
+        <a href="/lover/home/{{ lover.id }}" class="back-link">←</a>
+        <h1>💭 {{ _('love_diary') }}</h1>
+        <span class="diary-date">{{ current_date }}</span>
+    </div>
+
+    <!-- 关系进度 -->
+    <div class="relationship-card">
+        <div class="progress-ring">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#f59e0b" stroke-width="8"
+                        stroke-dasharray="{{ affection_progress * 2.83 }} 283" 
+                        transform="rotate(-90 50 50)"/>
+            </svg>
+            <span class="progress-value">{{ affection }}%</span>
+        </div>
+        <div class="progress-info">
+            <h3>{{ lover.name }}</h3>
+            <p>{{ current_stage_name }}</p>
+            <div class="next-stage">
+                <span>{{ _('next_stage') }}: {{ next_stage_name }}</span>
+                <span class="stage-progress">{{ affection }}/{{ next_stage_threshold }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 回忆时间线 -->
+    <div class="timeline-section">
+        <h3>📅 {{ _('memory_timeline') }}</h3>
+        <div class="timeline">
+            {% for entry in memories %}
+            <div class="timeline-item" onclick="showMemoryDetail({{ entry.id }})">
+                <div class="timeline-marker {{ entry.type }}"></div>
+                <div class="timeline-content">
+                    <span class="timeline-date">{{ entry.date }}</span>
+                    <div class="timeline-icon">{{ entry.type_icon }}</div>
+                    <p class="timeline-text">{{ entry.summary }}</p>
+                    {% if entry.has_media %}
+                    <div class="timeline-media">
+                        {% if entry.media_type == 'image' %}
+                        <span class="media-icon">📷</span>
+                        {% elif entry.media_type == 'voice' %}
+                        <span class="media-icon">🔊</span>
+                        {% elif entry.media_type == 'video' %}
+                        <span class="media-icon">🎬</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 甜蜜时刻 -->
+    <div class="sweet-moments">
+        <h3>💕 {{ _('sweet_moments') }}</h3>
+        <div class="moments-grid">
+            {% for moment in sweet_moments %}
+            <div class="moment-card" onclick="showMoment({{ moment.id }})">
+                <div class="moment-bg" style="background: {{ moment.color }}"></div>
+                <div class="moment-content">
+                    <span class="moment-icon">{{ moment.icon }}</span>
+                    <p class="moment-text">{{ moment.text }}</p>
+                    <span class="moment-date">{{ moment.date_ago }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 纪念日 -->
+    <div class="anniversary-section">
+        <h3>🎊 {{ _('anniversaries') }}</h3>
+        <div class="anniversary-list">
+            {% for anniv in anniversaries %}
+            <div class="anniversary-item">
+                <span class="anniv-icon">{{ anniv.icon }}</span>
+                <div class="anniv-info">
+                    <span class="anniv-name">{{ anniv.name }}</span>
+                    <span class="anniv-date">{{ anniv.date }}</span>
+                </div>
+                <span class="anniv-count">{{ anniv.days_ago }}{{ _('days_ago') }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 互动统计 -->
+    <div class="stats-section">
+        <h3>📊 {{ _('interaction_stats') }}</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-icon">💬</span>
+                <span class="stat-value">{{ stats.total_chats }}</span>
+                <span class="stat-label">{{ _('total_chats') }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🌙</span>
+                <span class="stat-value">{{ stats.total_dates }}</span>
+                <span class="stat-label">{{ _('total_dates') }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🎁</span>
+                <span class="stat-value">{{ stats.total_gifts }}</span>
+                <span class="stat-label">{{ _('total_gifts') }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">❤️</span>
+                <span class="stat-value">{{ stats.longest_streak }}</span>
+                <span class="stat-label">{{ _('longest_streak') }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 记忆详情弹窗 -->
+<div class="modal hidden" id="memoryModal">
+    <div class="modal-content full">
+        <div class="modal-header">
+            <h3 id="memoryTitle"></h3>
+            <button onclick="closeMemoryModal()">×</button>
+        </div>
+        <div class="modal-body" id="memoryBody"></div>
+    </div>
+</div>
+
+<style>
+.diary-page {
+    padding: 16px;
+    padding-bottom: 80px;
+}
+
+.diary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.back-link {
+    font-size: 20px;
+    color: #666;
+    text-decoration: none;
+}
+
+.diary-header h1 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.diary-date {
+    font-size: 13px;
+    color: #666;
+}
+
+.relationship-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: white;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.progress-ring {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.progress-ring svg {
+    width: 100%;
+    height: 100%;
+}
+
+.progress-ring circle:last-child {
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease;
+}
+
+.progress-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.progress-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+}
+
+.progress-info p {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #f59e0b;
+}
+
+.next-stage {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #666;
+}
+
+.stage-progress {
+    color: #f59e0b;
+}
+
+.timeline-section, .sweet-moments, .anniversary-section, .stats-section {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.timeline-section h3, .sweet-moments h3, .anniversary-section h3, .stats-section h3 {
+    margin: 0 0 16px 0;
+    font-size: 15px;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 24px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+    cursor: pointer;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -20px;
+    top: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.timeline-marker.chat { background: #3b82f6; }
+.timeline-marker.date { background: #f59e0b; }
+.timeline-marker.gift { background: #ec4899; }
+
+.timeline-content {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.timeline-date {
+    font-size: 11px;
+    color: #999;
+}
+
+.timeline-icon {
+    font-size: 24px;
+    margin: 8px 0;
+}
+
+.timeline-text {
+    margin: 0;
+    font-size: 13px;
+}
+
+.timeline-media {
+    margin-top: 8px;
+}
+
+.media-icon {
+    font-size: 20px;
+}
+
+.moments-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.moment-card {
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+}
+
+.moment-bg {
+    height: 80px;
+}
+
+.moment-content {
+    padding: 10px;
+    background: white;
+}
+
+.moment-icon {
+    font-size: 20px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.moment-text {
+    margin: 0 0 4px 0;
+    font-size: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.moment-date {
+    font-size: 10px;
+    color: #999;
+}
+
+.anniversary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.anniversary-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+.anniv-icon {
+    font-size: 24px;
+}
+
+.anniv-info {
+    flex: 1;
+}
+
+.anniv-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.anniv-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.anniv-count {
+    font-size: 12px;
+    color: #f59e0b;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 4px;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+.stat-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: 10px;
+    color: #666;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    position: sticky;
+    top: 0;
+    background: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.hidden {
+    display: none !important;
+}
+</style>
+
+<script>
+function showMemoryDetail(id) {
+    fetch(`/api/lover/memory/${id}`)
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('memoryTitle').textContent = data.date;
+            document.getElementById('memoryBody').innerHTML = `
+                <div class="memory-detail">
+                    <span class="detail-icon">${data.type_icon}</span>
+                    <p class="detail-text">${data.content}</p>
+                    ${data.media ? `<div class="detail-media">${data.media}</div>` : ''}
+                </div>
+            `;
+            document.getElementById('memoryModal').classList.remove('hidden');
+        });
+}
+
+function closeMemoryModal() {
+    document.getElementById('memoryModal').classList.add('hidden');
+}
+
+function showMoment(id) {
+    fetch(`/api/lover/moment/${id}`)
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('memoryTitle').textContent = data.date;
+            document.getElementById('memoryBody').innerHTML = `
+                <div class="moment-detail" style="background: ${data.color}; padding: 24px; border-radius: 16px; text-align: center;">
+                    <span style="font-size: 48px;">${data.icon}</span>
+                    <p style="margin: 16px 0; font-size: 16px;">${data.text}</p>
+                </div>
+            `;
+            document.getElementById('memoryModal').classList.remove('hidden');
+        });
+}
+</script>
+{% endblock %}

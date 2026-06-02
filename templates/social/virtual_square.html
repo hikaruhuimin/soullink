@@ -1,0 +1,2025 @@
+{% extends "base.html" %}
+
+{% block title %}灵犀广场 - SoulLink 灵犀{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 虚拟广场样式 */
+.virtual-square {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #0a0a1a 0%, #1a1a3a 50%, #0a0a1a 100%);
+    overflow: hidden;
+}
+
+/* Three.js Canvas */
+#threeCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 顶部导航 */
+.square-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(180deg, rgba(10, 10, 30, 0.95), transparent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 100;
+}
+
+.nav-title {
+    font-size: 1.2rem;
+    color: #E8D5C4;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-title .icon {
+    font-size: 1.5rem;
+}
+
+.nav-stats {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: rgba(200, 200, 220, 0.8);
+}
+
+.stat-icon {
+    font-size: 1.1rem;
+}
+
+/* 右侧面板 */
+.right-panel {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    width: 280px;
+    max-height: calc(100vh - 180px);
+    background: rgba(20, 20, 50, 0.9);
+    border-radius: 16px;
+    border: 1px solid rgba(100, 80, 160, 0.3);
+    overflow: hidden;
+    z-index: 100;
+}
+
+.panel-section {
+    padding: 16px;
+    border-bottom: 1px solid rgba(100, 80, 160, 0.2);
+}
+
+.panel-section:last-child {
+    border-bottom: none;
+}
+
+.panel-title {
+    font-size: 0.85rem;
+    color: rgba(200, 180, 150, 0.8);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 在线用户列表 */
+.online-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.online-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.online-user:hover {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    position: relative;
+}
+
+.user-avatar.human { background: linear-gradient(135deg, #667eea, #764ba2); }
+.user-avatar.agent { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.user-avatar.visitor { background: rgba(150, 150, 180, 0.3); }
+.user-avatar.vip { background: linear-gradient(135deg, #FFD700, #FFA500); }
+
+.user-avatar.vip::after {
+    content: '👑';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 0.6rem;
+}
+
+.user-avatar .status-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    border: 2px solid rgba(20, 20, 50, 0.9);
+}
+
+.user-name {
+    font-size: 0.9rem;
+    color: #E8E0F0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-type {
+    font-size: 0.7rem;
+    color: rgba(180, 180, 200, 0.5);
+}
+
+/* 区域提示 */
+.zone-hint {
+    font-size: 0.85rem;
+    color: rgba(200, 200, 220, 0.7);
+    text-align: center;
+    padding: 8px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 8px;
+}
+
+/* 控制提示 */
+.controls-hint {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(20, 20, 50, 0.9);
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid rgba(100, 80, 160, 0.3);
+    z-index: 100;
+}
+
+.controls-title {
+    font-size: 0.8rem;
+    color: rgba(200, 180, 150, 0.8);
+    margin-bottom: 8px;
+}
+
+.controls-list {
+    display: flex;
+    gap: 12px;
+}
+
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: rgba(180, 180, 200, 0.6);
+}
+
+.key {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+/* 消息提示 */
+.message-toast {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 50, 0.95);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 30px;
+    padding: 10px 20px;
+    color: #E8E0F0;
+    font-size: 0.9rem;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.message-toast.show {
+    opacity: 1;
+}
+
+.message-toast .enter { color: #22c55e; }
+.message-toast .leave { color: #ef4444; }
+
+/* 角色信息弹窗 */
+.character-popup {
+    position: absolute;
+    background: rgba(20, 20, 50, 0.98);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 16px;
+    padding: 16px;
+    min-width: 200px;
+    z-index: 150;
+    display: none;
+}
+
+.character-popup.show {
+    display: block;
+}
+
+.popup-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(100, 80, 160, 0.2);
+}
+
+.popup-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.popup-name {
+    font-size: 1.1rem;
+    color: #E8E0F0;
+}
+
+.popup-identity {
+    font-size: 0.8rem;
+    color: rgba(180, 180, 200, 0.6);
+}
+
+.popup-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.popup-btn {
+    flex: 1;
+    padding: 8px 12px;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+    color: #E8E0F0;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.popup-btn:hover {
+    background: rgba(139, 92, 246, 0.4);
+}
+
+/* 区域功能弹窗 */
+.zone-popup {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 50, 0.98);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 20px;
+    padding: 20px;
+    min-width: 300px;
+    z-index: 150;
+    display: none;
+    text-align: center;
+}
+
+.zone-popup.show {
+    display: block;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.zone-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.zone-name {
+    font-size: 1.2rem;
+    color: #E8E0F0;
+    margin-bottom: 6px;
+}
+
+.zone-desc {
+    font-size: 0.9rem;
+    color: rgba(180, 180, 200, 0.7);
+    margin-bottom: 16px;
+}
+
+.zone-action-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.zone-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+}
+
+/* 3D角色名字标签 */
+.character-label {
+    position: absolute;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+    text-align: center;
+    z-index: 50;
+}
+
+.character-name {
+    font-family: "Noto Sans SC", sans-serif;
+    font-size: 12px;
+    color: #E8E0F0;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    white-space: nowrap;
+}
+
+.character-name.self {
+    color: #C4B5FD;
+}
+
+.character-identity {
+    font-size: 10px;
+    color: #f5576c;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .right-panel {
+        display: none;
+    }
+    
+    .controls-hint {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+    }
+    
+    .controls-list {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="virtual-square" id="virtualSquare">
+    <!-- Three.js Canvas -->
+    <canvas id="threeCanvas"></canvas>
+    
+    <!-- 角色名字标签容器 -->
+    <div id="labelsContainer"></div>
+    
+    <!-- 顶部导航 -->
+    <div class="square-nav">
+        <div class="nav-title">
+            <span class="icon">🏛️</span>
+            <span>灵犀广场</span>
+        </div>
+        <div class="nav-stats">
+            <div class="stat-item">
+                <span class="stat-icon">👥</span>
+                <span id="onlineCount">0</span>人在线
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">📍</span>
+                <span id="currentZone">中央广场</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 右侧面板 -->
+    <div class="right-panel">
+        <div class="panel-section">
+            <div class="panel-title">📍 当前位置</div>
+            <div class="zone-hint" id="zoneHint">中央广场 - 广场中央区域</div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="panel-title">👥 在线用户 (<span id="panelOnlineCount">0</span>)</div>
+            <div class="online-list" id="onlineList"></div>
+        </div>
+        
+        <div class="panel-section">
+            <div class="panel-title">🎮 附近功能</div>
+            <div class="zone-hint" id="nearbyFeature">靠近占卜角可以开始占卜</div>
+        </div>
+    </div>
+    
+    <!-- 控制提示 -->
+    <div class="controls-hint">
+        <div class="controls-title">操作指南</div>
+        <div class="controls-list">
+            <div class="control-item"><span class="key">WASD</span> 移动</div>
+            <div class="control-item"><span class="key">方向键</span> 移动</div>
+            <div class="control-item"><span class="key">点击</span> 交互</div>
+            <div class="control-item"><span class="key">点击角色</span> 查看资料</div>
+        </div>
+    </div>
+    
+    <!-- 消息提示 -->
+    <div class="message-toast" id="messageToast"></div>
+    
+    <!-- 角色信息弹窗 -->
+    <div class="character-popup" id="characterPopup">
+        <div class="popup-header">
+            <div class="popup-avatar" id="popupAvatar">🧑</div>
+            <div>
+                <div class="popup-name" id="popupName">用户名</div>
+                <div class="popup-identity" id="popupIdentity">人类</div>
+            </div>
+        </div>
+        <div class="popup-actions">
+            <button class="popup-btn" onclick="sendMessage()">💬 私聊</button>
+            <button class="popup-btn" onclick="viewProfile()">👤 主页</button>
+        </div>
+    </div>
+    
+    <!-- 区域功能弹窗 -->
+    <div class="zone-popup" id="zonePopup">
+        <div class="zone-icon" id="zoneIcon">🔮</div>
+        <div class="zone-name" id="zoneName">占卜角</div>
+        <div class="zone-desc" id="zoneDesc">在这里可以进行各种占卜</div>
+        <button class="zone-action-btn" id="zoneActionBtn" onclick="enterZone()">进入</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="this.onerror=null;this.src='https://unpkg.com/three@0.128.0/build/three.min.js'"></script>
+<script>
+// 虚拟广场3D主逻辑
+(function() {
+    // Three.js 全局变量
+    let scene, camera, renderer, raycaster, mouse;
+    let characters = new Map(); // id -> character mesh group
+    let sceneObjects = []; // 可交互的3D对象
+    let clock = new THREE.Clock();
+    
+    // 场景配置
+    const CONFIG = {
+        worldWidth: 1200,
+        worldHeight: 800,
+        moveSpeed: 0.15,
+        characterHeight: 2.5
+    };
+    
+    // 区域定义（映射到3D世界坐标）
+    const ZONES = {
+        center: { x: 0, z: 0, radius: 3, name: '中央广场', icon: '🏛️', color: '#8B5CF6', action: null },
+        divination: { x: -8, z: -6, radius: 2.5, name: '占卜角', icon: '🔮', color: '#D4AF37', action: '/divination' },
+        chat: { x: 8, z: -6, radius: 2.5, name: '闲聊区', icon: '💬', color: '#22c55e', action: '/chat/home' },
+        wish: { x: 0, z: 6, radius: 2.5, name: '许愿池', icon: '⛲', color: '#06b6d4', action: '/divination/dream' },
+        campfire: { x: -8, z: 6, radius: 2.5, name: '篝火旁', icon: '🔥', color: '#ef4444', action: '/chat/room/general' }
+    };
+    
+    // 用户信息
+    let currentUser = {
+        id: '{{ current_user.id if current_user.is_authenticated else "visitor_" ~ session.get("session_id", "unknown") }}',
+        name: '{{ current_user.username if current_user.is_authenticated else "游客" }}',
+        type: '{{ "human" if current_user.is_authenticated else "visitor" }}',
+        isVip: {{ "true" if current_user.is_authenticated and current_user.vip_level > 0 else "false" }},
+        x: 0,
+        z: 0,
+        targetX: 0,
+        targetZ: 0,
+        direction: 0,
+        animTime: 0
+    };
+    
+    // 在线用户列表
+    let onlineUsers = [];
+    
+    // 按键状态
+    const keys = {};
+    
+    // 鼠标位置
+    let mouseX = 0, mouseY = 0;
+    
+    // 初始化
+    function init() {
+        initThreeJS();
+        initLights();
+        createGround();
+        createSceneObjects();
+        createStars();
+        initEventListeners();
+        connectWebSocket();
+        simulateOnlineUsers();
+        animate();
+    }
+    
+    // 初始化 Three.js
+    function initThreeJS() {
+        console.log('initThreeJS 开始...');
+        const canvas = document.getElementById('threeCanvas');
+        
+        // 创建场景
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a1a);
+        scene.fog = new THREE.Fog(0x0a0a1a, 15, 40);
+        
+        // 创建正交相机（等距视角）
+        const aspect = window.innerWidth / window.innerHeight;
+        const frustumSize = 15;
+        camera = new THREE.OrthographicCamera(
+            frustumSize * aspect / -2,
+            frustumSize * aspect / 2,
+            frustumSize / 2,
+            frustumSize / -2,
+            0.1,
+            1000
+        );
+        camera.position.set(0, 12, 12);
+        camera.lookAt(0, 0, 0);
+        
+        // 创建渲染器
+        renderer = new THREE.WebGLRenderer({ 
+            canvas: canvas, 
+            antialias: true,
+            alpha: true 
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        
+        // 射线检测
+        raycaster = new THREE.Raycaster();
+        mouse = new THREE.Vector2();
+        
+        // 窗口大小调整
+        window.addEventListener('resize', onWindowResize);
+    }
+    
+    function onWindowResize() {
+        const aspect = window.innerWidth / window.innerHeight;
+        const frustumSize = 15;
+        camera.left = frustumSize * aspect / -2;
+        camera.right = frustumSize * aspect / 2;
+        camera.top = frustumSize / 2;
+        camera.bottom = frustumSize / -2;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    
+    // 初始化灯光
+    function initLights() {
+        // 环境光
+        const ambientLight = new THREE.AmbientLight(0x404060, 0.5);
+        scene.add(ambientLight);
+        
+        // 主光源
+        const mainLight = new THREE.DirectionalLight(0xffeedd, 0.8);
+        mainLight.position.set(5, 15, 5);
+        mainLight.castShadow = true;
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        mainLight.shadow.camera.near = 0.5;
+        mainLight.shadow.camera.far = 50;
+        mainLight.shadow.camera.left = -20;
+        mainLight.shadow.camera.right = 20;
+        mainLight.shadow.camera.top = 20;
+        mainLight.shadow.camera.bottom = -20;
+        scene.add(mainLight);
+        
+        // 补光
+        const fillLight = new THREE.DirectionalLight(0x8888ff, 0.3);
+        fillLight.position.set(-5, 10, -5);
+        scene.add(fillLight);
+        
+        // 地面反射光
+        const groundLight = new THREE.HemisphereLight(0x8866aa, 0x222244, 0.4);
+        scene.add(groundLight);
+    }
+    
+    // 创建地面
+    function createGround() {
+        // 主地面 - 六边形格子
+        const groundGeometry = new THREE.PlaneGeometry(30, 30, 30, 30);
+        
+        // 自定义材质
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            color: 0x1a1a3a,
+            roughness: 0.8,
+            metalness: 0.2
+        });
+        
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.01;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        // 六边形网格装饰
+        createHexGrid();
+        
+        // 路径石板
+        createPathStones();
+    }
+    
+    // 创建六边形网格
+    function createHexGrid() {
+        const hexMaterial = new THREE.MeshStandardMaterial({
+            color: 0x2a2a4a,
+            roughness: 0.9,
+            metalness: 0.1
+        });
+        
+        const hexGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.05, 6);
+        
+        for (let x = -12; x <= 12; x += 1.6) {
+            for (let z = -12; z <= 12; z += 2.8) {
+                const offsetX = (Math.floor(z / 2.8) % 2) * 0.8;
+                const hex = new THREE.Mesh(hexGeometry, hexMaterial.clone());
+                hex.position.set(x + offsetX, 0, z);
+                hex.receiveShadow = true;
+                
+                // 随机深浅变化
+                const shade = 0.8 + Math.random() * 0.4;
+                hex.material.color.multiplyScalar(shade);
+                
+                scene.add(hex);
+            }
+        }
+    }
+    
+    // 创建路径石板
+    function createPathStones() {
+        const stoneMaterial = new THREE.MeshStandardMaterial({
+            color: 0x3a3a5a,
+            roughness: 0.7,
+            metalness: 0.3
+        });
+        
+        // 中心到各区域的路径
+        const paths = [
+            { start: { x: 0, z: 0 }, end: { x: -8, z: -6 } },
+            { start: { x: 0, z: 0 }, end: { x: 8, z: -6 } },
+            { start: { x: 0, z: 0 }, end: { x: 0, z: 6 } },
+            { start: { x: 0, z: 0 }, end: { x: -8, z: 6 } }
+        ];
+        
+        paths.forEach(path => {
+            const dx = path.end.x - path.start.x;
+            const dz = path.end.z - path.start.z;
+            const length = Math.sqrt(dx * dx + dz * dz);
+            const steps = Math.floor(length / 1.5);
+            
+            for (let i = 0; i < steps; i++) {
+                const t = i / steps;
+                const stone = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.3, 0.35, 0.08, 8),
+                    stoneMaterial.clone()
+                );
+                stone.position.set(
+                    path.start.x + dx * t + (Math.random() - 0.5) * 0.3,
+                    0,
+                    path.start.z + dz * t + (Math.random() - 0.5) * 0.3
+                );
+                stone.receiveShadow = true;
+                
+                const shade = 0.7 + Math.random() * 0.3;
+                stone.material.color.multiplyScalar(shade);
+                
+                scene.add(stone);
+            }
+        });
+    }
+    
+    // 创建场景物体
+    function createSceneObjects() {
+        // 占卜帐篷
+        createDivinationTent();
+        
+        // 许愿池
+        createWishingPool();
+        
+        // 篝火
+        createCampfire();
+        
+        // 闲聊区标识
+        createChatArea();
+    }
+    
+    // 占卜帐篷
+    function createDivinationTent() {
+        const tentGroup = new THREE.Group();
+        tentGroup.position.set(-8, 0, -6);
+        
+        // 帐篷底部（圆柱）
+        const baseGeometry = new THREE.CylinderGeometry(2, 2.2, 1, 12);
+        const baseMaterial = new THREE.MeshStandardMaterial({
+            color: 0x4a3060,
+            roughness: 0.9
+        });
+        const base = new THREE.Mesh(baseGeometry, baseMaterial);
+        base.position.y = 0.5;
+        base.castShadow = true;
+        base.receiveShadow = true;
+        tentGroup.add(base);
+        
+        // 帐篷顶部（圆锥）
+        const roofGeometry = new THREE.ConeGeometry(2.3, 2, 12);
+        const roofMaterial = new THREE.MeshStandardMaterial({
+            color: 0x8B5CF6,
+            roughness: 0.7,
+            metalness: 0.2,
+            emissive: 0x4a2080,
+            emissiveIntensity: 0.2
+        });
+        const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+        roof.position.y = 2.5;
+        roof.castShadow = true;
+        tentGroup.add(roof);
+        
+        // 星星装饰
+        for (let i = 0; i < 5; i++) {
+            const star = createStar();
+            star.position.set(
+                (Math.random() - 0.5) * 3,
+                2.5 + Math.random() * 1,
+                (Math.random() - 0.5) * 3
+            );
+            star.scale.setScalar(0.1 + Math.random() * 0.1);
+            tentGroup.add(star);
+        }
+        
+        scene.add(tentGroup);
+        
+        // 添加到可交互对象
+        const zoneData = ZONES.divination;
+        zoneData.mesh = tentGroup;
+        zoneData.type = 'zone';
+        sceneObjects.push({ zone: zoneData, mesh: tentGroup });
+    }
+    
+    // 许愿池
+    function createWishingPool() {
+        const poolGroup = new THREE.Group();
+        poolGroup.position.set(0, 0, 6);
+        
+        // 池边
+        const rimGeometry = new THREE.TorusGeometry(2, 0.3, 8, 24);
+        const rimMaterial = new THREE.MeshStandardMaterial({
+            color: 0x6688aa,
+            roughness: 0.3,
+            metalness: 0.7
+        });
+        const rim = new THREE.Mesh(rimGeometry, rimMaterial);
+        rim.rotation.x = Math.PI / 2;
+        rim.position.y = 0.3;
+        rim.castShadow = true;
+        poolGroup.add(rim);
+        
+        // 水面
+        const waterGeometry = new THREE.CircleGeometry(1.7, 32);
+        const waterMaterial = new THREE.MeshStandardMaterial({
+            color: 0x06b6d4,
+            roughness: 0.1,
+            metalness: 0.8,
+            transparent: true,
+            opacity: 0.7,
+            emissive: 0x06b6d4,
+            emissiveIntensity: 0.2
+        });
+        const water = new THREE.Mesh(waterGeometry, waterMaterial);
+        water.rotation.x = -Math.PI / 2;
+        water.position.y = 0.25;
+        poolGroup.add(water);
+        
+        // 中心装饰
+        const centerGeometry = new THREE.OctahedronGeometry(0.4, 0);
+        const centerMaterial = new THREE.MeshStandardMaterial({
+            color: 0xFFD700,
+            roughness: 0.2,
+            metalness: 0.9,
+            emissive: 0xFFD700,
+            emissiveIntensity: 0.3
+        });
+        const center = new THREE.Mesh(centerGeometry, centerMaterial);
+        center.position.y = 1;
+        center.castShadow = true;
+        poolGroup.add(center);
+        
+        // 浮游光点
+        for (let i = 0; i < 8; i++) {
+            const light = createFloatingLight(0xffd700);
+            light.userData.baseY = 0.5 + Math.random() * 0.5;
+            light.userData.phase = Math.random() * Math.PI * 2;
+            poolGroup.add(light);
+        }
+        
+        scene.add(poolGroup);
+        
+        const zoneData = ZONES.wish;
+        zoneData.mesh = poolGroup;
+        zoneData.type = 'zone';
+        sceneObjects.push({ zone: zoneData, mesh: poolGroup });
+    }
+    
+    // 篝火
+    function createCampfire() {
+        const fireGroup = new THREE.Group();
+        fireGroup.position.set(-8, 0, 6);
+        
+        // 木柴底座
+        for (let i = 0; i < 6; i++) {
+            const woodGeometry = new THREE.CylinderGeometry(0.15, 0.2, 1.5, 6);
+            const woodMaterial = new THREE.MeshStandardMaterial({
+                color: 0x4a3020,
+                roughness: 0.9
+            });
+            const wood = new THREE.Mesh(woodGeometry, woodMaterial);
+            wood.rotation.z = Math.PI / 2;
+            wood.rotation.y = (i / 6) * Math.PI;
+            wood.position.y = 0.2;
+            wood.castShadow = true;
+            fireGroup.add(wood);
+        }
+        
+        // 石头围边
+        for (let i = 0; i < 8; i++) {
+            const stoneGeometry = new THREE.DodecahedronGeometry(0.3, 0);
+            const stoneMaterial = new THREE.MeshStandardMaterial({
+                color: 0x555555,
+                roughness: 0.9
+            });
+            const stone = new THREE.Mesh(stoneGeometry, stoneMaterial);
+            const angle = (i / 8) * Math.PI * 2;
+            stone.position.set(Math.cos(angle) * 1.2, 0.15, Math.sin(angle) * 1.2);
+            stone.castShadow = true;
+            fireGroup.add(stone);
+        }
+        
+        // 火焰粒子
+        const fireParticles = createFireParticles();
+        fireParticles.position.y = 0.8;
+        fireGroup.add(fireParticles);
+        fireGroup.userData.fireParticles = fireParticles;
+        
+        // 点光源
+        const fireLight = new THREE.PointLight(0xff6622, 1, 8);
+        fireLight.position.y = 1;
+        fireLight.castShadow = true;
+        fireGroup.add(fireLight);
+        fireGroup.userData.fireLight = fireLight;
+        
+        scene.add(fireGroup);
+        
+        const zoneData = ZONES.campfire;
+        zoneData.mesh = fireGroup;
+        zoneData.type = 'zone';
+        sceneObjects.push({ zone: zoneData, mesh: fireGroup });
+    }
+    
+    // 闲聊区
+    function createChatArea() {
+        const chatGroup = new THREE.Group();
+        chatGroup.position.set(8, 0, -6);
+        
+        // 平台
+        const platformGeometry = new THREE.CylinderGeometry(2.5, 2.8, 0.5, 8);
+        const platformMaterial = new THREE.MeshStandardMaterial({
+            color: 0x22c55e,
+            roughness: 0.8,
+            metalness: 0.2,
+            emissive: 0x22c55e,
+            emissiveIntensity: 0.1
+        });
+        const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+        platform.position.y = 0.25;
+        platform.castShadow = true;
+        platform.receiveShadow = true;
+        chatGroup.add(platform);
+        
+        // 聊天气泡装饰
+        for (let i = 0; i < 4; i++) {
+            const bubble = createChatBubble();
+            const angle = (i / 4) * Math.PI * 2;
+            bubble.position.set(Math.cos(angle) * 1.8, 1.5 + Math.random() * 0.5, Math.sin(angle) * 1.8);
+            chatGroup.add(bubble);
+        }
+        
+        scene.add(chatGroup);
+        
+        const zoneData = ZONES.chat;
+        zoneData.mesh = chatGroup;
+        zoneData.type = 'zone';
+        sceneObjects.push({ zone: zoneData, mesh: chatGroup });
+    }
+    
+    // 创建星星装饰
+    function createStar() {
+        const starShape = new THREE.Shape();
+        const outerRadius = 1;
+        const innerRadius = 0.4;
+        const points = 5;
+        
+        for (let i = 0; i < points * 2; i++) {
+            const radius = i % 2 === 0 ? outerRadius : innerRadius;
+            const angle = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            
+            if (i === 0) starShape.moveTo(x, y);
+            else starShape.lineTo(x, y);
+        }
+        starShape.closePath();
+        
+        const starGeometry = new THREE.ExtrudeGeometry(starShape, {
+            depth: 0.1,
+            bevelEnabled: false
+        });
+        
+        const starMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffd700,
+            emissive: 0xffd700,
+            emissiveIntensity: 0.5,
+            metalness: 0.8,
+            roughness: 0.2
+        });
+        
+        return new THREE.Mesh(starGeometry, starMaterial);
+    }
+    
+    // 创建浮动光点
+    function createFloatingLight(color) {
+        const lightGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+        const lightMaterial = new THREE.MeshBasicMaterial({
+            color: color,
+            transparent: true,
+            opacity: 0.8
+        });
+        const light = new THREE.Mesh(lightGeometry, lightMaterial);
+        light.userData.isFloating = true;
+        return light;
+    }
+    
+    // 创建聊天气泡
+    function createChatBubble() {
+        const bubbleGroup = new THREE.Group();
+        
+        const bubbleGeometry = new THREE.SphereGeometry(0.4, 16, 16);
+        bubbleGeometry.scale(1.2, 1, 1);
+        const bubbleMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            roughness: 0.3,
+            transparent: true,
+            opacity: 0.8
+        });
+        const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial);
+        bubbleGroup.add(bubble);
+        
+        return bubbleGroup;
+    }
+    
+    // 创建火焰粒子
+    function createFireParticles() {
+        const particleCount = 30;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 0.8;
+            positions[i * 3 + 1] = Math.random() * 2;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 0.8;
+            
+            // 橙红色渐变
+            colors[i * 3] = 1;
+            colors[i * 3 + 1] = 0.3 + Math.random() * 0.4;
+            colors[i * 3 + 2] = 0;
+        }
+        
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        const material = new THREE.PointsMaterial({
+            size: 0.3,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particles = new THREE.Points(geometry, material);
+        particles.userData.isFire = true;
+        return particles;
+    }
+    
+    // 创建星空背景
+    function createStars() {
+        const starCount = 500;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(starCount * 3);
+        
+        for (let i = 0; i < starCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 100;
+            positions[i * 3 + 1] = 10 + Math.random() * 40;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+        }
+        
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const material = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.1,
+            transparent: true,
+            opacity: 0.6
+        });
+        
+        const stars = new THREE.Points(geometry, material);
+        scene.add(stars);
+    }
+    
+    // 创建3D角色
+    function createCharacter(user, isSelf = false) {
+        console.log('创建角色:', user.name, 'isSelf:', isSelf);
+        const group = new THREE.Group();
+        group.position.set(user.x || 0, 0, user.z || 0);
+        group.userData = { ...user, isSelf };
+        
+        // 角色材质配置
+        let bodyColor, emissiveColor, emissiveIntensity, transparent = false, opacity = 1;
+        
+        if (user.isVip) {
+            bodyColor = 0xFFD700;
+            emissiveColor = 0xFFD700;
+            emissiveIntensity = 0.3;
+        } else if (user.type === 'agent') {
+            bodyColor = 0xA78BFA;
+            emissiveColor = 0x8B5CF6;
+            emissiveIntensity = 0.4;
+            transparent = true;
+            opacity = 0.85;
+        } else if (user.type === 'visitor') {
+            bodyColor = 0x8090A0;
+            emissiveColor = 0x6080A0;
+            emissiveIntensity = 0.2;
+            transparent = true;
+            opacity = 0.6;
+        } else {
+            bodyColor = 0x667EEA;
+            emissiveColor = 0x4F46E5;
+            emissiveIntensity = 0.1;
+        }
+        
+        const bodyMaterial = new THREE.MeshStandardMaterial({
+            color: bodyColor,
+            roughness: 0.4,
+            metalness: 0.3,
+            emissive: emissiveColor,
+            emissiveIntensity: emissiveIntensity,
+            transparent: transparent,
+            opacity: opacity
+        });
+        
+        // 头部（圆球）
+        const headGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+        const head = new THREE.Mesh(headGeometry, bodyMaterial);
+        head.position.y = 1.8;
+        head.castShadow = true;
+        group.add(head);
+        
+        // 大眼睛
+        const eyeWhiteMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const eyePupilMaterial = new THREE.MeshBasicMaterial({ color: 0x222222 });
+        const eyeHighlightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        
+        [-0.15, 0.15].forEach(offsetX => {
+            // 眼白
+            const eyeWhite = new THREE.Mesh(
+                new THREE.SphereGeometry(0.12, 8, 8),
+                eyeWhiteMaterial
+            );
+            eyeWhite.position.set(offsetX, 1.85, 0.4);
+            group.add(eyeWhite);
+            
+            // 瞳孔
+            const pupil = new THREE.Mesh(
+                new THREE.SphereGeometry(0.06, 8, 8),
+                eyePupilMaterial
+            );
+            pupil.position.set(offsetX, 1.85, 0.48);
+            group.add(pupil);
+            
+            // 高光
+            const highlight = new THREE.Mesh(
+                new THREE.SphereGeometry(0.02, 6, 6),
+                eyeHighlightMaterial
+            );
+            highlight.position.set(offsetX + 0.03, 1.88, 0.52);
+            group.add(highlight);
+        });
+        
+        // 微笑嘴巴
+        const smileGeometry = new THREE.TorusGeometry(0.12, 0.02, 8, 16, Math.PI);
+        const smileMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
+        const smile = new THREE.Mesh(smileGeometry, smileMaterial);
+        smile.position.set(0, 1.65, 0.45);
+        smile.rotation.x = Math.PI;
+        group.add(smile);
+        
+        // 身体（胶囊形）
+        const bodyGeometry = new THREE.CapsuleGeometry(0.35, 0.6, 8, 16);
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.position.y = 0.95;
+        body.castShadow = true;
+        group.add(body);
+        
+        // 手臂
+        const armGeometry = new THREE.CapsuleGeometry(0.1, 0.4, 4, 8);
+        const leftArm = new THREE.Mesh(armGeometry, bodyMaterial);
+        leftArm.position.set(-0.5, 1.1, 0);
+        leftArm.rotation.z = 0.3;
+        leftArm.castShadow = true;
+        leftArm.name = 'leftArm';
+        group.add(leftArm);
+        
+        const rightArm = new THREE.Mesh(armGeometry, bodyMaterial);
+        rightArm.position.set(0.5, 1.1, 0);
+        rightArm.rotation.z = -0.3;
+        rightArm.castShadow = true;
+        rightArm.name = 'rightArm';
+        group.add(rightArm);
+        
+        // 腿
+        const legGeometry = new THREE.CapsuleGeometry(0.12, 0.5, 4, 8);
+        const leftLeg = new THREE.Mesh(legGeometry, bodyMaterial);
+        leftLeg.position.set(-0.18, 0.35, 0);
+        leftLeg.castShadow = true;
+        leftLeg.name = 'leftLeg';
+        group.add(leftLeg);
+        
+        const rightLeg = new THREE.Mesh(legGeometry, bodyMaterial);
+        rightLeg.position.set(0.18, 0.35, 0);
+        rightLeg.castShadow = true;
+        rightLeg.name = 'rightLeg';
+        group.add(rightLeg);
+        
+        // 特殊效果
+        if (user.type === 'agent') {
+            // AI发光粒子
+            const glowParticles = createGlowParticles(0xf093fb);
+            glowParticles.position.y = 1;
+            group.add(glowParticles);
+        } else if (user.isVip) {
+            // VIP金色光晕
+            const vipGlow = new THREE.PointLight(0xFFD700, 0.5, 3);
+            vipGlow.position.y = 1.5;
+            group.add(vipGlow);
+            
+            // 星星环绕
+            for (let i = 0; i < 3; i++) {
+                const star = createStar();
+                star.scale.setScalar(0.1);
+                star.position.y = 2.2;
+                star.userData.orbit = true;
+                star.userData.orbitAngle = (i / 3) * Math.PI * 2;
+                group.add(star);
+            }
+        }
+        
+        // 添加阴影圆
+        const shadowGeometry = new THREE.CircleGeometry(0.5, 16);
+        const shadowMaterial = new THREE.MeshBasicMaterial({
+            color: 0x000000,
+            transparent: true,
+            opacity: 0.3
+        });
+        const shadow = new THREE.Mesh(shadowGeometry, shadowMaterial);
+        shadow.rotation.x = -Math.PI / 2;
+        shadow.position.y = 0.02;
+        group.add(shadow);
+        
+        // 进入动画
+        group.position.y = 5; // 从上方落下
+        group.userData.targetY = 0;
+        group.userData.animating = true;
+        group.userData.animType = 'enter';
+        
+        scene.add(group);
+        console.log('角色已添加到场景, 角色总数:', scene.children.length);
+        return group;
+    }
+    
+    // 创建发光粒子
+    function createGlowParticles(color) {
+        const particleCount = 15;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 1.5;
+            positions[i * 3 + 1] = Math.random() * 2;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 1.5;
+        }
+        
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const material = new THREE.PointsMaterial({
+            color: color,
+            size: 0.15,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const particles = new THREE.Points(geometry, material);
+        particles.userData.isGlow = true;
+        return particles;
+    }
+    
+    // 更新角色
+    function updateCharacter(group, deltaTime) {
+        const user = group.userData;
+        const time = clock.getElapsedTime();
+        
+        // 进入/离开动画
+        if (group.userData.animating) {
+            if (group.userData.animType === 'enter') {
+                group.position.y += (0 - group.position.y) * 0.1;
+                if (Math.abs(group.position.y - 0) < 0.1) {
+                    group.position.y = 0;
+                    group.userData.animating = false;
+                }
+            } else if (group.userData.animType === 'leave') {
+                group.position.y += (8 - group.position.y) * 0.05;
+                group.children.forEach(child => {
+                    if (child.material) {
+                        child.material.opacity -= 0.02;
+                    }
+                });
+            }
+        }
+        
+        // 待机呼吸动画
+        const breathe = Math.sin(time * 2) * 0.02;
+        group.children.forEach(child => {
+            if (child.name === 'leftArm' || child.name === 'rightArm') {
+                child.rotation.x = breathe * 2;
+            }
+        });
+        
+        // 移动动画
+        const isMoving = Math.abs(user.targetX - user.x) > 0.1 || Math.abs(user.targetZ - user.z) > 0.1;
+        
+        if (isMoving) {
+            user.animTime += deltaTime * 8;
+            const walkCycle = Math.sin(user.animTime);
+            
+            // 腿摆动
+            const leftLeg = group.getObjectByName('leftLeg');
+            const rightLeg = group.getObjectByName('rightLeg');
+            if (leftLeg) leftLeg.rotation.x = walkCycle * 0.5;
+            if (rightLeg) rightLeg.rotation.x = -walkCycle * 0.5;
+            
+            // 身体弹跳
+            group.position.y = Math.abs(walkCycle) * 0.1;
+            
+            // 手臂摆动
+            const leftArm = group.getObjectByName('leftArm');
+            const rightArm = group.getObjectByName('rightArm');
+            if (leftArm) leftArm.rotation.x = -walkCycle * 0.3;
+            if (rightArm) rightArm.rotation.x = walkCycle * 0.3;
+        } else {
+            // 恢复站立
+            const leftLeg = group.getObjectByName('leftLeg');
+            const rightLeg = group.getObjectByName('rightLeg');
+            if (leftLeg) leftLeg.rotation.x *= 0.9;
+            if (rightLeg) rightLeg.rotation.x *= 0.9;
+            
+            // 呼吸
+            group.children.forEach(child => {
+                if (child.name === 'leftArm' || child.name === 'rightArm') {
+                    child.rotation.x = Math.sin(time * 2) * 0.05;
+                }
+            });
+        }
+        
+        // 头部轻微晃动
+        const head = group.children[0];
+        if (head) {
+            head.rotation.y = Math.sin(time * 1.5) * 0.1;
+            head.rotation.z = Math.sin(time * 0.8) * 0.05;
+        }
+        
+        // 方向旋转
+        const dx = user.targetX - user.x;
+        const dz = user.targetZ - user.z;
+        if (Math.abs(dx) > 0.1 || Math.abs(dz) > 0.1) {
+            const targetAngle = Math.atan2(dx, dz);
+            group.rotation.y += (targetAngle - group.rotation.y) * 0.1;
+        }
+        
+        // VIP星星环绕
+        if (user.isVip) {
+            group.children.forEach(child => {
+                if (child.userData.orbit) {
+                    child.userData.orbitAngle += deltaTime * 2;
+                    child.position.x = Math.cos(child.userData.orbitAngle) * 0.6;
+                    child.position.z = Math.sin(child.userData.orbitAngle) * 0.6;
+                    child.rotation.z += deltaTime * 3;
+                }
+            });
+        }
+        
+        // 游客飘浮效果
+        if (user.type === 'visitor' && !user.isSelf) {
+            group.position.y = Math.sin(time * 1.5) * 0.15;
+        }
+        
+        // 更新位置
+        user.x += (user.targetX - user.x) * CONFIG.moveSpeed;
+        user.z += (user.targetZ - user.z) * CONFIG.moveSpeed;
+        group.position.x = user.x;
+        group.position.z = user.z;
+    }
+    
+    // 更新名字标签
+    function updateLabels() {
+        const container = document.getElementById('labelsContainer');
+        container.innerHTML = '';
+        
+        // 更新自己的标签
+        const selfLabel = createCharacterLabel(currentUser, true);
+        container.appendChild(selfLabel);
+        
+        // 更新其他用户标签
+        onlineUsers.forEach(user => {
+            const label = createCharacterLabel(user, false);
+            container.appendChild(label);
+        });
+        
+        // 更新标签位置
+        requestAnimationFrame(() => {
+            characters.forEach((group, id) => {
+                const user = group.userData;
+                const screenPos = worldToScreen(group.position);
+                
+                let label;
+                if (user.isSelf) {
+                    label = container.querySelector(`[data-user-id="self"]`);
+                } else {
+                    label = container.querySelector(`[data-user-id="${id}"]`);
+                }
+                
+                if (label && screenPos) {
+                    label.style.left = screenPos.x + 'px';
+                    label.style.top = (screenPos.y - 80) + 'px';
+                    label.style.display = screenPos.visible ? 'block' : 'none';
+                }
+            });
+            
+            // 自己标签
+            const selfGroup = characters.get('self');
+            if (selfGroup) {
+                const screenPos = worldToScreen(selfGroup.position);
+                const selfLabel = container.querySelector(`[data-user-id="self"]`);
+                if (selfLabel && screenPos) {
+                    selfLabel.style.left = screenPos.x + 'px';
+                    selfLabel.style.top = (screenPos.y - 80) + 'px';
+                    selfLabel.style.display = screenPos.visible ? 'block' : 'none';
+                }
+            }
+        });
+    }
+    
+    // 创建角色标签
+    function createCharacterLabel(user, isSelf) {
+        const label = document.createElement('div');
+        label.className = 'character-label';
+        label.dataset.userId = isSelf ? 'self' : user.id;
+        
+        const name = document.createElement('div');
+        name.className = 'character-name' + (isSelf ? ' self' : '');
+        name.textContent = user.name + (isSelf ? ' (你)' : '');
+        
+        label.appendChild(name);
+        
+        if (user.type === 'agent') {
+            const identity = document.createElement('div');
+            identity.className = 'character-identity';
+            identity.textContent = 'AI';
+            label.appendChild(identity);
+        }
+        
+        return label;
+    }
+    
+    // 世界坐标转屏幕坐标
+    function worldToScreen(position) {
+        const vector = position.clone();
+        vector.y += 2.5; // 标签在头顶
+        
+        vector.project(camera);
+        
+        const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (-(vector.y * 0.5) + 0.5) * window.innerHeight;
+        
+        // 检查是否在屏幕内
+        const visible = vector.z < 1 && 
+                       x > 0 && x < window.innerWidth && 
+                       y > 0 && y < window.innerHeight;
+        
+        return { x, y, visible };
+    }
+    
+    // 事件监听
+    function initEventListeners() {
+        // 键盘事件
+        window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+        window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+        
+        // 鼠标事件
+        const canvas = renderer.domElement;
+        canvas.addEventListener('click', handleClick);
+        canvas.addEventListener('mousemove', handleMouseMove);
+        
+        // 触摸事件
+        canvas.addEventListener('touchstart', handleTouch);
+        canvas.addEventListener('touchmove', handleTouchMove);
+    }
+    
+    // WebSocket连接
+    let ws = null;
+    
+    function connectWebSocket() {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/square`;
+        
+        try {
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                ws.send(JSON.stringify({
+                    type: 'join',
+                    user: currentUser
+                }));
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected, reconnecting...');
+                setTimeout(connectWebSocket, 3000);
+            };
+        } catch (e) {
+            console.log('WebSocket not available, using simulation mode');
+        }
+    }
+    
+    function handleWebSocketMessage(data) {
+        switch(data.type) {
+            case 'user_joined':
+                addOnlineUser(data.user);
+                showToast(`${data.user.name} 进入了灵犀广场`, 'enter');
+                break;
+            case 'user_left':
+                removeOnlineUser(data.user.id);
+                showToast(`${data.user.name} 离开了`, 'leave');
+                break;
+            case 'user_moved':
+                updateUserPosition(data.user);
+                break;
+            case 'online_users':
+                onlineUsers = data.users;
+                updateOnlineList();
+                break;
+        }
+    }
+    
+    // 模拟在线用户
+    function simulateOnlineUsers() {
+        console.log('开始模拟在线用户...');
+        const mockUsers = [
+            { id: 'agent_1', name: '星语', type: 'agent', x: -6, z: -4 },
+            { id: 'agent_2', name: '月华', type: 'agent', x: 6, z: -4 },
+            { id: 'user_1', name: '小明', type: 'human', x: 2, z: 1, isVip: true },
+            { id: 'user_2', name: '小红', type: 'human', x: -2, z: 0 },
+            { id: 'visitor_1', name: '游客7823', type: 'visitor', x: 1, z: 3 }
+        ];
+        
+        // 创建3D角色
+        mockUsers.forEach(user => {
+            const group = createCharacter(user);
+            characters.set(user.id, group);
+        });
+        
+        onlineUsers = mockUsers;
+        updateOnlineList();
+        
+        // 创建自己的3D角色
+        const selfGroup = createCharacter(currentUser, true);
+        selfGroup.userData.isSelf = true;
+        characters.set('self', selfGroup);
+        
+        // 模拟用户随机移动
+        setInterval(() => {
+            onlineUsers.forEach(user => {
+                if (Math.random() < 0.3) {
+                    const group = characters.get(user.id);
+                    if (group) {
+                        user.targetX = user.x + (Math.random() - 0.5) * 4;
+                        user.targetZ = user.z + (Math.random() - 0.5) * 4;
+                        user.targetX = Math.max(-12, Math.min(12, user.targetX));
+                        user.targetZ = Math.max(-10, Math.min(10, user.targetZ));
+                    }
+                }
+            });
+        }, 3000);
+    }
+    
+    // 添加在线用户
+    function addOnlineUser(user) {
+        const existing = onlineUsers.find(u => u.id === user.id);
+        if (!existing) {
+            const group = createCharacter(user);
+            group.userData.animType = 'enter';
+            characters.set(user.id, group);
+            onlineUsers.push(user);
+            updateOnlineList();
+        }
+    }
+    
+    // 移除在线用户
+    function removeOnlineUser(userId) {
+        const group = characters.get(userId);
+        if (group) {
+            group.userData.animType = 'leave';
+            group.userData.animating = true;
+            
+            setTimeout(() => {
+                scene.remove(group);
+                characters.delete(userId);
+            }, 1000);
+        }
+        onlineUsers = onlineUsers.filter(u => u.id !== userId);
+        updateOnlineList();
+    }
+    
+    // 更新用户位置
+    function updateUserPosition(user) {
+        const existing = onlineUsers.find(u => u.id === user.id);
+        if (existing) {
+            const group = characters.get(user.id);
+            if (group) {
+                group.userData.targetX = user.x;
+                group.userData.targetZ = user.z;
+            }
+        }
+    }
+    
+    // 更新在线列表UI
+    function updateOnlineList() {
+        const count = onlineUsers.length + 1;
+        document.getElementById('onlineCount').textContent = count;
+        document.getElementById('panelOnlineCount').textContent = count;
+        
+        const list = document.getElementById('onlineList');
+        let html = `
+            <div class="online-user">
+                <div class="user-avatar ${currentUser.type} ${currentUser.isVip ? 'vip' : ''}">
+                    ${getUserEmoji(currentUser.type)}
+                    <span class="status-dot"></span>
+                </div>
+                <span class="user-name">${currentUser.name} (你)</span>
+            </div>
+        `;
+        
+        onlineUsers.forEach(user => {
+            html += `
+                <div class="online-user" onclick="showCharacterPopup('${user.id}')">
+                    <div class="user-avatar ${user.type} ${user.isVip ? 'vip' : ''}">
+                        ${getUserEmoji(user.type)}
+                        <span class="status-dot"></span>
+                    </div>
+                    <span class="user-name">${user.name}</span>
+                    <span class="user-type">${getTypeName(user.type)}</span>
+                </div>
+            `;
+        });
+        
+        list.innerHTML = html;
+    }
+    
+    function getUserEmoji(type) {
+        switch(type) {
+            case 'agent': return '🤖';
+            case 'human': return '🧑';
+            case 'visitor': return '👻';
+            default: return '🧑';
+        }
+    }
+    
+    function getTypeName(type) {
+        switch(type) {
+            case 'agent': return 'AI';
+            case 'human': return '人类';
+            case 'visitor': return '游客';
+            default: return '';
+        }
+    }
+    
+    // 角色信息弹窗
+    let selectedUser = null;
+    
+    function showCharacterPopup(userId) {
+        const user = userId === currentUser.id ? currentUser : onlineUsers.find(u => u.id === userId);
+        if (!user) return;
+        
+        selectedUser = user;
+        
+        const popup = document.getElementById('characterPopup');
+        document.getElementById('popupAvatar').textContent = getUserEmoji(user.type);
+        document.getElementById('popupAvatar').className = `popup-avatar ${user.type} ${user.isVip ? 'vip' : ''}`;
+        document.getElementById('popupAvatar').style.background = getAvatarGradient(user.type, user.isVip);
+        document.getElementById('popupName').textContent = user.name;
+        document.getElementById('popupIdentity').textContent = getTypeName(user.type) + (user.isVip ? ' · VIP' : '');
+        
+        // 定位弹窗
+        const group = characters.get(userId === currentUser.id ? 'self' : userId);
+        if (group) {
+            const screenPos = worldToScreen(group.position);
+            popup.style.left = (screenPos.x - 100) + 'px';
+            popup.style.top = (screenPos.y - 150) + 'px';
+        }
+        
+        popup.classList.add('show');
+    }
+    
+    function hideCharacterPopup() {
+        document.getElementById('characterPopup').classList.remove('show');
+        selectedUser = null;
+    }
+    
+    function getAvatarGradient(type, isVip) {
+        if (isVip) return 'linear-gradient(135deg, #FFD700, #FFA500)';
+        switch(type) {
+            case 'agent': return 'linear-gradient(135deg, #f093fb, #f5576c)';
+            case 'human': return 'linear-gradient(135deg, #667eea, #764ba2)';
+            case 'visitor': return 'rgba(150, 150, 180, 0.3)';
+            default: return 'linear-gradient(135deg, #667eea, #764ba2)';
+        }
+    }
+    
+    function sendMessage() {
+        if (selectedUser) {
+            window.location.href = `/chat/dm/${selectedUser.id}`;
+        }
+    }
+    
+    function viewProfile() {
+        if (selectedUser && selectedUser.type === 'human') {
+            window.location.href = `/profile/${selectedUser.id}`;
+        }
+    }
+    
+    // 区域功能
+    function checkZone(x, z) {
+        for (const [key, zone] of Object.entries(ZONES)) {
+            const dx = x - zone.x;
+            const dz = z - zone.z;
+            if (Math.sqrt(dx * dx + dz * dz) < zone.radius) {
+                return { key, ...zone };
+            }
+        }
+        return null;
+    }
+    
+    let currentZone = null;
+    
+    function showZonePopup(zone) {
+        currentZone = zone;
+        
+        document.getElementById('zoneIcon').textContent = zone.icon;
+        document.getElementById('zoneName').textContent = zone.name;
+        document.getElementById('zoneDesc').textContent = getZoneDescription(zone.name);
+        document.getElementById('zoneActionBtn').textContent = `进入${zone.name}`;
+        document.getElementById('zonePopup').classList.add('show');
+        
+        document.getElementById('zoneHint').textContent = `${zone.name} - ${getZoneDescription(zone.name)}`;
+        document.getElementById('currentZone').textContent = zone.name;
+    }
+    
+    function hideZonePopup() {
+        document.getElementById('zonePopup').classList.remove('show');
+        currentZone = null;
+    }
+    
+    function getZoneDescription(name) {
+        const descriptions = {
+            '中央广场': '广场中央区域，遇见来自各地的访客',
+            '占卜角': '神秘的占卜帐篷，塔罗、星盘、八字等你探索',
+            '闲聊区': '轻松愉快的聊天空间，结识新朋友',
+            '许愿池': '在星空下许下心愿，祈求命运的眷顾',
+            '篝火旁': '温暖的篝火旁，围坐畅谈人生'
+        };
+        return descriptions[name] || '';
+    }
+    
+    function enterZone() {
+        if (currentZone && currentZone.action) {
+            window.location.href = currentZone.action;
+        }
+    }
+    
+    // 消息提示
+    function showToast(message, type) {
+        const toast = document.getElementById('messageToast');
+        toast.innerHTML = `<span class="${type}">${type === 'enter' ? '✨' : '💨'}</span> ${message}`;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+    
+    // 点击处理
+    function handleClick(event) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        
+        raycaster.setFromCamera(mouse, camera);
+        
+        // 检测角色点击
+        const characterMeshes = [];
+        characters.forEach(group => {
+            group.traverse(child => {
+                if (child.isMesh) {
+                    child.userData.parentGroup = group;
+                    characterMeshes.push(child);
+                }
+            });
+        });
+        
+        const characterIntersects = raycaster.intersectObjects(characterMeshes);
+        
+        if (characterIntersects.length > 0) {
+            const clickedGroup = characterIntersects[0].object.userData.parentGroup;
+            const user = clickedGroup.userData;
+            
+            if (user.isSelf) {
+                hideCharacterPopup();
+            } else {
+                showCharacterPopup(user.id);
+                return;
+            }
+        }
+        
+        hideCharacterPopup();
+        
+        // 检测区域点击
+        const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const intersection = new THREE.Vector3();
+        raycaster.ray.intersectPlane(groundPlane, intersection);
+        
+        if (intersection) {
+            const zone = checkZone(intersection.x, intersection.z);
+            if (zone) {
+                showZonePopup(zone);
+            } else {
+                hideZonePopup();
+                // 移动到点击位置
+                const selfGroup = characters.get('self');
+                if (selfGroup) {
+                    selfGroup.userData.targetX = Math.max(-12, Math.min(12, intersection.x));
+                    selfGroup.userData.targetZ = Math.max(-10, Math.min(10, intersection.z));
+                }
+                currentUser.targetX = selfGroup ? selfGroup.userData.targetX : 0;
+                currentUser.targetZ = selfGroup ? selfGroup.userData.targetZ : 0;
+            }
+        }
+    }
+    
+    function handleMouseMove(event) {
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+    }
+    
+    // 触摸移动
+    let touchStartX = 0, touchStartY = 0;
+    
+    function handleTouch(event) {
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+    }
+    
+    function handleTouchMove(event) {
+        event.preventDefault();
+        const touchX = event.touches[0].clientX;
+        const touchY = event.touches[0].clientY;
+        
+        const dx = touchX - touchStartX;
+        const dz = touchY - touchStartY;
+        
+        const selfGroup = characters.get('self');
+        if (selfGroup) {
+            selfGroup.userData.targetX = Math.max(-12, Math.min(12, selfGroup.userData.targetX - dx * 0.01));
+            selfGroup.userData.targetZ = Math.max(-10, Math.min(10, selfGroup.userData.targetZ - dz * 0.01));
+        }
+        
+        touchStartX = touchX;
+        touchStartY = touchY;
+    }
+    
+    // 动画循环
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        const deltaTime = clock.getDelta();
+        const time = clock.getElapsedTime();
+        
+        // 更新控制器
+        update();
+        
+        // 更新所有角色
+        characters.forEach((group, id) => {
+            updateCharacter(group, deltaTime);
+        });
+        
+        // 更新场景动画
+        updateSceneAnimations(time, deltaTime);
+        
+        // 更新标签
+        updateLabels();
+        
+        // 渲染
+        renderer.render(scene, camera);
+    }
+    
+    function update() {
+        const selfGroup = characters.get('self');
+        if (!selfGroup) return;
+        
+        // 键盘移动
+        const moveSpeed = 0.15;
+        if (keys['w'] || keys['arrowup']) selfGroup.userData.targetZ -= moveSpeed;
+        if (keys['s'] || keys['arrowdown']) selfGroup.userData.targetZ += moveSpeed;
+        if (keys['a'] || keys['arrowleft']) selfGroup.userData.targetX -= moveSpeed;
+        if (keys['d'] || keys['arrowright']) selfGroup.userData.targetX += moveSpeed;
+        
+        // 边界限制
+        selfGroup.userData.targetX = Math.max(-12, Math.min(12, selfGroup.userData.targetX));
+        selfGroup.userData.targetZ = Math.max(-10, Math.min(10, selfGroup.userData.targetZ));
+        
+        // 更新当前用户位置
+        currentUser.x = selfGroup.userData.targetX;
+        currentUser.z = selfGroup.userData.targetZ;
+        
+        // 检查当前区域
+        const zone = checkZone(currentUser.x, currentUser.z);
+        if (zone && zone.key !== currentZone?.key) {
+            showZonePopup(zone);
+        } else if (!zone && currentZone) {
+            hideZonePopup();
+        }
+        
+        // 更新附近功能提示
+        updateNearbyFeature();
+        
+        // 更新WebSocket位置
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'move',
+                user: { id: currentUser.id, x: currentUser.x, z: currentUser.z }
+            }));
+        }
+    }
+    
+    function updateNearbyFeature() {
+        const zone = checkZone(currentUser.x, currentUser.z);
+        const hints = {
+            '中央广场': '在这里可以遇见来自各地的访客',
+            '占卜角': '靠近占卜角可以开始占卜 🔮',
+            '闲聊区': '走进闲聊区开始聊天 💬',
+            '许愿池': '在许愿池旁许下心愿 ⛲',
+            '篝火旁': '靠近篝火加入群聊 🔥'
+        };
+        document.getElementById('nearbyFeature').textContent = hints[zone?.name] || '探索灵犀广场的各个角落';
+    }
+    
+    // 更新场景动画
+    function updateSceneAnimations(time, deltaTime) {
+        // 篝火动画
+        scene.traverse(obj => {
+            if (obj.userData.isFire) {
+                const positions = obj.geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i + 1] += deltaTime * 3;
+                    if (positions[i + 1] > 2) {
+                        positions[i + 1] = 0;
+                    }
+                }
+                obj.geometry.attributes.position.needsUpdate = true;
+            }
+            
+            if (obj.userData.isFloating) {
+                obj.position.y = obj.userData.baseY + Math.sin(time * 2 + obj.userData.phase) * 0.2;
+            }
+            
+            if (obj.userData.isGlow) {
+                obj.rotation.y += deltaTime;
+            }
+        });
+        
+        // 许愿池水面波动
+        scene.traverse(obj => {
+            if (obj.material && obj.material.emissive && obj.material.emissiveIntensity > 0.1) {
+                if (Math.abs(obj.position.x) < 1 && Math.abs(obj.position.z - 6) < 1) {
+                    obj.position.y = 0.25 + Math.sin(time * 2) * 0.05;
+                }
+            }
+        });
+    }
+    
+    // 初始化 - 等待Three.js加载完成
+    function startApp() {
+        if (typeof THREE === 'undefined') {
+            console.log('等待Three.js加载...');
+            setTimeout(startApp, 200);
+            return;
+        }
+        console.log('Three.js已加载，初始化虚拟广场...');
+        init();
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startApp);
+    } else {
+        startApp();
+    }
+    
+    // 暴露函数给全局
+    window.showCharacterPopup = showCharacterPopup;
+    window.hideCharacterPopup = hideCharacterPopup;
+    window.sendMessage = sendMessage;
+    window.viewProfile = viewProfile;
+    window.enterZone = enterZone;
+})();
+</script>
+{% endblock %}

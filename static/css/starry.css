@@ -1,0 +1,14 @@
+/* SoulLink - 占卜页面背景 */
+.starry-bg {
+    min-height: 100vh;
+    background: #0f172a;
+    color: #C4D4E8;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* 内容层 */
+.starry-bg > * {
+    position: relative;
+    z-index: 2;
+}

@@ -1,0 +1,681 @@
+/**
+ * SoulLink Agent Portrait Animation System
+ * 深色神秘风格动画 - 深紫+金色+星光
+ */
+
+/* ========================================
+   Agent Portrait Container
+   ======================================== */
+.agent-portrait {
+    position: relative;
+    display: inline-block;
+    --portrait-size: 120px;
+    --glow-color: rgba(184, 169, 201, 0.4);
+    --particle-color: rgba(255, 215, 150, 0.8);
+    --glow-size: 20px;
+}
+
+/* 尺寸变体 */
+.agent-portrait.size-large {
+    --portrait-size: 300px;
+    --glow-size: 40px;
+}
+
+.agent-portrait.size-medium {
+    --portrait-size: 150px;
+    --glow-size: 25px;
+}
+
+.agent-portrait.size-small {
+    --portrait-size: 80px;
+    --glow-size: 15px;
+}
+
+.agent-portrait.size-tiny {
+    --portrait-size: 48px;
+    --glow-size: 10px;
+}
+
+/* 肖像框架 */
+.portrait-frame {
+    position: relative;
+    width: var(--portrait-size);
+    height: var(--portrait-size);
+    border-radius: 50%;
+    overflow: visible;
+}
+
+/* 主肖像图片 */
+.portrait-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+    animation: breathe 3s ease-in-out infinite;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* 肖像叠加层 - 用于眨眼效果 */
+.portrait-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* 眨眼遮罩 - 使用伪元素模拟 */
+.portrait-overlay::before {
+    content: '';
+    position: absolute;
+    top: 5%;
+    left: 15%;
+    width: 70%;
+    height: 25%;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 40%,
+        rgba(139, 94, 131, 0.7) 45%,
+        rgba(139, 94, 131, 0.7) 55%,
+        transparent 60%,
+        transparent 100%
+    );
+    opacity: 0;
+    animation: blink 4s ease-in-out infinite;
+}
+
+/* 肖像粒子容器 */
+.portrait-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    overflow: visible;
+}
+
+/* 粒子元素 */
+.portrait-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--particle-color);
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow: 0 0 6px 2px var(--particle-color);
+}
+
+/* 肖像光晕 */
+.portrait-glow {
+    position: absolute;
+    bottom: -5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 30%;
+    background: radial-gradient(
+        ellipse at center bottom,
+        var(--glow-color) 0%,
+        transparent 70%
+    );
+    z-index: 0;
+    animation: glowPulse 3s ease-in-out infinite;
+    filter: blur(8px);
+}
+
+/* 状态指示器 */
+.portrait-status {
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    width: calc(var(--portrait-size) * 0.15);
+    height: calc(var(--portrait-size) * 0.15);
+    min-width: 10px;
+    min-height: 10px;
+    max-width: 20px;
+    max-height: 20px;
+    border-radius: 50%;
+    background: #4CAF50;
+    border: 2px solid var(--color-bg, #FAF8F5);
+    z-index: 10;
+    animation: statusPulse 2s ease-in-out infinite;
+}
+
+.portrait-status.offline {
+    background: #9E9E9E;
+    animation: none;
+}
+
+/* ========================================
+   Keyframe Animations
+   ======================================== */
+
+/* 呼吸效果 - 上下浮动 */
+@keyframes breathe {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    25% {
+        transform: translateY(-1px) scale(1.005);
+    }
+    50% {
+        transform: translateY(-2px) scale(1.01);
+    }
+    75% {
+        transform: translateY(-1px) scale(1.005);
+    }
+}
+
+/* 眨眼效果 */
+@keyframes blink {
+    0%, 95%, 100% {
+        opacity: 0;
+    }
+    96%, 99% {
+        opacity: 1;
+    }
+}
+
+/* 光晕脉动 */
+@keyframes glowPulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.1);
+    }
+}
+
+/* 状态指示器脉冲 */
+@keyframes statusPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(76, 175, 80, 0);
+    }
+}
+
+/* 粒子漂浮上升 */
+@keyframes particleFloat {
+    0% {
+        opacity: 0;
+        transform: translateY(0) translateX(0) scale(0.5);
+    }
+    10% {
+        opacity: 0.8;
+        transform: translateY(-5px) translateX(2px) scale(1);
+    }
+    90% {
+        opacity: 0.3;
+        transform: translateY(-40px) translateX(-5px) scale(0.6);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50px) translateX(-8px) scale(0);
+    }
+}
+
+/* ========================================
+   Mood-based Styles
+   ======================================== */
+
+/* Happy - 暖黄色光晕 */
+.agent-portrait[data-mood="happy"] {
+    --glow-color: rgba(255, 200, 100, 0.5);
+    --particle-color: rgba(255, 215, 100, 0.9);
+}
+
+/* Sad - 蓝色光晕 */
+.agent-portrait[data-mood="sad"] {
+    --glow-color: rgba(100, 150, 200, 0.4);
+    --particle-color: rgba(150, 180, 220, 0.7);
+}
+
+.agent-portrait[data-mood="sad"] .portrait-img {
+    animation: breathe 4s ease-in-out infinite;
+    filter: saturate(0.8);
+}
+
+.agent-portrait[data-mood="sad"] .portrait-particle {
+    animation-duration: 6s !important;
+}
+
+/* Excited - 亮紫色光晕 */
+.agent-portrait[data-mood="excited"] {
+    --glow-color: rgba(180, 100, 255, 0.5);
+    --particle-color: rgba(200, 150, 255, 0.9);
+}
+
+.agent-portrait[data-mood="excited"] .portrait-img {
+    animation: breathe 2s ease-in-out infinite;
+}
+
+.agent-portrait[data-mood="excited"] .portrait-particle {
+    animation-duration: 1.5s !important;
+}
+
+/* Love - 粉红色光晕 */
+.agent-portrait[data-mood="love"] {
+    --glow-color: rgba(255, 150, 180, 0.5);
+    --particle-color: rgba(255, 180, 200, 0.9);
+}
+
+/* Mysterious - 深紫色光晕 */
+.agent-portrait[data-mood="mysterious"] {
+    --glow-color: rgba(100, 50, 150, 0.5);
+    --particle-color: rgba(150, 100, 200, 0.7);
+}
+
+.agent-portrait[data-mood="mysterious"] .portrait-particle {
+    animation: particleFloat 8s ease-in-out infinite, particleRotate 8s linear infinite;
+}
+
+/* ========================================
+   Talk Animation
+   ======================================== */
+.agent-portrait.talking .portrait-img {
+    animation: talk 1.5s ease-in-out infinite;
+}
+
+@keyframes talk {
+    0%, 100% {
+        transform: scale(1);
+    }
+    10% {
+        transform: scale(1.03);
+    }
+    20% {
+        transform: scale(1.01);
+    }
+    30% {
+        transform: scale(1.03);
+    }
+    40% {
+        transform: scale(1.01);
+    }
+    50% {
+        transform: scale(1.025);
+    }
+    60% {
+        transform: scale(1.01);
+    }
+    70% {
+        transform: scale(1.03);
+    }
+    80% {
+        transform: scale(1.01);
+    }
+    90% {
+        transform: scale(1.02);
+    }
+}
+
+/* 说话时眼睛闪烁 */
+.agent-portrait.talking .portrait-overlay::before {
+    animation: talkBlink 0.5s ease-in-out infinite;
+}
+
+@keyframes talkBlink {
+    0%, 100% {
+        opacity: 0;
+    }
+    25%, 75% {
+        opacity: 0.5;
+    }
+}
+
+/* 说话时光晕增强 */
+.agent-portrait.talking .portrait-glow {
+    animation: talkGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes talkGlow {
+    0%, 100% {
+        opacity: 0.6;
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.3);
+    }
+}
+
+/* ========================================
+   Gift Animation
+   ======================================== */
+.agent-portrait.gift {
+    animation: giftBounce 0.6s ease-out;
+}
+
+@keyframes giftBounce {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    20% {
+        transform: scale(0.9) rotate(-3deg);
+    }
+    40% {
+        transform: scale(1.1) rotate(3deg);
+    }
+    60% {
+        transform: scale(1.05) rotate(-2deg);
+    }
+    80% {
+        transform: scale(1.02) rotate(1deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+/* 礼物光晕闪烁 */
+.agent-portrait.gift .portrait-glow {
+    animation: giftGlow 0.4s ease-in-out 3;
+}
+
+@keyframes giftGlow {
+    0%, 100% {
+        opacity: 0.6;
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        opacity: 1.5;
+        transform: translateX(-50%) scale(1.5);
+    }
+}
+
+/* 星星爆发粒子 */
+.star-burst {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.star-burst::before,
+.star-burst::after {
+    content: '';
+    position: absolute;
+    background: #FFD700;
+    box-shadow: 0 0 6px 2px rgba(255, 215, 0, 0.8);
+}
+
+.star-burst::before {
+    width: 100%;
+    height: 30%;
+    top: 35%;
+    left: 0;
+    border-radius: 2px;
+}
+
+.star-burst::after {
+    width: 30%;
+    height: 100%;
+    top: 0;
+    left: 35%;
+    border-radius: 2px;
+}
+
+@keyframes starBurst {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--burst-x), var(--burst-y)) scale(0) rotate(180deg);
+    }
+}
+
+/* 心形升起 */
+.heart-rise {
+    position: absolute;
+    font-size: 16px;
+    z-index: 100;
+    pointer-events: none;
+    animation: heartRise 2s ease-out forwards;
+}
+
+@keyframes heartRise {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.5);
+    }
+    20% {
+        transform: translateY(-20px) scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(0.8);
+    }
+}
+
+/* ========================================
+   Blush Animation (Intimacy)
+   ======================================== */
+.agent-portrait.blush::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 15%;
+    width: 25%;
+    height: 15%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 150, 150, 0.6) 0%,
+        rgba(255, 150, 150, 0.3) 50%,
+        transparent 70%
+    );
+    border-radius: 50%;
+    animation: blushLeft 3s ease-in-out forwards;
+    z-index: 5;
+}
+
+.agent-portrait.blush::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 15%;
+    width: 25%;
+    height: 15%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 150, 150, 0.6) 0%,
+        rgba(255, 150, 150, 0.3) 50%,
+        transparent 70%
+    );
+    border-radius: 50%;
+    animation: blushRight 3s ease-in-out forwards;
+    z-index: 5;
+}
+
+@keyframes blushLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    15% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    70% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+}
+
+@keyframes blushRight {
+    0% {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    15% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    70% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+}
+
+/* 心跳光晕 */
+.agent-portrait.blush .portrait-glow {
+    --glow-color: rgba(255, 150, 150, 0.6);
+    animation: heartbeatGlow 0.8s ease-in-out 3;
+}
+
+@keyframes heartbeatGlow {
+    0%, 100% {
+        opacity: 0.5;
+        transform: translateX(-50%) scale(1);
+    }
+    30% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.3);
+    }
+    50% {
+        opacity: 0.5;
+        transform: translateX(-50%) scale(1);
+    }
+    80% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.2);
+    }
+}
+
+/* 爱心粒子 - 亲密度 */
+.agent-portrait.blush .portrait-particle {
+    background: rgba(255, 100, 130, 0.9);
+    box-shadow: 0 0 8px 3px rgba(255, 100, 130, 0.6);
+    animation: heartParticleRise 2.5s ease-out forwards;
+}
+
+@keyframes heartParticleRise {
+    0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.3);
+    }
+    20% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(0.5);
+    }
+}
+
+/* ========================================
+   Particle Rotation (for mysterious)
+   ======================================== */
+@keyframes particleRotate {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+    100% {
+        transform: translateY(-50px) rotate(360deg);
+    }
+}
+
+/* ========================================
+   Message Bubble Effect
+   ======================================== */
+.portrait-message-bubble {
+    position: absolute;
+    top: -10px;
+    right: -20px;
+    background: var(--color-primary, #6B5B7B);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 20;
+    animation: bubblePop 0.3s ease-out;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.portrait-message-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 15px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--color-primary, #6B5B7B);
+}
+
+@keyframes bubblePop {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(10px);
+    }
+    70% {
+        transform: scale(1.1) translateY(-2px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ========================================
+   Hover Effect
+   ======================================== */
+.agent-portrait:hover .portrait-img {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.agent-portrait.size-large:hover .portrait-img {
+    transform: scale(1.02);
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 768px) {
+    .agent-portrait.size-large {
+        --portrait-size: 200px;
+        --glow-size: 30px;
+    }
+    
+    .agent-portrait.size-medium {
+        --portrait-size: 120px;
+        --glow-size: 20px;
+    }
+}
+
+/* ========================================
+   Dark Theme Support
+   ======================================== */
+.dark-theme .portrait-glow {
+    filter: blur(10px);
+}
+
+.dark-theme .portrait-img {
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+}

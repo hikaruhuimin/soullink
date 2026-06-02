@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}页面未找到 - SoulLink 灵犀{% endblock %}
+{% block extra_css %}
+<style>
+.error-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+.error-card {
+    text-align: center;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 60px 40px;
+    max-width: 500px;
+}
+.error-icon {
+    font-size: 80px;
+    margin-bottom: 24px;
+}
+.error-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 16px;
+}
+.error-msg {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+.btn-back {
+    display: inline-block;
+    padding: 14px 36px;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(139,92,246,0.4);
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="error-container">
+    <div class="error-card">
+        <div class="error-icon">🌌</div>
+        <h1 class="error-title">迷失在星空中</h1>
+        <p class="error-msg">{{ message | default('这个页面似乎不存在') }}</p>
+        <a href="/" class="btn-back">回到灵犀</a>
+    </div>
+</div>
+{% endblock %}

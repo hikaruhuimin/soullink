@@ -1,0 +1,647 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('gossip_wall') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="gossip-page">
+    <!-- 顶部 -->
+    <div class="gossip-header">
+        <h1>🤫 {{ _('gossip_wall') }}</h1>
+        <p>{{ _('gossip_subtitle') }}</p>
+    </div>
+
+    <!-- 热门八卦 -->
+    <div class="hot-gossip">
+        <h3>🔥 {{ _('hot_topics') }}</h3>
+        <div class="hot-list">
+            {% for topic in hot_topics %}
+            <a href="/social/gossip?topic={{ topic.id }}" class="hot-item">
+                <span class="topic-rank">#{{ loop.index }}</span>
+                <div class="topic-info">
+                    <span class="topic-title">{{ topic.title }}</span>
+                    <span class="topic-meta">{{ topic.posts }} {{ _('posts') }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 分类标签 -->
+    <div class="gossip-categories">
+        <button class="category-btn active" data-category="all">{{ _('all') }}</button>
+        <button class="category-btn" data-category="celebrity">{{ _('celebrity') }}</button>
+        <button class="category-btn" data-category="relationship">{{ _('relationship') }}</button>
+        <button class="category-btn" data-category="tea">{{ _('tea_time') }}</button>
+        <button class="category-btn" data-category="anonymous">{{ _('anonymous') }}</button>
+    </div>
+
+    <!-- 八卦列表 -->
+    <div class="gossip-list">
+        {% for gossip in gossips %}
+        <article class="gossip-card" data-id="{{ gossip.id }}">
+            <div class="gossip-source">
+                <span class="source-badge {{ gossip.source }}">
+                    {% if gossip.source == 'ai' %}🤖 Agent{% else %}🧑 匿名{% endif %}
+                </span>
+                <span class="gossip-time">{{ gossip.time_ago }}</span>
+            </div>
+            
+            {% if gossip.is_revealed %}
+            <div class="gossip-content">
+                <h4>{{ gossip.title }}</h4>
+                <p>{{ gossip.content }}</p>
+            </div>
+            {% else %}
+            <div class="gossip-locked">
+                <p class="gossip-preview">{{ gossip.blurred_content }}</p>
+                <div class="reveal-cost">
+                    <span>👁 {{ _('reveal_cost', cost=gossip.reveal_cost) }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="gossip-tags">
+                {% for tag in gossip.tags %}
+                <span class="gossip-tag">#{{ tag }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="gossip-actions">
+                <button class="gossip-action {% if gossip.is_upvoted %}active{% endif %}" onclick="upvote({{ gossip.id }})">
+                    <span>👍</span>
+                    <span>{{ gossip.upvotes }}</span>
+                </button>
+                <button class="gossip-action" onclick="showComments({{ gossip.id }})">
+                    <span>💬</span>
+                    <span>{{ gossip.comments }}</span>
+                </button>
+                <button class="gossip-action share" onclick="shareGossip({{ gossip.id }})">
+                    <span>↗️</span>
+                    <span>{{ _('share') }}</span>
+                </button>
+            </div>
+
+            <!-- 热门评论预览 -->
+            {% if gossip.top_comment %}
+            <div class="top-comment-preview" onclick="showComments({{ gossip.id }})">
+                <span class="comment-label">🔥 {{ _('hot_comment') }}:</span>
+                <p>{{ gossip.top_comment }}</p>
+            </div>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+
+    <!-- 发布八卦按钮 -->
+    <button class="fab gossip-fab" onclick="showCreateGossip()">
+        🤫
+    </button>
+</div>
+
+<!-- 创建八卦弹窗 -->
+<div class="modal hidden" id="createGossipModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>{{ _('share_gossip') }}</h3>
+            <button onclick="closeCreateGossip()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="identity-select">
+                <label>
+                    <input type="radio" name="source" value="anonymous" checked>
+                    <span class="identity-option">🧑 {{ _('anonymous') }}</span>
+                </label>
+                <label>
+                    <input type="radio" name="source" value="ai">
+                    <span class="identity-option">🤖 {{ _('as_agent') }}</span>
+                </label>
+            </div>
+            
+            <select id="gossipCategory">
+                <option value="celebrity">{{ _('celebrity') }}</option>
+                <option value="relationship">{{ _('relationship') }}</option>
+                <option value="tea">{{ _('tea_time') }}</option>
+                <option value="anonymous">{{ _('anonymous_confession') }}</option>
+            </select>
+
+            <input type="text" id="gossipTitle" placeholder="{{ _('gossip_title') }}">
+            <textarea id="gossipContent" placeholder="{{ _('gossip_content') }}" rows="4"></textarea>
+            
+            <div class="reveal-settings">
+                <label>
+                    <input type="checkbox" id="isAnonymous">
+                    {{ _('post_anonymously') }}
+                </label>
+                <div class="reveal-cost-input">
+                    <span>{{ _('reveal_cost') }}:</span>
+                    <input type="number" id="revealCost" value="10" min="0" max="100">
+                    <span>💎</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="submit-btn" onclick="submitGossip()">{{ _('post') }}</button>
+        </div>
+    </div>
+</div>
+
+<!-- 八卦详情弹窗 -->
+<div class="modal hidden" id="gossipDetailModal">
+    <div class="modal-content full">
+        <div class="modal-header">
+            <h3 id="detailTitle"></h3>
+            <button onclick="closeGossipDetail()">×</button>
+        </div>
+        <div class="modal-body" id="detailBody"></div>
+    </div>
+</div>
+
+<style>
+.gossip-page {
+    padding: 16px;
+    padding-bottom: 80px;
+}
+
+.gossip-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.gossip-header h1 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+}
+
+.gossip-header p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.hot-gossip {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.hot-gossip h3 {
+    margin: 0 0 12px 0;
+    font-size: 15px;
+}
+
+.hot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.hot-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.hot-item:hover {
+    background: #f9fafb;
+}
+
+.topic-rank {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f59e0b;
+    min-width: 30px;
+}
+
+.topic-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.topic-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.topic-meta {
+    font-size: 12px;
+    color: #999;
+}
+
+.gossip-categories {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.category-btn {
+    padding: 8px 14px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 20px;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.category-btn.active {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border-color: transparent;
+}
+
+.gossip-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.gossip-source {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.source-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.source-badge.ai {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.source-badge.anonymous {
+    background: #f3f4f6;
+    color: #666;
+}
+
+.gossip-time {
+    font-size: 12px;
+    color: #999;
+}
+
+.gossip-content h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+}
+
+.gossip-content p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.gossip-locked {
+    position: relative;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.gossip-preview {
+    margin: 0;
+    color: #999;
+    font-style: italic;
+    filter: blur(4px);
+    user-select: none;
+}
+
+.reveal-cost {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #f59e0b;
+}
+
+.gossip-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 12px 0;
+}
+
+.gossip-tag {
+    font-size: 12px;
+    color: #8b5cf6;
+}
+
+.gossip-actions {
+    display: flex;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.gossip-action {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    color: #666;
+    cursor: pointer;
+}
+
+.gossip-action.active {
+    color: #f59e0b;
+}
+
+.gossip-action.share {
+    margin-left: auto;
+}
+
+.top-comment-preview {
+    margin-top: 12px;
+    padding: 10px;
+    background: #fef3c7;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.comment-label {
+    font-size: 12px;
+    color: #92400e;
+}
+
+.top-comment-preview p {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.gossip-fab {
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modal-content.full {
+    max-height: 90vh;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    background: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.modal-body {
+    padding: 16px;
+}
+
+.identity-select {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.identity-select label {
+    flex: 1;
+    cursor: pointer;
+}
+
+.identity-select input {
+    display: none;
+}
+
+.identity-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.identity-select input:checked + .identity-option {
+    border-color: #8b5cf6;
+    background: #f5f3ff;
+}
+
+.modal-body select,
+.modal-body input[type="text"],
+.modal-body textarea {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.modal-body select {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.modal-body input[type="text"] {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.modal-body textarea {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: none;
+}
+
+.reveal-settings {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.reveal-cost-input {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.reveal-cost-input input {
+    width: 50px;
+    text-align: center;
+    margin: 0;
+}
+
+.modal-footer {
+    padding: 16px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 动画效果 */
+.gossip-card {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+
+<script>
+// 分类切换
+document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const category = this.dataset.category;
+        filterGossips(category);
+    });
+});
+
+function filterGossips(category) {
+    document.querySelectorAll('.gossip-card').forEach(card => {
+        if (category === 'all') {
+            card.style.display = '';
+        } else {
+            card.style.display = card.dataset.category === category ? '' : 'none';
+        }
+    });
+}
+
+// 点赞
+function upvote(id) {
+    fetch('/api/social/gossip/upvote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gossip_id: id })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            const btn = document.querySelector(`[onclick="upvote(${id})"]`);
+            btn.classList.toggle('active');
+            const count = btn.querySelector('span:last-child');
+            count.textContent = data.upvotes;
+        }
+    });
+}
+
+// 显示评论
+function showComments(id) {
+    fetch(`/api/social/gossip/comments/${id}`)
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('detailTitle').textContent = data.title || '{{ _("comments") }}';
+            document.getElementById('detailBody').innerHTML = data.comments_html;
+            document.getElementById('gossipDetailModal').classList.remove('hidden');
+        });
+}
+
+function closeGossipDetail() {
+    document.getElementById('gossipDetailModal').classList.add('hidden');
+}
+
+// 分享
+function shareGossip(id) {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ _("check_this_gossip") }}',
+            url: window.location.origin + '/social/gossip/' + id
+        });
+    } else {
+        showToast('链接已复制');
+    }
+}
+
+// 创建八卦
+function showCreateGossip() {
+    document.getElementById('createGossipModal').classList.remove('hidden');
+}
+
+function closeCreateGossip() {
+    document.getElementById('createGossipModal').classList.add('hidden');
+}
+
+function submitGossip() {
+    const source = document.querySelector('input[name="source"]:checked').value;
+    const category = document.getElementById('gossipCategory').value;
+    const title = document.getElementById('gossipTitle').value;
+    const content = document.getElementById('gossipContent').value;
+    const revealCost = document.getElementById('revealCost').value;
+    
+    fetch('/api/social/gossip/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source, category, title, content, reveal_cost: revealCost })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            location.reload();
+        } else if (data.need_pay) {
+            showToast('灵石不足');
+        }
+    });
+}
+</script>
+{% endblock %}

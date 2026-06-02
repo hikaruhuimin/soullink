@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'zh' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SoulLink Admin - Settings</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;min-height:100vh;background:#0f172a;color:#e2e8f0}
+.sidebar{width:260px;background:#1e293b;padding:24px 0;position:fixed;height:100vh;overflow-y:auto}
+.sidebar h1{font-size:20px;color:#f8fafc;padding:0 24px 24px;border-bottom:1px solid #334155;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.sidebar h1 span{font-size:24px}
+.nav-item{display:block;padding:12px 24px;color:#94a3b8;text-decoration:none;font-size:14px;transition:all .2s;border-left:3px solid transparent}
+.nav-item:hover,.nav-item.active{background:#334155;color:#f8fafc;border-left-color:#8b5cf6}
+.nav-item span{margin-right:10px}
+.sidebar .section-title{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding:16px 24px 8px}
+.content{flex:1;margin-left:260px;padding:32px;background:#f1f5f9;min-height:100vh}
+.flash{padding:16px;background:#dcfce7;color:#16a34a;border-radius:8px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:24px}
+.section{background:#fff;border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.section h3{font-size:16px;color:#1e293b;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;color:#64748b;margin-bottom:6px}
+.form-group input,.form-group textarea,.form-group select{padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;width:100%;background:#fff}
+.form-group textarea{min-height:100px;resize:vertical}
+.form-row{display:flex;gap:12px}
+.form-row .form-group{flex:1}
+.hint{font-size:11px;color:#94a3b8;margin-top:4px}
+.config-list{background:#f8fafc;border-radius:12px;padding:16px}
+.config-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e2e8f0}
+.config-item:last-child{border-bottom:none}
+.config-item label{color:#475569;font-weight:500}
+.config-item .value{color:#8b5cf6;font-weight:600;font-size:16px}
+.btn{padding:12px 24px;background:#8b5cf6;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:500;transition:all .2s}
+.btn:hover{background:#7c3aed}
+@media(max-width:768px){.sidebar{display:none}.content{margin-left:0;padding:16px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="sidebar">
+<h1><span>🧿</span>SoulLink</h1>
+<div class="section-title">Main</div>
+<a href="/admin2" class="nav-item"><span>📊</span>{% if lang == 'zh' %}仪表盘{% elif lang == 'ja' %}ダッシュボード{% else %}Dashboard{% endif %}</a>
+<a href="/admin/dashboard" class="nav-item"><span>📈</span>{% if lang == 'zh' %}数据面板{% elif lang == 'ja' %}データパネル{% else %}Data Dashboard{% endif %}</a>
+<a href="/admin2/users" class="nav-item"><span>👥</span>{% if lang == 'zh' %}用户管理{% elif lang == 'ja' %}ユーザー{% else %}Users{% endif %}</a>
+<a href="/admin2/content" class="nav-item"><span>📝</span>{% if lang == 'zh' %}内容管理{% elif lang == 'ja' %}コンテンツ{% else %}Content{% endif %}</a>
+<a href="/admin2/settings" class="nav-item active"><span>⚙️</span>{% if lang == 'zh' %}系统设置{% elif lang == 'ja' %}設定{% else %}Settings{% endif %}</a>
+</nav>
+<div class="content">
+<h2 style="color:#1e293b;margin-bottom:24px">⚙️ {% if lang == 'zh' %}系统设置{% elif lang == 'ja' %}システム設定{% else %}System Settings{% endif %}</h2>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="flash">{{ messages[0] }}</div>
+{% endif %}
+{% endwith %}
+<div class="grid">
+<div class="section">
+<h3>📢 {% if lang == 'zh' %}公告推送{% elif lang == 'ja' %}公告{% else %}Announcement{% endif %}</h3>
+<form method="POST" action="/admin2/settings">
+<input type="hidden" name="action" value="announcement">
+<div class="form-group">
+<label>{% if lang == 'zh' %}公告内容{% elif lang == 'ja' %}公告内容{% else %}Announcement Content{% endif %}</label>
+<textarea name="announcement" placeholder="{% if lang == 'zh' %}输入公告内容，留空则不显示公告...{% elif lang == 'ja' %}公告を入力...{% else %}Enter announcement, leave empty to hide...{% endif %}">{{ announcement }}</textarea>
+<div class="hint">{% if lang == 'zh' %}公告将在首页顶部显示{% elif lang == 'ja' %}公告はトップに表示{% else %}Announcement will be shown at the top of homepage{% endif %}</div>
+</div>
+<button type="submit" class="btn">💾 {% if lang == 'zh' %}保存公告{% elif lang == 'ja' %}保存{% else %}Save Announcement{% endif %}</button>
+</form>
+</div>
+<div class="section">
+<h3>💎 {% if lang == 'zh' %}灵石汇率{% elif lang == 'ja' %}霊石為替{% else %}Spirit Stone Exchange Rate{% endif %}</h3>
+<div class="config-list">
+<div class="config-item">
+<label>{% if lang == 'zh' %}灵石:人民币{% elif lang == 'ja' %}霊石:元{% else %}Stones:CNY{% endif %}</label>
+<span class="value">{{ config.spirit_rate_cny }} : 1</span>
+</div>
+<div class="config-item">
+<label>{% if lang == 'zh' %}灵石:日元{% elif lang == 'ja' %}霊石:円{% else %}Stones:JPY{% endif %}</label>
+<span class="value">{{ config.spirit_rate_jpy }} : 1</span>
+</div>
+<div class="config-item">
+<label>{% if lang == 'zh' %}灵石:美元{% elif lang == 'ja' %}霊石:ドル{% else %}Stones:USD{% endif %}</label>
+<span class="value">{{ config.spirit_rate_usd }} : 1</span>
+</div>
+</div>
+<form method="POST" action="/admin2/settings" style="margin-top:16px">
+<input type="hidden" name="action" value="spirit_rate">
+<div class="form-row">
+<div class="form-group">
+<label>CNY (¥)</label>
+<input type="number" name="rate_cny" value="{{ config.spirit_rate_cny }}" step="0.01">
+</div>
+<div class="form-group">
+<label>JPY (¥)</label>
+<input type="number" name="rate_jpy" value="{{ config.spirit_rate_jpy }}" step="0.01">
+</div>
+<div class="form-group">
+<label>USD ($)</label>
+<input type="number" name="rate_usd" value="{{ config.spirit_rate_usd }}" step="0.01">
+</div>
+</div>
+<button type="submit" class="btn">🔄 {% if lang == 'zh' %}更新汇率{% elif lang == 'ja' %}更新{% else %}Update Rates{% endif %}</button>
+</form>
+</div>
+<div class="section">
+<h3>🎁 {% if lang == 'zh' %}免费次数配置{% elif lang == 'ja' %}無料回数{% else %}Free Usage Config{% endif %}</h3>
+<div class="config-list">
+<div class="config-item">
+<label>{% if lang == 'zh' %}新用户初始灵石{% elif lang == 'ja' %}新規初期霊石{% else %}New User Initial Stones{% endif %}</label>
+<span class="value">{{ config.initial_stones }}</span>
+</div>
+<div class="config-item">
+<label>{% if lang == 'zh' %}每日签到奖励{% elif lang == 'ja' %}チェックインボーナス{% else %}Daily Check-in Bonus{% endif %}</label>
+<span class="value">{{ config.daily_checkin_bonus }}</span>
+</div>
+<div class="config-item">
+<label>{% if lang == 'zh' %}免费占卜次数/天{% elif lang == 'ja' %}無料占卜/日{% else %}Free Divinations/Day{% endif %}</label>
+<span class="value">{{ config.free_divinations }}</span>
+</div>
+</div>
+<form method="POST" action="/admin2/settings" style="margin-top:16px">
+<input type="hidden" name="action" value="free_config">
+<div class="form-row">
+<div class="form-group">
+<label>{% if lang == 'zh' %}初始灵石{% elif lang == 'ja' %}初期霊石{% else %}Initial Stones{% endif %}</label>
+<input type="number" name="initial_stones" value="{{ config.initial_stones }}">
+</div>
+<div class="form-group">
+<label>{% if lang == 'zh' %}签到奖励{% elif lang == 'ja' %}チェックイン{% else %}Check-in Bonus{% endif %}</label>
+<input type="number" name="daily_checkin" value="{{ config.daily_checkin_bonus }}">
+</div>
+<div class="form-group">
+<label>{% if lang == 'zh' %}免费占卜{% elif lang == 'ja' %}無料占卜{% else %}Free Divinations{% endif %}</label>
+<input type="number" name="free_divinations" value="{{ config.free_divinations }}">
+</div>
+</div>
+<button type="submit" class="btn">💾 {% if lang == 'zh' %}保存配置{% elif lang == 'ja' %}保存{% else %}Save Config{% endif %}</button>
+</form>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,685 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('find_match') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="match-page">
+    <!-- 顶部信息 -->
+    <div class="match-header">
+        <h1>💕 {{ _('find_your_match') }}</h1>
+        <p>{{ _('match_tips') }}</p>
+    </div>
+
+    <!-- 匹配卡片区域 -->
+    <div class="cards-container" id="cardsContainer">
+        {% if current_cards %}
+        {% for card in current_cards %}
+        <div class="profile-card" data-id="{{ card.id }}" data-direction="">
+            <div class="card-bg" style="background: linear-gradient(135deg, {{ card.gradient }})">
+                <div class="card-icons">
+                    <span class="identity-icon">
+                        {% if card.identity == 'ai' %}🤖{% else %}🧑{% endif %}
+                    </span>
+                    {% if card.is_verified %}
+                    <span class="verified-icon">✓</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card-content">
+                <div class="avatar-large">{{ card.avatar }}</div>
+                <h2 class="card-name">{{ card.name }}</h2>
+                <p class="card-bio">{{ card.bio }}</p>
+                
+                <div class="card-tags">
+                    {% for tag in card.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="card-stats">
+                    <div class="stat">
+                        <span class="stat-icon">🔥</span>
+                        <span class="stat-value">{{ card.hot_score }}</span>
+                        <span class="stat-label">{{ _('hot_score') }}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-icon">💜</span>
+                        <span class="stat-value">{{ card.love_score }}</span>
+                        <span class="stat-label">{{ _('love_score') }}</span>
+                    </div>
+                </div>
+
+                <!-- 社交动态预览 -->
+                <div class="social-preview">
+                    <div class="preview-header">
+                        <span>最近动态</span>
+                    </div>
+                    <div class="preview-content">
+                        <p class="preview-text">{{ card.latest_post }}</p>
+                        <div class="preview-reactions">
+                            <span>❤️ {{ card.post_likes }}</span>
+                            <span>💬 {{ card.post_comments }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 标签 -->
+            {% if card.is_online %}
+            <span class="online-tag">🟢 在线</span>
+            {% endif %}
+            
+            {% if card.is_popular %}
+            <span class="popular-tag">🔥 热门</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-cards">
+            <span class="empty-icon">🔍</span>
+            <p>{{ _('no_more_cards') }}</p>
+            <button onclick="refreshCards()">{{ _('refresh') }}</button>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons">
+        <button class="action-btn pass" onclick="swipeCard('left')">
+            <span class="btn-icon">✕</span>
+        </button>
+        <button class="action-btn super-like" onclick="swipeCard('up')">
+            <span class="btn-icon">⭐</span>
+        </button>
+        <button class="action-btn like" onclick="swipeCard('right')">
+            <span class="btn-icon">❤️</span>
+        </button>
+    </div>
+
+    <!-- 匹配成功弹窗 -->
+    <div class="match-modal hidden" id="matchModal">
+        <div class="match-content">
+            <div class="match-icons">
+                <div class="avatar-1" id="matchAvatar1"></div>
+                <span class="heart-icon">💕</span>
+                <div class="avatar-2" id="matchAvatar2"></div>
+            </div>
+            <h2>{{ _('its_match') }}</h2>
+            <p id="matchMessage">{{ _('match_message') }}</p>
+            <div class="match-actions">
+                <button class="send-msg-btn" onclick="sendMessage()">{{ _('send_message') }}</button>
+                <button class="keep-swiping-btn" onclick="closeMatchModal()">{{ _('keep_swiping') }}</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 超级喜欢说明 -->
+    <div class="super-like-info">
+        <p>{{ _('super_like_tip') }}</p>
+        <span class="super-like-count">⭐ {{ super_likes_left }} {{ _('left') }}</span>
+    </div>
+</div>
+
+<style>
+.match-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px);
+    padding: 16px;
+    background: linear-gradient(180deg, #fef3c7 0%, #fff 100%);
+}
+
+.match-header {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.match-header h1 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+}
+
+.match-header p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.cards-container {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+}
+
+.profile-card {
+    position: absolute;
+    width: 100%;
+    max-width: 340px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+    cursor: grab;
+    user-select: none;
+}
+
+.profile-card:active {
+    cursor: grabbing;
+}
+
+.card-bg {
+    height: 120px;
+    position: relative;
+}
+
+.card-icons {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+}
+
+.identity-icon, .verified-icon {
+    width: 28px;
+    height: 28px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.verified-icon {
+    color: #3b82f6;
+    font-weight: bold;
+}
+
+.card-content {
+    padding: 0 20px 20px;
+    margin-top: -50px;
+}
+
+.avatar-large {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.card-name {
+    text-align: center;
+    margin: 0 0 4px 0;
+    font-size: 20px;
+}
+
+.card-bio {
+    text-align: center;
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #666;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.tag {
+    padding: 4px 10px;
+    background: #fef3c7;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #92400e;
+}
+
+.card-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 16px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-icon {
+    font-size: 20px;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: #666;
+}
+
+.social-preview {
+    background: #f9fafb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.preview-header {
+    padding: 8px 12px;
+    background: #f3f4f6;
+    font-size: 12px;
+    color: #666;
+}
+
+.preview-text {
+    margin: 8px 12px;
+    font-size: 13px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.preview-reactions {
+    display: flex;
+    gap: 12px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #666;
+}
+
+.online-tag, .popular-tag {
+    position: absolute;
+    top: 80px;
+    padding: 4px 10px;
+    background: white;
+    border-radius: 12px;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.online-tag {
+    left: 12px;
+    color: #10b981;
+}
+
+.popular-tag {
+    right: 12px;
+    color: #ef4444;
+}
+
+.empty-cards {
+    text-align: center;
+    padding: 40px;
+}
+
+.empty-icon {
+    font-size: 64px;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.empty-cards p {
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.empty-cards button {
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 16px 0;
+}
+
+.action-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.action-btn:active {
+    transform: scale(0.9);
+}
+
+.action-btn.pass {
+    background: white;
+}
+
+.action-btn.pass .btn-icon {
+    font-size: 28px;
+    color: #ccc;
+}
+
+.action-btn.super-like {
+    width: 50px;
+    height: 50px;
+    background: white;
+}
+
+.action-btn.super-like .btn-icon {
+    font-size: 24px;
+}
+
+.action-btn.like {
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+}
+
+.action-btn.like .btn-icon {
+    font-size: 28px;
+    color: white;
+}
+
+/* Match Modal */
+.match-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.match-content {
+    background: white;
+    border-radius: 24px;
+    padding: 32px;
+    text-align: center;
+    max-width: 340px;
+    width: 90%;
+}
+
+.match-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.avatar-1, .avatar-2 {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+.heart-icon {
+    font-size: 40px;
+    animation: heartbeat 1s infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.match-content h2 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.match-content p {
+    margin: 0 0 24px 0;
+    color: #666;
+}
+
+.match-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.send-msg-btn {
+    padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.keep-swiping-btn {
+    padding: 12px;
+    background: transparent;
+    color: #666;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.super-like-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #fef3c7;
+    border-radius: 12px;
+    margin-top: auto;
+}
+
+.super-like-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #92400e;
+}
+
+.super-like-count {
+    font-size: 13px;
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.hidden {
+    display: none !important;
+}
+</style>
+
+<script>
+let currentIndex = 0;
+let cards = [];
+let startX = 0;
+let startY = 0;
+let currentCard = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    cards = document.querySelectorAll('.profile-card');
+    if (cards.length > 0) {
+        currentCard = cards[0];
+        setupSwipe();
+    }
+});
+
+function setupSwipe() {
+    if (!currentCard) return;
+    
+    currentCard.addEventListener('touchstart', handleStart);
+    currentCard.addEventListener('touchmove', handleMove);
+    currentCard.addEventListener('touchend', handleEnd);
+    currentCard.addEventListener('mousedown', handleStart);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleEnd);
+}
+
+function handleStart(e) {
+    if (!currentCard) return;
+    startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+}
+
+function handleMove(e) {
+    if (!currentCard || startX === 0) return;
+    
+    const currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    const currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+    
+    const deltaX = currentX - startX;
+    const deltaY = currentY - startY;
+    
+    const rotation = deltaX * 0.1;
+    currentCard.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotation}deg)`;
+    
+    // 透明度指示器
+    if (deltaX > 50) {
+        currentCard.querySelector('.action-btn.like')?.classList.add('highlight');
+        currentCard.querySelector('.action-btn.pass')?.classList.remove('highlight');
+    } else if (deltaX < -50) {
+        currentCard.querySelector('.action-btn.pass')?.classList.add('highlight');
+        currentCard.querySelector('.action-btn.like')?.classList.remove('highlight');
+    }
+}
+
+function handleEnd(e) {
+    if (!currentCard) return;
+    
+    const endX = e.type.includes('mouse') ? e.clientX : e.changedTouches[0].clientX;
+    const deltaX = endX - startX;
+    
+    if (deltaX > 100) {
+        swipeCard('right');
+    } else if (deltaX < -100) {
+        swipeCard('left');
+    } else {
+        currentCard.style.transform = '';
+    }
+    
+    startX = 0;
+    startY = 0;
+}
+
+function swipeCard(direction) {
+    if (!currentCard) return;
+    
+    const cardId = currentCard.dataset.id;
+    let transform = '';
+    
+    if (direction === 'right') {
+        transform = 'translateX(150%) rotate(30deg)';
+    } else if (direction === 'left') {
+        transform = 'translateX(-150%) rotate(-30deg)';
+    } else if (direction === 'up') {
+        transform = 'translateY(-150%)';
+    }
+    
+    currentCard.style.transition = 'transform 0.4s ease';
+    currentCard.style.transform = transform;
+    currentCard.dataset.direction = direction;
+    
+    // 发送匹配请求
+    fetch('/api/social/match/swipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ card_id: cardId, direction: direction })
+    }).then(r => r.json()).then(data => {
+        if (data.is_match) {
+            showMatchModal(data);
+        }
+        
+        // 加载下一张卡片
+        setTimeout(() => {
+            currentCard.remove();
+            cards = document.querySelectorAll('.profile-card');
+            currentIndex++;
+            
+            if (cards.length > 0) {
+                currentCard = cards[0];
+                setupSwipe();
+            } else {
+                currentCard = null;
+                showEmptyState();
+            }
+        }, 400);
+    });
+}
+
+function showMatchModal(data) {
+    document.getElementById('matchAvatar1').textContent = data.avatar1;
+    document.getElementById('matchAvatar1').style.background = data.gradient1;
+    document.getElementById('matchAvatar2').textContent = data.avatar2;
+    document.getElementById('matchAvatar2').style.background = data.gradient2;
+    document.getElementById('matchMessage').textContent = data.message;
+    document.getElementById('matchModal').classList.remove('hidden');
+}
+
+function closeMatchModal() {
+    document.getElementById('matchModal').classList.add('hidden');
+}
+
+function sendMessage() {
+    const matchedId = currentCard?.dataset.id;
+    window.location.href = `/lover/select?chat_with=${matchedId}`;
+}
+
+function refreshCards() {
+    fetch('/api/social/match/refresh')
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+}
+
+function showEmptyState() {
+    const container = document.getElementById('cardsContainer');
+    container.innerHTML = `
+        <div class="empty-cards">
+            <span class="empty-icon">🔍</span>
+            <p>{{ _('no_more_cards') }}</p>
+            <button onclick="refreshCards()">{{ _('refresh') }}</button>
+        </div>
+    `;
+}
+</script>
+{% endblock %}

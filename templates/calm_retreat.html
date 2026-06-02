@@ -1,0 +1,1111 @@
+{% extends "base.html" %}
+
+{% block title %}清寂山房 · 东方静修生活空间 - SoulLink{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== 清寂山房专属样式 ===== */
+    
+    /* 导入字体 */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&display=swap');
+    
+    :root {
+        --wabi-paper: #f7f4ef;
+        --wabi-stone: #8b8680;
+        --wabi-clay: #c4a882;
+        --wabi-moss: #7a8b6e;
+        --wabi-charcoal: #3d3a36;
+        --wabi-cream: #faf8f5;
+        --wabi-ink: #2c2a28;
+        --wabi-rust: #a65d4e;
+        --wabi-sage: #9caa8e;
+    }
+    
+    /* 全局样式 */
+    .calm-retreat-page {
+        font-family: 'Noto Serif SC', serif;
+        background: var(--wabi-paper);
+        color: var(--wabi-ink);
+        line-height: 1.8;
+    }
+    
+    /* Hero区域 */
+    .calm-hero {
+        position: relative;
+        height: 100vh;
+        min-height: 600px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: linear-gradient(180deg, #e8e4dc 0%, var(--wabi-paper) 100%);
+    }
+    
+    .calm-hero-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.15;
+        filter: grayscale(60%) contrast(1.1);
+    }
+    
+    .calm-hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(ellipse at center, transparent 0%, rgba(247, 244, 239, 0.9) 70%);
+    }
+    
+    .calm-hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        max-width: 900px;
+        padding: 0 24px;
+    }
+    
+    .calm-logo {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: clamp(2.5rem, 6vw, 4rem);
+        color: var(--wabi-charcoal);
+        letter-spacing: 0.3em;
+        margin-bottom: 16px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .calm-subtitle {
+        font-size: clamp(1rem, 2.5vw, 1.25rem);
+        color: var(--wabi-stone);
+        letter-spacing: 0.15em;
+        margin-bottom: 40px;
+    }
+    
+    .calm-tagline {
+        font-family: 'Ma Shan Zheng', cursive;
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+        color: var(--wabi-charcoal);
+        margin-bottom: 60px;
+        opacity: 0.9;
+    }
+    
+    .calm-cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 40px;
+        background: var(--wabi-charcoal);
+        color: var(--wabi-cream);
+        font-size: 1rem;
+        letter-spacing: 0.1em;
+        border: none;
+        border-radius: 2px;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        text-decoration: none;
+    }
+    
+    .calm-cta-btn:hover {
+        background: var(--wabi-rust);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .calm-scroll-hint {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: var(--wabi-stone);
+        font-size: 0.875rem;
+        letter-spacing: 0.2em;
+        opacity: 0.7;
+        animation: gentleFloat 3s ease-in-out infinite;
+    }
+    
+    @keyframes gentleFloat {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-10px); }
+    }
+    
+    /* 四大核心 */
+    .calm-tags-section {
+        padding: 80px 24px;
+        background: var(--wabi-cream);
+    }
+    
+    .calm-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .calm-section-title {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+    
+    .calm-section-title h2 {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        color: var(--wabi-charcoal);
+        letter-spacing: 0.2em;
+        margin-bottom: 16px;
+    }
+    
+    .calm-section-title p {
+        color: var(--wabi-stone);
+        font-size: 1rem;
+        letter-spacing: 0.1em;
+    }
+    
+    .calm-tags-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 24px;
+    }
+    
+    .calm-tag-item {
+        background: var(--wabi-paper);
+        border: 1px solid rgba(139, 134, 128, 0.2);
+        padding: 32px 24px;
+        text-align: center;
+        transition: all 0.4s ease;
+    }
+    
+    .calm-tag-item:hover {
+        border-color: var(--wabi-clay);
+        transform: translateY(-4px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    }
+    
+    .calm-tag-icon {
+        font-size: 2.5rem;
+        margin-bottom: 16px;
+    }
+    
+    .calm-tag-name {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: 1.25rem;
+        color: var(--wabi-charcoal);
+        letter-spacing: 0.1em;
+        margin-bottom: 8px;
+    }
+    
+    .calm-tag-desc {
+        font-size: 0.875rem;
+        color: var(--wabi-stone);
+        letter-spacing: 0.05em;
+    }
+    
+    /* 核心定位 */
+    .calm-philosophy {
+        padding: 100px 24px;
+        background: var(--wabi-charcoal);
+        color: var(--wabi-cream);
+        text-align: center;
+    }
+    
+    .calm-philosophy-content {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .calm-philosophy-quote {
+        font-family: 'Noto Serif SC', serif;
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 300;
+        letter-spacing: 0.1em;
+        line-height: 2;
+        margin-bottom: 40px;
+        opacity: 0.95;
+    }
+    
+    .calm-philosophy-sub {
+        font-size: 1.125rem;
+        color: var(--wabi-clay);
+        letter-spacing: 0.15em;
+    }
+    
+    /* 选址信息 */
+    .calm-location {
+        padding: 100px 24px;
+        background: var(--wabi-paper);
+    }
+    
+    .calm-location-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: center;
+    }
+    
+    .calm-location-image {
+        width: 100%;
+        border-radius: 4px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    }
+    
+    .calm-location-content h3 {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: 2rem;
+        color: var(--wabi-charcoal);
+        letter-spacing: 0.15em;
+        margin-bottom: 24px;
+    }
+    
+    .calm-location-content p {
+        font-size: 1.125rem;
+        color: var(--wabi-stone);
+        margin-bottom: 32px;
+        line-height: 2;
+    }
+    
+    .calm-location-features {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    
+    .calm-feature-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background: var(--wabi-cream);
+        border-left: 3px solid var(--wabi-clay);
+    }
+    
+    .calm-feature-icon {
+        font-size: 1.5rem;
+    }
+    
+    .calm-feature-text {
+        font-size: 0.9375rem;
+        color: var(--wabi-charcoal);
+    }
+    
+    /* 麻阳独有标签 */
+    .calm-mayang-tags {
+        padding: 80px 24px;
+        background: var(--wabi-cream);
+    }
+    
+    .calm-mayang-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    
+    .calm-mayang-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 24px;
+        background: var(--wabi-paper);
+        border: 1px solid rgba(139, 134, 128, 0.15);
+        transition: all 0.3s ease;
+    }
+    
+    .calm-mayang-item:hover {
+        border-color: var(--wabi-moss);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+    
+    .calm-mayang-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+    
+    .calm-mayang-content h4 {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: 1.125rem;
+        color: var(--wabi-charcoal);
+        margin-bottom: 8px;
+        letter-spacing: 0.05em;
+    }
+    
+    .calm-mayang-content p {
+        font-size: 0.875rem;
+        color: var(--wabi-stone);
+        line-height: 1.7;
+    }
+    
+    /* 空间规划 */
+    .calm-spaces {
+        padding: 100px 24px;
+        background: var(--wabi-paper);
+    }
+    
+    .calm-spaces-list {
+        display: grid;
+        gap: 40px;
+    }
+    
+    .calm-space-item {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 60px;
+        align-items: center;
+        padding: 40px;
+        background: var(--wabi-cream);
+        border: 1px solid rgba(139, 134, 128, 0.1);
+    }
+    
+    .calm-space-item:nth-child(even) {
+        direction: rtl;
+    }
+    
+    .calm-space-item:nth-child(even) > * {
+        direction: ltr;
+    }
+    
+    .calm-space-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 4px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    }
+    
+    .calm-space-content h3 {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: 1.5rem;
+        color: var(--wabi-charcoal);
+        letter-spacing: 0.1em;
+        margin-bottom: 16px;
+    }
+    
+    .calm-space-content p {
+        font-size: 1rem;
+        color: var(--wabi-stone);
+        line-height: 2;
+    }
+    
+    /* 核心体验 */
+    .calm-experiences {
+        padding: 100px 24px;
+        background: linear-gradient(180deg, var(--wabi-cream) 0%, var(--wabi-paper) 100%);
+    }
+    
+    .calm-exp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+    }
+    
+    .calm-exp-card {
+        background: var(--wabi-cream);
+        border: 1px solid rgba(139, 134, 128, 0.12);
+        padding: 40px 32px;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .calm-exp-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 0;
+        background: var(--wabi-clay);
+        transition: height 0.4s ease;
+    }
+    
+    .calm-exp-card:hover::before {
+        height: 100%;
+    }
+    
+    .calm-exp-card:hover {
+        border-color: var(--wabi-clay);
+        transform: translateY(-8px);
+        box-shadow: 0 25px 60px rgba(0,0,0,0.1);
+    }
+    
+    .calm-exp-number {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: 3rem;
+        color: var(--wabi-clay);
+        opacity: 0.4;
+        margin-bottom: 16px;
+    }
+    
+    .calm-exp-title {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: 1.375rem;
+        color: var(--wabi-charcoal);
+        letter-spacing: 0.08em;
+        margin-bottom: 8px;
+    }
+    
+    .calm-exp-subtitle {
+        font-size: 0.875rem;
+        color: var(--wabi-clay);
+        letter-spacing: 0.1em;
+        margin-bottom: 20px;
+    }
+    
+    .calm-exp-desc {
+        font-size: 0.9375rem;
+        color: var(--wabi-stone);
+        line-height: 1.9;
+    }
+    
+    /* 出片点 */
+    .calm-spots {
+        padding: 100px 24px;
+        background: var(--wabi-charcoal);
+    }
+    
+    .calm-spots .calm-section-title h2,
+    .calm-spots .calm-section-title p {
+        color: var(--wabi-cream);
+    }
+    
+    .calm-spots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+    }
+    
+    .calm-spot-card {
+        position: relative;
+        height: 280px;
+        overflow: hidden;
+        border-radius: 4px;
+    }
+    
+    .calm-spot-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+    
+    .calm-spot-card:hover img {
+        transform: scale(1.1);
+    }
+    
+    .calm-spot-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 24px;
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        color: white;
+    }
+    
+    .calm-spot-name {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: 1.25rem;
+        letter-spacing: 0.1em;
+    }
+    
+    /* CTA区域 */
+    .calm-cta-section {
+        padding: 120px 24px;
+        background: var(--wabi-paper);
+        text-align: center;
+    }
+    
+    .calm-cta-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .calm-cta-content h2 {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: clamp(2rem, 4vw, 3rem);
+        color: var(--wabi-charcoal);
+        letter-spacing: 0.2em;
+        margin-bottom: 24px;
+    }
+    
+    .calm-cta-content p {
+        font-size: 1.125rem;
+        color: var(--wabi-stone);
+        margin-bottom: 48px;
+        line-height: 2;
+    }
+    
+    .calm-cta-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .calm-btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 48px;
+        background: var(--wabi-rust);
+        color: white;
+        font-size: 1rem;
+        letter-spacing: 0.1em;
+        text-decoration: none;
+        border-radius: 2px;
+        transition: all 0.4s ease;
+    }
+    
+    .calm-btn-primary:hover {
+        background: #8b4a3d;
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(166, 93, 78, 0.3);
+        color: white;
+    }
+    
+    .calm-btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 48px;
+        background: transparent;
+        color: var(--wabi-charcoal);
+        font-size: 1rem;
+        letter-spacing: 0.1em;
+        text-decoration: none;
+        border: 1px solid var(--wabi-charcoal);
+        border-radius: 2px;
+        transition: all 0.4s ease;
+    }
+    
+    .calm-btn-secondary:hover {
+        background: var(--wabi-charcoal);
+        color: var(--wabi-cream);
+    }
+    
+    .calm-contact-info {
+        margin-top: 48px;
+        font-size: 0.9375rem;
+        color: var(--wabi-stone);
+    }
+    
+    .calm-contact-info a {
+        color: var(--wabi-rust);
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.3s;
+    }
+    
+    .calm-contact-info a:hover {
+        border-bottom-color: var(--wabi-rust);
+    }
+    
+    /* Footer */
+    .calm-footer {
+        padding: 60px 24px;
+        background: var(--wabi-charcoal);
+        text-align: center;
+        color: var(--wabi-stone);
+    }
+    
+    .calm-footer-logo {
+        font-family: 'ZCOOL XiaoWei', serif;
+        font-size: 1.5rem;
+        color: var(--wabi-cream);
+        letter-spacing: 0.2em;
+        margin-bottom: 16px;
+    }
+    
+    .calm-footer-text {
+        font-size: 0.875rem;
+        letter-spacing: 0.05em;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+        .calm-location-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+        
+        .calm-location-image {
+            order: -1;
+        }
+        
+        .calm-space-item {
+            grid-template-columns: 1fr;
+            gap: 24px;
+            padding: 24px;
+        }
+        
+        .calm-space-item:nth-child(even) {
+            direction: ltr;
+        }
+        
+        .calm-exp-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .calm-tags-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .calm-mayang-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .calm-location-features {
+            grid-template-columns: 1fr;
+        }
+        
+        .calm-cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+    
+    /* 装饰线 */
+    .calm-divider {
+        width: 60px;
+        height: 1px;
+        background: var(--wabi-clay);
+        margin: 0 auto 24px;
+    }
+    
+    /* 图片画廊 */
+    .calm-gallery {
+        padding: 100px 24px;
+        background: var(--wabi-cream);
+    }
+    
+    .calm-gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+    
+    .calm-gallery-item {
+        position: relative;
+        aspect-ratio: 4/3;
+        overflow: hidden;
+        border-radius: 4px;
+    }
+    
+    .calm-gallery-item:first-child {
+        grid-column: span 2;
+        grid-row: span 2;
+        aspect-ratio: auto;
+    }
+    
+    .calm-gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+    
+    .calm-gallery-item:hover img {
+        transform: scale(1.05);
+    }
+    
+    @media (max-width: 768px) {
+        .calm-gallery-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .calm-gallery-item:first-child {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="calm-retreat-page">
+    <!-- Hero Section -->
+    <section class="calm-hero">
+        <img src="/static/images/calm_retreat/3cabins_daytime.jpg" alt="清寂山房" class="calm-hero-bg">
+        <div class="calm-hero-overlay"></div>
+        <div class="calm-hero-content">
+            <h1 class="calm-logo">清寂山房</h1>
+            <p class="calm-subtitle">东方静修生活空间</p>
+            <p class="calm-tagline">两小时高铁，住进世界长寿乡的药香里</p>
+            <a href="/contact" class="calm-cta-btn">
+                预约体验
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M3 8h10M9 4l4 4-4 4"/>
+                </svg>
+            </a>
+        </div>
+        <div class="calm-scroll-hint">∨ 向下探索</div>
+    </section>
+    
+    <!-- 五感标签 -->
+    <section class="calm-tags-section">
+        <div class="calm-container">
+            <div class="calm-section-title">
+                <div class="calm-divider"></div>
+                <h2>五感归一</h2>
+                <p>在清寂山房，重新遇见自己</p>
+            </div>
+            <div class="calm-tags-grid">
+                <div class="calm-tag-item">
+                    <div class="calm-tag-icon">🌱</div>
+                    <div class="calm-tag-name">无农残生活</div>
+                    <div class="calm-tag-desc">瑞士精品农业标准<br>零农药零重金属</div>
+                </div>
+                <div class="calm-tag-item">
+                    <div class="calm-tag-icon">🧘</div>
+                    <div class="calm-tag-name">静修疗愈</div>
+                    <div class="calm-tag-desc">处方级冥想方案<br>颂钵音疗体验</div>
+                </div>
+                <div class="calm-tag-item">
+                    <div class="calm-tag-icon">🌿</div>
+                    <div class="calm-tag-name">瑞士精品农业</div>
+                    <div class="calm-tag-desc">富硒洁净蔬菜<br>无土栽培展示</div>
+                </div>
+                <div class="calm-tag-item">
+                    <div class="calm-tag-icon">🍵</div>
+                    <div class="calm-tag-name">东方生活美学</div>
+                    <div class="calm-tag-desc">处方级静修方案</div>
+                </div>
+                <div class="calm-tag-item">
+                    <div class="calm-tag-icon">🤖</div>
+                    <div class="calm-tag-name">AI定制体验</div>
+                    <div class="calm-tag-desc">科技与人文融合<br>个性化静修方案</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 核心定位 -->
+    <section class="calm-philosophy">
+        <div class="calm-container calm-philosophy-content">
+            <div class="calm-divider" style="background: var(--wabi-clay);"></div>
+            <p class="calm-philosophy-quote">
+                不是"逃离AI"<br>
+                而是"驾驭AI"<br>
+                <span style="color: var(--wabi-clay);">——AI时代的精神升级站</span>
+            </p>
+            <p class="calm-philosophy-sub">在山房，找回内心的秩序</p>
+        </div>
+    </section>
+    
+    <!-- 选址信息 -->
+    <section class="calm-location">
+        <div class="calm-container">
+            <div class="calm-location-grid">
+                <img src="/static/images/calm_retreat/apple_cabin_exterior_night.jpg" alt="清寂山房夜景" class="calm-location-image">
+                <div class="calm-location-content">
+                    <h3>静修圣地</h3>
+                    <p>
+                        湖南麻阳<br>
+                        世界长寿乡 · 千年古镇<br>
+                        两小时高铁，即刻抵达
+                    </p>
+                    <div class="calm-location-features">
+                        <div class="calm-feature-item">
+                            <span class="calm-feature-icon">🏆</span>
+                            <span class="calm-feature-text">世界长寿乡<br><small>联合国认证，全国仅8个</small></span>
+                        </div>
+                        <div class="calm-feature-item">
+                            <span class="calm-feature-icon">🌿</span>
+                            <span class="calm-feature-text">全域富硒<br><small>土壤天然富硒认证</small></span>
+                        </div>
+                        <div class="calm-feature-item">
+                            <span class="calm-feature-icon">🏥</span>
+                            <span class="calm-feature-text"><br><small>四大民族医药之一</small></span>
+                        </div>
+                        <div class="calm-feature-item">
+                            <span class="calm-feature-icon">♨️</span>
+                            <span class="calm-feature-text">蓝宝石温泉<br><small>48℃偏硅酸温泉</small></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 麻阳独有标签 -->
+    <section class="calm-mayang-tags">
+        <div class="calm-container">
+            <div class="calm-section-title">
+                <div class="calm-divider"></div>
+                <h2>麻阳·天赐</h2>
+                <p>五大独特资源，独一无二的静修体验</p>
+            </div>
+            <div class="calm-mayang-grid">
+                <div class="calm-mayang-item">
+                    <div class="calm-mayang-icon">🏆</div>
+                    <div class="calm-mayang-content">
+                        <h4>世界长寿乡</h4>
+                        <p>联合国认证，全国仅8个。百岁老人比例远超国际标准，空气、水质、食材均为天然纯净。</p>
+                    </div>
+                </div>
+                <div class="calm-mayang-item">
+                    <div class="calm-mayang-icon">🌿</div>
+                    <div class="calm-mayang-content">
+                        <h4>富硒土地</h4>
+                        <p>全域富硒认证，土壤中硒元素含量丰富。种植的农作物天然富含微量元素。</p>
+                    </div>
+                </div>
+                <div class="calm-mayang-item">
+                    <div class="calm-mayang-icon">🏥</div>
+                    <div class="calm-mayang-content">
+                        <h4></h4>
+                        <p>中国四大民族医药之一，千年底蕴。独特的炮制工艺和诊疗方法，传承至今。</p>
+                    </div>
+                </div>
+                <div class="calm-mayang-item">
+                    <div class="calm-mayang-icon">♨️</div>
+                    <div class="calm-mayang-content">
+                        <h4>蓝宝石温泉</h4>
+                        <p>48℃偏硅酸温泉，水质清澈如蓝宝石。泡池中即可远眺山景，身心俱养。</p>
+                    </div>
+                </div>
+                <div class="calm-mayang-item">
+                    <div class="calm-mayang-icon">🍊</div>
+                    <div class="calm-mayang-content">
+                        <h4>冰糖橙IP联名</h4>
+                        <p>30亿品牌价值的麻阳冰糖橙，与清寂山房联名推出限定体验，新鲜采摘品尝。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 空间规划 -->
+    <section class="calm-spaces">
+        <div class="calm-container">
+            <div class="calm-section-title">
+                <div class="calm-divider"></div>
+                <h2>空间规划</h2>
+                <p>每一处细节，都是归心的设计</p>
+            </div>
+            <div class="calm-spaces-list">
+                <div class="calm-space-item">
+                    <img src="/static/images/calm_retreat/herb_garden_moon_gate.jpg" alt="主空间" class="calm-space-image">
+                    <div class="calm-space-content">
+                        <h3>主空间 · 农房改造</h3>
+                        <p>
+                            在保留农房原始结构的基础上，融入东方侘寂美学。<br><br>
+                            茶道厅 · 香道工坊 · 药膳厨房 · 枯山水庭院 · 冥想瑜伽室
+                        </p>
+                    </div>
+                </div>
+                <div class="calm-space-item">
+                    <img src="/static/images/calm_retreat/apple_cabin_exterior_night.jpg" alt="苹果舱住宿" class="calm-space-image">
+                    <div class="calm-space-content">
+                        <h3>苹果舱住宿</h3>
+                        <p>
+                            静修客房，独立空间，极简设计。<br><br>
+                            隔音效果卓越，为深度静修提供安静保障。舱内配备智能化控制系统，温暖如归。
+                        </p>
+                    </div>
+                </div>
+                <div class="calm-space-item">
+                    <img src="/static/images/calm_retreat/hydroponic_greenhouse_cyber.jpg" alt="无土栽培温室" class="calm-space-image">
+                    <div class="calm-space-content">
+                        <h3>无土栽培温室</h3>
+                        <p>
+                            瑞士精品农业标准，无土栽培+健康食疗。<br><br>
+                            全程可视化，零农药零重金属。采摘即入药膳厨房，从田间到舌尖，即摘即食。
+                        </p>
+                    </div>
+                </div>
+                <div class="calm-space-item">
+                    <img src="/static/images/calm_retreat/herb_garden_moon_gate.jpg" alt="药草精品圃" class="calm-space-image">
+                    <div class="calm-space-content">
+                        <h3>药草精品圃</h3>
+                        <p>
+                            精选药草+无土栽培，艾草→艾条/香薰、薰衣草→精油、迷迭香→纯露，种→采→手作→品鉴→带走。<br><br>
+                            从种植→采摘→炮制→体验，亲手制作艾条、精油、香囊、九蒸九晒黄精等。
+                        </p>
+                    </div>
+                </div>
+                <div class="calm-space-item">
+                    <img src="/static/images/calm_retreat/night_firefly_meditation.jpg" alt="安静草坪" class="calm-space-image">
+                    <div class="calm-space-content">
+                        <h3>萤火虫生态草坪</h3>
+                        <p>
+                            依山而建的开阔草坪，天地为席。生态养殖萤火虫，夏夜观萤冥想。<br><br>
+                            晨间冥想、户外瑜伽、山间茶席、夜间观萤……与自然共呼吸。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 核心体验 -->
+    <section class="calm-experiences">
+        <div class="calm-container">
+            <div class="calm-section-title">
+                <div class="calm-divider"></div>
+                <h2>核心体验</h2>
+                <p>核心体验，重启内在力量</p>
+            </div>
+            <div class="calm-exp-grid">
+                <div class="calm-exp-card">
+                    <div class="calm-exp-number">01</div>
+                    <h3 class="calm-exp-title">无土栽培</h3>
+                    <p class="calm-exp-subtitle">"看得见的干净"</p>
+                    <p class="calm-exp-desc">
+                        零农药+零重金属+全程可视化，亲手采摘后送往药膳厨房，实现从田间到舌尖的纯净体验。
+                    </p>
+                </div>
+                <div class="calm-exp-card">
+                    <div class="calm-exp-number">02</div>
+                    <h3 class="calm-exp-title">冥想瑜伽</h3>
+                    <p class="calm-exp-subtitle">"向内的旅程"</p>
+                    <p class="calm-exp-desc">
+                        处方级冥想方案，针对性解决睡眠修复、焦虑疏导等问题。配合颂钵音疗，深度放松。
+                    </p>
+                </div>
+                <div class="calm-exp-card">
+                    <div class="calm-exp-number">03</div>
+                    <h3 class="calm-exp-title">瑞士精品农业</h3>
+                    <p class="calm-exp-subtitle">种→采→手作→品鉴→带走</p>
+                    <p class="calm-exp-desc">
+                        无土栽培+健康食疗完整闭环：亲手采摘洁净蔬菜入药膳，制艾条、蒸馏精油、手作香囊，每一步都是修行。种→采→手作→品鉴→带走。
+                    </p>
+                </div>
+                <div class="calm-exp-card">
+                    <div class="calm-exp-number">04</div>
+                    <h3 class="calm-exp-title">茶香道</h3>
+                    <p class="calm-exp-subtitle">"茶香合一，以静养心"</p>
+                    <p class="calm-exp-desc">
+                        茶道与香道合一。精选艾草、薰衣草、迷迭香等药草蒸馏天然香薰精油，在茶香中静心，在香道中悟道。
+                    </p>
+                </div>
+                <div class="calm-exp-card">
+                    <div class="calm-exp-number">05</div>
+                    <h3 class="calm-exp-title">萤火虫生态</h3>
+                    <p class="calm-exp-subtitle">"光的疗愈"</p>
+                    <p class="calm-exp-desc">
+                        生态养殖萤火虫，夏夜庭院观萤冥想。在微光中与自然对话，体验最温柔的夜间疗愈。
+                    </p>
+                </div>
+                <div class="calm-exp-card">
+                    <div class="calm-exp-number">06</div>
+                    <h3 class="calm-exp-title">萤火虫夜话</h3>
+                    <p class="calm-exp-subtitle">"万物有光"</p>
+                    <p class="calm-exp-desc">
+                        生态养殖萤火虫+观萤冥想 · 夜茶止语 · 星空颂钵夜 · 萤火虫庭院晚宴……在夜色与微光中，遇见真实的自己。
+                    </p>
+                </div>
+                <div class="calm-exp-card">
+                    <div class="calm-exp-number">07</div>
+                    <h3 class="calm-exp-title">数字排毒</h3>
+                    <p class="calm-exp-subtitle">"48小时断网静修"</p>
+                    <p class="calm-exp-desc">
+                        寄存手机，远离屏幕，深度沉浸。在信息洪流中辟一方净土，完成真正的精神重启。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 出片点 -->
+    <section class="calm-spots">
+        <div class="calm-container">
+            <div class="calm-section-title">
+                <div class="calm-divider" style="background: var(--wabi-clay);"></div>
+                <h2>出片打卡点</h2>
+                <p>每一个角度，都是风景</p>
+            </div>
+            <div class="calm-spots-grid">
+                <div class="calm-spot-card">
+                    <img src="/static/images/calm_retreat/hydroponic_greenhouse_cyber.jpg" alt="赛博农场温室">
+                    <div class="calm-spot-overlay">
+                        <p class="calm-spot-name">赛博农场温室</p>
+                    </div>
+                </div>
+                <div class="calm-spot-card">
+                    <img src="/static/images/calm_retreat/herb_garden_moon_gate.jpg" alt="枯山水月门">
+                    <div class="calm-spot-overlay">
+                        <p class="calm-spot-name">枯山水月门</p>
+                    </div>
+                </div>
+                <div class="calm-spot-card">
+                    <img src="/static/images/calm_retreat/night_firefly_meditation.jpg" alt="萤火虫冥想">
+                    <div class="calm-spot-overlay">
+                        <p class="calm-spot-name">萤火虫夜间冥想</p>
+                    </div>
+                </div>
+                <div class="calm-spot-card">
+                    <img src="/static/images/calm_retreat/apple_cabin_exterior_night.jpg" alt="苹果舱夜景">
+                    <div class="calm-spot-overlay">
+                        <p class="calm-spot-name">苹果舱夜景</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 住宿体验展示 -->
+    <section class="calm-gallery">
+        <div class="calm-container">
+            <div class="calm-section-title">
+                <div class="calm-divider"></div>
+                <h2>住宿体验</h2>
+                <p>极简空间，深度静修</p>
+            </div>
+            <div class="calm-gallery-grid">
+                <div class="calm-gallery-item">
+                    <img src="/static/images/calm_retreat/3cabins_daytime.jpg" alt="苹果舱白天全景">
+                </div>
+                <div class="calm-gallery-item">
+                    <img src="/static/images/calm_retreat/apple_cabin_exterior_night.jpg" alt="苹果舱夜景">
+                </div>
+                <div class="calm-gallery-item">
+                    <img src="/static/images/calm_retreat/cabin_japanese_warm.jpg" alt="日式暖色调">
+                </div>
+                <div class="calm-gallery-item">
+                    <img src="/static/images/calm_retreat/cabin_cyber_future.jpg" alt="赛博未来风格">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA区域 -->
+    <section class="calm-cta-section">
+        <div class="calm-container calm-cta-content">
+            <div class="calm-divider"></div>
+            <h2>开启你的静修之旅</h2>
+            <p>
+                两小时高铁，远离城市喧嚣<br>
+                住进世界长寿乡的药香里<br>
+                遇见更真实的自己
+            </p>
+            <div class="calm-cta-buttons">
+                <a href="/contact" class="calm-btn-primary">
+                    预约体验
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 8h10M9 4l4 4-4 4"/>
+                    </svg>
+                </a>
+                <a href="mailto:hikaru0701@qq.com" class="calm-btn-secondary">
+                    联系我们
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="2" y="4" width="12" height="9" rx="1"/>
+                        <path d="M2 5l6 4 6-4"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="calm-contact-info">
+                <p>咨询邮箱：<a href="mailto:hikaru0701@qq.com">hikaru0701@qq.com</a></p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="calm-footer">
+        <p class="calm-footer-logo">清寂山房</p>
+        <p class="calm-footer-text">湖南麻阳 · 世界长寿乡 · 千年古镇</p>
+        <p class="calm-footer-text" style="margin-top: 16px; opacity: 0.6;">
+            © 2024 清寂山房 · SoulLink旗下静修品牌
+        </p>
+    </footer>
+</div>
+{% endblock %}

@@ -1,0 +1,468 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('schedule_date') }} - 灵犀{% endblock %}
+
+{% block content %}
+<div class="date-page">
+    <!-- 返回按钮 -->
+    <a href="/lover/home/{{ lover.id }}" class="back-link">← {{ _('back') }}</a>
+    
+    <!-- 恋人信息 -->
+    <div class="lover-mini-card">
+        <div class="mini-avatar" style="background: linear-gradient(135deg, {{ lover.avatar_gradient }})">
+            {{ lover.avatar_icon }}
+        </div>
+        <div class="mini-info">
+            <h2>{{ lover.name }}</h2>
+            <p>{{ lover.current_mood }}</p>
+        </div>
+    </div>
+
+    <!-- 日期类型选择 -->
+    <div class="date-types">
+        <h3>🌙 {{ _('choose_date_type') }}</h3>
+        <div class="type-grid">
+            {% for type in date_types %}
+            <div class="type-card {% if type.is_available %}{% else %}unavailable{% endif %}" 
+                 data-id="{{ type.id }}" 
+                 onclick="{% if type.is_available %}selectDateType('{{ type.id }}'){% endif %}">
+                <span class="type-icon">{{ type.icon }}</span>
+                <span class="type-name">{{ type.name }}</span>
+                <span class="type-cost">{{ type.cost }}💎</span>
+                {% if type.discount %}
+                <span class="type-discount">{{ type.discount }}</span>
+                {% endif %}
+                {% if not type.is_available %}
+                <span class="unlock-hint">{{ _('unlock_hint') }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 约会时间 -->
+    <div class="date-time-section">
+        <h3>📅 {{ _('select_time') }}</h3>
+        <div class="time-slots">
+            {% for slot in time_slots %}
+            <button class="time-slot {% if slot.available %}{% else %}disabled{% endif %}" 
+                    data-time="{{ slot.time }}"
+                    {% if slot.available %}onclick="selectTime('{{ slot.time }}')"{% endif %}>
+                <span class="slot-time">{{ slot.time }}</span>
+                <span class="slot-status">{% if slot.available %}{{ slot.status }}{% else %}{{ _('unavailable') }}{% endif %}</span>
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 特殊场景 -->
+    <div class="special-scenes">
+        <h3>✨ {{ _('special_scenes') }}</h3>
+        <div class="scene-list">
+            {% for scene in special_scenes %}
+            <div class="scene-card" onclick="toggleScene('{{ scene.id }}')">
+                <div class="scene-info">
+                    <span class="scene-icon">{{ scene.icon }}</span>
+                    <div class="scene-text">
+                        <span class="scene-name">{{ scene.name }}</span>
+                        <span class="scene-desc">{{ scene.description }}</span>
+                    </div>
+                </div>
+                <div class="scene-toggle {% if scene.selected %}active{% endif %}">
+                    {% if scene.selected %}✓{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 确认区域 -->
+    <div class="confirm-section">
+        <div class="date-summary">
+            <div class="summary-item">
+                <span class="summary-label">{{ _('date_type') }}</span>
+                <span class="summary-value" id="selectedType">{{ _('not_selected') }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">{{ _('date_time') }}</span>
+                <span class="summary-value" id="selectedTime">{{ _('not_selected') }}</span>
+            </div>
+            <div class="summary-item total">
+                <span class="summary-label">{{ _('total_cost') }}</span>
+                <span class="summary-value" id="totalCost">0💎</span>
+            </div>
+        </div>
+        <button class="confirm-btn" id="confirmBtn" onclick="confirmDate()" disabled>
+            {{ _('confirm_date_request') }}
+        </button>
+        <p class="hint-text">{{ _('date_hint') }}</p>
+    </div>
+</div>
+
+<style>
+.date-page {
+    padding: 16px;
+    padding-bottom: 100px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 16px;
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.lover-mini-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.mini-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.mini-info h2 {
+    margin: 0 0 2px 0;
+    font-size: 16px;
+}
+
+.mini-info p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.date-types, .date-time-section, .special-scenes {
+    margin-bottom: 20px;
+}
+
+.date-types h3, .date-time-section h3, .special-scenes h3 {
+    margin: 0 0 12px 0;
+    font-size: 15px;
+}
+
+.type-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.type-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 8px;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.type-card:active {
+    transform: scale(0.95);
+}
+
+.type-card.selected {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.type-card.unavailable {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.type-icon {
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+.type-name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.type-cost {
+    font-size: 12px;
+    color: #f59e0b;
+}
+
+.type-discount {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    padding: 2px 6px;
+    background: #ef4444;
+    color: white;
+    border-radius: 8px;
+    font-size: 10px;
+}
+
+.unlock-hint {
+    font-size: 10px;
+    color: #999;
+    margin-top: 4px;
+}
+
+.time-slots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.time-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 4px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.time-slot:active {
+    transform: scale(0.95);
+}
+
+.time-slot.selected {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.time-slot.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.slot-time {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.slot-status {
+    font-size: 10px;
+    color: #666;
+}
+
+.scene-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.scene-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px;
+    background: white;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.scene-card:active {
+    background: #f9fafb;
+}
+
+.scene-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.scene-icon {
+    font-size: 28px;
+}
+
+.scene-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.scene-desc {
+    display: block;
+    font-size: 12px;
+    color: #666;
+}
+
+.scene-toggle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    transition: background 0.2s;
+}
+
+.scene-toggle.active {
+    background: #f59e0b;
+}
+
+.confirm-section {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 16px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+}
+
+.date-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.summary-item.total {
+    padding-top: 8px;
+    border-top: 1px solid #e5e7eb;
+    font-weight: 600;
+}
+
+.summary-label {
+    color: #666;
+}
+
+.summary-value {
+    color: #333;
+}
+
+.summary-item.total .summary-value {
+    color: #f59e0b;
+    font-size: 16px;
+}
+
+.confirm-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #fb923c);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.confirm-btn:disabled {
+    background: #e5e7eb;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.hint-text {
+    margin: 8px 0 0 0;
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+}
+</style>
+
+<script>
+let selectedType = null;
+let selectedTime = null;
+let selectedScenes = [];
+let totalCost = 0;
+
+const typeCosts = {{ date_type_costs | tojson }};
+
+function selectDateType(typeId) {
+    document.querySelectorAll('.type-card').forEach(card => card.classList.remove('selected'));
+    event.target.closest('.type-card').classList.add('selected');
+    selectedType = typeId;
+    updateSummary();
+}
+
+function selectTime(time) {
+    document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
+    event.target.closest('.time-slot').classList.add('selected');
+    selectedTime = time;
+    updateSummary();
+}
+
+function toggleScene(sceneId) {
+    const index = selectedScenes.indexOf(sceneId);
+    if (index > -1) {
+        selectedScenes.splice(index, 1);
+    } else {
+        selectedScenes.push(sceneId);
+    }
+    event.target.closest('.scene-card').querySelector('.scene-toggle').classList.toggle('active');
+    updateSummary();
+}
+
+function updateSummary() {
+    let typeName = '{{ _('not_selected') }}';
+    let typeCost = 0;
+    
+    if (selectedType && typeCosts[selectedType]) {
+        typeName = typeCosts[selectedType].name;
+        typeCost = typeCosts[selectedType].cost;
+    }
+    
+    document.getElementById('selectedType').textContent = typeName;
+    document.getElementById('selectedTime').textContent = selectedTime || '{{ _('not_selected') }}';
+    
+    totalCost = typeCost;
+    document.getElementById('totalCost').textContent = totalCost + '💎';
+    
+    const btn = document.getElementById('confirmBtn');
+    btn.disabled = !(selectedType && selectedTime);
+}
+
+function confirmDate() {
+    fetch('/api/lover/date/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            lover_id: {{ lover.id }},
+            date_type: selectedType,
+            time: selectedTime,
+            scenes: selectedScenes
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            showToast('约会请求已发送');
+            setTimeout(() => {
+                window.location.href = '/lover/home/{{ lover.id }}';
+            }, 1500);
+        } else if (data.need_pay) {
+            showToast('灵石不足，请充值');
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,1594 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('recharge') }} - {{ _('app_name') }}{% endblock %}
+
+{% block content %}
+<style>
+.recharge-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 页面标题 */
+.page-header {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 20px;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* 当前余额 */
+.balance-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.balance-card h2 {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.balance-amount {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.balance-label {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+/* 充值套餐网格 */
+.package-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+/* 充值卡片 */
+.package-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px 16px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.package-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.package-card.selected {
+    border-color: #9c27b0;
+    background: #f3e5f5;
+}
+
+.package-card.best-value {
+    border-color: #ff5722;
+}
+
+/* 最划算标签 */
+.best-value-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: linear-gradient(135deg, #ff5722, #ff9800);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* 赠送标签 */
+.bonus-badge {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    background: #4caf50;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+}
+
+/* 图标 */
+.package-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+/* 名称 */
+.package-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+/* 灵石数量 */
+.stone-amount {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #9c27b0;
+    margin-bottom: 4px;
+}
+
+.stone-label {
+    font-size: 0.85rem;
+    color: #999;
+}
+
+/* 赠送灵石 */
+.bonus-amount {
+    font-size: 0.9rem;
+    color: #4caf50;
+    margin: 8px 0;
+}
+
+/* 价格 */
+.price-amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-top: 8px;
+}
+
+/* 支付方式 */
+.payment-section {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.payment-section h3 {
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 1.3rem;
+}
+
+/* 支付方式网格 - 新样式 */
+.payment-methods {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.payment-method {
+    background: #fafafa;
+    border: 2px solid #eee;
+    border-radius: 16px;
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.payment-method:hover {
+    border-color: #9c27b0;
+    background: #fff;
+}
+
+.payment-method.selected {
+    border-color: #9c27b0;
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    box-shadow: 0 4px 15px rgba(156, 39, 176, 0.2);
+}
+
+.payment-method .icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.payment-method .name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.payment-method .subtitle {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+/* 确认按钮 */
+.confirm-section {
+    text-align: center;
+}
+
+.confirm-btn {
+    background: linear-gradient(135deg, #9c27b0, #e91e63);
+    color: white;
+    border: none;
+    padding: 16px 60px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.confirm-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+}
+
+.confirm-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 说明文字 */
+.info-text {
+    text-align: center;
+    color: #999;
+    font-size: 0.9rem;
+    margin-top: 20px;
+}
+
+/* 温馨提示 */
+.tips-section {
+    background: #fff3e0;
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 30px;
+}
+
+.tips-section h4 {
+    color: #e65100;
+    margin-bottom: 16px;
+}
+
+.tips-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tips-section li {
+    padding: 8px 0;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tips-section li .icon {
+    color: #ff9800;
+}
+
+/* ========== 支付弹窗样式 ========== */
+.payment-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.payment-modal.active {
+    display: flex;
+}
+
+.payment-modal-content {
+    background: white;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+    position: relative;
+    animation: modalSlideUp 0.3s ease;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: #f5f5f5;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background: #e0e0e0;
+}
+
+/* 支付方式头部 */
+.pay-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.pay-header .pay-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.pay-header .pay-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.pay-header .pay-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* 订单信息 */
+.order-info {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.order-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.order-row:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.order-label {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.order-value {
+    font-weight: 600;
+    color: #333;
+}
+
+.order-value.highlight {
+    color: #9c27b0;
+    font-size: 1.1rem;
+}
+
+/* 支付宝占位样式 */
+.alipay-coming-soon {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.alipay-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #00a1e9 0%, #1677ff 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2.5rem;
+}
+
+.alipay-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.alipay-hint {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.alipay-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #00a1e9 0%, #1677ff 100%);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-top: 16px;
+}
+
+/* 微信二维码样式 */
+.wechat-qr-display {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.wechat-qr-image {
+    width: 220px;
+    height: 220px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(7, 193, 96, 0.2);
+    border: 4px solid #f0f9f4;
+    margin-bottom: 16px;
+}
+
+.wechat-qr-hint {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+}
+
+.wechat-amount {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #07c160;
+    margin-bottom: 12px;
+}
+
+.wechat-reminder {
+    background: #f0f9f4;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.wechat-reminder::before {
+    content: '💚 ';
+}
+
+/* 二维码区域 */
+.qr-section {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.qr-placeholder {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.qr-grid {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 2px;
+}
+
+.qr-cell {
+    background: #333;
+    border-radius: 1px;
+}
+
+.qr-cell.empty {
+    background: transparent;
+}
+
+.qr-logo {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 8px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.qr-hint {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* 倒计时 */
+.countdown {
+    text-align: center;
+    margin: 16px 0;
+}
+
+.countdown-label {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 4px;
+}
+
+.countdown-time {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ff5722;
+}
+
+/* 钱包地址区域 */
+.wallet-section {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.wallet-address {
+    background: #f5f5f5;
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #333;
+}
+
+.sol-amount {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #9945FF;
+    margin-bottom: 8px;
+}
+
+.sol-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.copy-btn {
+    background: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.copy-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(153, 69, 255, 0.3);
+}
+
+.copy-btn.copied {
+    background: #4caf50;
+}
+
+/* PayPal按钮 */
+.paypal-btn {
+    display: inline-block;
+    background: #0070ba;
+    color: white;
+    padding: 14px 32px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.paypal-btn:hover {
+    background: #005ea6;
+    transform: scale(1.02);
+}
+
+/* Apple Pay / Google Pay 按钮 */
+.biometric-section {
+    text-align: center;
+    padding: 30px 0;
+}
+
+.biometric-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.biometric-hint {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.biometric-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.biometric-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* 底部确认按钮 */
+.modal-confirm-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #9c27b0, #e91e63);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 16px;
+}
+
+.modal-confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+}
+
+.modal-confirm-btn:active {
+    transform: translateY(0);
+}
+
+/* ========== 支付成功动画 ========== */
+.success-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 11000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.success-modal.active {
+    display: flex;
+}
+
+.success-content {
+    background: white;
+    border-radius: 24px;
+    padding: 48px 32px;
+    text-align: center;
+    max-width: 340px;
+    width: 100%;
+    animation: successPop 0.5s ease;
+}
+
+@keyframes successPop {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.success-checkmark {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    animation: checkBounce 0.6s ease 0.2s both;
+}
+
+@keyframes checkBounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.success-checkmark::after {
+    content: '✓';
+    font-size: 40px;
+    color: white;
+}
+
+.success-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.success-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 24px;
+}
+
+.success-stones {
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.success-stones .icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.success-stones .amount {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #9c27b0;
+}
+
+.success-stones .label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.success-hint {
+    font-size: 0.85rem;
+    color: #999;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    z-index: 12000;
+    display: none;
+}
+
+.toast.show {
+    display: block;
+    animation: toastFade 0.3s ease;
+}
+
+@keyframes toastFade {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .package-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .payment-methods {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .payment-method {
+        padding: 16px 12px;
+    }
+    
+    .payment-method .icon {
+        font-size: 2rem;
+    }
+    
+    .payment-method .name {
+        font-size: 0.9rem;
+    }
+    
+    .payment-modal {
+        align-items: flex-end;
+        padding: 0;
+    }
+    
+    .payment-modal-content {
+        border-radius: 24px 24px 0 0;
+        max-width: 100%;
+        padding: 24px 20px;
+        padding-bottom: 40px;
+    }
+    
+    .success-modal {
+        align-items: flex-end;
+    }
+    
+    .success-content {
+        border-radius: 24px 24px 0 0;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 769px) {
+    .payment-modal-content {
+        animation: modalFadeIn 0.3s ease;
+    }
+    
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+}
+</style>
+
+<div class="recharge-page">
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <h1>💎 {{ _('recharge_spirit_stones') }}</h1>
+        <p>{{ _('recharge_slogan') }}</p>
+    </div>
+    
+    <!-- 当前余额 -->
+    <div class="balance-card">
+        <h2>{{ _('current_balance') }}</h2>
+        {% if current_user.is_authenticated %}
+        <div class="balance-amount">{{ spirit_stones }}</div>
+        {% else %}
+        <div class="balance-amount">***</div>
+        {% endif %}
+        <div class="balance-label">💎 {{ _('spirit_stones_unit') }}</div>
+    </div>
+    
+    <!-- 未登录提示横幅 -->
+    {% if not current_user.is_authenticated %}
+    <div class="login-banner" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 16px; padding: 20px 25px; margin-bottom: 25px; color: white;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="font-size: 2.5rem;">🎉</div>
+            <div style="flex: 1;">
+                <div style="font-size: 1.15rem; font-weight: bold; margin-bottom: 5px;">新用户首充特惠</div>
+                <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 12px;">注册账号即可享受首充赠送，灵石可用于AI陪伴、占卜及商城兑换</div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="/auth/login" style="flex: 1; display: block; text-align: center; background: white; color: #f5576c; padding: 10px; border-radius: 20px; text-decoration: none; font-weight: 600;">登录</a>
+                    <a href="/auth/register" style="flex: 1; display: block; text-align: center; background: rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 20px; text-decoration: none; font-weight: 600;">注册</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- 选择充值套餐 -->
+    <div class="package-grid">
+        {% for package in packages %}
+        <div class="package-card {% if package.id == 'premium' %}best-value{% endif %}" 
+             onclick="selectPackage('{{ package.id }}')" 
+             ontouchend="selectPackage('{{ package.id }}')"
+             id="pkg-{{ package.id }}">
+            
+            {% if package.bonus > 0 %}
+            <div class="bonus-badge">+{{ package.bonus }}</div>
+            {% endif %}
+            
+            {% if package.id == 'premium' %}
+            <div class="best-value-badge">{{ _('best_value') }}</div>
+            {% endif %}
+            
+            <div class="package-icon">{{ package.icon }}</div>
+            <div class="package-name">{{ package.name.zh if package.name is mapping else package.name }}</div>
+            <div class="stone-amount">{{ package.amount }}</div>
+            <div class="stone-label">💎 {{ _('stones') }}</div>
+            
+            {% if package.bonus > 0 %}
+            <div class="bonus-amount">+{{ package.bonus }} {{ _('bonus') }}</div>
+            {% endif %}
+            
+            <div class="price-amount">¥{{ package.price }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- 支付方式 -->
+    <div class="payment-section">
+        <h3>{{ _('select_payment_method') }}</h3>
+        
+        <div class="payment-methods">
+            <div class="payment-method" onclick="selectPayment('wechat')" ontouchend="selectPayment('wechat')" id="pay-wechat">
+                <div class="icon">💚</div>
+                <div class="name">微信支付</div>
+                <div class="subtitle">心意即刻送达</div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('alipay')" ontouchend="selectPayment('alipay')" id="pay-alipay">
+                <div class="icon">💙</div>
+                <div class="name">支付宝</div>
+                <div class="subtitle">便捷支付体验</div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('paypal')" ontouchend="selectPayment('paypal')" id="pay-paypal">
+                <div class="icon">🅿️</div>
+                <div class="name">PayPal</div>
+                <div class="subtitle">全球支付，心意无界</div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('sol')" ontouchend="selectPayment('sol')" id="pay-sol">
+                <div class="icon">🪙</div>
+                <div class="name">Sol Pay</div>
+                <div class="subtitle">用未来货币，表达真挚心意</div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('apple')" ontouchend="selectPayment('apple')" id="pay-apple">
+                <div class="icon">🍎</div>
+                <div class="name">Apple Pay</div>
+                <div class="subtitle">轻轻一触，完成支付</div>
+            </div>
+            <div class="payment-method" onclick="selectPayment('google')" ontouchend="selectPayment('google')" id="pay-google">
+                <div class="icon">🤖</div>
+                <div class="name">Google Pay</div>
+                <div class="subtitle">安全快捷支付</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 确认按钮 -->
+    <div class="confirm-section">
+        <button class="confirm-btn" id="confirmBtn" onclick="confirmRecharge()" ontouchend="confirmRecharge()" disabled>
+            {{ _('confirm_recharge') }}
+        </button>
+        <p class="info-text">{{ _('recharge_note') }}</p>
+    </div>
+    
+    <!-- 温馨提示 -->
+    <div class="tips-section">
+        <h4>💡 {{ _('recharge_tips') }}</h4>
+        <ul>
+            <li><span class="icon">✓</span> {{ _('tip_1') }}</li>
+            <li><span class="icon">✓</span> {{ _('tip_2') }}</li>
+            <li><span class="icon">✓</span> {{ _('tip_3') }}</li>
+            <li><span class="icon">✓</span> {{ _('tip_4') }}</li>
+        </ul>
+    </div>
+</div>
+
+<!-- 支付弹窗 -->
+<div class="payment-modal" id="paymentModal">
+    <div class="payment-modal-content" id="paymentModalContent">
+        <!-- 内容由JS动态填充 -->
+    </div>
+</div>
+
+<!-- 支付成功弹窗 -->
+<div class="success-modal" id="successModal">
+    <div class="success-content">
+        <div class="success-checkmark"></div>
+        <div class="success-title">支付成功</div>
+        <div class="success-subtitle">您的灵石已到账</div>
+        <div class="success-stones">
+            <div class="icon">💎</div>
+            <div class="amount" id="successAmount">+100</div>
+            <div class="label">灵石已到账</div>
+        </div>
+        <div class="success-hint">页面即将刷新...</div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+let selectedPackage = null;
+let selectedPayment = null;
+let countdownTimer = null;
+let currentOrderInfo = null;
+
+// 套餐数据 - 灵石充值套餐
+const packages = {
+    'starter': { name: '新手礼包', amount: 30, price: 30, bonus: 5, icon: '🌱', best_value: false },
+    'standard': { name: '标准充值', amount: 68, price: 68, bonus: 15, icon: '💎', best_value: false },
+    'premium': { name: '超值礼包', amount: 198, price: 198, bonus: 50, icon: '👑', best_value: true },
+    'ultimate': { name: '尊享大礼包', amount: 498, price: 498, bonus: 150, icon: '🚀', best_value: false }
+};
+
+function selectPackage(id) {
+    // 检查是否登录（通过检查是否有 current_user.id）
+    {% if not current_user.is_authenticated %}
+    if (confirm('登录后可进行充值，是否前往登录？')) {
+        window.location.href = '/auth/login';
+        return;
+    }
+    {% endif %}
+    
+    document.querySelectorAll('.package-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    document.getElementById('pkg-' + id).classList.add('selected');
+    selectedPackage = id;
+    updateConfirmButton();
+}
+
+function selectPayment(method) {
+    document.querySelectorAll('.payment-method').forEach(el => {
+        el.classList.remove('selected');
+    });
+    document.getElementById('pay-' + method).classList.add('selected');
+    selectedPayment = method;
+    updateConfirmButton();
+}
+
+function updateConfirmButton() {
+    const btn = document.getElementById('confirmBtn');
+    btn.disabled = !(selectedPackage && selectedPayment);
+}
+
+function confirmRecharge() {
+    if (!selectedPackage || !selectedPayment) return;
+    
+    const pkg = packages[selectedPackage];
+    const totalStones = pkg.amount + pkg.bonus;
+    currentOrderInfo = {
+        packageId: selectedPackage,
+        packageName: pkg.name,
+        stones: pkg.amount,
+        bonus: pkg.bonus,
+        total: totalStones,
+        price: pkg.price,
+        paymentMethod: selectedPayment
+    };
+    
+    // 微信支付调用后端API创建真实订单
+    if (selectedPayment === 'wechat') {
+        createWxpayOrder(selectedPackage);
+    } else {
+        showPaymentModal(selectedPayment, currentOrderInfo);
+    }
+}
+
+// 创建微信支付订单
+async function createWxpayOrder(packageId) {
+    const btn = document.getElementById('confirmBtn');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '正在创建订单...';
+    
+    try {
+        const resp = await fetch('/api/wxpay/create', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                type: 'lingstone',
+                package_id: packageId
+            })
+        });
+        
+        const data = await resp.json();
+        
+        if (data.error) {
+            showToast('创建订单失败: ' + data.error);
+            btn.disabled = false;
+            btn.textContent = originalText;
+            return;
+        }
+        
+        // 保存微信支付订单信息
+        currentOrderInfo.wxpayOrderNo = data.out_trade_no;
+        currentOrderInfo.wxpayCodeUrl = data.code_url;
+        
+        showPaymentModal('wechat', currentOrderInfo);
+    } catch (e) {
+        showToast('网络错误，请重试');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        updateConfirmButton();
+    }
+}
+
+function showPaymentModal(method, order) {
+    const modal = document.getElementById('paymentModal');
+    const content = document.getElementById('paymentModalContent');
+    
+    let html = '';
+    
+    switch(method) {
+        case 'wechat':
+            html = getWechatPayHTML(order);
+            break;
+        case 'alipay':
+            html = getAlipayHTML(order);
+            break;
+        case 'paypal':
+            html = getPaypalHTML(order);
+            break;
+        case 'sol':
+            html = getSolPayHTML(order);
+            break;
+        case 'apple':
+            html = getApplePayHTML(order);
+            break;
+        case 'google':
+            html = getGooglePayHTML(order);
+            break;
+    }
+    
+    content.innerHTML = html;
+    modal.classList.add('active');
+    
+    // 启动倒计时
+    if (method === 'wechat' || method === 'alipay') {
+        startCountdown();
+    }
+}
+
+function getWechatPayHTML(order) {
+    // 使用微信支付API返回的code_url生成二维码
+    const qrApiUrl = order.wxpayCodeUrl 
+        ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(order.wxpayCodeUrl)}`
+        : '';
+    
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">💚</div>
+            <div class="pay-title">微信支付</div>
+            <div class="pay-subtitle">扫码支付，温暖相伴</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">支付金额</span>
+                <span class="order-value highlight">¥${order.price}</span>
+            </div>
+        </div>
+        <div class="wechat-qr-display">
+            ${qrApiUrl ? `
+                <img src="${qrApiUrl}" alt="微信支付二维码" class="wechat-qr-image" 
+                     onerror="this.style.display='none'; document.getElementById('wxpay-qr-fallback').style.display='block';">
+                <div id="wxpay-qr-fallback" style="display:none; padding: 20px; text-align: center;">
+                    <p style="color: #666; font-size: 14px;">二维码加载失败</p>
+                    <p style="word-break: break-all; color: #07c160; font-size: 12px; padding: 10px;">${order.wxpayCodeUrl || ''}</p>
+                    <p style="color: #999; font-size: 12px;">请复制上方链接，在微信中打开</p>
+                </div>
+            ` : `
+                <div style="padding: 40px; text-align: center; color: #999;">
+                    <p>订单创建中，请稍候...</p>
+                </div>
+            `}
+            <div class="wechat-qr-hint">请使用微信扫描上方二维码</div>
+            <div class="wechat-amount">¥${order.price}</div>
+            <div class="wechat-reminder">支付完成后，点击下方"我已完成支付"按钮</div>
+        </div>
+        <div class="countdown">
+            <div class="countdown-label">订单有效时间</div>
+            <div class="countdown-time" id="countdown">15:00</div>
+        </div>
+        <button class="modal-confirm-btn" onclick="confirmPayment('wechat')">我已完成支付 ✓</button>
+        <p style="text-align: center; color: #999; font-size: 0.8rem; margin-top: 12px;">
+            如有疑问请联系客服
+        </p>
+    `;
+}
+
+function getAlipayHTML(order) {
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">💙</div>
+            <div class="pay-title">支付宝</div>
+            <div class="pay-subtitle">便捷支付体验</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">支付金额</span>
+                <span class="order-value highlight">¥${order.price}</span>
+            </div>
+        </div>
+        <div class="wechat-qr-display" style="--qr-color: #1677ff;">
+            <style>
+                .wechat-qr-display[style*="1677ff"] .wechat-qr-image {
+                    border-color: #e6f4ff;
+                    box-shadow: 0 4px 20px rgba(22, 119, 255, 0.15);
+                }
+                .wechat-qr-display[style*="1677ff"] .wechat-amount {
+                    color: #1677ff;
+                }
+                .wechat-qr-display[style*="1677ff"] .wechat-reminder::before {
+                    content: '💙 ';
+                }
+            </style>
+            <img src="/static/img/alipay_qr.png" alt="支付宝收款码" class="wechat-qr-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjIwIiBoZWlnaHQ9IjIyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjIwIiBoZWlnaHQ9IjIyMCIgZmlsbD0iI2U2ZjRmZiIvPjxlbGxpcHNlIGN4PSIxMTAiIGN5PSIxMTAiIHJ4PSIyMCIgcng9IjIwIiByeT0iMjAiIGZpbGw9IiMwMWE0ZWIiLz48dGV4dCB4PSIxMTAiIHk9IjEyMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7lk6zskJzqijwvdGV4dD48L3N2Zz4='">
+            <div class="wechat-qr-hint">请使用支付宝扫描上方二维码</div>
+            <div class="wechat-amount">¥${order.price}</div>
+            <div class="wechat-reminder">支付完成后，点击下方"我已完成支付"按钮</div>
+        </div>
+        <div class="countdown">
+            <div class="countdown-label">订单有效时间</div>
+            <div class="countdown-time" id="countdown">15:00</div>
+        </div>
+        <button class="modal-confirm-btn" onclick="confirmPayment('alipay')">我已完成支付 ✓</button>
+        <p style="text-align: center; color: #999; font-size: 0.8rem; margin-top: 12px;">
+            如有疑问请联系客服
+        </p>
+    `;
+}
+
+function getPaypalHTML(order) {
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">🅿️</div>
+            <div class="pay-title">PayPal</div>
+            <div class="pay-subtitle">全球支付，心意无界</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">支付金额</span>
+                <span class="order-value highlight">¥${order.price}</span>
+            </div>
+        </div>
+        <div style="text-align: center; padding: 20px 0;">
+            <a href="https://www.paypal.com" target="_blank" class="paypal-btn" onclick="simulatePaypal()">
+                跳转到 PayPal 完成支付 🡕
+            </a>
+            <p style="color: #999; font-size: 0.85rem; margin-top: 16px;">
+                点击按钮后在新窗口完成支付
+            </p>
+        </div>
+        <button class="modal-confirm-btn" onclick="confirmPayment('paypal')" style="background: #4caf50;">返回确认支付</button>
+    `;
+}
+
+function getSolPayHTML(order) {
+    // 简化的SOL价格，约0.1 SOL起步
+    const solPrice = 150; // 假设SOL价格150 USDT
+    const solAmount = (order.price / solPrice).toFixed(4);
+    const walletAddress = 'SoL' + generateRandomString(42);
+    
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">🪙</div>
+            <div class="pay-title">Solana Pay</div>
+            <div class="pay-subtitle">用未来货币，表达真挚心意</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+        </div>
+        <div class="wallet-section">
+            <div class="sol-amount">${solAmount} SOL</div>
+            <div class="sol-label">发送到此钱包地址</div>
+            <div class="qr-placeholder" style="background: linear-gradient(135deg, #9945FF 0%, #14F195 100%); height: 180px;">
+                <div class="qr-grid" style="filter: brightness(0) invert(1);">
+                    ${generateQRGrid()}
+                </div>
+            </div>
+            <div class="wallet-address">${walletAddress}</div>
+            <button class="copy-btn" id="copyBtn" onclick="copyWalletAddress('${walletAddress}')">
+                📋 复制钱包地址
+            </button>
+        </div>
+        <p style="text-align: center; color: #999; font-size: 0.85rem; margin-bottom: 16px;">
+            发送完成后点击确认，我们会在确认后立即到账
+        </p>
+        <button class="modal-confirm-btn" onclick="confirmPayment('sol')">我已发送 SOL</button>
+    `;
+}
+
+function getApplePayHTML(order) {
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">🍎</div>
+            <div class="pay-title">Apple Pay</div>
+            <div class="pay-subtitle">轻轻一触，完成支付</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">支付金额</span>
+                <span class="order-value highlight">¥${order.price}</span>
+            </div>
+        </div>
+        <div class="biometric-section">
+            <div class="biometric-icon">👆</div>
+            <div class="biometric-hint">将手指放在 Touch ID 上确认支付</div>
+            <button class="biometric-btn" onclick="confirmPayment('apple')">
+                使用 Touch ID 确认
+            </button>
+        </div>
+    `;
+}
+
+function getGooglePayHTML(order) {
+    return `
+        <button class="modal-close-btn" onclick="closePaymentModal()">×</button>
+        <div class="pay-header">
+            <div class="pay-icon">🤖</div>
+            <div class="pay-title">Google Pay</div>
+            <div class="pay-subtitle">安全快捷支付</div>
+        </div>
+        <div class="order-info">
+            <div class="order-row">
+                <span class="order-label">商品名称</span>
+                <span class="order-value">${order.packageName}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">灵石数量</span>
+                <span class="order-value highlight">💎 ${order.total}</span>
+            </div>
+            <div class="order-row">
+                <span class="order-label">支付金额</span>
+                <span class="order-value highlight">¥${order.price}</span>
+            </div>
+        </div>
+        <div class="biometric-section">
+            <div class="biometric-icon">🔐</div>
+            <div class="biometric-hint">确认使用 Google Pay 完成支付</div>
+            <button class="biometric-btn" onclick="confirmPayment('google')" style="background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);">
+                确认支付 ¥${order.price}
+            </button>
+        </div>
+    `;
+}
+
+function generateQRGrid() {
+    let html = '';
+    for (let i = 0; i < 64; i++) {
+        const rand = Math.random();
+        if (rand < 0.3) {
+            html += '<div class="qr-cell empty"></div>';
+        } else {
+            html += '<div class="qr-cell"></div>';
+        }
+    }
+    return html;
+}
+
+function generateRandomString(length) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
+function startCountdown() {
+    let minutes = 14;
+    let seconds = 59;
+    
+    const updateTimer = () => {
+        const countdownEl = document.getElementById('countdown');
+        if (countdownEl) {
+            countdownEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        
+        if (seconds > 0) {
+            seconds--;
+        } else if (minutes > 0) {
+            minutes--;
+            seconds = 59;
+        } else {
+            clearInterval(countdownTimer);
+            showToast('支付已超时，请重新发起支付');
+            closePaymentModal();
+        }
+    };
+    
+    updateTimer();
+    countdownTimer = setInterval(updateTimer, 1000);
+}
+
+function closePaymentModal() {
+    if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+    }
+    document.getElementById('paymentModal').classList.remove('active');
+}
+
+function copyWalletAddress(address) {
+    navigator.clipboard.writeText(address).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✓ 已复制';
+        btn.classList.add('copied');
+        setTimeout(() => {
+            btn.textContent = '📋 复制钱包地址';
+            btn.classList.remove('copied');
+        }, 2000);
+    }).catch(() => {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = address;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('钱包地址已复制');
+    });
+}
+
+function simulatePaypal() {
+    // 模拟打开PayPal窗口
+    showToast('正在跳转到 PayPal...');
+}
+
+function confirmPayment(method) {
+    // 微信支付查询真实订单状态
+    if (method === 'wechat' && currentOrderInfo && currentOrderInfo.wxpayOrderNo) {
+        checkWxpayStatus(currentOrderInfo.wxpayOrderNo);
+        return;
+    }
+    
+    closePaymentModal();
+    
+    // 显示支付成功
+    setTimeout(() => {
+        showPaymentSuccess(currentOrderInfo);
+    }, 300);
+}
+
+// 查询微信支付订单状态
+async function checkWxpayStatus(orderNo) {
+    showToast('正在确认支付结果...');
+    
+    try {
+        const resp = await fetch('/api/wxpay/query/' + orderNo);
+        const data = await resp.json();
+        
+        if (data.trade_state === 'SUCCESS') {
+            closePaymentModal();
+            setTimeout(() => {
+                showPaymentSuccess(currentOrderInfo);
+            }, 300);
+        } else if (data.trade_state === 'NOTPAY') {
+            showToast('尚未检测到支付，请完成支付后再确认');
+        } else if (data.trade_state === 'CLOSED') {
+            closePaymentModal();
+            showToast('订单已关闭，请重新发起支付');
+        } else {
+            showToast('支付状态: ' + (data.trade_state || '未知'));
+        }
+    } catch (e) {
+        showToast('查询支付状态失败，请稍后重试');
+    }
+}
+
+function showPaymentSuccess(order) {
+    const modal = document.getElementById('successModal');
+    const amountEl = document.getElementById('successAmount');
+    
+    amountEl.textContent = '+' + order.total;
+    modal.classList.add('active');
+    
+    // 2秒后关闭并刷新
+    setTimeout(() => {
+        modal.classList.remove('active');
+        // 模拟增加灵石
+        showToast(`充值成功！获得 ${order.total} 灵石`);
+        // 刷新页面
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    }, 2500);
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2000);
+}
+
+// 点击弹窗外部关闭
+document.getElementById('paymentModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePaymentModal();
+    }
+});
+
+document.getElementById('successModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        // 不允许点击外部关闭成功弹窗
+    }
+});
+</script>
+
+<!-- 客服联系入口 -->
+<div style="text-align: center; padding: 30px 20px; margin-top: 20px; border-top: 1px solid var(--color-border-light);">
+    <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 10px;">充值遇到问题？</p>
+    <a href="/contact" style="color: var(--color-primary); font-weight: 600; text-decoration: none;">
+        💬 联系客服
+    </a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,1110 @@
+{% extends "base.html" %}
+{% block title %}温暖陪伴套餐 - 灵犀{% endblock %}
+{% block content %}
+<style>
+.page-container {
+    padding: 16px;
+    padding-bottom: 80px;
+}
+
+.period-switch {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.plans-grid {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.plans-grid > div {
+    margin-bottom: 16px;
+}
+
+/* 支付弹窗样式 */
+.pay-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.pay-modal.active {
+    display: flex;
+}
+
+.pay-modal-content {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    padding: 24px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* 支付方式网格 */
+.payment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.payment-option {
+    background: #f8f9fa;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.payment-option:hover {
+    border-color: #9c27b0;
+}
+
+.payment-option.selected {
+    border-color: #9c27b0;
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+}
+
+.payment-option .icon {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+}
+
+.payment-option .name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #333;
+}
+
+.payment-option .subtitle {
+    font-size: 0.7rem;
+    color: #999;
+    margin-top: 2px;
+}
+
+/* 订单信息 */
+.order-summary {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.order-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+}
+
+.order-summary-row:not(:last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.order-summary-row .label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.order-summary-row .value {
+    font-weight: 600;
+    color: #333;
+}
+
+.order-summary-row .value.highlight {
+    color: #9c27b0;
+    font-size: 1.1rem;
+}
+
+/* 支付按钮 */
+.pay-confirm-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #9c27b0, #e91e63);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.pay-confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+}
+
+/* 微信二维码样式 */
+.m-wechat-qr-display {
+    text-align: center;
+    margin: 16px 0;
+}
+
+.m-wechat-qr-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(7, 193, 96, 0.15);
+    border: 3px solid #f0f9f4;
+    margin-bottom: 12px;
+}
+
+.m-wechat-amount {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #07c160;
+    margin-bottom: 8px;
+}
+
+.m-wechat-reminder {
+    background: #f0f9f4;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 10px;
+}
+
+/* 支付宝占位样式 */
+.m-alipay-coming {
+    text-align: center;
+    padding: 24px;
+}
+
+.m-alipay-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #00a1e9 0%, #1677ff 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 2rem;
+}
+
+.m-alipay-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.m-alipay-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #00a1e9 0%, #1677ff 100%);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    margin-top: 12px;
+}
+
+/* 二维码占位 */
+.qr-area {
+    text-align: center;
+    margin: 16px 0;
+}
+
+.qr-placeholder {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 12px;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.qr-grid {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 1px;
+}
+
+.qr-cell {
+    background: #333;
+    border-radius: 1px;
+}
+
+.qr-cell.empty {
+    background: transparent;
+}
+
+.qr-logo {
+    width: 36px;
+    height: 36px;
+    background: white;
+    border-radius: 6px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.qr-hint {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.countdown-box {
+    text-align: center;
+    margin: 12px 0;
+}
+
+.countdown-label {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.countdown-time {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ff5722;
+}
+
+/* 钱包区域 */
+.wallet-area {
+    text-align: center;
+    margin: 16px 0;
+}
+
+.sol-amount {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #9945FF;
+    margin-bottom: 4px;
+}
+
+.wallet-address {
+    background: #f5f5f5;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 12px 0;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #333;
+}
+
+.copy-wallet-btn {
+    background: linear-gradient(135deg, #9945FF 0%, #14F195 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.copy-wallet-btn.copied {
+    background: #4caf50;
+}
+
+/* 生物识别区域 */
+.biometric-area {
+    text-align: center;
+    padding: 24px 0;
+}
+
+.biometric-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.biometric-hint {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+.biometric-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* 支付成功弹窗 */
+.success-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.success-overlay.active {
+    display: flex;
+}
+
+.success-card {
+    background: white;
+    border-radius: 20px;
+    padding: 36px 24px;
+    text-align: center;
+    max-width: 300px;
+    width: 90%;
+    animation: popIn 0.4s ease;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.success-check {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 36px;
+    color: white;
+}
+
+.success-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.success-subtitle {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+}
+
+.success-plan {
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.success-plan-icon {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+}
+
+.success-plan-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #9c27b0;
+}
+
+.success-hint {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+/* Toast */
+.toast-msg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    z-index: 3000;
+    display: none;
+}
+
+.toast-msg.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* 桌面端布局 */
+@media (min-width: 768px) {
+    .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+    }
+    .period-switch {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .period-switch > div {
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .plans-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    .plans-grid > div {
+        margin-bottom: 0;
+    }
+    .pay-modal {
+        align-items: center;
+    }
+    .pay-modal-content {
+        border-radius: 20px;
+        max-width: 420px;
+        max-height: 85vh;
+    }
+    .payment-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+</style>
+
+<div class="page-container">
+    <h1 style="font-size:24px;text-align:center;margin-bottom:6px;">👑 温暖陪伴套餐</h1>
+    <p style="text-align:center;color:#666;margin-bottom:24px;">选择最适合你的陪伴方式</p>
+
+    <!-- 价格切换 -->
+    <div class="period-switch">
+        <div style="display:flex;background:#f3f4f6;border-radius:12px;padding:4px;margin-bottom:24px;">
+            <button onclick="switchPeriod('month')" id="btn-month" style="flex:1;padding:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;">月付</button>
+            <button onclick="switchPeriod('quarter')" id="btn-quarter" style="flex:1;padding:10px;background:transparent;border:none;border-radius:10px;font-size:14px;">季付<sn style="color:#10b981;font-size:11px;">省10%</sn></button>
+            <button onclick="switchPeriod('year')" id="btn-year" style="flex:1;padding:10px;background:transparent;border:none;border-radius:10px;font-size:14px;">年付<sn style="color:#10b981;font-size:11px;">省20%</sn></button>
+        </div>
+    </div>
+
+    <!-- 会员卡片网格 -->
+    <div class="plans-grid">
+
+    <!-- 暖心相伴 -->
+    <div style="background:white;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="font-size:32px;">🌱</span>
+            <div><h3 style="margin:0;font-size:18px;">暖心相伴</h3><span style="font-size:12px;color:#999;">体验温暖的开始</span></div>
+        </div>
+        <div style="font-size:28px;font-weight:700;margin-bottom:12px;">免费</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <span>✅ 每日30分钟陪伴</span>
+            <span>✅ 基础占卜（每日1次）</span>
+            <span>✅ 浏览社交广场</span>
+            <span>✅ 3位陪伴师可选</span>
+            <span style="color:#ccc;">❌ 语音消息</span>
+            <span style="color:#ccc;">❌ 礼物折扣</span>
+        </div>
+        <button style="width:100%;margin-top:16px;padding:12px;background:#f3f4f6;border:none;border-radius:12px;font-size:15px;color:#666;cursor:pointer;">当前方案</button>
+    </div>
+
+    <!-- 知心守护 -->
+    <div style="background:white;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border:2px solid #f59e0b;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:32px;">💝</span>
+                <div><h3 style="margin:0;font-size:18px;">知心守护</h3><span style="font-size:12px;color:#f59e0b;">最受欢迎 ✨</span></div>
+            </div>
+            <span style="padding:4px 10px;background:#fef3c7;color:#d97706;border-radius:8px;font-size:11px;font-weight:600;">热门</span>
+        </div>
+        <div style="margin-bottom:12px;"><span class="price" data-month="19" data-quarter="51" data-year="182" style="font-size:28px;font-weight:700;">¥19</span><span style="color:#999;font-size:14px;">/月</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <span>✅ 每日2小时陪伴</span>
+            <span>✅ 每日5次占卜</span>
+            <span>✅ 社交互动权限</span>
+            <span>✅ 10位陪伴师可选</span>
+            <span>✅ 语音消息</span>
+            <span>✅ 礼物9折优惠</span>
+        </div>
+        <button onclick="openMembershipPay('知心守护', 19, '💝')" style="width:100%;margin-top:16px;padding:12px;background:linear-gradient(135deg,#f59e0b,#fb923c);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">立即开通 💝</button>
+    </div>
+
+    <!-- 深情相守 -->
+    <div style="background:white;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="font-size:32px;">💎</span>
+            <div><h3 style="margin:0;font-size:18px;">深情相守</h3><span style="font-size:12px;color:#7c3aed;">深度陪伴体验</span></div>
+        </div>
+        <div style="margin-bottom:12px;"><span class="price" data-month="49" data-quarter="132" data-year="470" style="font-size:28px;font-weight:700;">¥49</span><span style="color:#999;font-size:14px;">/月</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <span>✅ 每日5小时陪伴</span>
+            <span>✅ 无限占卜</span>
+            <span>✅ 完整社交权限</span>
+            <span>✅ 全部陪伴师可选</span>
+            <span>✅ 无限语音消息</span>
+            <span>✅ 情感分析报告</span>
+            <span>✅ 礼物8折优惠</span>
+        </div>
+        <button onclick="openMembershipPay('深情相守', 49, '💎')" style="width:100%;margin-top:16px;padding:12px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">立即开通 💎</button>
+    </div>
+
+    <!-- 灵魂共鸣 -->
+    <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:16px;padding:20px;margin-bottom:24px;box-shadow:0 4px 16px rgba(245,158,11,0.2);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="font-size:32px;">👑</span>
+            <div><h3 style="margin:0;font-size:18px;">灵魂共鸣</h3><span style="font-size:12px;color:#b45309;">极致陪伴体验</span></div>
+        </div>
+        <div style="margin-bottom:12px;"><span class="price" data-month="99" data-quarter="267" data-year="950" style="font-size:28px;font-weight:700;">¥99</span><span style="color:#999;font-size:14px;">/月</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <span>✅ 无限时长陪伴</span>
+            <span>✅ 无限占卜 + 深度解读</span>
+            <span>✅ 专属陪伴师</span>
+            <span>✅ 优先匹配</span>
+            <span>✅ 灵魂共鸣特权</span>
+            <span>✅ 礼物7折礼遇</span>
+            <span>✅ 节日专属惊喜</span>
+        </div>
+        <button onclick="openMembershipPay('灵魂共鸣', 99, '👑')" style="width:100%;margin-top:16px;padding:12px;background:linear-gradient(135deg,#b45309,#d97706);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">尊享开通 👑</button>
+    </div>
+    </div><!-- 结束 plans-grid -->
+
+    <!-- FAQ -->
+    <h3 style="font-size:18px;margin-bottom:16px;">❓ 常见问题</h3>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
+        <div style="background:white;border-radius:12px;padding:14px;">
+            <div style="font-weight:600;margin-bottom:4px;">可以随时取消吗？</div>
+            <div style="color:#666;font-size:13px;">当然可以！随时取消，取消后当前周期内仍可使用。</div>
+        </div>
+        <div style="background:white;border-radius:12px;padding:14px;">
+            <div style="font-weight:600;margin-bottom:4px;">灵石是什么？</div>
+            <div style="color:#666;font-size:13px;">灵石是灵犀的虚拟货币，用来送礼物和享受特殊服务。1灵石≈0.1元。</div>
+        </div>
+        <div style="background:white;border-radius:12px;padding:14px;">
+            <div style="font-weight:600;margin-bottom:4px;">陪伴师是真人吗？</div>
+            <div style="color:#666;font-size:13px;">陪伴师是精心设计的AI角色，24小时在线，永远温柔以待。</div>
+        </div>
+    </div>
+</div>
+
+<!-- 支付方式选择弹窗 -->
+<div class="pay-modal" id="payMethodModal">
+    <div class="pay-modal-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h3 style="margin:0;">开通 <span id="mPlanName"></span></h3>
+            <button onclick="closePayModal()" style="background:none;border:none;font-size:24px;cursor:pointer;">×</button>
+        </div>
+        
+        <!-- 支付方式网格 -->
+        <div class="payment-grid">
+            <div class="payment-option" onclick="selectPayMethod('wechat')" id="m-pay-wechat">
+                <div class="icon">💚</div>
+                <div class="name">微信支付</div>
+                <div class="subtitle">心意即刻送达</div>
+            </div>
+            <div class="payment-option" onclick="selectPayMethod('alipay')" id="m-pay-alipay">
+                <div class="icon">💙</div>
+                <div class="name">支付宝</div>
+                <div class="subtitle">便捷支付体验</div>
+            </div>
+            <div class="payment-option" onclick="selectPayMethod('paypal')" id="m-pay-paypal">
+                <div class="icon">🅿️</div>
+                <div class="name">PayPal</div>
+                <div class="subtitle">全球支付，心意无界</div>
+            </div>
+            <div class="payment-option" onclick="selectPayMethod('sol')" id="m-pay-sol">
+                <div class="icon">🪙</div>
+                <div class="name">Sol Pay</div>
+                <div class="subtitle">用未来货币</div>
+            </div>
+            <div class="payment-option" onclick="selectPayMethod('apple')" id="m-pay-apple">
+                <div class="icon">🍎</div>
+                <div class="name">Apple Pay</div>
+                <div class="subtitle">轻轻一触</div>
+            </div>
+            <div class="payment-option" onclick="selectPayMethod('google')" id="m-pay-google">
+                <div class="icon">🤖</div>
+                <div class="name">Google Pay</div>
+                <div class="subtitle">安全快捷</div>
+            </div>
+        </div>
+        
+        <button class="pay-confirm-btn" id="mPayBtn" onclick="confirmMembershipPay()" disabled>
+            请选择支付方式
+        </button>
+    </div>
+</div>
+
+<!-- 支付详情弹窗 -->
+<div class="pay-modal" id="payDetailModal">
+    <div class="pay-modal-content" id="payDetailContent">
+        <!-- 动态内容 -->
+    </div>
+</div>
+
+<!-- 支付成功弹窗 -->
+<div class="success-overlay" id="successOverlay">
+    <div class="success-card">
+        <div class="success-check">✓</div>
+        <div class="success-title">开通成功</div>
+        <div class="success-subtitle">欢迎开启温暖陪伴之旅</div>
+        <div class="success-plan">
+            <div class="success-plan-icon" id="successIcon">💝</div>
+            <div class="success-plan-name" id="successPlan"></div>
+        </div>
+        <div class="success-hint">页面即将刷新...</div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-msg" id="mToast"></div>
+
+<script>
+var currentPeriod = 'month';
+var selectedPayMethod = null;
+var currentMembershipPlan = null;
+var currentMembershipPrice = 0;
+var currentMembershipIcon = '';
+var countdownTimer = null;
+
+// 价格方案
+var planPrices = {
+    'month': { '知心守护': 19, '深情相守': 49, '灵魂共鸣': 99 },
+    'quarter': { '知心守护': 51, '深情相守': 132, '灵魂共鸣': 267 },
+    'year': { '知心守护': 182, '深情相守': 470, '灵魂共鸣': 950 }
+};
+
+function switchPeriod(period) {
+    currentPeriod = period;
+    document.querySelectorAll('.price').forEach(function(el) {
+        var plan = el.closest('[style*="border-radius:16px"]').querySelector('h3').textContent;
+        var price = el.getAttribute('data-' + period);
+        el.textContent = '¥' + price;
+    });
+    ['month','quarter','year'].forEach(function(p) {
+        var btn = document.getElementById('btn-' + p);
+        if (p === period) {
+            btn.style.background = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+            btn.style.color = 'white';
+        } else {
+            btn.style.background = 'transparent';
+            btn.style.color = 'inherit';
+        }
+    });
+}
+
+function openMembershipPay(planName, basePrice, icon) {
+    currentMembershipPlan = planName;
+    currentMembershipIcon = icon;
+    // 根据当前选择的周期获取实际价格
+    currentMembershipPrice = planPrices[currentPeriod][planName] || basePrice;
+    
+    document.getElementById('mPlanName').textContent = planName + ' ' + currentMembershipPrice + '元';
+    
+    // 重置选择
+    selectedPayMethod = null;
+    document.querySelectorAll('.payment-option').forEach(function(el) {
+        el.classList.remove('selected');
+    });
+    document.getElementById('mPayBtn').disabled = true;
+    document.getElementById('mPayBtn').textContent = '请选择支付方式';
+    
+    document.getElementById('payMethodModal').classList.add('active');
+}
+
+function closePayModal() {
+    if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+    }
+    document.getElementById('payMethodModal').classList.remove('active');
+    document.getElementById('payDetailModal').classList.remove('active');
+}
+
+function selectPayMethod(method) {
+    selectedPayMethod = method;
+    document.querySelectorAll('.payment-option').forEach(function(el) {
+        el.classList.remove('selected');
+    });
+    document.getElementById('m-pay-' + method).classList.add('selected');
+    
+    var methodNames = {
+        'wechat': '微信支付',
+        'alipay': '支付宝',
+        'paypal': 'PayPal',
+        'sol': 'Solana Pay',
+        'apple': 'Apple Pay',
+        'google': 'Google Pay'
+    };
+    
+    document.getElementById('mPayBtn').disabled = false;
+    document.getElementById('mPayBtn').textContent = '使用 ' + methodNames[method] + ' 支付 ¥' + currentMembershipPrice;
+}
+
+function confirmMembershipPay() {
+    if (!selectedPayMethod) return;
+    
+    closePayModal();
+    
+    setTimeout(function() {
+        showPayDetail(selectedPayMethod);
+    }, 200);
+}
+
+function showPayDetail(method) {
+    var content = document.getElementById('payDetailContent');
+    var html = '';
+    
+    switch(method) {
+        case 'wechat':
+            html = getWechatDetailHTML();
+            break;
+        case 'alipay':
+            html = getAlipayDetailHTML();
+            break;
+        case 'paypal':
+            html = getPaypalDetailHTML();
+            break;
+        case 'sol':
+            html = getSolDetailHTML();
+            break;
+        case 'apple':
+            html = getAppleDetailHTML();
+            break;
+        case 'google':
+            html = getGoogleDetailHTML();
+            break;
+    }
+    
+    content.innerHTML = html;
+    document.getElementById('payDetailModal').classList.add('active');
+    
+    if (method === 'wechat' || method === 'alipay') {
+        startDetailCountdown();
+    }
+}
+
+function getWechatDetailHTML() {
+    return `
+        <button onclick="closePayModal()" style="position:absolute;top:16px;right:16px;background:#f5f5f5;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;">×</button>
+        <div style="text-align:center;margin-bottom:16px;">
+            <div style="font-size:2.5rem;margin-bottom:8px;">💚</div>
+            <div style="font-size:1.2rem;font-weight:bold;">微信支付</div>
+            <div style="color:#666;font-size:0.85rem;">扫码支付，温暖相伴</div>
+        </div>
+        <div class="order-summary">
+            <div class="order-summary-row">
+                <span class="label">会员套餐</span>
+                <span class="value">${currentMembershipPlan}</span>
+            </div>
+            <div class="order-summary-row">
+                <span class="label">支付金额</span>
+                <span class="value highlight">¥${currentMembershipPrice}</span>
+            </div>
+        </div>
+        <div class="m-wechat-qr-display">
+            <img src="/static/img/wechat_qr.jpg" alt="微信收款码" class="m-wechat-qr-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y1ZjVmNSIvPjxlbGxpcHNlIGN4PSIxMDAiIGN5PSIxMDAiIHJ4PSIxOCIgcng9IjE4IiByeT0iMTgiIGZpbGw9IiMwMGE0ZWIiLz48dGV4dCB4PSIxMDAiIHk9IjExMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7lm6TslLUnPC90ZXh0Pjwvc3ZnPg=='">
+            <div class="m-wechat-amount">¥${currentMembershipPrice}</div>
+            <div style="color:#666;font-size:0.85rem;">请使用微信扫描上方二维码</div>
+            <div class="m-wechat-reminder">💚 支付完成后点击下方按钮</div>
+        </div>
+        <div class="countdown-box">
+            <div class="countdown-label">订单有效时间</div>
+            <div class="countdown-time" id="detailCountdown">15:00</div>
+        </div>
+        <button class="pay-confirm-btn" onclick="confirmMembershipSuccess()">我已完成支付 ✓</button>
+        <p style="text-align:center;color:#999;font-size:0.75rem;margin-top:10px;">
+            如有疑问请联系客服
+        </p>
+    `;
+}
+
+function getAlipayDetailHTML() {
+    return `
+        <button onclick="closePayModal()" style="position:absolute;top:16px;right:16px;background:#f5f5f5;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;">×</button>
+        <div style="text-align:center;margin-bottom:16px;">
+            <div style="font-size:2.5rem;margin-bottom:8px;">💙</div>
+            <div style="font-size:1.2rem;font-weight:bold;">支付宝</div>
+            <div style="color:#666;font-size:0.85rem;">便捷支付体验</div>
+        </div>
+        <div class="order-summary">
+            <div class="order-summary-row">
+                <span class="label">会员套餐</span>
+                <span class="value">${currentMembershipPlan}</span>
+            </div>
+            <div class="order-summary-row">
+                <span class="label">支付金额</span>
+                <span class="value highlight">¥${currentMembershipPrice}</span>
+            </div>
+        </div>
+        <div class="m-wechat-qr-display" style="--qr-color: #1677ff;">
+            <style>
+                .m-wechat-qr-display[style*="1677ff"] .m-wechat-qr-image {
+                    border-color: #e6f4ff;
+                    box-shadow: 0 4px 16px rgba(22, 119, 255, 0.15);
+                }
+                .m-wechat-qr-display[style*="1677ff"] .m-wechat-amount {
+                    color: #1677ff;
+                }
+                .m-wechat-qr-display[style*="1677ff"] .m-wechat-reminder::before {
+                    content: '💙 ';
+                }
+            </style>
+            <img src="/static/img/alipay_qr.png" alt="支付宝收款码" class="m-wechat-qr-image" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2U2ZjRmZiIvPjxlbGxpcHNlIGN4PSIxMDAiIGN5PSIxMDAiIHJ4PSIxOCIgcng9IjE4IiByeT0iMTgiIGZpbGw9IiMwMWE0ZWIiLz48dGV4dCB4PSIxMDAiIHk9IjExMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7lk6zskJzqijwvdGV4dD48L3N2Zz4='">
+            <div class="m-wechat-amount">¥${currentMembershipPrice}</div>
+            <div style="color:#666;font-size:0.85rem;">请使用支付宝扫描上方二维码</div>
+            <div class="m-wechat-reminder">支付完成后点击下方按钮</div>
+        </div>
+        <div class="countdown-box">
+            <div class="countdown-label">订单有效时间</div>
+            <div class="countdown-time" id="detailCountdown">15:00</div>
+        </div>
+        <button class="pay-confirm-btn" onclick="confirmMembershipSuccess()">我已完成支付 ✓</button>
+        <p style="text-align:center;color:#999;font-size:0.75rem;margin-top:10px;">
+            如有疑问请联系客服
+        </p>
+    `;
+}
+
+function getPaypalDetailHTML() {
+    return `
+        <button onclick="closePayModal()" style="position:absolute;top:16px;right:16px;background:#f5f5f5;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;">×</button>
+        <div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:2.8rem;margin-bottom:8px;">🅿️</div>
+            <div style="font-size:1.3rem;font-weight:bold;">PayPal</div>
+            <div style="color:#666;font-size:0.9rem;">全球支付，心意无界</div>
+        </div>
+        <div class="order-summary">
+            <div class="order-summary-row">
+                <span class="label">会员套餐</span>
+                <span class="value">${currentMembershipPlan}</span>
+            </div>
+            <div class="order-summary-row">
+                <span class="label">支付金额</span>
+                <span class="value highlight">¥${currentMembershipPrice}</span>
+            </div>
+        </div>
+        <div style="text-align:center;padding:20px 0;">
+            <a href="https://www.paypal.com" target="_blank" style="display:inline-block;background:#0070ba;color:white;padding:12px 28px;border-radius:22px;font-size:0.95rem;font-weight:600;text-decoration:none;">
+                跳转到 PayPal 🡕
+            </a>
+            <p style="color:#999;font-size:0.8rem;margin-top:12px;">点击后在新窗口完成支付</p>
+        </div>
+        <button class="pay-confirm-btn" style="background:#4caf50;" onclick="confirmMembershipSuccess()">返回确认支付</button>
+    `;
+}
+
+function getSolDetailHTML() {
+    var solPrice = 150;
+    var solAmount = (currentMembershipPrice / solPrice).toFixed(4);
+    var walletAddr = 'SoL' + Math.random().toString(36).substring(2, 45);
+    
+    return `
+        <button onclick="closePayModal()" style="position:absolute;top:16px;right:16px;background:#f5f5f5;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;">×</button>
+        <div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:2.8rem;margin-bottom:8px;">🪙</div>
+            <div style="font-size:1.3rem;font-weight:bold;">Solana Pay</div>
+            <div style="color:#666;font-size:0.9rem;">用未来货币，表达真挚心意</div>
+        </div>
+        <div class="order-summary">
+            <div class="order-summary-row">
+                <span class="label">会员套餐</span>
+                <span class="value">${currentMembershipPlan}</span>
+            </div>
+        </div>
+        <div class="wallet-area">
+            <div class="sol-amount">${solAmount} SOL</div>
+            <div class="wallet-address">${walletAddr}</div>
+            <button class="copy-wallet-btn" id="copyWalletBtn" onclick="copyWallet('${walletAddr}')">📋 复制钱包地址</button>
+        </div>
+        <p style="text-align:center;color:#999;font-size:0.8rem;margin:16px 0;">
+            发送完成后点击确认，我们会在确认后立即开通
+        </p>
+        <button class="pay-confirm-btn" onclick="confirmMembershipSuccess()">我已发送 SOL</button>
+    `;
+}
+
+function getAppleDetailHTML() {
+    return `
+        <button onclick="closePayModal()" style="position:absolute;top:16px;right:16px;background:#f5f5f5;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;">×</button>
+        <div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:2.8rem;margin-bottom:8px;">🍎</div>
+            <div style="font-size:1.3rem;font-weight:bold;">Apple Pay</div>
+            <div style="color:#666;font-size:0.9rem;">轻轻一触，完成支付</div>
+        </div>
+        <div class="order-summary">
+            <div class="order-summary-row">
+                <span class="label">会员套餐</span>
+                <span class="value">${currentMembershipPlan}</span>
+            </div>
+            <div class="order-summary-row">
+                <span class="label">支付金额</span>
+                <span class="value highlight">¥${currentMembershipPrice}</span>
+            </div>
+        </div>
+        <div class="biometric-area">
+            <div class="biometric-icon">👆</div>
+            <div class="biometric-hint">将手指放在 Touch ID 上确认支付</div>
+            <button class="biometric-btn" onclick="confirmMembershipSuccess()">使用 Touch ID 确认</button>
+        </div>
+    `;
+}
+
+function getGoogleDetailHTML() {
+    return `
+        <button onclick="closePayModal()" style="position:absolute;top:16px;right:16px;background:#f5f5f5;border:none;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;">×</button>
+        <div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:2.8rem;margin-bottom:8px;">🤖</div>
+            <div style="font-size:1.3rem;font-weight:bold;">Google Pay</div>
+            <div style="color:#666;font-size:0.9rem;">安全快捷支付</div>
+        </div>
+        <div class="order-summary">
+            <div class="order-summary-row">
+                <span class="label">会员套餐</span>
+                <span class="value">${currentMembershipPlan}</span>
+            </div>
+            <div class="order-summary-row">
+                <span class="label">支付金额</span>
+                <span class="value highlight">¥${currentMembershipPrice}</span>
+            </div>
+        </div>
+        <div class="biometric-area">
+            <div class="biometric-icon">🔐</div>
+            <div class="biometric-hint">确认使用 Google Pay 完成支付</div>
+            <button class="biometric-btn" style="background:linear-gradient(135deg,#4285f4,#34a853);" onclick="confirmMembershipSuccess()">
+                确认支付 ¥${currentMembershipPrice}
+            </button>
+        </div>
+    `;
+}
+
+function generateQRGrid() {
+    var html = '';
+    for (var i = 0; i < 64; i++) {
+        if (Math.random() < 0.3) {
+            html += '<div class="qr-cell empty"></div>';
+        } else {
+            html += '<div class="qr-cell"></div>';
+        }
+    }
+    return html;
+}
+
+function startDetailCountdown() {
+    var minutes = 14;
+    var seconds = 59;
+    
+    var updateTimer = function() {
+        var el = document.getElementById('detailCountdown');
+        if (el) {
+            el.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        }
+        
+        if (seconds > 0) {
+            seconds--;
+        } else if (minutes > 0) {
+            minutes--;
+            seconds = 59;
+        } else {
+            clearInterval(countdownTimer);
+            showMToast('支付已超时，请重新发起支付');
+            closePayModal();
+        }
+    };
+    
+    updateTimer();
+    countdownTimer = setInterval(updateTimer, 1000);
+}
+
+function copyWallet(address) {
+    navigator.clipboard.writeText(address).then(function() {
+        var btn = document.getElementById('copyWalletBtn');
+        btn.textContent = '✓ 已复制';
+        btn.classList.add('copied');
+        setTimeout(function() {
+            btn.textContent = '📋 复制钱包地址';
+            btn.classList.remove('copied');
+        }, 2000);
+    }).catch(function() {
+        showMToast('钱包地址已复制');
+    });
+}
+
+function confirmMembershipSuccess() {
+    closePayModal();
+    
+    setTimeout(function() {
+        document.getElementById('successIcon').textContent = currentMembershipIcon;
+        document.getElementById('successPlan').textContent = currentMembershipPlan + ' · ¥' + currentMembershipPrice;
+        document.getElementById('successOverlay').classList.add('active');
+        
+        setTimeout(function() {
+            document.getElementById('successOverlay').classList.remove('active');
+            showMToast('开通成功！欢迎开启温暖陪伴');
+            setTimeout(function() {
+                location.reload();
+            }, 1000);
+        }, 2500);
+    }, 200);
+}
+
+function showMToast(msg) {
+    var t = document.getElementById('mToast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() {
+        t.classList.remove('show');
+    }, 2000);
+}
+
+// 点击外部关闭
+document.getElementById('payMethodModal').addEventListener('click', function(e) {
+    if (e.target === this) closePayModal();
+});
+
+document.getElementById('payDetailModal').addEventListener('click', function(e) {
+    if (e.target === this) closePayModal();
+});
+</script>
+
+<!-- 客服联系入口 -->
+<div style="text-align: center; padding: 30px 20px; margin-top: 20px; border-top: 1px solid var(--color-border-light);">
+    <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin-bottom: 10px;">会员相关问题？</p>
+    <a href="/contact" style="color: var(--color-primary); font-weight: 600; text-decoration: none;">
+        💬 联系客服
+    </a>
+</div>
+
+{% endblock %}

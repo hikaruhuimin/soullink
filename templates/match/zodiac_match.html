@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'zh' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}星座配对 - SoulLink{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <style>
+        :root {
+            --gradient-romantic: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            --gradient-pink: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --gradient-purple: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            --color-pink: #ff6b9d;
+            --color-pink-light: #ffc2d4;
+            --color-gold: #d4a574;
+            --color-gold-light: #f5e6d3;
+        }
+
+        body {
+            background: linear-gradient(180deg, #fff5f7 0%, #fff 100%);
+            min-height: 100vh;
+            font-family: 'Noto Sans SC', -apple-system, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: var(--gradient-romantic);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .page-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Selection Area */
+        .zodiac-selection {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(255, 107, 157, 0.1);
+            margin-bottom: 32px;
+        }
+
+        .selection-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .zodiac-selector {
+            flex: 1;
+            max-width: 280px;
+        }
+
+        .zodiac-selector label {
+            display: block;
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .zodiac-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 16px;
+            background: #fafafa;
+            border-radius: 16px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .zodiac-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .zodiac-grid::-webkit-scrollbar-thumb {
+            background: var(--color-pink-light);
+            border-radius: 3px;
+        }
+
+        .zodiac-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .zodiac-item:hover {
+            background: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.15);
+        }
+
+        .zodiac-item.selected {
+            background: white;
+            border-color: var(--color-pink);
+            box-shadow: 0 4px 16px rgba(255, 107, 157, 0.25);
+        }
+
+        .zodiac-item .emoji {
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+
+        .zodiac-item .name {
+            font-size: 0.75rem;
+            color: #333;
+        }
+
+        .heart-icon {
+            font-size: 2.5rem;
+            color: var(--color-pink);
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .match-btn {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 16px 32px;
+            background: var(--gradient-romantic);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(255, 107, 157, 0.4);
+        }
+
+        .match-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(255, 107, 157, 0.5);
+        }
+
+        .match-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Result Area */
+        .result-area {
+            display: none;
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(255, 107, 157, 0.1);
+        }
+
+        .result-area.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .result-zodiac {
+            text-align: center;
+        }
+
+        .result-zodiac .emoji {
+            font-size: 4rem;
+            margin-bottom: 8px;
+        }
+
+        .result-zodiac .name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .vs-text {
+            font-size: 1.5rem;
+            color: var(--color-pink);
+            font-weight: 600;
+        }
+
+        /* Score Section */
+        .score-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .overall-score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: var(--gradient-romantic);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .score-label {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .score-bar {
+            max-width: 400px;
+            margin: 16px auto;
+            height: 12px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            background: var(--gradient-romantic);
+            border-radius: 6px;
+            transition: width 1.5s ease;
+        }
+
+        /* Detail Scores */
+        .detail-scores {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .detail-item {
+            text-align: center;
+            padding: 20px 24px;
+            background: #fafafa;
+            border-radius: 16px;
+        }
+
+        .detail-item .score {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-pink);
+        }
+
+        .detail-item .label {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* Analysis Section */
+        .analysis-section {
+            background: var(--color-gold-light);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .analysis-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #8b6914;
+            margin-bottom: 12px;
+        }
+
+        .analysis-text {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* Advice Section */
+        .advice-section {
+            margin-bottom: 24px;
+        }
+
+        .advice-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .advice-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .advice-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .advice-item .icon {
+            width: 24px;
+            height: 24px;
+            background: var(--color-pink-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+        }
+
+        .advice-item .text {
+            color: #333;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid #eee;
+        }
+
+        .cta-text {
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .cta-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--gradient-purple);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .cta-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(168, 140, 209, 0.4);
+        }
+
+        .share-btn {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid var(--color-pink);
+            color: var(--color-pink);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .share-btn:hover {
+            background: var(--color-pink);
+            color: white;
+        }
+
+        /* Navigation Banner */
+        .nav-banner {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 12px 20px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 50px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--color-pink);
+            color: var(--color-pink);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #f0f0f0;
+            border-top-color: var(--color-pink);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .selection-row {
+                flex-direction: column;
+            }
+
+            .zodiac-selector {
+                max-width: 100%;
+            }
+
+            .zodiac-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .detail-scores {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .result-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .vs-text {
+                transform: rotate(90deg);
+            }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    {% extends "base.html" %}
+
+    {% block content %}
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">✨ 星座配对</h1>
+            <p class="page-subtitle">探索星座之间的神秘缘分</p>
+        </div>
+
+        <!-- Selection Area -->
+        <div class="zodiac-selection" id="selectionArea">
+            <div class="selection-row">
+                <!-- Zodiac 1 -->
+                <div class="zodiac-selector">
+                    <label>选择第一个星座</label>
+                    <div class="zodiac-grid" id="zodiac1Grid">
+                        <div class="zodiac-item" data-zodiac="aries">
+                            <span class="emoji">♈</span>
+                            <span class="name">白羊座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="taurus">
+                            <span class="emoji">♉</span>
+                            <span class="name">金牛座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="gemini">
+                            <span class="emoji">♊</span>
+                            <span class="name">双子座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="cancer">
+                            <span class="emoji">♋</span>
+                            <span class="name">巨蟹座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="leo">
+                            <span class="emoji">♌</span>
+                            <span class="name">狮子座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="virgo">
+                            <span class="emoji">♍</span>
+                            <span class="name">处女座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="libra">
+                            <span class="emoji">♎</span>
+                            <span class="name">天秤座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="scorpio">
+                            <span class="emoji">♏</span>
+                            <span class="name">天蝎座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="sagittarius">
+                            <span class="emoji">♐</span>
+                            <span class="name">射手座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="capricorn">
+                            <span class="emoji">♑</span>
+                            <span class="name">摩羯座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="aquarius">
+                            <span class="emoji">♒</span>
+                            <span class="name">水瓶座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="pisces">
+                            <span class="emoji">♓</span>
+                            <span class="name">双鱼座</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Heart -->
+                <div class="heart-icon">💕</div>
+
+                <!-- Zodiac 2 -->
+                <div class="zodiac-selector">
+                    <label>选择第二个星座</label>
+                    <div class="zodiac-grid" id="zodiac2Grid">
+                        <div class="zodiac-item" data-zodiac="aries">
+                            <span class="emoji">♈</span>
+                            <span class="name">白羊座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="taurus">
+                            <span class="emoji">♉</span>
+                            <span class="name">金牛座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="gemini">
+                            <span class="emoji">♊</span>
+                            <span class="name">双子座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="cancer">
+                            <span class="emoji">♋</span>
+                            <span class="name">巨蟹座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="leo">
+                            <span class="emoji">♌</span>
+                            <span class="name">狮子座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="virgo">
+                            <span class="emoji">♍</span>
+                            <span class="name">处女座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="libra">
+                            <span class="emoji">♎</span>
+                            <span class="name">天秤座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="scorpio">
+                            <span class="emoji">♏</span>
+                            <span class="name">天蝎座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="sagittarius">
+                            <span class="emoji">♐</span>
+                            <span class="name">射手座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="capricorn">
+                            <span class="emoji">♑</span>
+                            <span class="name">摩羯座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="aquarius">
+                            <span class="emoji">♒</span>
+                            <span class="name">水瓶座</span>
+                        </div>
+                        <div class="zodiac-item" data-zodiac="pisces">
+                            <span class="emoji">♓</span>
+                            <span class="name">双鱼座</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="match-btn" id="matchBtn" disabled>
+                💕 测试配对
+            </button>
+
+            <div class="nav-banner">
+                <a href="/match/matchmaker" class="nav-btn">💘 AI红娘匹配</a>
+                <a href="/match/profile/edit" class="nav-btn">👤 完善个人资料</a>
+                <a href="/divination" class="nav-btn">🔮 AI占卜</a>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>正在分析星座缘分...</p>
+        </div>
+
+        <!-- Result Area -->
+        <div class="result-area" id="resultArea">
+            <div class="result-header">
+                <div class="result-zodiac">
+                    <div class="emoji" id="zodiac1Emoji">♈</div>
+                    <div class="name" id="zodiac1Name">白羊座</div>
+                </div>
+                <div class="vs-text">×</div>
+                <div class="result-zodiac">
+                    <div class="emoji" id="zodiac2Emoji">♉</div>
+                    <div class="name" id="zodiac2Name">金牛座</div>
+                </div>
+            </div>
+
+            <div class="score-section">
+                <div class="overall-score" id="overallScore">0%</div>
+                <div class="score-label">综合匹配度</div>
+                <div class="score-bar">
+                    <div class="score-bar-fill" id="scoreBar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="detail-scores">
+                <div class="detail-item">
+                    <div class="score" id="loveScore">0</div>
+                    <div class="label">爱情匹配</div>
+                </div>
+                <div class="detail-item">
+                    <div class="score" id="careerScore">0</div>
+                    <div class="label">事业匹配</div>
+                </div>
+            </div>
+
+            <div class="analysis-section">
+                <div class="analysis-title">💜 性格互补分析</div>
+                <p class="analysis-text" id="analysisText">
+                    正在加载分析...
+                </p>
+            </div>
+
+            <div class="advice-section">
+                <div class="advice-title">💝 相处建议</div>
+                <ul class="advice-list" id="adviceList">
+                </ul>
+            </div>
+
+            <div class="cta-section">
+                <p class="cta-text">想知道谁最适合你？让AI红娘帮你匹配~</p>
+                <a href="/match/matchmaker" class="cta-link">💘 AI红娘匹配 →</a>
+                <br>
+                <button class="share-btn" onclick="shareResult()">📤 分享配对结果</button>
+            </div>
+
+            <div class="nav-banner" style="margin-top: 24px;">
+                <a href="/match/zodiac" class="nav-btn" onclick="resetSelection()">🔄 重新测试</a>
+                <a href="/match/matchmaker" class="nav-btn">💘 AI红娘匹配</a>
+                <a href="/match/profile/edit" class="nav-btn">👤 完善资料</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const ZODIAC_DATA = {
+            'aries': { emoji: '♈', name: '白羊座' },
+            'taurus': { emoji: '♉', name: '金牛座' },
+            'gemini': { emoji: '♊', name: '双子座' },
+            'cancer': { emoji: '♋', name: '巨蟹座' },
+            'leo': { emoji: '♌', name: '狮子座' },
+            'virgo': { emoji: '♍', name: '处女座' },
+            'libra': { emoji: '♎', name: '天秤座' },
+            'scorpio': { emoji: '♏', name: '天蝎座' },
+            'sagittarius': { emoji: '♐', name: '射手座' },
+            'capricorn': { emoji: '♑', name: '摩羯座' },
+            'aquarius': { emoji: '♒', name: '水瓶座' },
+            'pisces': { emoji: '♓', name: '双鱼座' }
+        };
+
+        let selectedZodiac1 = null;
+        let selectedZodiac2 = null;
+
+        // Initialize zodiac selection
+        document.querySelectorAll('#zodiac1Grid .zodiac-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('#zodiac1Grid .zodiac-item').forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                selectedZodiac1 = item.dataset.zodiac;
+                checkMatchBtn();
+            });
+        });
+
+        document.querySelectorAll('#zodiac2Grid .zodiac-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('#zodiac2Grid .zodiac-item').forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                selectedZodiac2 = item.dataset.zodiac;
+                checkMatchBtn();
+            });
+        });
+
+        function checkMatchBtn() {
+            const btn = document.getElementById('matchBtn');
+            btn.disabled = !(selectedZodiac1 && selectedZodiac2);
+        }
+
+        // Match button click
+        document.getElementById('matchBtn').addEventListener('click', async () => {
+            if (!selectedZodiac1 || !selectedZodiac2) return;
+
+            const loading = document.getElementById('loading');
+            const selection = document.getElementById('selectionArea');
+            const result = document.getElementById('resultArea');
+
+            loading.classList.add('show');
+            selection.style.display = 'none';
+            result.classList.remove('show');
+
+            try {
+                const response = await fetch('/match/api/zodiac/compatibility', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        zodiac1: selectedZodiac1,
+                        zodiac2: selectedZodiac2,
+                        lang: '{{ lang }}'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showToast(data.error);
+                    loading.classList.remove('show');
+                    selection.style.display = 'block';
+                    return;
+                }
+
+                displayResult(data);
+            } catch (error) {
+                showToast('请求失败，请重试');
+                loading.classList.remove('show');
+                selection.style.display = 'block';
+            }
+        });
+
+        function displayResult(data) {
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('resultArea');
+
+            // Update zodiac info
+            document.getElementById('zodiac1Emoji').textContent = ZODIAC_DATA[data.zodiac1].emoji;
+            document.getElementById('zodiac1Name').textContent = ZODIAC_DATA[data.zodiac1].name;
+            document.getElementById('zodiac2Emoji').textContent = ZODIAC_DATA[data.zodiac2].emoji;
+            document.getElementById('zodiac2Name').textContent = ZODIAC_DATA[data.zodiac2].name;
+
+            // Update scores
+            document.getElementById('overallScore').textContent = data.overall + '%';
+            document.getElementById('loveScore').textContent = data.love;
+            document.getElementById('careerScore').textContent = data.career;
+
+            // Animate score bar
+            setTimeout(() => {
+                document.getElementById('scoreBar').style.width = data.overall + '%';
+            }, 100);
+
+            // Update analysis
+            document.getElementById('analysisText').textContent = data.analysis;
+
+            // Update advice
+            const adviceList = document.getElementById('adviceList');
+            adviceList.innerHTML = data.advice.map((advice, index) => `
+                <li class="advice-item">
+                    <span class="icon">${index + 1}</span>
+                    <span class="text">${advice}</span>
+                </li>
+            `).join('');
+
+            loading.classList.remove('show');
+            result.classList.add('show');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function resetSelection() {
+            selectedZodiac1 = null;
+            selectedZodiac2 = null;
+            document.querySelectorAll('.zodiac-item').forEach(i => i.classList.remove('selected'));
+            document.getElementById('matchBtn').disabled = true;
+            document.getElementById('scoreBar').style.width = '0%';
+        }
+
+        function shareResult() {
+            const text = `我在SoulLink测试了星座配对：${ZODIAC_DATA[selectedZodiac1].name} × ${ZODIAC_DATA[selectedZodiac2].name}，匹配度高达${document.getElementById('overallScore').textContent}！快来测试你的星座缘分吧~ 💕`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: '星座配对',
+                    text: text,
+                    url: window.location.origin + '/match/zodiac'
+                });
+            } else {
+                navigator.clipboard.writeText(text + ' ' + window.location.origin + '/match/zodiac');
+                showToast('已复制到剪贴板！');
+            }
+        }
+    </script>
+    {% endblock %}
+</body>
+</html>

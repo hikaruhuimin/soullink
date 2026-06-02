@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'zh' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ profile_user.username }} - SoulLink{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <style>
+        :root {
+            --gradient-romantic: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            --gradient-pink: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --gradient-purple: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            --color-pink: #ff6b9d;
+            --color-pink-light: #ffc2d4;
+            --color-gold: #d4a574;
+        }
+
+        body {
+            background: linear-gradient(180deg, #fef0f3 0%, #fff 100%);
+            min-height: 100vh;
+            font-family: 'Noto Sans SC', -apple-system, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(255, 107, 157, 0.1);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--gradient-pink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            margin: 0 auto 24px;
+            overflow: hidden;
+            border: 4px solid white;
+            box-shadow: 0 8px 24px rgba(255, 107, 157, 0.3);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .profile-tags {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .profile-tag {
+            padding: 8px 16px;
+            background: var(--color-pink-light);
+            color: var(--color-pink);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Bio Section */
+        .bio-section {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .bio-text {
+            color: #666;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        /* Interests Section */
+        .interests-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .interests-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .interest-tag {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid var(--color-pink-light);
+            color: var(--color-pink);
+            border-radius: 50px;
+            font-size: 0.85rem;
+        }
+
+        /* Looking For Section */
+        .looking-for-section {
+            background: var(--color-pink-light);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .looking-for-title {
+            font-size: 0.875rem;
+            color: var(--color-pink);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .looking-for-text {
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Match Score */
+        .match-score-section {
+            background: var(--gradient-romantic);
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 32px;
+            color: white;
+        }
+
+        .match-score-title {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .match-score-value {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .match-score-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .like-btn {
+            flex: 1;
+            padding: 16px;
+            background: var(--gradient-romantic);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .like-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 24px rgba(255, 107, 157, 0.4);
+        }
+
+        .like-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .like-btn.liked {
+            background: #ccc;
+        }
+
+        .back-btn {
+            flex: 1;
+            padding: 16px;
+            background: white;
+            color: var(--color-pink);
+            border: 2px solid var(--color-pink);
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--color-pink);
+            color: white;
+        }
+
+        /* Match Success Modal */
+        .match-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .match-modal.show {
+            display: flex;
+        }
+
+        .match-modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 48px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: bounceIn 0.5s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .match-modal-icon {
+            font-size: 5rem;
+            margin-bottom: 16px;
+        }
+
+        .match-modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-pink);
+            margin-bottom: 12px;
+        }
+
+        .match-modal-text {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .match-modal-btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background: var(--gradient-romantic);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        /* Privacy Notice */
+        .privacy-notice {
+            margin-top: 32px;
+            padding: 16px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .privacy-notice p {
+            color: #999;
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .profile-card {
+                padding: 24px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% extends "base.html" %}
+
+    {% block content %}
+    <div class="container">
+        <div class="profile-card">
+            <!-- Avatar -->
+            <div class="profile-avatar">
+                {% if profile_user.avatar %}
+                <img src="{{ profile_user.avatar }}" alt="{{ profile_user.username }}">
+                {% else %}
+                {{ profile_user.username[0] }}
+                {% endif %}
+            </div>
+
+            <!-- Name & Tags -->
+            <h1 class="profile-name">{{ profile_user.username }}</h1>
+            <div class="profile-tags">
+                {% if profile_user.mbti %}
+                <span class="profile-tag">{{ profile_user.mbti }}</span>
+                {% endif %}
+                {% if profile_user.zodiac_sign %}
+                <span class="profile-tag">{{ profile_user.zodiac_sign }}</span>
+                {% endif %}
+                {% if profile_user.gender %}
+                <span class="profile-tag">
+                    {% if profile_user.gender == 'male' %}👨 男{% else %}👩 女{% endif %}
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Bio -->
+            {% if profile_user.bio %}
+            <div class="bio-section">
+                <p class="bio-text">{{ profile_user.bio }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Interests -->
+            {% if profile_user.interests %}
+            <div class="interests-section">
+                <h3 class="section-title">💫 兴趣标签</h3>
+                <div class="interests-list">
+                    {% for interest in profile_user.interests.split(',') %}
+                    <span class="interest-tag">{{ interest.strip() }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Looking For -->
+            {% if profile_user.looking_for %}
+            <div class="looking-for-section">
+                <div class="looking-for-title">💝 TA在期待这样的TA</div>
+                <p class="looking-for-text">{{ profile_user.looking_for }}</p>
+            </div>
+            {% endif %}
+
+            {% if current_user.is_authenticated and current_user.id != profile_user.id %}
+            <!-- Match Score -->
+            {% if match_score is defined and match_score %}
+            <div class="match-score-section">
+                <div class="match-score-title">💕 你们之间的缘分</div>
+                <div class="match-score-value">{{ match_score }}%</div>
+                <div class="match-score-label">综合匹配度</div>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="action-buttons">
+                <button class="like-btn" id="likeBtn" onclick="sendLike({{ profile_user.id }})">
+                    💕 心动
+                </button>
+                <a href="/match/matchmaker" class="back-btn">返回匹配</a>
+            </div>
+            {% elif current_user.id == profile_user.id %}
+            <a href="/match/profile/edit" class="like-btn" style="display: block;">
+                ✏️ 编辑资料
+            </a>
+            {% else %}
+            <a href="/auth/login?next=/match/profile/{{ profile_user.username }}" class="like-btn" style="display: block;">
+                🔐 登录后心动
+            </a>
+            {% endif %}
+
+            <!-- Privacy Notice -->
+            <div class="privacy-notice">
+                <p>🔒 为保护用户隐私，联系方式不对外显示</p>
+                <p>互相心动后才能开始聊天</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Success Modal -->
+    <div class="match-modal" id="matchModal">
+        <div class="match-modal-content">
+            <div class="match-modal-icon">🎉</div>
+            <h2 class="match-modal-title">配对成功!</h2>
+            <p class="match-modal-text">你们互相心动了！快去打个招呼吧~</p>
+            <a href="/chat" class="match-modal-btn">💬 开始聊天</a>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let hasLiked = false;
+
+        async function sendLike(userId) {
+            if (hasLiked) {
+                showToast('已经心动过了~');
+                return;
+            }
+
+            try {
+                const response = await fetch('/match/api/like', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ to_user_id: userId })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showToast(data.error);
+                    return;
+                }
+
+                hasLiked = true;
+                const btn = document.getElementById('likeBtn');
+                btn.disabled = true;
+                btn.classList.add('liked');
+                btn.innerHTML = '✓ 已心动';
+
+                if (data.is_match) {
+                    document.getElementById('matchModal').classList.add('show');
+                } else {
+                    showToast('心动已发送 💕 期待TA也心动画~');
+                }
+            } catch (error) {
+                showToast('请求失败，请重试');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+    {% endblock %}
+</body>
+</html>

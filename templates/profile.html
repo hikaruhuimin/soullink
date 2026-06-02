@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}个人资料 - SoulLink 灵犀{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <!-- 用户信息卡片 -->
+    <div class="profile-header">
+        <div class="avatar-section">
+            <div class="avatar-large">{{ user.username[0] }}</div>
+            {% if user.is_vip %}
+            <span class="vip-badge">VIP</span>
+            {% endif %}
+        </div>
+        
+        <div class="profile-info">
+            <h1 class="profile-name">{{ user.username }}</h1>
+            <p class="profile-email">{{ user.email }}</p>
+            
+            {% if user.bio %}
+            <p class="profile-bio">{{ user.bio }}</p>
+            {% endif %}
+        </div>
+        
+        <button class="btn btn-outline btn-sm" id="editProfileBtn">
+            <span>✏️</span> 编辑资料
+        </button>
+    </div>
+    
+    <!-- 统计数据 -->
+    <div class="profile-stats">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_divinations }}</div>
+            <div class="stat-label">总占卜次数</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ 3 - today_count }}</div>
+            <div class="stat-label">今日剩余</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ favorites|length }}</div>
+            <div class="stat-label">收藏数</div>
+        </div>
+    </div>
+    
+    <!-- 基本信息 -->
+    <div class="profile-section">
+        <h2 class="section-title">
+            <span class="title-icon">👤</span>
+            基本信息
+        </h2>
+        
+        <div class="info-list">
+            <div class="info-item">
+                <span class="info-label">性别</span>
+                <span class="info-value">{{ user.gender or '未设置' }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">出生日期</span>
+                <span class="info-value">{{ user.birth_date.strftime('%Y-%m-%d') if user.birth_date else '未设置' }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">出生时间</span>
+                <span class="info-value">{{ user.birth_time or '未设置' }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">出生地点</span>
+                <span class="info-value">{{ user.birth_place or '未设置' }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">语言偏好</span>
+                <span class="info-value">
+                    {% if user.language == 'zh' %}中文
+                    {% elif user.language == 'en' %}English
+                    {% elif user.language == 'ja' %}日本語
+                    {% else %}中文{% endif %}
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">注册时间</span>
+                <span class="info-value">{{ user.created_at.strftime('%Y-%m-%d') }}</span>
+            </div>
+        </div>
+        
+        <p class="info-hint">
+            💡 设置出生信息后，星盘分析和八字简批将自动填充
+        </p>
+    </div>
+    
+    <!-- VIP状态 -->
+    {% if user.is_vip %}
+    <div class="profile-section vip-section">
+        <div class="vip-header">
+            <span class="vip-icon">👑</span>
+            <div class="vip-info">
+                <h3>VIP会员</h3>
+                <p>有效期至：{{ user.vip_expire_date.strftime('%Y-%m-%d') if user.vip_expire_date else '永久' }}</p>
+            </div>
+        </div>
+        <div class="vip-benefits">
+            <span class="benefit-tag">无限占卜</span>
+            <span class="benefit-tag">深度解读</span>
+            <span class="benefit-tag">专属客服</span>
+        </div>
+    </div>
+    {% else %}
+    <div class="profile-section upgrade-section">
+        <h2 class="section-title">
+            <span class="title-icon">👑</span>
+            升级VIP
+        </h2>
+        <p class="upgrade-desc">解锁全部功能，无限占卜次数</p>
+        <a href="/upgrade" class="btn btn-primary">
+            立即升级
+        </a>
+    </div>
+    {% endif %}
+    
+    <!-- 收藏记录 -->
+    {% if favorites %}
+    <div class="profile-section">
+        <h2 class="section-title">
+            <span class="title-icon">❤️</span>
+            我的收藏
+        </h2>
+        
+        <div class="favorites-list">
+            {% for fav in favorites %}
+            <a href="/divination/result/{{ fav.divination_id }}" class="favorite-item">
+                <div class="favorite-icon">
+                    {% if fav.divination.divination_type == 'tarot' %}🃏
+                    {% elif fav.divination.divination_type == 'horoscope' %}⭐
+                    {% elif fav.divination.divination_type == 'love' %}💕
+                    {% else %}🔮{% endif %}
+                </div>
+                <div class="favorite-content">
+                    <h4>{{ fav.divination.result_title }}</h4>
+                    <p>{{ fav.divination.created_at.strftime('%Y-%m-%d') }}</p>
+                </div>
+                <span class="favorite-arrow">→</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- 设置 -->
+    <div class="profile-section">
+        <h2 class="section-title">
+            <span class="title-icon">⚙️</span>
+            设置
+        </h2>
+        
+        <div class="settings-list">
+            <a href="#" class="setting-item" id="changePasswordBtn">
+                <span class="setting-icon">🔑</span>
+                <span class="setting-text">修改密码</span>
+                <span class="setting-arrow">→</span>
+            </a>
+            <a href="#" class="setting-item" id="changeLangBtn">
+                <span class="setting-icon">🌐</span>
+                <span class="setting-text">切换语言</span>
+                <span class="setting-arrow">→</span>
+            </a>
+            <a href="/privacy" class="setting-item">
+                <span class="setting-icon">🔒</span>
+                <span class="setting-text">隐私政策</span>
+                <span class="setting-arrow">→</span>
+            </a>
+            <a href="/auth/logout" class="setting-item logout">
+                <span class="setting-icon">🚪</span>
+                <span class="setting-text">退出登录</span>
+                <span class="setting-arrow">→</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑资料弹窗 -->
+<div class="modal" id="editProfileModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>编辑资料</h3>
+            <button class="modal-close" onclick="closeModal('editProfileModal')">×</button>
+        </div>
+        
+        <form id="editProfileForm">
+            <div class="form-group">
+                <label>用户名</label>
+                <input type="text" name="username" value="{{ user.username }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>个人简介</label>
+                <textarea name="bio" rows="3" placeholder="介绍一下自己...">{{ user.bio or '' }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>性别</label>
+                <select name="gender">
+                    <option value="">请选择</option>
+                    <option value="male" {% if user.gender == 'male' %}selected{% endif %}>男</option>
+                    <option value="female" {% if user.gender == 'female' %}selected{% endif %}>女</option>
+                    <option value="other" {% if user.gender == 'other' %}selected{% endif %}>其他</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>出生日期</label>
+                <input type="date" name="birth_date" value="{{ user.birth_date.strftime('%Y-%m-%d') if user.birth_date else '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label>出生时间</label>
+                <input type="time" name="birth_time" value="{{ user.birth_time or '12:00' }}">
+            </div>
+            
+            <div class="form-group">
+                <label>出生地点</label>
+                <input type="text" name="birth_place" value="{{ user.birth_place or '' }}" placeholder="如：上海">
+            </div>
+            
+            <div class="form-group">
+                <label>语言偏好</label>
+                <select name="language">
+                    <option value="zh" {% if user.language == 'zh' %}selected{% endif %}>中文</option>
+                    <option value="en" {% if user.language == 'en' %}selected{% endif %}>English</option>
+                    <option value="ja" {% if user.language == 'ja' %}selected{% endif %}>日本語</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">保存</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('editProfileBtn').addEventListener('click', function() {
+    openModal('editProfileModal');
+});
+
+document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+    
+    fetch('/profile/edit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast('资料已更新', 'success');
+            closeModal('editProfileModal');
+            location.reload();
+        } else {
+            showToast(data.message || '更新失败', 'error');
+        }
+    });
+});
+
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+</script>
+{% endblock %}

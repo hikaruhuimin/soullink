@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'zh' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SoulLink Admin - Statistics</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#F5F3F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#333;min-height:100vh}
+.nav{background:#fff;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,0.05);position:sticky;top:0;z-index:100}
+.nav h1{font-size:18px;color:#6B5B7B}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav a{color:#8B5E83;text-decoration:none;font-size:14px;padding:6px 12px;border-radius:6px;transition:all .2s}
+.nav a:hover{background:#F5F3F0}
+.lang-select{display:flex;gap:4px}
+.lang-select a{padding:4px 8px;font-size:12px;border-radius:4px;color:#B8A9C9}
+.lang-select a.active{background:#8B5E83;color:#fff}
+.container{max-width:1200px;margin:24px auto;padding:0 24px}
+.section{background:#fff;border-radius:16px;padding:24px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+.section h2{font-size:16px;color:#6B5B7B;margin-bottom:20px;font-weight:600}
+.chart-container{height:250px;display:flex;align-items:flex-end;gap:6px;padding:16px 0}
+.bar{flex:1;background:linear-gradient(180deg,#B8A9C9,#D4C4D8);border-radius:4px 4px 0 0;min-height:4px;position:relative;transition:all .3s}
+.bar:hover{background:linear-gradient(180deg,#8B5E83,#A880A0)}
+.bar .value{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:#6B5B7B;font-weight:600}
+.bar .label{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);font-size:9px;color:#B8A9C9;white-space:nowrap}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px}
+.stat-box{background:linear-gradient(135deg,#FAF8F5,#F5F3F0);border-radius:12px;padding:20px;text-align:center}
+.stat-box .num{font-size:28px;font-weight:700;color:#6B5B7B}
+.stat-box .label{font-size:12px;color:#B8A9C9;margin-top:4px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:24px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:10px 12px;color:#B8A9C9;border-bottom:2px solid #F0EDEA;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+td{padding:10px 12px;border-bottom:1px solid #F0EDEA}
+tr:hover td{background:#FAF8F5}
+tr:last-child td{border-bottom:none}
+.rank{font-weight:700;color:#8B5E83;min-width:30px}
+.empty-state{text-align:center;padding:32px;color:#B8A9C9;font-size:14px}
+.pie-container{display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+.pie-chart{width:180px;height:180px;border-radius:50%;position:relative;background:conic-gradient(#8B5E83 0% 25%,#B8A9C9 25% 50%,#D4C4D8 50% 75%,#F0E6F6 75% 100%)}
+.legend{display:flex;flex-direction:column;gap:12px}
+.legend-item{display:flex;align-items:center;gap:8px}
+.legend-dot{width:12px;height:12px;border-radius:50%}
+.legend-label{font-size:13px;color:#666}
+.legend-value{font-weight:600;color:#6B5B7B;margin-left:auto}
+@media(max-width:768px){.container{padding:0 16px}.nav{padding:12px 16px}.grid-2{grid-template-columns:1fr}.pie-container{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="nav">
+<h1>🧿 SoulLink Admin</h1>
+<div class="nav-right">
+<div class="lang-select">
+<a href="?lang=zh" class="{% if lang=='zh' %}active{% endif %}">中文</a>
+<a href="?lang=en" class="{% if lang=='en' %}active{% endif %}">EN</a>
+<a href="?lang=ja" class="{% if lang=='ja' %}active{% endif %}">JA</a>
+</div>
+<a href="/admin">Dashboard</a>
+<a href="/admin/users">Users</a>
+<a href="/admin/stats">Stats</a>
+<a href="/admin/settings">Settings</a>
+<a href="/admin/logout" style="color:#c62828">Logout</a>
+</div>
+</div>
+<div class="container">
+<div class="section">
+<h2>📊 Registration Trend (Last 30 Days)</h2>
+<div class="chart-container">
+{% set max_count = registration_trend|max(attribute='count') %}
+{% for item in registration_trend %}
+<div class="bar" style="height:{{ (item.count / (max_count + 1) * 220)|round }}px">
+<span class="value">{{ item.count }}</span>
+<span class="label">{{ item.date }}</span>
+</div>
+{% endfor %}
+</div>
+</div>
+<div class="section">
+<h2>👥 User Growth Summary</h2>
+<div class="stats-grid">
+<div class="stat-box">
+<div class="num">{{ vip_distribution.free + vip_distribution.basic + vip_distribution.premium + vip_distribution.guardian }}</div>
+<div class="label">Total Users</div>
+</div>
+<div class="stat-box">
+<div class="num">{{ vip_distribution.free }}</div>
+<div class="label">Free Users</div>
+</div>
+<div class="stat-box">
+<div class="num">{{ vip_distribution.basic + vip_distribution.premium }}</div>
+<div class="label">VIP Users</div>
+</div>
+<div class="stat-box">
+<div class="num">{{ (vip_distribution.basic + vip_distribution.premium * 2) / ((vip_distribution.free + vip_distribution.basic + vip_distribution.premium + 1) * 1) * 100)|round(1) }}%</div>
+<div class="label">VIP Rate</div>
+</div>
+</div>
+</div>
+<div class="section">
+<h2>📈 VIP Distribution</h2>
+<div class="pie-container">
+<div class="pie-chart"></div>
+<div class="legend">
+<div class="legend-item">
+<span class="legend-dot" style="background:#8B5E83"></span>
+<span class="legend-label">Premium VIP</span>
+<span class="legend-value">{{ vip_distribution.premium }}</span>
+</div>
+<div class="legend-item">
+<span class="legend-dot" style="background:#B8A9C9"></span>
+<span class="legend-label">Basic VIP</span>
+<span class="legend-value">{{ vip_distribution.basic }}</span>
+</div>
+<div class="legend-item">
+<span class="legend-dot" style="background:#D4C4D8"></span>
+<span class="legend-label">Guardian</span>
+<span class="legend-value">{{ vip_distribution.guardian }}</span>
+</div>
+<div class="legend-item">
+<span class="legend-dot" style="background:#F0E6F6"></span>
+<span class="legend-label">Free</span>
+<span class="legend-value">{{ vip_distribution.free }}</span>
+</div>
+</div>
+</div>
+</div>
+<div class="grid-2">
+<div class="section">
+<h2>💰 Top Spenders (Spirit Stones)</h2>
+{% if top_spenders %}
+<table>
+<thead><tr><th>#</th><th>Username</th><th>Total Spent</th></tr></thead>
+<tbody>
+{% for s in top_spenders %}
+<tr>
+<td class="rank">{{ loop.index }}</td>
+<td>{{ s.username }}</td>
+<td>{{ s.total }} stones</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% else %}
+<div class="empty-state">No spending data available</div>
+{% endif %}
+</div>
+<div class="section">
+<h2>👥 Top Inviters</h2>
+{% if top_inviters %}
+<table>
+<thead><tr><th>#</th><th>Username</th><th>Invited</th></tr></thead>
+<tbody>
+{% for s in top_inviters %}
+<tr>
+<td class="rank">{{ loop.index }}</td>
+<td>{{ s.username }}</td>
+<td>{{ s.invite_count }} users</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% else %}
+<div class="empty-state">No invitation data available</div>
+{% endif %}
+</div>
+</div>
+<div class="section">
+<h2>📱 Daily Active Users (Last 7 Days)</h2>
+<div class="chart-container">
+{% set max_active = daily_active|max(attribute='count') %}
+{% for item in daily_active %}
+<div class="bar" style="height:{{ (item.count / (max_active + 1) * 220)|round }}px">
+<span class="value">{{ item.count }}</span>
+<span class="label">{{ item.date }}</span>
+</div>
+{% endfor %}
+</div>
+</div>
+</div>
+</body>
+</html>
